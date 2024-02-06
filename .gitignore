@@ -5,6 +5,7 @@ build.ps1
 Ignore/*
 .vs/*
 .vscode/*
+.gitignore
 Examples/Output/*
 Examples/Logs/*
 Releases/*
