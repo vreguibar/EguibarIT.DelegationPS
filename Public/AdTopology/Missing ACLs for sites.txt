@@ -1,0 +1,14 @@
+﻿
+
+
+
+
+<#
+    DistinguishedName      : CN=NetServices,CN=Services,CN=Configuration,DC=test,DC=local
+    ActiveDirectoryRightst : CreateChild, DeleteChild
+    AccessControlType      : Allow
+    ObjectType             : dHCPClass [ClassSchema]
+    InheritanceType        : All
+    InheritedObjectType    : GuidNULL
+    IsInherited            : False
+#>
