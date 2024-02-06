@@ -3,7 +3,7 @@
         .Synopsis
             Nice display PsBoundParameters
         .DESCRIPTION
-
+            This function formats and displays the PsBoundParameters hashtable in a visually appealing way for Verbose output.
         .EXAMPLE
             Set-FunctionDisplay $PsBoundParameters
         .EXAMPLE
@@ -12,10 +12,6 @@
             Hashtable variable from calling function containing PsBoundParameters to format accordingly
         .PARAMETER TabCount
             Amount of Tabs to be used on the formatting.
-        .NOTES
-            Used Functions:
-                Name                                   | Module
-                ---------------------------------------|--------------------------
         .NOTES
             Version:         1.0
             DateModified:    20/Oct/2022
@@ -44,31 +40,37 @@
     )
 
     Begin {
-        If(($null -eq $PsBoundParameters['TabCount']) -or
-            ($PsBoundParameters['TabCount'] -lt 1)
-        ) {
-            $TabCount = 4
+
+        $NewLine = [System.Environment]::NewLine
+        $HorizontalTab = "`t"
+
+        # Validate TabCount and set default if needed
+        if ($TabCount -lt 2) {
+            $TabCount = 2
         }
     } # end Begin
 
     Process {
 
         # Display PSBoundparameters formatted nicely for Verbose output
-        # Get hashtable formated properly
-        [string]$pb = ($HashTable | Format-Table -AutoSize | Out-String).TrimEnd()
 
-        # Add a new line
-        $Display = $Constants.NL
+        $display = $NewLine
 
-        # Add corresponding tab's and new lines to each table member
-        $Display += $($pb.split($($Constants.NL)).Foreach({"$($Constants.HTab*$TabCount)$_"}) | Out-String)
+        # Validate if HashTable is not empty
+        if ($HashTable.Count -gt 0) {
+            # Get hashtable formatted properly
+            $pb = $HashTable | Format-Table -AutoSize | Out-String
 
-        # Add a new line
-        $Display += $Constants.NL
+            # Add corresponding tabs and new lines to each table member
+            $display += $pb -split $NewLine | ForEach-Object { "$($HorizontalTab * $TabCount)$_" } | Out-String
+        } else {
+            $display = 'No PsBoundParameters to display.'
+        } #end If
+        $display += $NewLine
 
     } # end Process
 
     End {
-        Return $Display
+        Return $display
     } #end END
 } #end Function

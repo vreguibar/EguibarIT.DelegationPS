@@ -53,21 +53,20 @@ function Set-AclConstructor4 {
     param (
         # PARAM1 STRING for the Delegated Identity
         # An IdentityReference object that identifies the trustee of the access rule.
-        [Parameter(Mandatory=$true, ValueFromPipeline=$True, ValueFromPipelineByPropertyName=$True, ValueFromRemainingArguments=$false,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
             HelpMessage = 'SamAccountName of the Delegated Group. An IdentityReference object that identifies the trustee of the access rule.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [Alias('IdentityReference','Identity','Trustee','GroupID')]
-        [String]
+        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID', 'Group')]
         $Id,
 
         # PARAM2 STRING for the object's LDAP path
         # The LDAP path to the object where the ACL will be changed
-        [Parameter(Mandatory=$true, ValueFromPipeline=$True, ValueFromPipelineByPropertyName=$True, ValueFromRemainingArguments=$false,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
             HelpMessage = 'Distinguished (DN) Name of the object. The LDAP path to the object where the ACL will be changed.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
-        [Alias('DN','DistinguishedName')]
+        [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath,
 
@@ -76,7 +75,8 @@ function Set-AclConstructor4 {
             HelpMessage = 'Active Directory Right',
             Position = 2)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet('CreateChild', 'DeleteChild', 'Delete', 'DeleteTree', 'ExtendedRight', 'GenericAll', 'GenericExecute', 'GenericRead', 'GenericWrite', 'ListChildren', 'ListObject', 'ReadControl', 'ReadProperty', 'Self', 'Synchronize', 'WriteDacl', 'WriteOwner', 'WriteProperty')]
+        [ValidateSet([ActiveDirectoryRights], ErrorMessage = "Value '{0}' is invalid. Try one of: {1}")]
+        #[ValidateSet('CreateChild', 'DeleteChild', 'Delete', 'DeleteTree', 'ExtendedRight', 'GenericAll', 'GenericExecute', 'GenericRead', 'GenericWrite', 'ListChildren', 'ListObject', 'ReadControl', 'ReadProperty', 'Self', 'Synchronize', 'WriteDacl', 'WriteOwner', 'WriteProperty')]
         [Alias('ActiveDirectoryRights')]
         [String[]]
         $AdRight,
@@ -130,14 +130,17 @@ function Set-AclConstructor4 {
 
     Process {
         # Collect the SID for the trustee we will be delegating to
-        $groupObject = Get-ADGroup -Identity $PSBoundParameters['Id']
+        If (-not ($PSBoundParameters['Id'] -is [Microsoft.ActiveDirectory.Management.AdGroup])) {
+            $GroupObject = Get-AdObjectType -Identity $PSBoundParameters['Id']
+        }
+        #$groupObject = Get-ADGroup -Identity $PSBoundParameters['Id']
 
         # Check if Identity is a WellKnownSID
         # If identity is NOT a WellKnownSID, the function will translate to existing Object SID.
         # WellKnownSid function will return null if SID is not well known.
         $IsWellKnownSid = Get-AdWellKnownSid -Sid $groupObject.SID
 
-        If(-not $IsWellKnownSid) {
+        If (-not $IsWellKnownSid) {
             # translate to existing Object SID
             $groupSID = New-Object -TypeName System.Security.Principal.SecurityIdentifier -ArgumentList $groupObject.SID
         } else {
@@ -146,7 +149,10 @@ function Set-AclConstructor4 {
 
         try {
             #Get a reference to the Object we want to delegate
-            $object = Get-ADObject -Identity $PSBoundParameters['LDAPPath']
+            If (Test-IsValidDN -ObjectDN $PSBoundParameters['LDAPPath']) {
+                $object = Get-ADObject -Identity $PSBoundParameters['LDAPPath']
+            }
+
 
             #Get a copy of the current DACL on the object
             $acl = Get-Acl -Path ($object.DistinguishedName)
@@ -176,11 +182,14 @@ function Set-AclConstructor4 {
                 # Action when FALSE is ADD
                 #Create an Access Control Entry for new permission we wish to add
                 $null = $acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
-            }
+            } #end If-Else
 
             #Re-apply the modified DACL to the OU
             Set-Acl -AclObject $acl -Path ('AD:\{0}' -f $object.DistinguishedName)
-        } Catch { throw  }
+        } Catch {
+            Get-CurrentErrorToDisplay -CurrentError $error[0]
+            throw
+        } #end Try-Catch
     } #end Process
 
     End {

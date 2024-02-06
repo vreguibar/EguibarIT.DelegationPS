@@ -116,7 +116,7 @@
             # RequireLicenseAcceptance = $false
 
             # External dependent modules of this module
-            ExternalModuleDependencies = @('ActiveDirectory', 'GroupPolicy', 'ServerManager', 'EguibarIT.Delegation')
+            ExternalModuleDependencies = @('ActiveDirectory', 'GroupPolicy', 'ServerManager', 'EguibarIT.DelegationPS')
 
         } # End of PSData hashtable
 
