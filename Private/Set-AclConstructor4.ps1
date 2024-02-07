@@ -2,35 +2,49 @@
 
 function Set-AclConstructor4 {
     <#
-        .Synopsis
-            Helper function calling the AdAccessRule constructor using the corresponding 4 attributes
+        .SYNOPSIS
+        Modifies ACLs on Active Directory objects.
+
+        .DESCRIPTION
+            This function adds or removes access rules to an Active Directory object using a constructor with four parameters to specify the access rule details.
+
+        .PARAMETER Id
+            Specifies the SamAccountName of the delegated group or user. This is the identity for which the access rule will be modified.
+
+        .PARAMETER LDAPPath
+            Specifies the LDAP path of the target Active Directory object.
+
+        .PARAMETER AdRight
+            Specifies the Active Directory rights. Valid options include CreateChild, DeleteChild, and others.
+
+        .PARAMETER AccessControlType
+            Specifies whether the access control is to Allow or Deny.
+
+        .PARAMETER ObjectType
+            Specifies the object type GUID. Use for specific property access or extended rights.
+
+        .PARAMETER RemoveRule
+            If specified, the access rule will be removed. If omitted, the access rule will be added.
+
         .EXAMPLE
-            Set-AclConstructor4 -Id "SG_SiteAdmins_XXXX" `
-            -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local" `
-            -AdRight "CreateChild,DeleteChild" `
-            -AccessControlType "Allow" `
-            -ObjectType 12345678-abcd-1234-abcd-0123456789012
+            Set-AclConstructor4 -Id "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local" -AdRight "CreateChild,DeleteChild" -AccessControlType "Allow" -ObjectType "12345678-abcd-1234-abcd-0123456789012"
+
         .EXAMPLE
             $splat = @{
-                Id                = "SG_SiteAdmins_XXXX" `
-                LDAPPath          = "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local" `
-                AdRight           = "CreateChild,DeleteChild" `
-                AccessControlType = "Allow" `
+                Id                = "SG_SiteAdmins_XXXX"
+                LDAPPath          = "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
+                AdRight           = "CreateChild,DeleteChild"
+                AccessControlType = "Allow"
                 ObjectType        = "12345678-abcd-1234-abcd-0123456789012"
             }
-            Set-AclConstructor4 @Splat
-        .PARAMETER ID
-            [String] Identity of the Delegated Group
-        .PARAMETER LDAPPath
-            [String] Distinguished Name of the object
-        .PARAMETER AdRight
-            [String] Active Directory Rights
-        .PARAMETER AccessControlType
-            [String] Allow or Deny access to the given object
-        .PARAMETER ObjectType
-            [GUID] of the object
-        .PARAMETER RemoveRule
-            [Switch] togle between ADD or REMOVE the rule
+            Set-AclConstructor4 @splat
+
+        .INPUTS
+            String, GUID
+
+        .OUTPUTS
+            None. Modifies Active Directory object ACLs.
+
         .NOTES
             Used Functions:
                 Name                                   | Module
@@ -75,8 +89,9 @@ function Set-AclConstructor4 {
             HelpMessage = 'Active Directory Right',
             Position = 2)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet([ActiveDirectoryRights], ErrorMessage = "Value '{0}' is invalid. Try one of: {1}")]
+        #[ValidateScript({ [ActiveDirectoryRights]::new().GetValidValues().Contains($_) })]
         #[ValidateSet('CreateChild', 'DeleteChild', 'Delete', 'DeleteTree', 'ExtendedRight', 'GenericAll', 'GenericExecute', 'GenericRead', 'GenericWrite', 'ListChildren', 'ListObject', 'ReadControl', 'ReadProperty', 'Self', 'Synchronize', 'WriteDacl', 'WriteOwner', 'WriteProperty')]
+        [ValidateSet([ActiveDirectoryRights], ErrorMessage = "Value '{0}' is invalid. Try one of: {1}")]
         [Alias('ActiveDirectoryRights')]
         [String[]]
         $AdRight,
@@ -177,11 +192,14 @@ function Set-AclConstructor4 {
             If ($PSBoundParameters['RemoveRule']) {
                 # Action when TRUE is REMOVE
                 #Create an Access Control Entry for new permission we wish to remove
-                $null = $acl.RemoveAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
+                [void]$acl.RemoveAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
+                Write-Verbose -Message ('Removed access rule from {0}' -f $objectDN.DistinguishedName)
+
             } else {
                 # Action when FALSE is ADD
                 #Create an Access Control Entry for new permission we wish to add
-                $null = $acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
+                [void]$acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
+                Write-Verbose -Message ('Added access rule to {0}' -f $objectDN.DistinguishedName)
             } #end If-Else
 
             #Re-apply the modified DACL to the OU
