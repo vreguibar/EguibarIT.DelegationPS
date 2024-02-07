@@ -1,7 +1,7 @@
 ﻿class ActiveDirectoryRights : System.Management.Automation.IValidateSetValuesGenerator {
     [String[]] GetValidValues() {
 
-        $Script:ActiveDirectoryRights = @(
+        $ActiveDirectoryRights = @(
             'AccessSystemSecurity',
             'CreateChild',
             'DeleteChild',
@@ -22,7 +22,7 @@
             'WriteOwner',
             'WriteProperty'
         )
-        return $Script:ActiveDirectoryRights
+        return $ActiveDirectoryRights
     }
 } #end Class
 # [ValidateSet([ActiveDirectoryRights],ErrorMessage="Value '{0}' is invalid. Try one of: {1}")]

@@ -47,7 +47,7 @@
             HelpMessage = 'Distinguished Name of the object',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [Alias('DN','DistinguishedName')]
+        [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath,
 
@@ -55,25 +55,37 @@
         [Parameter(Mandatory = $False, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'The identity to filter ACE',
             Position = 1)]
-        [Alias('IdentityReference','Identity','Trustee','GroupID')]
+        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         [String]
         $SearchBy
     )
     Begin {
-        Import-Module -name ActiveDirectory -Verbose:$false
-        Import-Module -name EguibarIT.Delegation -Verbose:$false
+
+        $error.clear()
+
+        Write-Verbose -Message '|=> ************************************************************************ <=|'
+        Write-Verbose -Message (Get-Date).ToShortDateString()
+        Write-Verbose -Message ('  Starting: {0}' -f $MyInvocation.Mycommand)
+        Write-Verbose -Message ('Parameters used by the function... {0}' -f (Set-FunctionDisplay $PsBoundParameters -Verbose:$False))
+
+        ##############################
+        # Variables Definition
+
+        Import-Module -Name ActiveDirectory -Verbose:$false
 
         Set-Location -Path AD:\
 
-        $result = @()
+        #$result = @()
+        $result = [System.Collections.ArrayList]::New()
+
     } #end Begin
     Process {
-        If($PSBoundParameters['searchBy']) {
+        If ($PSBoundParameters['searchBy']) {
             $AclAccess = Get-Acl -Path $PSBoundParameters['LDAPpath'] |
-                Select-Object -ExpandProperty Access |
-                    Where-Object -FilterScript {
-                        $_.IdentityReference -match $PSBoundParameters['searchBy']
-                    }
+            Select-Object -ExpandProperty Access |
+            Where-Object -FilterScript {
+                $_.IdentityReference -match $PSBoundParameters['searchBy']
+            }
 
             Write-Verbose -Message ('{0}    ACE (Access Control Entry)  Filtered By: {1}' -f $Constants.NL, $PSBoundParameters['searchBy'])
 
@@ -87,7 +99,7 @@
         Write-Verbose -Message '------------------------------------------------------------'
 
         $AceCount = 1
-        foreach($entry in $AclAccess) {
+        foreach ($entry in $AclAccess) {
 
             $ACLResult = [PSCustomObject]@{
                 ACENumber             = $AceCount
@@ -100,12 +112,19 @@
                 InheritedObjectType   = (Convert-GUIDToName -guid $entry.InheritedObjectType -Verbose:$false)
                 IsInherited           = $entry.IsInherited
             }
-            $result += $ACLResult
+            #$result += $ACLResult
+            [void]$result.Add($ACLResult)
 
             $AceCount++
         } #end Foreach
     } #end Process
+
     End {
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished creating central OU."
+        Write-Verbose -Message ''
+        Write-Verbose -Message '-------------------------------------------------------------------------------'
+        Write-Verbose -Message ''
+
         Set-Location -Path $env:HOMEDRIVE\
 
         Return $result

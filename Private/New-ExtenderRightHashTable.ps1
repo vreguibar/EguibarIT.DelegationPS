@@ -30,8 +30,8 @@ Function New-ExtenderRightHashTable {
     Process {
         try {
             If ( ($null -eq $Variables.ExtendedRightsMap) -and
-                 ($Variables.ExtendedRightsMap -ne 0)     -and
-                 ($Variables.ExtendedRightsMap -ne '')    -and
+                 ($Variables.ExtendedRightsMap -ne 0) -and
+                 ($Variables.ExtendedRightsMap -ne '') -and
                  (   ($Variables.ExtendedRightsMap -isnot [array]) -or
                      ($Variables.ExtendedRightsMap.Length -ne 0)) -and
                  ($Variables.ExtendedRightsMap -ne $false)
@@ -44,13 +44,15 @@ Function New-ExtenderRightHashTable {
                     Properties = 'DisplayName', 'rightsGuid'
                 }
                 $AllExtended = Get-ADObject @Splat
-                    ForEach($Item in $AllExtended) {
-                        $TmpMap.Add($Item.displayName, [system.guid]$Item.rightsGuid)
-                    }
+                ForEach ($Item in $AllExtended) {
+                    $TmpMap.Add($Item.displayName, [system.guid]$Item.rightsGuid)
+                }
                 # Include "ALL [nullGUID]"
-                $TmpMap.Add([System.GUID]'00000000-0000-0000-0000-000000000000', 'All')
+                $TmpMap.Add('All', [System.GUID]'00000000-0000-0000-0000-000000000000')
             } #end If
-        } catch { throw }
+        } catch {
+            throw 
+        }
 
         $Variables.ExtendedRightsMap = $TmpMap
     } #end Process

@@ -1,3 +1,5 @@
+using module .\Classes\Class.ActiveDirectoryRights.ps1
+
 #Get public and private function definition files.
 $Classes = @( Get-ChildItem -Path $PSScriptRoot\Classes\*.ps1 -ErrorAction SilentlyContinue -Recurse )
 $Enums = @( Get-ChildItem -Path $PSScriptRoot\Enums\*.ps1 -ErrorAction SilentlyContinue -Recurse )
