@@ -75,7 +75,6 @@
 
         Set-Location -Path AD:\
 
-        #$result = @()
         $result = [System.Collections.ArrayList]::New()
 
     } #end Begin
@@ -112,7 +111,6 @@
                 InheritedObjectType   = (Convert-GUIDToName -guid $entry.InheritedObjectType -Verbose:$false)
                 IsInherited           = $entry.IsInherited
             }
-            #$result += $ACLResult
             [void]$result.Add($ACLResult)
 
             $AceCount++
