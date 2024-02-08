@@ -269,7 +269,7 @@
             Write-Verbose 'Attempting to set ACL 5 for permissions...'
             $Splat = @{
                 Id                = $PSBoundParameters['Group']
-                LDAPPath          = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.
+                LDAPPath          = 'CN=Sites,{0}' -f $Variables.configurationNamingContext
                 AdRight           = 'WriteDacl'
                 AccessControlType = 'Allow'
                 ObjectType        = $Variables.GuidMap['nTDSDSA']
