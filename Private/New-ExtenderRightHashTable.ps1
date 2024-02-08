@@ -15,20 +15,30 @@ Function New-ExtenderRightHashTable {
                 Eguibar Information Technology S.L.
                 http://www.eguibarit.com
     #>
-    [CmdletBinding(ConfirmImpact = 'Low')]
+    [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'Low')]
     [OutputType([System.Collections.Hashtable])]
 
     Param()
 
     Begin {
+        $error.clear()
+
+        Write-Verbose -Message '|=> ************************************************************************ <=|'
+        Write-Verbose -Message (Get-Date).ToShortDateString()
+        Write-Verbose -Message ('  Starting: {0}' -f $MyInvocation.Mycommand)
+        Write-Verbose -Message ('This function does not uses any Parameter' )
+
         ##############################
         # Variables Definition
-        $TmpMap = @{}
+
+        [hashtable]$TmpMap = [hashtable]::New()
+        [hashtable]$Splat = [hashtable]::New()
 
     } #end Begin
 
     Process {
         try {
+
             If ( ($null -eq $Variables.ExtendedRightsMap) -and
                  ($Variables.ExtendedRightsMap -ne 0) -and
                  ($Variables.ExtendedRightsMap -ne '') -and
@@ -39,11 +49,12 @@ Function New-ExtenderRightHashTable {
 
                 # store the GUID value of each extended right in the forest
                 $Splat = @{
-                    SearchBase = $Variables.configurationNamingContext
-                    LDAPFilter = '(&(objectclass=controlAccessRight)(rightsguid=*))'
+                    SearchBase = ('CN=Extended-Rights,{0}' -f $Variables.configurationNamingContext)
+                    LDAPFilter = '(objectclass=controlAccessRight)'
                     Properties = 'DisplayName', 'rightsGuid'
                 }
                 $AllExtended = Get-ADObject @Splat
+
                 ForEach ($Item in $AllExtended) {
                     $TmpMap.Add($Item.displayName, [system.guid]$Item.rightsGuid)
                 }
@@ -51,12 +62,20 @@ Function New-ExtenderRightHashTable {
                 $TmpMap.Add('All', [System.GUID]'00000000-0000-0000-0000-000000000000')
             } #end If
         } catch {
-            throw 
-        }
+            Get-CurrentErrorToDisplay -CurrentError $error[0]
+        } #end Try-Catch
 
-        $Variables.ExtendedRightsMap = $TmpMap
+
     } #end Process
 
     End {
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding members to the group."
+        Write-Verbose -Message ''
+        Write-Verbose -Message '--------------------------------------------------------------------------------'
+        Write-Verbose -Message ''
+
+        $Variables.ExtendedRightsMap = $TmpMap
+
+        Return $Variables.ExtendedRightsMap
     } #end END
 }

@@ -3,40 +3,52 @@
         .Synopsis
             The function will delegate the premission for a group to
             Create and Delete Sites
+
         .DESCRIPTION
-            Long description
+            This function delegates or removes permissions for a specified
+            group to create and delete Active Directory Sites within the domain.
+
         .EXAMPLE
             Set-AdAclCreateDeleteSite -Group "SG_SiteAdmins_XXXX"
+
         .EXAMPLE
             Set-AdAclCreateDeleteSite -Group "SG_SiteAdmins_XXXX" -RemoveRule
+
         .PARAMETER Group
-            [STRING] for the Delegated Group Name
+            Specifies the name of the group to delegate permissions to.
+
         .PARAMETER RemoveRule
-            [SWITCH] If present, the access rule will be removed
+            If specified, the function will remove the delegated permissions from the group.
+
         .NOTES
             Used Functions:
                 Name                                   | Module
                 ---------------------------------------|--------------------------
-                Set-AclConstructor4                    | EguibarIT.Delegation
+                Set-AclConstructor4                    | EguibarIT.DelegationPS
                 Set-AclConstructor5                    | EguibarIT.Delegation
                 Set-AclConstructor6                    | EguibarIT.Delegation
-                New-GuidObjectHashTable                | EguibarIT.Delegation
+                Get-AttributeSchemaHashTable           | EguibarIT.Delegation
+                New-ExtenderRightHashTable             | EguibarIT.Delegation
+                Get-CurrentErrorToDisplay              | EguibarIT.DelegationPS
+
         .NOTES
-            Version:         1.1
-            DateModified:    17/Oct/2016
+            Version:         1.2
+            DateModified:    8/Feb/2024
             LasModifiedBy:   Vicente Rodriguez Eguibar
                 vicente@eguibar.com
                 Eguibar Information Technology S.L.
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([void])]
+
     param (
         # PARAM1 STRING for the Delegated Group Name
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Group Name which will get the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [Alias('IdentityReference','Identity','Trustee','GroupID')]
+        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         [String]
         $Group,
 
@@ -48,29 +60,48 @@
         [Switch]
         $RemoveRule
     )
+
     begin {
         Write-Verbose -Message '|=> ************************************************************************ <=|'
         Write-Verbose -Message (Get-Date).ToShortDateString()
         Write-Verbose -Message ('  Starting: {0}' -f $MyInvocation.Mycommand)
         Write-Verbose -Message ('Parameters used by the function... {0}' -f (Set-FunctionDisplay $PsBoundParameters -Verbose:$False))
 
+        Import-Module ActiveDirectory -Verbose:$false
+
         ##############################
         # Variables Definition
-        $parameters     = $null
+        [hashtable]$Splat = [hashtable]::New()
 
+        # Check and fill GuidMap variable
         If ( ($null -eq $Variables.GuidMap) -and
-                 ($Variables.GuidMap -ne 0)     -and
-                 ($Variables.GuidMap -ne '')    -and
+                 ($Variables.GuidMap -ne 0) -and
+                 ($Variables.GuidMap -ne '') -and
                  (   ($Variables.GuidMap -isnot [array]) -or
                      ($Variables.GuidMap.Length -ne 0)) -and
                  ($Variables.GuidMap -ne $false)
-            ) {
+        ) {
             # $Variables.GuidMap is empty. Call function to fill it up
             Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
-            New-GuidObjectHashTable
+            Get-AttributeSchemaHashTable
+        } #end If
+
+        # Check and fill ExtendedRightsMap variable
+        If ( ($null -eq $Variables.ExtendedRightsMap) -and
+                 ($Variables.ExtendedRightsMap -ne 0) -and
+                 ($Variables.ExtendedRightsMap -ne '') -and
+                 (   ($Variables.ExtendedRightsMap -isnot [array]) -or
+                     ($Variables.ExtendedRightsMap.Length -ne 0)) -and
+                 ($Variables.ExtendedRightsMap -ne $false)
+        ) {
+            Write-Verbose -Message 'Variable $Variables.ExtendedRightsMap is empty. Calling function to fill it up.'
+            New-ExtenderRightHashTable
         }
+
     } #end Begin
+
     process {
+
         <#
             ACE number: 1
             --------------------------------------------------------
@@ -82,21 +113,32 @@
                 InheritedObjectType : site [ClassSchema]
                         IsInherited = False
         #>
-        $parameters = @{
-            Id                    = $PSBoundParameters['Group']
-            LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
-            AdRight               = 'CreateChild', 'DeleteChild'
-            AccessControlType     = 'Allow'
-            ObjectType            = $Constants.guidNull
-            AdSecurityInheritance = 'Descendents'
-            InheritedObjectType   = $Variables.GuidMap['site']
-        }
-        # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor6 @parameters
+        try {
+            Write-Verbose 'Attempting to set ACL 1 for permissions...'
+            $Splat = @{
+                Id                    = $PSBoundParameters['Group']
+                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext
+                AdRight               = 'CreateChild', 'DeleteChild'
+                AccessControlType     = 'Allow'
+                ObjectType            = $Constants.guidNull
+                AdSecurityInheritance = 'Descendents'
+                InheritedObjectType   = $Variables.GuidMap['site']
+            }
+            # Check if RemoveRule switch is present.
+            If ($PSBoundParameters['RemoveRule']) {
+                # Add the parameter to remove the rule
+                if ($PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
+                    $Splat.Add('RemoveRule', $true)
+                }
+            }
+            if ($PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
+                Set-AclConstructor6 @Splat
+            }
+        } Catch {
+            Get-CurrentErrorToDisplay -CurrentError $error[0]
+        } #end Try-Catch
+
+
 
         <#
             ACE number: 2
@@ -109,20 +151,32 @@
                 InheritedObjectType : GuidNULL
                         IsInherited = False
         #>
-        $parameters = @{
-            Id                    = $PSBoundParameters['Group']
-            LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
-            AdRight               = 'CreateChild', 'DeleteChild'
-            AccessControlType     = 'Allow'
-            ObjectType            = $Variables.GuidMap['site']
-            AdSecurityInheritance = 'All'
-        }
-        # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
+        try {
+            Write-Verbose 'Attempting to set ACL 2 for permissions...'
+            $Splat = @{
+                Id                    = $PSBoundParameters['Group']
+                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext
+                AdRight               = 'CreateChild', 'DeleteChild'
+                AccessControlType     = 'Allow'
+                ObjectType            = $Variables.GuidMap['site']
+                AdSecurityInheritance = 'All'
+            }
+            # Check if RemoveRule switch is present.
+            If ($PSBoundParameters['RemoveRule']) {
+                if ($PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
+
+                    # Add the parameter to remove the rule
+                    $Splat.Add('RemoveRule', $true)
+                }
+            }
+            if ($PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
+                Set-AclConstructor5 @Splat
+            }
+        } Catch {
+            Get-CurrentErrorToDisplay -CurrentError $error[0]
+        } #end Try-Catch
+
+
 
         <#
             ACE number: 3
@@ -135,21 +189,33 @@
                 InheritedObjectType : site [ClassSchema]
                         IsInherited = False
         #>
-        $parameters = @{
-            Id                    = $PSBoundParameters['Group']
-            LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
-            AdRight               = 'CreateChild', 'DeleteChild'
-            AccessControlType     = 'Allow'
-            ObjectType            = $Variables.GuidMap['nTDSSiteSettings']
-            AdSecurityInheritance = 'Descendents'
-            InheritedObjectType   = $Variables.GuidMap['site']
-        }
-        # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor6 @parameters
+        try {
+            Write-Verbose 'Attempting to set ACL 3 for permissions...'
+            $Splat = @{
+                Id                    = $PSBoundParameters['Group']
+                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
+                AdRight               = 'CreateChild', 'DeleteChild'
+                AccessControlType     = 'Allow'
+                ObjectType            = $Variables.GuidMap['nTDSSiteSettings']
+                AdSecurityInheritance = 'Descendents'
+                InheritedObjectType   = $Variables.GuidMap['site']
+            }
+            # Check if RemoveRule switch is present.
+            If ($PSBoundParameters['RemoveRule']) {
+                if ($PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
+
+                    # Add the parameter to remove the rule
+                    $Splat.Add('RemoveRule', $true)
+                }
+            }
+            if ($PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
+                Set-AclConstructor6 @Splat
+            }
+        } Catch {
+            Get-CurrentErrorToDisplay -CurrentError $error[0]
+        } #end Try-Catch
+
+
 
         <#
             ACE number: 4
@@ -162,20 +228,30 @@
                 InheritedObjectType : GuidNULL
                         IsInherited = False
         #>
-        $parameters = @{
-            Id                    = $PSBoundParameters['Group']
-            LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
-            AdRight               = 'CreateChild', 'DeleteChild'
-            AccessControlType     = 'Allow'
-            ObjectType            = $Variables.GuidMap['nTDSDSA']
-            AdSecurityInheritance = 'Descendents'
-        }
-        # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
+        try {
+            Write-Verbose 'Attempting to set ACL 4 for permissions...'
+            $Splat = @{
+                Id                    = $PSBoundParameters['Group']
+                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
+                AdRight               = 'CreateChild', 'DeleteChild'
+                AccessControlType     = 'Allow'
+                ObjectType            = $Variables.GuidMap['nTDSDSA']
+                AdSecurityInheritance = 'Descendents'
+            }
+            # Check if RemoveRule switch is present.
+            If ($PSBoundParameters['RemoveRule']) {
+                if ($PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
+
+                    # Add the parameter to remove the rule
+                    $Splat.Add('RemoveRule', $true)
+                }
+            }
+            if ($PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
+                Set-AclConstructor5 @Splat
+            }
+        } Catch {
+            Get-CurrentErrorToDisplay -CurrentError $error[0]
+        } #end Try-Catch
 
 
         <#
@@ -189,19 +265,31 @@
                 InheritedObjectType : GuidNULL
                         IsInherited = False
         #>
-        $parameters = @{
-            Id                    = $PSBoundParameters['Group']
-            LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
-            AdRight               = 'WriteDacl'
-            AccessControlType     = 'Allow'
-            ObjectType            = $Variables.GuidMap['nTDSDSA']
-        }
-        # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor4 @parameters
+        try {
+            Write-Verbose 'Attempting to set ACL 5 for permissions...'
+            $Splat = @{
+                Id                = $PSBoundParameters['Group']
+                LDAPPath          = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
+                AdRight           = 'WriteDacl'
+                AccessControlType = 'Allow'
+                ObjectType        = $Variables.GuidMap['nTDSDSA']
+            }
+            # Check if RemoveRule switch is present.
+            If ($PSBoundParameters['RemoveRule']) {
+                if ($PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
+
+                    # Add the parameter to remove the rule
+                    $Splat.Add('RemoveRule', $true)
+                }
+            }
+            if ($PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
+                Set-AclConstructor4 @Splat
+            }
+        } Catch {
+            Get-CurrentErrorToDisplay -CurrentError $error[0]
+        } #end Try-Catch
+
+
 
         <#
             ACE number: 6
@@ -214,20 +302,32 @@
                 InheritedObjectType : GuidNULL
                         IsInherited = False
         #>
-        $parameters = @{
-            Id                    = $PSBoundParameters['Group']
-            LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
-            AdRight               = 'CreateChild', 'DeleteChild'
-            AccessControlType     = 'Allow'
-            ObjectType            = $Variables.GuidMap['server']
-            AdSecurityInheritance = 'Descendents'
-        }
-        # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
+        try {
+            Write-Verbose 'Attempting to set ACL 6 for permissions...'
+            $Splat = @{
+                Id                    = $PSBoundParameters['Group']
+                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
+                AdRight               = 'CreateChild', 'DeleteChild'
+                AccessControlType     = 'Allow'
+                ObjectType            = $Variables.GuidMap['server']
+                AdSecurityInheritance = 'Descendents'
+            }
+            # Check if RemoveRule switch is present.
+            If ($PSBoundParameters['RemoveRule']) {
+                if ($PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
+
+                    # Add the parameter to remove the rule
+                    $Splat.Add('RemoveRule', $true)
+                }
+            }
+            if ($PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
+                Set-AclConstructor5 @Splat
+            }
+        } Catch {
+            Get-CurrentErrorToDisplay -CurrentError $error[0]
+        } #end Try-Catch
+
+
 
         <#
 
@@ -241,20 +341,32 @@
                 InheritedObjectType : GuidNULL
                         IsInherited = False
         #>
-        $parameters = @{
-            Id                    = $PSBoundParameters['Group']
-            LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
-            AdRight               = 'CreateChild', 'DeleteChild'
-            AccessControlType     = 'Allow'
-            ObjectType            = $Variables.GuidMap['nTDSConnection']
-            AdSecurityInheritance = 'Descendents'
-        }
-        # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
+        try {
+            Write-Verbose 'Attempting to set ACL 7 for permissions...'
+            $Splat = @{
+                Id                    = $PSBoundParameters['Group']
+                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
+                AdRight               = 'CreateChild', 'DeleteChild'
+                AccessControlType     = 'Allow'
+                ObjectType            = $Variables.GuidMap['nTDSConnection']
+                AdSecurityInheritance = 'Descendents'
+            }
+            # Check if RemoveRule switch is present.
+            If ($PSBoundParameters['RemoveRule']) {
+                if ($PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
+
+                    # Add the parameter to remove the rule
+                    $Splat.Add('RemoveRule', $true)
+                }
+            }
+            if ($PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
+                Set-AclConstructor5 @Splat
+            }
+        } Catch {
+            Get-CurrentErrorToDisplay -CurrentError $error[0]
+        } #end Try-Catch
+
+
 
         <#
             ACE number: 8
@@ -267,21 +379,31 @@
             InheritedObjectType    : serversContainer [ClassSchema]
             IsInherited            = False
         #>
-        $parameters = @{
-            Id                    = $PSBoundParameters['Group']
-            LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
-            AdRight               = 'GenericAll'
-            AccessControlType     = 'Allow'
-            InheritedObjectType   = $Variables.GuidMap['serversContainer']
-            ObjectType            = $Constants.guidNull
-            AdSecurityInheritance = 'Descendents'
-        }
-        # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor6 @parameters
+        try {
+            Write-Verbose 'Attempting to set ACL 8 for permissions...'
+            $Splat = @{
+                Id                    = $PSBoundParameters['Group']
+                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
+                AdRight               = 'GenericAll'
+                AccessControlType     = 'Allow'
+                InheritedObjectType   = $Variables.GuidMap['serversContainer']
+                ObjectType            = $Constants.guidNull
+                AdSecurityInheritance = 'Descendents'
+            }
+            # Check if RemoveRule switch is present.
+            If ($PSBoundParameters['RemoveRule']) {
+                if ($PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
+
+                    # Add the parameter to remove the rule
+                    $Splat.Add('RemoveRule', $true)
+                }
+            }
+            if ($PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
+                Set-AclConstructor6 @Splat
+            }
+        } Catch {
+            Get-CurrentErrorToDisplay -CurrentError $error[0]
+        } #end Try-Catch
 
         <#
             ACE number: 9
@@ -294,24 +416,35 @@
              InheritedObjectType    : msDNS-ServerSettings [ClassSchema]
              IsInherited            = False
         #>
-        $parameters = @{
-            Id                    = $PSBoundParameters['Group']
-            LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
-            AdRight               = 'GenericAll'
-            AccessControlType     = 'Allow'
-            InheritedObjectType   = $Variables.GuidMap['msDNS-ServerSettings']
-            ObjectType            = $Constants.guidNull
-            AdSecurityInheritance = 'Descendents'
-        }
-        # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor6 @parameters
+        try {
+            Write-Verbose 'Attempting to set ACL 9 for permissions...'
+            $Splat = @{
+                Id                    = $PSBoundParameters['Group']
+                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
+                AdRight               = 'GenericAll'
+                AccessControlType     = 'Allow'
+                InheritedObjectType   = $Variables.GuidMap['msDNS-ServerSettings']
+                ObjectType            = $Constants.guidNull
+                AdSecurityInheritance = 'Descendents'
+            }
+            # Check if RemoveRule switch is present.
+            If ($PSBoundParameters['RemoveRule']) {
+                if ($PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
+
+                    # Add the parameter to remove the rule
+                    $Splat.Add('RemoveRule', $true)
+                }
+            }
+            if ($PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
+                Set-AclConstructor6 @Splat
+            }
+        } Catch {
+            Get-CurrentErrorToDisplay -CurrentError $error[0]
+        } #end Try-Catch
 
 
     } #end Process
+
     end {
         Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished."
         Write-Verbose -Message ''
