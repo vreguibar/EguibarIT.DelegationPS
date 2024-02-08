@@ -1,7 +1,7 @@
-# Constructor W/5 attributes https://msdn.microsoft.com/en-us/library/cawwkf0x.aspx
+﻿# Constructor W/5 attributes https://msdn.microsoft.com/en-us/library/cawwkf0x.aspx
 
 function Set-AclConstructor5 {
-  <#
+    <#
     .Synopsis
       Helper function calling the AdAccessRule constructor using the corresponding 5 attributes
     .EXAMPLE
@@ -42,161 +42,160 @@ function Set-AclConstructor5 {
         Eguibar Information Technology S.L.
         http://www.eguibarit.com
   #>
-  [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'Low')]
+    [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'Low')]
+    [OutputType([void])]
 
-  param (
-    # PARAM1 STRING for the Delegated Identity
-    # An IdentityReference object that identifies the trustee of the access rule.
-    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
-        HelpMessage = 'Identity of the Delegated Group',
-        Position = 0)]
-    [ValidateNotNullOrEmpty()]
-    [Alias('IdentityReference','Identity','Trustee','GroupID')]
-    [String]
-    $Id,
+    param (
+        # PARAM1 STRING for the Delegated Identity
+        # An IdentityReference object that identifies the trustee of the access rule.
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Identity of the Delegated Group',
+            Position = 0)]
+        [ValidateNotNullOrEmpty()]
+        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
+        [String]
+        $Id,
 
-    # PARAM2 STRING for the object's LDAP path
-    # The LDAP path to the object where the ACL will be changed
-    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
-        HelpMessage = 'Distinguished Name of the object',
-        Position = 1)]
-    [ValidateNotNullOrEmpty()]
-    [Alias('DN','DistinguishedName')]
-    [String]
-    $LDAPpath,
+        # PARAM2 STRING for the object's LDAP path
+        # The LDAP path to the object where the ACL will be changed
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Distinguished Name of the object',
+            Position = 1)]
+        [ValidateNotNullOrEmpty()]
+        [Alias('DN', 'DistinguishedName')]
+        [String]
+        $LDAPpath,
 
-    # PARAM3 STRING representing AdRight
-    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
-        HelpMessage = 'Active Directory Right',
-        Position = 2)]
-    [ValidateNotNullOrEmpty()]
-    [ValidateSet('CreateChild', 'DeleteChild', 'Delete', 'DeleteTree', 'ExtendedRight', 'GenericAll', 'GenericExecute', 'GenericRead', 'GenericWrite', 'ListChildren', 'ListObject', 'ReadControl', 'ReadProperty', 'Self', 'Synchronize', 'WriteDacl', 'WriteOwner', 'WriteProperty')]
-    [Alias('ActiveDirectoryRights')]
-    [String[]]
-    $AdRight,
+        # PARAM3 STRING representing AdRight
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Active Directory Right',
+            Position = 2)]
+        [ValidateNotNullOrEmpty()]
+        #[ValidateScript({ [ActiveDirectoryRights]::new().GetValidValues().Contains($_) })]
+        #[ValidateSet('CreateChild', 'DeleteChild', 'Delete', 'DeleteTree', 'ExtendedRight', 'GenericAll', 'GenericExecute', 'GenericRead', 'GenericWrite', 'ListChildren', 'ListObject', 'ReadControl', 'ReadProperty', 'Self', 'Synchronize', 'WriteDacl', 'WriteOwner', 'WriteProperty')]
+        [ValidateSet([ActiveDirectoryRights])]
+        [Alias('ActiveDirectoryRights')]
+        [String[]]
+        $AdRight,
 
-    # PARAM4 STRING representing Access Control Type
-    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
-        HelpMessage = 'Allow or Deny access to the given object',
-        Position = 3)]
-    [ValidateSet('Allow', 'Deny')]
-    [String]
-    $AccessControlType,
+        # PARAM4 STRING representing Access Control Type
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Allow or Deny access to the given object',
+            Position = 3)]
+        [ValidateSet('Allow', 'Deny')]
+        [String]
+        $AccessControlType,
 
-    # PARAM5 STRING representing Object GUID
-    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
-        HelpMessage = 'GUID of the object',
-        Position = 4)]
-    [AllowNull()]
-    [Guid]
-    $ObjectType,
+        # PARAM5 STRING representing Object GUID
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'GUID of the object',
+            Position = 4)]
+        [AllowNull()]
+        [Guid]
+        $ObjectType,
 
-    # PARAM6 STRING representing ActiveDirectory Security Inheritance
-    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
-        HelpMessage = 'Security inheritance of the new right (All, Children, Descendents, None, SelfAndChildren)',
-        Position = 5)]
-    [ValidateSet('All', 'Children', 'Descendents', 'None', 'SelfAndChildren')]
-    [Alias('InheritanceType','ActiveDirectorySecurityInheritance')]
-    [String]
-    $AdSecurityInheritance,
+        # PARAM6 STRING representing ActiveDirectory Security Inheritance
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Security inheritance of the new right (All, Children, Descendents, None, SelfAndChildren)',
+            Position = 5)]
+        [ValidateSet('All', 'Children', 'Descendents', 'None', 'SelfAndChildren')]
+        [Alias('InheritanceType', 'ActiveDirectorySecurityInheritance')]
+        [String]
+        $AdSecurityInheritance,
 
-    # PARAM7 SWITCH if $false (default) will add the rule. If $true, it will remove the rule
-    [Parameter(Mandatory = $False, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
-        HelpMessage = 'If present, the access rule will be removed.',
-        Position = 6)]
-    [Switch]
-    $RemoveRule
-  )
+        # PARAM7 SWITCH if $false (default) will add the rule. If $true, it will remove the rule
+        [Parameter(Mandatory = $False, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'If present, the access rule will be removed.',
+            Position = 6)]
+        [Switch]
+        $RemoveRule
+    )
 
-  Begin {
-    Write-Verbose -Message '|=> ************************************************************************ <=|'
-    Write-Verbose -Message (Get-Date).ToShortDateString()
-    Write-Verbose -Message ('  Starting: {0}' -f $MyInvocation.Mycommand)
-    Write-Verbose -Message ('Parameters used by the function... {0}' -f (Set-FunctionDisplay $PsBoundParameters -Verbose:$False))
+    Begin {
+        Write-Verbose -Message '|=> ************************************************************************ <=|'
+        Write-Verbose -Message (Get-Date).ToShortDateString()
+        Write-Verbose -Message ('  Starting: {0}' -f $MyInvocation.Mycommand)
+        Write-Verbose -Message ('Parameters used by the function... {0}' -f (Set-FunctionDisplay $PsBoundParameters -Verbose:$False))
 
-    ##############################
-    # Variables Definition
+        ##############################
+        # Variables Definition
 
+        $groupObject, $groupSID, $acl, $Arg1, $Arg2, $Arg3, $Arg4, $Arg5, $RuleArguments = $null
 
+        Set-Location -Path AD:\
+    } #end Begin
 
+    Process {
 
-    $groupObject, $groupSID, $acl, $Arg1, $Arg2, $Arg3, $Arg4, $Arg5, $RuleArguments = $null
+        try {
 
-    # Check if the guidmap variable is empty and fill it if required
-    #New-GuidObjectHashTable
+            Switch ($PSBoundParameters['ID']) {
+                'EVERYONE' {
+                    $groupSID = New-Object -TypeName System.Security.Principal.SecurityIdentifier -ArgumentList ('S-1-1-0')
+                }
+                'SELF' {
+                    $groupSID = New-Object -TypeName System.Security.Principal.SecurityIdentifier -ArgumentList ('S-1-5-10')
+                }
+                'AUTHENTICATED USERS' {
+                    $groupSID = New-Object -TypeName System.Security.Principal.SecurityIdentifier -ArgumentList ('S-1-5-11')
+                }
+                default {
+                    # Collect the SID for the trustee we will be delegating to
+                    $groupObject = Get-ADGroup -Identity $PSBoundParameters['Id']
+                    $groupSID = New-Object -TypeName System.Security.Principal.SecurityIdentifier -ArgumentList $groupObject.SID
+                }
 
-    # Check if the guidmap variable is empty and fill it if required
-    #New-ExtenderRightHashTable
+            } #end Switch
 
-    Set-Location -Path AD:\
-  } #end Begin
+            #Get a reference to the Object we want to delegate
+            $object = Get-ADObject -Identity $PSBoundParameters['LDAPPath']
 
-  Process {
-    try {
-      Switch($PSBoundParameters['ID']) {
-        'EVERYONE' {
-          $groupSID = New-Object -TypeName System.Security.Principal.SecurityIdentifier -ArgumentList ('S-1-1-0')
+            #Get a copy of the current DACL on the object
+            $acl = Get-Acl -Path ($object.DistinguishedName)
+
+            # Start creating the Access Rule Arguments
+            #  Provide the trustee identity (Group who gets the permissions)
+            $Arg1 = [Security.Principal.IdentityReference] $groupSID
+
+            # Set what to do (AD Rights http://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectoryrights(v=vs.110).aspx)
+            $Arg2 = [DirectoryServices.ActiveDirectoryRights] $PSBoundParameters['AdRight']
+
+            # Define if allowed or denied (AccessControlType - Allow/Denied)
+            $Arg3 = [Security.AccessControl.AccessControlType] $PSBoundParameters['AccessControlType']
+
+            # Set the object GUID
+            $Arg4 = $PSBoundParameters['ObjectType']
+
+            # Set the scope (AdSecurityInheritance - http://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectorysecurityinheritance(v=vs.110).aspx)
+            $Arg5 = [DirectoryServices.ActiveDirectorySecurityInheritance] $PSBoundParameters['AdSecurityInheritance']
+
+            $RuleArguments = $Arg1, $Arg2, $Arg3, $Arg4, $Arg5
+
+            # If parameter RemoveRule is False (default when omitted) it will ADD the Access Rule
+            # if TRUE then will REMOVE the access rule
+            If ($PSBoundParameters['RemoveRule']) {
+                # Action when TRUE is REMOVE
+                #Create an Access Control Entry for new permission we wish to remove
+                $null = $acl.RemoveAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
+            } else {
+                # Action when FALSE is ADD
+                #Create an Access Control Entry for new permission we wish to add
+                $null = $acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
+            }
+
+            #Re-apply the modified DACL to the OU
+            Set-Acl -AclObject $acl -Path ('AD:\{0}' -f $object.DistinguishedName)
+        } Catch {
+            throw
         }
-        'SELF' {
-          $groupSID = New-Object -TypeName System.Security.Principal.SecurityIdentifier -ArgumentList ('S-1-5-10')
-        }
-        'AUTHENTICATED USERS' {
-          $groupSID = New-Object -TypeName System.Security.Principal.SecurityIdentifier -ArgumentList ('S-1-5-11')
-        }
-        default {
-          # Collect the SID for the trustee we will be delegating to
-          $groupObject = Get-ADGroup -Identity $PSBoundParameters['Id']
-          $groupSID = New-Object -TypeName System.Security.Principal.SecurityIdentifier -ArgumentList $groupObject.SID
-        }
-      }
+    } #end Process
 
-      #Get a reference to the Object we want to delegate
-      $object = Get-ADObject -Identity $PSBoundParameters['LDAPPath']
+    End {
+        Set-Location -Path $env:HOMEDRIVE\
 
-      #Get a copy of the current DACL on the object
-      $acl = Get-Acl -Path ($object.DistinguishedName)
-
-      # Start creating the Access Rule Arguments
-      #  Provide the trustee identity (Group who gets the permissions)
-      $Arg1 = [Security.Principal.IdentityReference] $groupSID
-
-      # Set what to do (AD Rights http://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectoryrights(v=vs.110).aspx)
-      $Arg2 = [DirectoryServices.ActiveDirectoryRights] $PSBoundParameters['AdRight']
-
-      # Define if allowed or denied (AccessControlType - Allow/Denied)
-      $Arg3 = [Security.AccessControl.AccessControlType] $PSBoundParameters['AccessControlType']
-
-      # Set the object GUID
-      $Arg4 = $PSBoundParameters['ObjectType']
-
-      # Set the scope (AdSecurityInheritance - http://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectorysecurityinheritance(v=vs.110).aspx)
-      $Arg5 = [DirectoryServices.ActiveDirectorySecurityInheritance] $PSBoundParameters['AdSecurityInheritance']
-
-      $RuleArguments = $Arg1, $Arg2, $Arg3, $Arg4, $Arg5
-
-      # If parameter RemoveRule is False (default when omitted) it will ADD the Access Rule
-      # if TRUE then will REMOVE the access rule
-      If ($PSBoundParameters['RemoveRule']) {
-        # Action when TRUE is REMOVE
-        #Create an Access Control Entry for new permission we wish to remove
-        $null = $acl.RemoveAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
-      } else {
-        # Action when FALSE is ADD
-        #Create an Access Control Entry for new permission we wish to add
-        $null = $acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
-      }
-
-      #Re-apply the modified DACL to the OU
-      Set-Acl -AclObject $acl -Path ('AD:\{0}' -f $object.DistinguishedName)
-    } Catch { throw  }
-  } #end Process
-
-  End {
-    Set-Location -Path $env:HOMEDRIVE\
-
-    Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished."
-    Write-Verbose -Message ''
-    Write-Verbose -Message '-------------------------------------------------------------------------------'
-    Write-Verbose -Message ''
-  } #end END
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished."
+        Write-Verbose -Message ''
+        Write-Verbose -Message '-------------------------------------------------------------------------------'
+        Write-Verbose -Message ''
+    } #end END
 }

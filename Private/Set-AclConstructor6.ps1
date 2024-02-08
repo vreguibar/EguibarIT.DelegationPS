@@ -39,77 +39,79 @@ function Set-AclConstructor6 {
   #>
   [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'Low')]
 
-    param (
-        # PARAM1 STRING for the Delegated Identity
-        # An IdentityReference object that identifies the trustee of the access rule.
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Identity of the Delegated Group',
-            Position = 0)]
-        [ValidateNotNullOrEmpty()]
-        [Alias('IdentityReference','Identity','Trustee','GroupID')]
-        [String]
-        $Id,
+  param (
+    # PARAM1 STRING for the Delegated Identity
+    # An IdentityReference object that identifies the trustee of the access rule.
+    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+      HelpMessage = 'Identity of the Delegated Group',
+      Position = 0)]
+    [ValidateNotNullOrEmpty()]
+    [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
+    [String]
+    $Id,
 
-        # PARAM2 STRING for the object's LDAP path
-        # The LDAP path to the object where the ACL will be changed
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Distinguished Name of the object',
-            Position = 1)]
-        [ValidateNotNullOrEmpty()]
-        [Alias('DN','DistinguishedName')]
-        [String]
-        $LDAPpath,
+    # PARAM2 STRING for the object's LDAP path
+    # The LDAP path to the object where the ACL will be changed
+    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+      HelpMessage = 'Distinguished Name of the object',
+      Position = 1)]
+    [ValidateNotNullOrEmpty()]
+    [Alias('DN', 'DistinguishedName')]
+    [String]
+    $LDAPpath,
 
-        # PARAM3 STRING representing AdRight
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Active Directory Right',
-            Position = 2)]
-        [ValidateNotNullOrEmpty()]
-        [ValidateSet('CreateChild', 'DeleteChild', 'Delete', 'DeleteTree', 'ExtendedRight', 'GenericAll', 'GenericExecute', 'GenericRead', 'GenericWrite', 'ListChildren', 'ListObject', 'ReadControl', 'ReadProperty', 'Self', 'Synchronize', 'WriteDacl', 'WriteOwner', 'WriteProperty')]
-        [Alias('ActiveDirectoryRights')]
-        [String[]]
-        $AdRight,
+    # PARAM3 STRING representing AdRight
+    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+      HelpMessage = 'Active Directory Right',
+      Position = 2)]
+    [ValidateNotNullOrEmpty()]
+    #[ValidateScript({ [ActiveDirectoryRights]::new().GetValidValues().Contains($_) })]
+    #[ValidateSet('CreateChild', 'DeleteChild', 'Delete', 'DeleteTree', 'ExtendedRight', 'GenericAll', 'GenericExecute', 'GenericRead', 'GenericWrite', 'ListChildren', 'ListObject', 'ReadControl', 'ReadProperty', 'Self', 'Synchronize', 'WriteDacl', 'WriteOwner', 'WriteProperty')]
+    [ValidateSet([ActiveDirectoryRights])]
+    [Alias('ActiveDirectoryRights')]
+    [String[]]
+    $AdRight,
 
-        # PARAM4 STRING representing Access Control Type
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Allow or Deny access to the given object',
-            Position = 3)]
-        [ValidateSet('Allow', 'Deny')]
-        [String]
-        $AccessControlType,
+    # PARAM4 STRING representing Access Control Type
+    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+      HelpMessage = 'Allow or Deny access to the given object',
+      Position = 3)]
+    [ValidateSet('Allow', 'Deny')]
+    [String]
+    $AccessControlType,
 
-        # PARAM5 STRING representing the object GUID
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'GUID of the object',
-            Position = 4)]
-        [AllowNull()]
-        [GUID]
-        $ObjectType,
+    # PARAM5 STRING representing the object GUID
+    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+      HelpMessage = 'GUID of the object',
+      Position = 4)]
+    [AllowNull()]
+    [GUID]
+    $ObjectType,
 
-        # PARAM6 STRING representing ActiveDirectory Security Inheritance
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Security inheritance of the new right (All, Children, Descendents, None, SelfAndChildren)',
-            Position = 5)]
-        [ValidateSet('All', 'Children', 'Descendents', 'None', 'SelfAndChildren')]
-        [Alias('InheritanceType','ActiveDirectorySecurityInheritance')]
-        [String]
-        $AdSecurityInheritance,
+    # PARAM6 STRING representing ActiveDirectory Security Inheritance
+    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+      HelpMessage = 'Security inheritance of the new right (All, Children, Descendents, None, SelfAndChildren)',
+      Position = 5)]
+    [ValidateSet('All', 'Children', 'Descendents', 'None', 'SelfAndChildren')]
+    [Alias('InheritanceType', 'ActiveDirectorySecurityInheritance')]
+    [String]
+    $AdSecurityInheritance,
 
-        # PARAM7 Object GUID (or Extended Right)
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'GUID of the Inherited object or Extended Right',
-            Position = 6)]
-        [AllowNull()]
-        [GUID]
-        $InheritedObjectType,
+    # PARAM7 Object GUID (or Extended Right)
+    [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+      HelpMessage = 'GUID of the Inherited object or Extended Right',
+      Position = 6)]
+    [AllowNull()]
+    [GUID]
+    $InheritedObjectType,
 
-        # PARAM8 SWITCH if $false (default) will add the rule. If $true, it will remove the rule
-        [Parameter(Mandatory = $False, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'If present, the access rule will be removed.',
-            Position = 7)]
-        [Switch]
-        $RemoveRule
-    )
+    # PARAM8 SWITCH if $false (default) will add the rule. If $true, it will remove the rule
+    [Parameter(Mandatory = $False, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+      HelpMessage = 'If present, the access rule will be removed.',
+      Position = 7)]
+    [Switch]
+    $RemoveRule
+  )
 
   Begin {
     Write-Verbose -Message '|=> ************************************************************************ <=|'
@@ -122,13 +124,12 @@ function Set-AclConstructor6 {
 
     $groupObject, $groupSID, $acl, $Arg1, $Arg2, $Arg3, $Arg4, $Arg5, $Arg6, $RuleArguments = $null
 
-
     Set-Location -Path AD:\
   } #end Begin
 
   Process {
     try {
-      Switch($PSBoundParameters['Id']) {
+      Switch ($PSBoundParameters['Id']) {
         'EVERYONE' {
           $groupSID = New-Object -TypeName System.Security.Principal.SecurityIdentifier -ArgumentList ('S-1-1-0')
         }
@@ -186,7 +187,9 @@ function Set-AclConstructor6 {
 
       #Re-apply the modified DACL to the OU
       Set-Acl -AclObject $acl -Path ('AD:\{0}' -f $object.DistinguishedName)
-    } Catch { throw }
+    } Catch {
+      throw
+    }
   } #end Process
 
   End {

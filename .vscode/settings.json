@@ -1,20 +1,10 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-  "powershell.scriptAnalysis.enable": true,
-  "powershell.scriptAnalysis.settingsPath": ".vscode/ScriptAnalyzerSettings.psd1",
-  "powershell.codeFormatting.autoCorrectAliases": true,
-  "powershell.codeFormatting.useCorrectCasing": true,
-  "powershell.codeFormatting.openBraceOnSameLine": true,
-  "powershell.codeFormatting.newLineAfterOpenBrace": true,
-  "powershell.codeFormatting.newLineAfterCloseBrace": false,
-  "powershell.codeFormatting.whitespaceBeforeOpenBrace": true,
-  "powershell.codeFormatting.whitespaceBeforeOpenParen": true,
-  "powershell.codeFormatting.whitespaceAroundOperator": true,
-  "powershell.codeFormatting.whitespaceAfterSeparator": true,
-  "powershell.codeFormatting.ignoreOneLineBlock": false,
-  "powershell.codeFormatting.alignPropertyValuePairs": true,
+  "csv-preview.separator": ";",
+  "editor.accessibilitySupport": "off",
   "editor.autoIndent": "full",
   "editor.autoClosingBrackets": "always",
+  "editor.autoClosingComments": "always",
   "editor.bracketPairColorization.enabled": true,
   "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
   "editor.codeLens": true,
@@ -26,13 +16,24 @@
   "editor.formatOnType": true,
   "editor.guides.bracketPairs": true,
   "editor.guides.highlightActiveBracketPair": true,
+  "editor.guides.highlightActiveIndentation": true,
   "editor.indentSize": "tabSize",
   "editor.insertSpaces": true,
   "editor.matchBrackets": "always",
+  "editor.renderWhitespace": "all",
+  "editor.rulers": [
+    120
+  ],
   "editor.showDeprecated": true,
+  "editor.showUnused": true,
+  "editor.stickyScroll.enabled": true,
   "editor.tabCompletion": "on",
   "editor.tabSize": 4,
   "editor.unusualLineTerminators": "auto",
+  "editor.unicodeHighlight.ambiguousCharacters": true,
+  "editor.unicodeHighlight.invisibleCharacters": true,
+  "editor.wordWrapColumn": 80,
+  // Add a visual ruler for the typescript linting line length
   "files.autoSave": "afterDelay",
   "files.autoSaveDelay": 20000,
   "files.encoding": "utf8bom",
@@ -45,14 +46,35 @@
     "node_modules": true,
     "markdownissues.txt": true
   },
-  "files.hotExit": "onExit",
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": false,
   "files.trimTrailingWhitespace": true,
-  // Add a visual ruler for the typescript linting line length
-  "editor.rulers": [
-    120
-  ],
+  "git.openRepositoryInParentFolders": "never",
+  "git.autofetch": true,
+  "git.enableSmartCommit": true,
+  "json.format.enable": true,
+  "markdownlint.config": {
+    "MD024": false // no-duplicate-header
+  },
+  "problems.autoReveal": true,
+  "problems.decorations.enabled": true,
+  "powershell.codeFormatting.alignPropertyValuePairs": true,
+  "powershell.codeFormatting.autoCorrectAliases": true,
+  "powershell.codeFormatting.ignoreOneLineBlock": false,
+  "powershell.codeFormatting.newLineAfterOpenBrace": true,
+  "powershell.codeFormatting.newLineAfterCloseBrace": false,
+  "powershell.codeFormatting.openBraceOnSameLine": true,
+  "powershell.codeFormatting.trimWhitespaceAroundPipe": true,
+  "powershell.codeFormatting.useCorrectCasing": true,
+  "powershell.codeFormatting.useConstantStrings": true,
+  "powershell.codeFormatting.whitespaceAroundOperator": true,
+  "powershell.codeFormatting.whitespaceAfterSeparator": true,
+  "powershell.codeFormatting.whitespaceBeforeOpenBrace": true,
+  "powershell.codeFormatting.whitespaceBeforeOpenParen": true,
+  "powershell.codeFormatting.whitespaceBetweenParameters": true,
+  "powershell.scriptAnalysis.enable": true,
+  "powershell.scriptAnalysis.settingsPath": ".vscode/ScriptAnalyzerSettings.psd1",
+  "redhat.telemetry.enabled": true,
   "search.exclude": {
     "**/node_modules": true,
     "**/bower_components": true,
@@ -62,7 +84,7 @@
   // Lock the TypeScript SDK path to the version we use
   "typescript.tsdk": "./node_modules/typescript/lib",
   // Ignore the MD rule:
-  "markdownlint.config": {
-    "MD024": false // no-duplicate-header
+  "yaml.schemas": {
+    "file:///c%3A/Users/RODRIGUEZEGUIBARVice/.vscode/extensions/docsmsft.docs-yaml-1.0.1/dist/toc.schema.json": "/toc\\.yml/i"
   }
 }

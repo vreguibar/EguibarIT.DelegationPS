@@ -74,12 +74,11 @@
         [hashtable]$Splat = [hashtable]::New()
 
         # Check and fill GuidMap variable
-        If ( ($null -eq $Variables.GuidMap) -and
-                 ($Variables.GuidMap -ne 0) -and
-                 ($Variables.GuidMap -ne '') -and
-                 (   ($Variables.GuidMap -isnot [array]) -or
-                     ($Variables.GuidMap.Length -ne 0)) -and
-                 ($Variables.GuidMap -ne $false)
+        If ( ($null -eq $Variables.GuidMap) -or
+            ($Variables.GuidMap -eq 0) -or
+            ($Variables.GuidMap -eq '') -or
+            ($Variables.GuidMap.Length -eq 0) -or
+            ($Variables.GuidMap -eq $false)
         ) {
             # $Variables.GuidMap is empty. Call function to fill it up
             Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
@@ -87,12 +86,11 @@
         } #end If
 
         # Check and fill ExtendedRightsMap variable
-        If ( ($null -eq $Variables.ExtendedRightsMap) -and
-                 ($Variables.ExtendedRightsMap -ne 0) -and
-                 ($Variables.ExtendedRightsMap -ne '') -and
-                 (   ($Variables.ExtendedRightsMap -isnot [array]) -or
-                     ($Variables.ExtendedRightsMap.Length -ne 0)) -and
-                 ($Variables.ExtendedRightsMap -ne $false)
+        If ( ($null -eq $Variables.ExtendedRightsMap) -or
+            ($Variables.ExtendedRightsMap -eq 0) -or
+            ($Variables.ExtendedRightsMap -eq '') -or
+            ($Variables.ExtendedRightsMap.Length -eq 0) -or
+            ($Variables.ExtendedRightsMap -eq $false)
         ) {
             Write-Verbose -Message 'Variable $Variables.ExtendedRightsMap is empty. Calling function to fill it up.'
             New-ExtenderRightHashTable

@@ -6,7 +6,8 @@ function Set-AclConstructor4 {
         Modifies ACLs on Active Directory objects.
 
         .DESCRIPTION
-            This function adds or removes access rules to an Active Directory object using a constructor with four parameters to specify the access rule details.
+            This function adds or removes access rules to an Active Directory object
+            using a constructor with four parameters to specify the access rule details.
 
         .PARAMETER Id
             Specifies the SamAccountName of the delegated group or user. This is the identity for which the access rule will be modified.
@@ -39,6 +40,18 @@ function Set-AclConstructor4 {
             }
             Set-AclConstructor4 @splat
 
+        .EXAMPLE
+            $group = Get-AdGroup "SG_SiteAdmins_XXXX"
+
+            $splat = @{
+                Id                = $group
+                LDAPPath          = "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
+                AdRight           = "CreateChild,DeleteChild"
+                AccessControlType = "Allow"
+                ObjectType        = "12345678-abcd-1234-abcd-0123456789012"
+            }
+            Set-AclConstructor4 @splat
+
         .INPUTS
             String, GUID
 
@@ -54,6 +67,9 @@ function Set-AclConstructor4 {
                 Set-Acl                                | Microsoft.Powershell.Security
                 New-Object                             | Microsoft.Powershell.Utility
                 Set-Location                           | Microsoft.Powershell.Management
+                Get-AdObjectType                       | EguibarIT.DelegationPS
+                Test-IsValidDN                         | EguibarIT.DelegationPS
+                Get-CurrentErrorToDisplay              | EguibarIT.DelegationPS
         .NOTES
             Version:         1.0
             DateModified:    28/Apr/2022
@@ -63,12 +79,13 @@ function Set-AclConstructor4 {
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'Low')]
+    [OutputType([void])]
 
     param (
         # PARAM1 STRING for the Delegated Identity
         # An IdentityReference object that identifies the trustee of the access rule.
         [Parameter(Mandatory = $true, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
-            HelpMessage = 'SamAccountName of the Delegated Group. An IdentityReference object that identifies the trustee of the access rule.',
+            HelpMessage = 'SamAccountName of the Delegated Group (It also valid variable containing the group). An IdentityReference object that identifies the trustee of the access rule.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID', 'Group')]
@@ -129,79 +146,80 @@ function Set-AclConstructor4 {
         ##############################
         # Variables Definition
 
+        $groupObject, $groupSID, $acl, $trustee, $RuleArguments = $null
 
-
-        $groupObject, $groupSID, $acl, $trustee, $AdRight, $AccessControlType, $ObjectType, $RuleArguments = $null
-        $IsWellKnownSid = $null
-
-        # Check if the guidmap variable is empty and fill it if required
-        #New-GuidObjectHashTable
-
-        # Check if the guidmap variable is empty and fill it if required
-        #New-ExtenderRightHashTable
-
-        Set-Location -Path AD:\
     } #end Begin
 
     Process {
-        # Collect the SID for the trustee we will be delegating to
+
+        # Collect the SID for the trustee we will be delegating to.
+        # NULL will be returned if ID is a WellKnownSid
         If (-not ($PSBoundParameters['Id'] -is [Microsoft.ActiveDirectory.Management.AdGroup])) {
             $GroupObject = Get-AdObjectType -Identity $PSBoundParameters['Id']
         }
-        #$groupObject = Get-ADGroup -Identity $PSBoundParameters['Id']
 
-        # Check if Identity is a WellKnownSID
-        # If identity is NOT a WellKnownSID, the function will translate to existing Object SID.
-        # WellKnownSid function will return null if SID is not well known.
-        $IsWellKnownSid = Get-AdWellKnownSid -Sid $groupObject.SID
+        # $groupObject will be NULL if ID is a WellKnownSid
+        If ($null -eq $GroupObject) {
 
-        If (-not $IsWellKnownSid) {
-            # translate to existing Object SID
-            $groupSID = New-Object -TypeName System.Security.Principal.SecurityIdentifier -ArgumentList $groupObject.SID
+            # Check if Identity is a WellKnownSID
+            If ($WellKnownSIDs.ContainsKey($PSBoundParameters['Id'])) {
+                $groupSID = $PSBoundParameters['Id']
+            }
         } else {
-            $groupSID = $IsWellKnownSid.value
+            # If identity is NOT a WellKnownSID, the function will translate to existing Object SID.
+            $groupSID = New-Object -TypeName System.Security.Principal.SecurityIdentifier -ArgumentList $groupObject.SID
         }
 
-        try {
-            #Get a reference to the Object we want to delegate
-            If (Test-IsValidDN -ObjectDN $PSBoundParameters['LDAPPath']) {
+
+        #Get a reference to the Object we want to delegate
+        If (Test-IsValidDN -ObjectDN $PSBoundParameters['LDAPPath']) {
+            try {
                 $object = Get-ADObject -Identity $PSBoundParameters['LDAPPath']
-            }
+            } Catch {
+                Get-CurrentErrorToDisplay -CurrentError $error[0]
+            } #end Try-Catch
+        }
 
 
-            #Get a copy of the current DACL on the object
-            $acl = Get-Acl -Path ($object.DistinguishedName)
+        #Get a copy of the current DACL on the object
+        try {
+            $acl = Get-Acl -Path ('AD:\{0}' -f $object.DistinguishedName)
+        } Catch {
+            Get-CurrentErrorToDisplay -CurrentError $error[0]
+        } #end Try-Catch
 
-            # Start creating the Access Rule Arguments
-            #  Provide the trustee identity (Group who gets the permissions)
-            $trustee = [Security.Principal.IdentityReference] $groupSID
 
-            # Set what to do (AD Rights http://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectoryrights(v=vs.110).aspx)
-            $AdRight = [DirectoryServices.ActiveDirectoryRights] $PSBoundParameters['AdRight']
+        # Start creating the Access Rule Arguments
+        #  Provide the trustee identity (Group who gets the permissions)
+        $trustee = [Security.Principal.IdentityReference] $groupSID
 
-            # Define if allowed or denied (AccessControlType - Allow/Denied)
-            $AccessControlType = [Security.AccessControl.AccessControlType] $PSBoundParameters['AccessControlType']
+        # Set what to do (AD Rights http://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectoryrights(v=vs.110).aspx)
+        $AdRight = [DirectoryServices.ActiveDirectoryRights] $PSBoundParameters['AdRight']
 
-            # Set the object GUID
-            $ObjectType = $PSBoundParameters['ObjectType']
+        # Define if allowed or denied (AccessControlType - Allow/Denied)
+        $AccessControlType = [Security.AccessControl.AccessControlType] $PSBoundParameters['AccessControlType']
 
-            $RuleArguments = $trustee, $AdRight, $AccessControlType, $ObjectType
+        # Set the object GUID
+        $ObjectType = $PSBoundParameters['ObjectType']
 
-            # If parameter RemoveRule is False (default when omitted) it will ADD the Access Rule
-            # if TRUE then will REMOVE the access rule
-            If ($PSBoundParameters['RemoveRule']) {
-                # Action when TRUE is REMOVE
-                #Create an Access Control Entry for new permission we wish to remove
-                [void]$acl.RemoveAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
-                Write-Verbose -Message ('Removed access rule from {0}' -f $objectDN.DistinguishedName)
+        $RuleArguments = $trustee, $AdRight, $AccessControlType, $ObjectType
 
-            } else {
-                # Action when FALSE is ADD
-                #Create an Access Control Entry for new permission we wish to add
-                [void]$acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
-                Write-Verbose -Message ('Added access rule to {0}' -f $objectDN.DistinguishedName)
-            } #end If-Else
+        # If parameter RemoveRule is False (default when omitted) it will ADD the Access Rule
+        # if TRUE then will REMOVE the access rule
+        If ($PSBoundParameters['RemoveRule']) {
+            # Action when TRUE is REMOVE
+            #Create an Access Control Entry for new permission we wish to remove
+            [void]$acl.RemoveAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
+            Write-Verbose -Message ('Removed access rule from {0}' -f $objectDN.DistinguishedName)
 
+        } else {
+            # Action when FALSE is ADD
+            #Create an Access Control Entry for new permission we wish to add
+            [void]$acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
+            Write-Verbose -Message ('Added access rule to {0}' -f $objectDN.DistinguishedName)
+        } #end If-Else
+
+        try {
             #Re-apply the modified DACL to the OU
             Set-Acl -AclObject $acl -Path ('AD:\{0}' -f $object.DistinguishedName)
         } Catch {
@@ -211,8 +229,6 @@ function Set-AclConstructor4 {
     } #end Process
 
     End {
-        Set-Location -Path $env:HOMEDRIVE\
-
         Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished."
         Write-Verbose -Message ''
         Write-Verbose -Message '-------------------------------------------------------------------------------'
