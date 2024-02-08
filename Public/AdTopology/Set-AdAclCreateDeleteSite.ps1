@@ -446,6 +446,12 @@
     } #end Process
 
     end {
+        if ($RemoveRule) {
+            Write-Verbose ('Permissions removal process completed for group: {0}' -f $Group)
+        } else {
+            Write-Verbose ('Permissions delegation process completed for group: {0}' -f $Group)
+        } #end If-Else
+
         Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished."
         Write-Verbose -Message ''
         Write-Verbose -Message '-------------------------------------------------------------------------------'
