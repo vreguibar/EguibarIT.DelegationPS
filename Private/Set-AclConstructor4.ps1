@@ -11,6 +11,7 @@ function Set-AclConstructor4 {
 
         .PARAMETER Id
             Specifies the SamAccountName of the delegated group or user. This is the identity for which the access rule will be modified.
+            It can be a variable containing the AD group.
 
         .PARAMETER LDAPPath
             Specifies the LDAP path of the target Active Directory object.
@@ -71,8 +72,8 @@ function Set-AclConstructor4 {
                 Test-IsValidDN                         | EguibarIT.DelegationPS
                 Get-CurrentErrorToDisplay              | EguibarIT.DelegationPS
         .NOTES
-            Version:         1.0
-            DateModified:    28/Apr/2022
+            Version:         1.1
+            DateModified:    08/Feb/2024
             LasModifiedBy:   Vicente Rodriguez Eguibar
                 vicente@eguibar.com
                 Eguibar Information Technology S.L.
