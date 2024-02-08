@@ -193,7 +193,7 @@
             Write-Verbose 'Attempting to set ACL 3 for permissions...'
             $Splat = @{
                 Id                    = $PSBoundParameters['Group']
-                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
+                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext
                 AdRight               = 'CreateChild', 'DeleteChild'
                 AccessControlType     = 'Allow'
                 ObjectType            = $Variables.GuidMap['nTDSSiteSettings']
@@ -232,7 +232,7 @@
             Write-Verbose 'Attempting to set ACL 4 for permissions...'
             $Splat = @{
                 Id                    = $PSBoundParameters['Group']
-                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
+                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext
                 AdRight               = 'CreateChild', 'DeleteChild'
                 AccessControlType     = 'Allow'
                 ObjectType            = $Variables.GuidMap['nTDSDSA']
@@ -269,7 +269,7 @@
             Write-Verbose 'Attempting to set ACL 5 for permissions...'
             $Splat = @{
                 Id                = $PSBoundParameters['Group']
-                LDAPPath          = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
+                LDAPPath          = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.
                 AdRight           = 'WriteDacl'
                 AccessControlType = 'Allow'
                 ObjectType        = $Variables.GuidMap['nTDSDSA']
@@ -306,7 +306,7 @@
             Write-Verbose 'Attempting to set ACL 6 for permissions...'
             $Splat = @{
                 Id                    = $PSBoundParameters['Group']
-                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
+                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext
                 AdRight               = 'CreateChild', 'DeleteChild'
                 AccessControlType     = 'Allow'
                 ObjectType            = $Variables.GuidMap['server']
@@ -345,7 +345,7 @@
             Write-Verbose 'Attempting to set ACL 7 for permissions...'
             $Splat = @{
                 Id                    = $PSBoundParameters['Group']
-                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
+                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext
                 AdRight               = 'CreateChild', 'DeleteChild'
                 AccessControlType     = 'Allow'
                 ObjectType            = $Variables.GuidMap['nTDSConnection']
@@ -383,7 +383,7 @@
             Write-Verbose 'Attempting to set ACL 8 for permissions...'
             $Splat = @{
                 Id                    = $PSBoundParameters['Group']
-                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
+                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext
                 AdRight               = 'GenericAll'
                 AccessControlType     = 'Allow'
                 InheritedObjectType   = $Variables.GuidMap['serversContainer']
@@ -420,7 +420,7 @@
             Write-Verbose 'Attempting to set ACL 9 for permissions...'
             $Splat = @{
                 Id                    = $PSBoundParameters['Group']
-                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
+                LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext
                 AdRight               = 'GenericAll'
                 AccessControlType     = 'Allow'
                 InheritedObjectType   = $Variables.GuidMap['msDNS-ServerSettings']
