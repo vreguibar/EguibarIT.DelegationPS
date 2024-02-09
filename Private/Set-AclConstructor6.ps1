@@ -109,6 +109,7 @@ function Set-AclConstructor6 {
             HelpMessage = 'Distinguished Name of the object',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
+        [ValidateScript({ Test-IsValidDN -ObjectDN $_ })]
         [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath,
