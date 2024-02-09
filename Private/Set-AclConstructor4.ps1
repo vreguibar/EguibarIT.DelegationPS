@@ -3,11 +3,11 @@
 function Set-AclConstructor4 {
     <#
         .SYNOPSIS
-        Modifies ACLs on Active Directory objects.
+            Modifies ACLs on Active Directory objects.
 
         .DESCRIPTION
             This function adds or removes access rules to an Active Directory object
-            using a constructor with four parameters to specify the access rule details.
+            using a constructor with 4 parameters to specify the access rule details.
 
         .PARAMETER Id
             Specifies the SamAccountName of the delegated group or user. This is the identity for which the access rule will be modified.
@@ -53,12 +53,6 @@ function Set-AclConstructor4 {
             }
             Set-AclConstructor4 @splat
 
-        .INPUTS
-            String, GUID
-
-        .OUTPUTS
-            None. Modifies Active Directory object ACLs.
-
         .NOTES
             Used Functions:
                 Name                                   | Module
@@ -67,7 +61,6 @@ function Set-AclConstructor4 {
                 Get-Acl                                | Microsoft.Powershell.Security
                 Set-Acl                                | Microsoft.Powershell.Security
                 New-Object                             | Microsoft.Powershell.Utility
-                Set-Location                           | Microsoft.Powershell.Management
                 Get-AdObjectType                       | EguibarIT.DelegationPS
                 Test-IsValidDN                         | EguibarIT.DelegationPS
                 Get-CurrentErrorToDisplay              | EguibarIT.DelegationPS
@@ -79,7 +72,7 @@ function Set-AclConstructor4 {
                 Eguibar Information Technology S.L.
                 http://www.eguibarit.com
     #>
-    [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'Low')]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
     [OutputType([void])]
 
     param (
@@ -147,7 +140,7 @@ function Set-AclConstructor4 {
         ##############################
         # Variables Definition
 
-        $groupObject, $groupSID, $acl, $trustee, $RuleArguments = $null
+        $groupObject, $groupSID, $acl, $Arg1, $Arg2, $Arg3, $Arg4, $RuleArguments = $null
 
     } #end Begin
 
@@ -163,8 +156,10 @@ function Set-AclConstructor4 {
         If ($null -eq $GroupObject) {
 
             # Check if Identity is a WellKnownSID
-            If ($WellKnownSIDs.ContainsKey($PSBoundParameters['Id'])) {
-                $groupSID = $PSBoundParameters['Id']
+            # Looking in var $WellKnownSid by Value (ej. 'authenticated users')
+            If ($WellKnownSIDs.Values.Contains($PSBoundParameters['Id'])) {
+                # return SID of the WellKnownSid
+                $groupSID = $WellKnownSIDs.keys.where{ $WellKnownSIDs[$_].Contains($PSBoundParameters['Id']) }
             }
         } else {
             # If identity is NOT a WellKnownSID, the function will translate to existing Object SID.
@@ -190,35 +185,49 @@ function Set-AclConstructor4 {
         } #end Try-Catch
 
 
+
         # Start creating the Access Rule Arguments
         #  Provide the trustee identity (Group who gets the permissions)
-        $trustee = [Security.Principal.IdentityReference] $groupSID
+        $Arg1 = [Security.Principal.IdentityReference] $groupSID
 
         # Set what to do (AD Rights http://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectoryrights(v=vs.110).aspx)
-        $AdRight = [DirectoryServices.ActiveDirectoryRights] $PSBoundParameters['AdRight']
+        $Arg2 = [DirectoryServices.ActiveDirectoryRights] $PSBoundParameters['AdRight']
 
         # Define if allowed or denied (AccessControlType - Allow/Denied)
-        $AccessControlType = [Security.AccessControl.AccessControlType] $PSBoundParameters['AccessControlType']
+        $Arg3 = [Security.AccessControl.AccessControlType] $PSBoundParameters['AccessControlType']
 
         # Set the object GUID
-        $ObjectType = $PSBoundParameters['ObjectType']
+        $Arg4 = $PSBoundParameters['ObjectType']
 
-        $RuleArguments = $trustee, $AdRight, $AccessControlType, $ObjectType
+        $RuleArguments = $Arg1, $Arg2, $Arg3, $Arg4
+
+
 
         # If parameter RemoveRule is False (default when omitted) it will ADD the Access Rule
         # if TRUE then will REMOVE the access rule
         If ($PSBoundParameters['RemoveRule']) {
             # Action when TRUE is REMOVE
-            #Create an Access Control Entry for new permission we wish to remove
-            [void]$acl.RemoveAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
-            Write-Verbose -Message ('Removed access rule from {0}' -f $objectDN.DistinguishedName)
 
+            if ($PSCmdlet.ShouldProcess($object.DistinguishedName, "Removing access rule for $($PSBoundParameters['Id'])")) {
+
+                #Create an Access Control Entry for new permission we wish to remove
+                [void]$acl.RemoveAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
+
+                Write-Verbose -Message ('Removed access rule from {0}' -f $objectDN.DistinguishedName)
+            } #end If
         } else {
             # Action when FALSE is ADD
-            #Create an Access Control Entry for new permission we wish to add
-            [void]$acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
-            Write-Verbose -Message ('Added access rule to {0}' -f $objectDN.DistinguishedName)
+
+            if ($PSCmdlet.ShouldProcess($object.DistinguishedName, "Adding access rule for $($PSBoundParameters['Id'])")) {
+
+                #Create an Access Control Entry for new permission we wish to add
+                [void]$acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
+
+                Write-Verbose -Message ('Added access rule to {0}' -f $objectDN.DistinguishedName)
+            } #end If
         } #end If-Else
+
+
 
         try {
             #Re-apply the modified DACL to the OU
