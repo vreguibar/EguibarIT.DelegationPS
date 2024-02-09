@@ -129,7 +129,8 @@ function Set-AclConstructor6 {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Allow or Deny access to the given object',
             Position = 3)]
-        [ValidateSet('Allow', 'Deny')]
+        #[ValidateSet('Allow', 'Deny')]
+        [ValidateSet([AccessControlType])]
         [String]
         $AccessControlType,
 
