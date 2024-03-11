@@ -28,7 +28,6 @@
                 Set-AclConstructor5                    | EguibarIT.Delegation
                 Set-AclConstructor6                    | EguibarIT.Delegation
                 Get-AttributeSchemaHashTable           | EguibarIT.Delegation
-                New-ExtenderRightHashTable             | EguibarIT.Delegation
                 Get-CurrentErrorToDisplay              | EguibarIT.DelegationPS
 
         .NOTES
@@ -67,8 +66,6 @@
         Write-Verbose -Message ('  Starting: {0}' -f $MyInvocation.Mycommand)
         Write-Verbose -Message ('Parameters used by the function... {0}' -f (Set-FunctionDisplay $PsBoundParameters -Verbose:$False))
 
-        Import-Module ActiveDirectory -Verbose:$false
-
         ##############################
         # Variables Definition
         [hashtable]$Splat = [hashtable]::New()
@@ -84,17 +81,6 @@
             Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
             Get-AttributeSchemaHashTable
         } #end If
-
-        # Check and fill ExtendedRightsMap variable
-        If ( ($null -eq $Variables.ExtendedRightsMap) -or
-            ($Variables.ExtendedRightsMap -eq 0) -or
-            ($Variables.ExtendedRightsMap -eq '') -or
-            ($Variables.ExtendedRightsMap.Length -eq 0) -or
-            ($Variables.ExtendedRightsMap -eq $false)
-        ) {
-            Write-Verbose -Message 'Variable $Variables.ExtendedRightsMap is empty. Calling function to fill it up.'
-            New-ExtenderRightHashTable
-        }
 
     } #end Begin
 
@@ -129,7 +115,7 @@
                     $Splat.Add('RemoveRule', $true)
                 }
             }
-            if ($PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate permissions for creating and deleting AD sites?')) {
                 Set-AclConstructor6 @Splat
             }
         } Catch {
@@ -444,10 +430,11 @@
     } #end Process
 
     end {
+
         if ($RemoveRule) {
-            Write-Verbose ('Permissions removal process completed for group: {0}' -f $Group)
+            Write-Verbose ('Permissions removal process completed for group: {0}' -f $PSBoundParameters['Group'])
         } else {
-            Write-Verbose ('Permissions delegation process completed for group: {0}' -f $Group)
+            Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
         } #end If-Else
 
         Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished."
