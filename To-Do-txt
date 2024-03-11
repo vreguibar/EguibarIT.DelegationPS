@@ -1,0 +1,27 @@
+﻿Original ACL
+
+Get-AclAccessRule -LDAPpath 'OU=Admin,DC=EguibarIT,DC=local' -SearchBy 'Authenticated Users'
+
+ACENumber              : 1
+DistinguishedName      : OU=Admin,DC=EguibarIT,DC=local
+IdentityReference      : NT AUTHORITY\Authenticated Users
+ActiveDirectoryRightst : GenericRead
+AccessControlType      : Allow
+ObjectType             : GuidNULL
+InheritanceType        : None
+InheritedObjectType    : GuidNULL
+IsInherited            : False
+
+To be changed to:
+
+Get-AclAccessRule -LDAPpath 'OU=Admin,DC=EguibarIT,DC=local' -SearchBy 'Authenticated Users'
+
+ACENumber              : 1
+DistinguishedName      : OU=Admin,DC=EguibarIT,DC=local
+IdentityReference      : NT AUTHORITY\Authenticated Users
+ActiveDirectoryRightst : ReadProperty, GenericExecute
+AccessControlType      : Allow
+ObjectType             : GuidNULL
+InheritanceType        : All
+InheritedObjectType    : GuidNULL
+IsInherited            : False
