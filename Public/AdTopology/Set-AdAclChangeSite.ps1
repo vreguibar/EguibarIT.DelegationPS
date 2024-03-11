@@ -28,6 +28,7 @@
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([void])]
 
     param (
         # PARAM1 STRING for the Delegated Group Name
@@ -56,7 +57,7 @@
 
         ##############################
         # Variables Definition
-        $parameters = $null
+        [Hashtable]$Splat = [hashtable]::New()
 
         If ( ($null -eq $Variables.GuidMap) -and
                  ($Variables.GuidMap -ne 0)     -and
@@ -65,9 +66,11 @@
                      ($Variables.GuidMap.Length -ne 0)) -and
                  ($Variables.GuidMap -ne $false)
             ) {
+
             # $Variables.GuidMap is empty. Call function to fill it up
             Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
-            New-GuidObjectHashTable
+            Get-AttributeSchemaHashTable
+
         }
     } #end Begin
 
@@ -82,7 +85,7 @@
             InheritedObjectType   : All [GuidNULL]
             IsInherited           : False
         #>
-        $parameters = @{
+        $Splat = @{
             Id                    = $PSBoundParameters['Group']
             LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
             AdRight               = 'ReadProperty', 'WriteProperty'
@@ -93,9 +96,13 @@
         # Check if RemoveRule switch is present.
         If($PSBoundParameters['RemoveRule']) {
             # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
+            $Splat.Add('RemoveRule', $true)
         }
-        Set-AclConstructor5 @parameters
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], ('Set the permisssions to Change AD Sites?'))) {
+            Set-AclConstructor5 @Splat
+        }
+
     } #end Process
 
     end {
