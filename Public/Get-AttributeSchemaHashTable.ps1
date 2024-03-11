@@ -5,12 +5,19 @@ Function Get-AttributeSchemaHashTable {
         .DESCRIPTION
             Function that reads all GUID from the Schema and stores into a Hashtable named $guidmap
         .EXAMPLE
-            New-GuidObjectHashTable
+            Get-AttributeSchemaHashTable
         .EXAMPLE
-            $guidmap = New-GuidObjectHashTable
+            $guidmap = Get-AttributeSchemaHashTable
         .NOTES
-            Version:         1.0
-            DateModified:    19/Feb/2015
+            Used Functions:
+                Name                                   | Module
+                ---------------------------------------|--------------------------
+                Get-ADObject                           | ActiveDirectory
+                Write-Progress                         | PSWriteLog
+                Get-CurrentErrorToDisplay              | EguibarIT.DelegationPS
+        .NOTES
+            Version:         1.1
+            DateModified:    11/Mar/2024
             LasModifiedBy:   Vicente Rodriguez Eguibar
                 vicente@eguibar.com
                 Eguibar Information Technology S.L.
