@@ -34,6 +34,7 @@ Function Get-AttributeSchemaHashTable {
 
         [hashtable]$TmpMap = [hashtable]::New()
         [hashtable]$Splat = [hashtable]::New()
+        [int32]$i = 0
 
     } #end Begin
 
@@ -57,6 +58,17 @@ Function Get-AttributeSchemaHashTable {
                 $AllSchema = Get-ADObject @Splat
 
                 Foreach ($item in $AllSchema) {
+                    $i ++
+
+                    $parameters = @{
+                        Activity         = 'Adding {0} Schema attributes to Hashtable' -f $AllSchema.count
+                        Status           = 'Reading attribute number {0}  ' -f $i
+                        PercentComplete  = ($i / $AllSchema.count) * 100
+                        CurrentOperation = '      Processing Attribute...: {0}' -f $item.lDAPDisplayName
+                    }
+                    Write-Progress @parameters
+
+
                     $TmpMap.Add($item.lDAPDisplayName, [System.GUID]$item.schemaIDGUID)
                 }
                 # Include "ALL [nullGUID]"
@@ -74,7 +86,10 @@ Function Get-AttributeSchemaHashTable {
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''
 
-        $Variables.GuidMap = $TmpMap
+        # Only fill $Variables.GuidMap in case is not empty
+        If (-not $TmpMap) {
+            $Variables.GuidMap = $TmpMap
+        }
 
         Return $Variables.GuidMap
     } # end END
