@@ -29,7 +29,8 @@ Function Set-AdAclFMSOtransfer {
                 Eguibar Information Technology S.L.
                 http://www.eguibarit.com
     #>
-    [CmdletBinding(ConfirmImpact = 'Low')]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([void])]
 
     Param (
 
@@ -37,7 +38,7 @@ Function Set-AdAclFMSOtransfer {
             HelpMessage = 'Identity of the group getting the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [Alias('IdentityReference','Identity','Trustee','GroupID')]
+        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         [String]
         $Group,
 
@@ -67,37 +68,27 @@ Function Set-AdAclFMSOtransfer {
 
         ##############################
         # Variables Definition
-        $parameters = $null
+        [Hashtable]$Splat = [hashtable]::New()
 
         If ( ($null -eq $Variables.GuidMap) -and
-                 ($Variables.GuidMap -ne 0)     -and
-                 ($Variables.GuidMap -ne '')    -and
+                 ($Variables.GuidMap -ne 0) -and
+                 ($Variables.GuidMap -ne '') -and
                  (   ($Variables.GuidMap -isnot [array]) -or
                      ($Variables.GuidMap.Length -ne 0)) -and
                  ($Variables.GuidMap -ne $false)
-            ) {
+        ) {
+
             # $Variables.GuidMap is empty. Call function to fill it up
             Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
-            New-GuidObjectHashTable
-        }
+            Get-AttributeSchemaHashTable
 
-        If ( ($null -eq $Variables.ExtendedRightsMap) -and
-                 ($Variables.ExtendedRightsMap -ne 0)     -and
-                 ($Variables.ExtendedRightsMap -ne '')    -and
-                 (   ($Variables.ExtendedRightsMap -isnot [array]) -or
-                     ($Variables.ExtendedRightsMap.Length -ne 0)) -and
-                 ($Variables.ExtendedRightsMap -ne $false)
-            ) {
-            # $Variables.ExtendedRightsMap is empty. Call function to fill it up
-            Write-Verbose -Message 'Variable $Variables.ExtendedRightsMap is empty. Calling function to fill it up.'
-            New-ExtenderRightHashTable
-        }
+        } #end If
     } #end Begin
 
     Process {
         # Process each of the FMSO roles
-        foreach($Role in $FSMOroles) {
-            switch($role){
+        foreach ($Role in $FSMOroles) {
+            switch ($role) {
                 # Forest wide roles
                 'Schema' {
                     <#
@@ -124,37 +115,49 @@ Function Set-AdAclFMSOtransfer {
                         IsInherited            : False
                     #>
 
-                    $parameters = @{
-                        Id                    = $PSBoundParameters['Group']
-                        LDAPPath              = 'CN=Schema,CN=Configuration,{0}' -f $Variables.defaultNamingContext
-                        AdRight               = 'ExtendedRight'
-                        AccessControlType     = 'Allow'
-                        ObjectType            = $Variables.ExtendedRightsMap['Change Schema Master']
-                        Verbose               = $false
+                    $Splat = @{
+                        Id                = $PSBoundParameters['Group']
+                        LDAPPath          = 'CN=Schema,CN=Configuration,{0}' -f $Variables.defaultNamingContext
+                        AdRight           = 'ExtendedRight'
+                        AccessControlType = 'Allow'
+                        ObjectType        = $Variables.ExtendedRightsMap['Change Schema Master']
+                        Verbose           = $false
                     }
                     # Check if RemoveRule switch is present.
-                    If($PSBoundParameters['RemoveRule']) {
-                        # Add the parameter to remove the rule
-                        $parameters.Add('RemoveRule', $true)
-                    }
-                    Set-AclConstructor4 @parameters
+                    If ($PSBoundParameters['RemoveRule']) {
 
-                    $parameters = @{
-                        Id                    = $PSBoundParameters['Group']
-                        LDAPPath              = 'CN=Schema,CN=Configuration,{0}' -f $Variables.defaultNamingContext
-                        AdRight               = 'WriteProperty'
-                        AccessControlType     = 'Allow'
-                        ObjectType            = $Variables.GuidMap['fSMORoleOwner']
-                        Verbose               = $false
+                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer Schema Master?')) {
+                            # Add the parameter to remove the rule
+                            $Splat.Add('RemoveRule', $true)
+                        } #end If
+                    }
+
+                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Schema Master?')) {
+                        Set-AclConstructor4 @Splat
+                    } #end If
+
+                    $Splat = @{
+                        Id                = $PSBoundParameters['Group']
+                        LDAPPath          = 'CN=Schema,CN=Configuration,{0}' -f $Variables.defaultNamingContext
+                        AdRight           = 'WriteProperty'
+                        AccessControlType = 'Allow'
+                        ObjectType        = $Variables.GuidMap['fSMORoleOwner']
+                        Verbose           = $false
                     }
                     # Check if RemoveRule switch is present.
-                    If($PSBoundParameters['RemoveRule']) {
-                        # Add the parameter to remove the rule
-                        $parameters.Add('RemoveRule', $true)
-                    }
-                    Set-AclConstructor4 @parameters
+                    If ($PSBoundParameters['RemoveRule']) {
+
+                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer Schema Master?')) {
+                            # Add the parameter to remove the rule
+                            $Splat.Add('RemoveRule', $true)
+                        } #end If
+                    } #end If
+
+                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Schema Master?')) {
+                        Set-AclConstructor4 @Splat
+                    } #end If
                 }
-                'DomainNaming'  {
+                'DomainNaming' {
                     <#
                         Get-AclAccessRule -LDAPpath 'CN=Partitions,CN=Configuration,DC=EguibarIT,DC=local' -SearchBy xxxx
 
@@ -179,35 +182,47 @@ Function Set-AdAclFMSOtransfer {
                         IsInherited            : False
                     #>
 
-                    $parameters = @{
-                        Id                    = $PSBoundParameters['Group']
-                        LDAPPath              = 'CN=Partitions,CN=Configuration,{0}' -f $Variables.defaultNamingContext
-                        AdRight               = 'WriteProperty'
-                        AccessControlType     = 'Allow'
-                        ObjectType            = $Variables.GuidMap['fSMORoleOwner']
-                        Verbose               = $false
+                    $Splat = @{
+                        Id                = $PSBoundParameters['Group']
+                        LDAPPath          = 'CN=Partitions,CN=Configuration,{0}' -f $Variables.defaultNamingContext
+                        AdRight           = 'WriteProperty'
+                        AccessControlType = 'Allow'
+                        ObjectType        = $Variables.GuidMap['fSMORoleOwner']
+                        Verbose           = $false
                     }
                     # Check if RemoveRule switch is present.
-                    If($PSBoundParameters['RemoveRule']) {
-                        # Add the parameter to remove the rule
-                        $parameters.Add('RemoveRule', $true)
-                    }
-                    Set-AclConstructor4 @parameters
+                    If ($PSBoundParameters['RemoveRule']) {
 
-                    $parameters = @{
-                        Id                    = $PSBoundParameters['Group']
-                        LDAPPath              = 'CN=Partitions,CN=Configuration,{0}' -f $Variables.defaultNamingContext
-                        AdRight               = 'ExtendedRight'
-                        AccessControlType     = 'Allow'
-                        ObjectType            = $Variables.ExtendedRightsMap['Change Domain Master']
-                        Verbose               = $false
+                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer Domain Naming Master?')) {
+                            # Add the parameter to remove the rule
+                            $Splat.Add('RemoveRule', $true)
+                        } #end If
+                    } #end If
+
+                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Domain Naming Master?')) {
+                        Set-AclConstructor4 @Splat
+                    } #end If
+
+                    $Splat = @{
+                        Id                = $PSBoundParameters['Group']
+                        LDAPPath          = 'CN=Partitions,CN=Configuration,{0}' -f $Variables.defaultNamingContext
+                        AdRight           = 'ExtendedRight'
+                        AccessControlType = 'Allow'
+                        ObjectType        = $Variables.ExtendedRightsMap['Change Domain Master']
+                        Verbose           = $false
                     }
                     # Check if RemoveRule switch is present.
-                    If($PSBoundParameters['RemoveRule']) {
-                        # Add the parameter to remove the rule
-                        $parameters.Add('RemoveRule', $true)
+                    If ($PSBoundParameters['RemoveRule']) {
+
+                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer Domain Naming Master?')) {
+                            # Add the parameter to remove the rule
+                            $Splat.Add('RemoveRule', $true)
+                        } #end If
                     }
-                    Set-AclConstructor4 @parameters
+
+                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Domain Naming Master?')) {
+                        Set-AclConstructor4 @Splat
+                    } #end If
                 }
                 # Domain specific roles
                 'Infrastructure' {
@@ -235,37 +250,49 @@ Function Set-AdAclFMSOtransfer {
                         IsInherited            : False
                     #>
 
-                    $parameters = @{
-                        Id                    = $PSBoundParameters['Group']
-                        LDAPPath              = 'CN=Infrastructure,{0}' -f $Variables.defaultNamingContext
-                        AdRight               = 'WriteProperty'
-                        AccessControlType     = 'Allow'
-                        ObjectType            = $Variables.GuidMap['fSMORoleOwner']
-                        Verbose               = $false
+                    $Splat = @{
+                        Id                = $PSBoundParameters['Group']
+                        LDAPPath          = 'CN=Infrastructure,{0}' -f $Variables.defaultNamingContext
+                        AdRight           = 'WriteProperty'
+                        AccessControlType = 'Allow'
+                        ObjectType        = $Variables.GuidMap['fSMORoleOwner']
+                        Verbose           = $false
                     }
                     # Check if RemoveRule switch is present.
-                    If($PSBoundParameters['RemoveRule']) {
-                        # Add the parameter to remove the rule
-                        $parameters.Add('RemoveRule', $true)
-                    }
-                    Set-AclConstructor4 @parameters
+                    If ($PSBoundParameters['RemoveRule']) {
 
-                    $parameters = @{
-                        Id                    = $PSBoundParameters['Group']
-                        LDAPPath              = 'CN=Infrastructure,{0}' -f $Variables.defaultNamingContext
-                        AdRight               = 'ExtendedRight'
-                        AccessControlType     = 'Allow'
-                        ObjectType            = $Variables.ExtendedRightsMap['Change Infrastructure Master']
-                        Verbose               = $false
+                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer Infrastructure Master?')) {
+                            # Add the parameter to remove the rule
+                            $Splat.Add('RemoveRule', $true)
+                        } #end If
+                    } #end If
+
+                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Infrastructure Master?')) {
+                        Set-AclConstructor4 @Splat
+                    } #end If
+
+                    $Splat = @{
+                        Id                = $PSBoundParameters['Group']
+                        LDAPPath          = 'CN=Infrastructure,{0}' -f $Variables.defaultNamingContext
+                        AdRight           = 'ExtendedRight'
+                        AccessControlType = 'Allow'
+                        ObjectType        = $Variables.ExtendedRightsMap['Change Infrastructure Master']
+                        Verbose           = $false
                     }
                     # Check if RemoveRule switch is present.
-                    If($PSBoundParameters['RemoveRule']) {
-                        # Add the parameter to remove the rule
-                        $parameters.Add('RemoveRule', $true)
-                    }
-                    Set-AclConstructor4 @parameters
+                    If ($PSBoundParameters['RemoveRule']) {
+
+                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer Infrastructure Master?')) {
+                            # Add the parameter to remove the rule
+                            $Splat.Add('RemoveRule', $true)
+                        } #end If
+                    } #end If
+
+                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Infrastructure Master?')) {
+                        Set-AclConstructor4 @Splat
+                    } #end If
                 }
-                'RID'   {
+                'RID' {
                     <#
                         Get-AclAccessRule -LDAPpath 'CN=RID Manager$,CN=System,DC=EguibarIT,DC=local' -SearchBy xxxx
 
@@ -290,35 +317,47 @@ Function Set-AdAclFMSOtransfer {
                         IsInherited            : False
                     #>
 
-                    $parameters = @{
-                        Id                    = $PSBoundParameters['Group']
-                        LDAPPath              = 'CN=RID Manager$,CN=System,{0}' -f $Variables.defaultNamingContext
-                        AdRight               = 'WriteProperty'
-                        AccessControlType     = 'Allow'
-                        ObjectType            = $Variables.GuidMap['fSMORoleOwner']
-                        Verbose               = $false
+                    $Splat = @{
+                        Id                = $PSBoundParameters['Group']
+                        LDAPPath          = 'CN=RID Manager$,CN=System,{0}' -f $Variables.defaultNamingContext
+                        AdRight           = 'WriteProperty'
+                        AccessControlType = 'Allow'
+                        ObjectType        = $Variables.GuidMap['fSMORoleOwner']
+                        Verbose           = $false
                     }
                     # Check if RemoveRule switch is present.
-                    If($PSBoundParameters['RemoveRule']) {
-                        # Add the parameter to remove the rule
-                        $parameters.Add('RemoveRule', $true)
-                    }
-                    Set-AclConstructor4 @parameters
+                    If ($PSBoundParameters['RemoveRule']) {
 
-                    $parameters = @{
-                        Id                    = $PSBoundParameters['Group']
-                        LDAPPath              = 'CN=RID Manager$,CN=System,{0}' -f $Variables.defaultNamingContext
-                        AdRight               = 'ExtendedRight'
-                        AccessControlType     = 'Allow'
-                        ObjectType            = $Variables.ExtendedRightsMap['Change Rid Master']
-                        Verbose               = $false
+                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer RID Master?')) {
+                            # Add the parameter to remove the rule
+                            $Splat.Add('RemoveRule', $true)
+                        } #end If
+                    } #end If
+
+                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer RID Master?')) {
+                        Set-AclConstructor4 @Splat
+                    } #end If
+
+                    $Splat = @{
+                        Id                = $PSBoundParameters['Group']
+                        LDAPPath          = 'CN=RID Manager$,CN=System,{0}' -f $Variables.defaultNamingContext
+                        AdRight           = 'ExtendedRight'
+                        AccessControlType = 'Allow'
+                        ObjectType        = $Variables.ExtendedRightsMap['Change Rid Master']
+                        Verbose           = $false
                     }
                     # Check if RemoveRule switch is present.
-                    If($PSBoundParameters['RemoveRule']) {
-                        # Add the parameter to remove the rule
-                        $parameters.Add('RemoveRule', $true)
-                    }
-                    Set-AclConstructor4 @parameters
+                    If ($PSBoundParameters['RemoveRule']) {
+
+                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer RID Master?')) {
+                            # Add the parameter to remove the rule
+                            $Splat.Add('RemoveRule', $true)
+                        } #end If
+                    } #end If
+
+                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer RID Master?')) {
+                        Set-AclConstructor4 @Splat
+                    } #end If
                 }
                 'PDC' {
                     <#
@@ -345,39 +384,51 @@ Function Set-AdAclFMSOtransfer {
                         IsInherited            : False
                     #>
 
-                    $parameters = @{
-                        Id                    = $PSBoundParameters['Group']
-                        LDAPPath              = $Variables.defaultNamingContext
-                        AdRight               = 'WriteProperty'
-                        AccessControlType     = 'Allow'
-                        ObjectType            = $Variables.GuidMap['fSMORoleOwner']
-                        Verbose               = $false
+                    $Splat = @{
+                        Id                = $PSBoundParameters['Group']
+                        LDAPPath          = $Variables.defaultNamingContext
+                        AdRight           = 'WriteProperty'
+                        AccessControlType = 'Allow'
+                        ObjectType        = $Variables.GuidMap['fSMORoleOwner']
+                        Verbose           = $false
                     }
                     # Check if RemoveRule switch is present.
-                    If($PSBoundParameters['RemoveRule']) {
-                        # Add the parameter to remove the rule
-                        $parameters.Add('RemoveRule', $true)
-                    }
-                    Set-AclConstructor4 @parameters
+                    If ($PSBoundParameters['RemoveRule']) {
 
-                    $parameters = @{
-                        Id                    = $PSBoundParameters['Group']
-                        LDAPPath              = $Variables.defaultNamingContext
-                        AdRight               = 'ExtendedRight'
-                        AccessControlType     = 'Allow'
-                        ObjectType            = $Variables.ExtendedRightsMap['Change PDC']
-                        Verbose               = $false
+                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer PDCemulator Master?')) {
+                            # Add the parameter to remove the rule
+                            $Splat.Add('RemoveRule', $true)
+                        } #end If
+                    } #end If
+
+                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer PDCemulator Master?')) {
+                        Set-AclConstructor4 @Splat
+                    } #end If
+
+                    $Splat = @{
+                        Id                = $PSBoundParameters['Group']
+                        LDAPPath          = $Variables.defaultNamingContext
+                        AdRight           = 'ExtendedRight'
+                        AccessControlType = 'Allow'
+                        ObjectType        = $Variables.ExtendedRightsMap['Change PDC']
+                        Verbose           = $false
                     }
                     # Check if RemoveRule switch is present.
-                    If($PSBoundParameters['RemoveRule']) {
-                        # Add the parameter to remove the rule
-                        $parameters.Add('RemoveRule', $true)
-                    }
-                    Set-AclConstructor4 @parameters
+                    If ($PSBoundParameters['RemoveRule']) {
+
+                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer PDCemulator Master?')) {
+                            # Add the parameter to remove the rule
+                            $Splat.Add('RemoveRule', $true)
+                        } #end If
+                    } #end If
+
+                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer PDCemulator Master?')) {
+                        Set-AclConstructor4 @Splat
+                    } #end If
                 }
             } #end Switch
 
-            If($PSBoundParameters['RemoveRule']) {
+            If ($PSBoundParameters['RemoveRule']) {
                 Write-Verbose -Message ('The right to transfer {1} role was revoked from {0}.' -f $PSBoundParameters['Group'], $role)
             } else {
                 Write-Verbose -Message ('{0} now has the right to transfer {1} role.' -f $PSBoundParameters['Group'], $role)
