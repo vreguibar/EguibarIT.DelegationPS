@@ -56,6 +56,7 @@ Function Get-AttributeSchemaHashTable {
                  ($Variables.GuidMap -ne $false)
             ) {
 
+                Write-Verbose -Message 'Getting the GUID value of each schema class and attribute'
                 #store the GUID value of each schema class and attribute
                 $Splat = @{
                     SearchBase = $Variables.SchemaNamingContext
@@ -64,6 +65,7 @@ Function Get-AttributeSchemaHashTable {
                 }
                 $AllSchema = Get-ADObject @Splat
 
+                Write-Verbose -Message 'Processing all schema class and attribute'
                 Foreach ($item in $AllSchema) {
                     $i ++
 
@@ -77,7 +79,8 @@ Function Get-AttributeSchemaHashTable {
 
 
                     $TmpMap.Add($item.lDAPDisplayName, [System.GUID]$item.schemaIDGUID)
-                }
+                } #end ForEach
+
                 # Include "ALL [nullGUID]"
                 $TmpMap.Add('All', [System.GUID]'00000000-0000-0000-0000-000000000000')
             } #end If
@@ -95,6 +98,8 @@ Function Get-AttributeSchemaHashTable {
 
         # Only fill $Variables.GuidMap in case is not empty
         If (-not $TmpMap) {
+
+            Write-Verbose -Message '$Variables.GuidMap was empty. Adding values to it!'
             $Variables.GuidMap = $TmpMap
         }
 
