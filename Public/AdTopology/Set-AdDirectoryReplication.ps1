@@ -27,14 +27,15 @@ function Set-AdDirectoryReplication {
                 Eguibar Information Technology S.L.
                 http://www.eguibarit.com
     #>
-    [CmdletBinding(ConfirmImpact = 'Low')]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([void])]
 
     param (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [Alias('IdentityReference','Identity','Trustee','GroupID')]
+        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         [String]
         $Group,
 
@@ -55,36 +56,26 @@ function Set-AdDirectoryReplication {
 
         ##############################
         # Variables Definition
-        $parameters = $null
+        [Hashtable]$Splat = [hashtable]::New()
 
         If ( ($null -eq $Variables.GuidMap) -and
-                 ($Variables.GuidMap -ne 0)     -and
-                 ($Variables.GuidMap -ne '')    -and
+                 ($Variables.GuidMap -ne 0) -and
+                 ($Variables.GuidMap -ne '') -and
                  (   ($Variables.GuidMap -isnot [array]) -or
                      ($Variables.GuidMap.Length -ne 0)) -and
                  ($Variables.GuidMap -ne $false)
-            ) {
+        ) {
+
             # $Variables.GuidMap is empty. Call function to fill it up
             Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
-            New-GuidObjectHashTable
-        } #end If
+            Get-AttributeSchemaHashTable
 
-        If ( ($null -eq $Variables.ExtendedRightsMap) -and
-                 ($Variables.ExtendedRightsMap -ne 0)     -and
-                 ($Variables.ExtendedRightsMap -ne '')    -and
-                 (   ($Variables.ExtendedRightsMap -isnot [array]) -or
-                     ($Variables.ExtendedRightsMap.Length -ne 0)) -and
-                 ($Variables.ExtendedRightsMap -ne $false)
-            ) {
-            # $Variables.ExtendedRightsMap is empty. Call function to fill it up
-            Write-Verbose -Message 'Variable $Variables.ExtendedRightsMap is empty. Calling function to fill it up.'
-            New-ExtenderRightHashTable
         } #end If
     }
     Process {
 
         # Iterate through all naming contexts
-        Foreach($CurrentContext in $Variables.namingContexts) {
+        Foreach ($CurrentContext in $Variables.namingContexts) {
             ####################
             # Monitor Active Directory Replication
             <#
@@ -98,19 +89,25 @@ function Set-AdDirectoryReplication {
                 InheritedObjectType    : GuidNULL
                 IsInherited            : False
             #>
-            $parameters = @{
-                Id                    = $PSBoundParameters['Group']
-                LDAPPath              = $CurrentContext
-                AdRight               = 'ExtendedRight'
-                AccessControlType     = 'Allow'
-                ObjectType            = $Variables.ExtendedRightsMap['Monitor Active Directory Replication']
+            $Splat = @{
+                Id                = $PSBoundParameters['Group']
+                LDAPPath          = $CurrentContext
+                AdRight           = 'ExtendedRight'
+                AccessControlType = 'Allow'
+                ObjectType        = $Variables.ExtendedRightsMap['Monitor Active Directory Replication']
             }
             # Check if RemoveRule switch is present.
-            If($PSBoundParameters['RemoveRule']) {
-                # Add the parameter to remove the rule
-                $parameters.Add('RemoveRule', $true)
-            }
-            Set-AclConstructor4 @parameters
+            If ($PSBoundParameters['RemoveRule']) {
+
+                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Monitor Active Directory Replication?')) {
+                    # Add the parameter to remove the rule
+                    $Splat.Add('RemoveRule', $true)
+                } #end If
+            } #end If
+
+            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Monitor Active Directory Replication?')) {
+                Set-AclConstructor4 @Splat
+            } #end If
 
             ####################
             # Replicating Directory Changes
@@ -125,19 +122,25 @@ function Set-AdDirectoryReplication {
                 InheritedObjectType    : GuidNULL
                 IsInherited            : False
             #>
-            $parameters = @{
-                Id                    = $PSBoundParameters['Group']
-                LDAPPath              = $CurrentContext
-                AdRight               = 'ExtendedRight'
-                AccessControlType     = 'Allow'
-                ObjectType            = $Variables.ExtendedRightsMap['Replicating Directory Changes']
+            $Splat = @{
+                Id                = $PSBoundParameters['Group']
+                LDAPPath          = $CurrentContext
+                AdRight           = 'ExtendedRight'
+                AccessControlType = 'Allow'
+                ObjectType        = $Variables.ExtendedRightsMap['Replicating Directory Changes']
             }
             # Check if RemoveRule switch is present.
-            If($PSBoundParameters['RemoveRule']) {
-                # Add the parameter to remove the rule
-                $parameters.Add('RemoveRule', $true)
-            }
-            Set-AclConstructor4 @parameters
+            If ($PSBoundParameters['RemoveRule']) {
+
+                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Replicating Directory Changes?')) {
+                    # Add the parameter to remove the rule
+                    $Splat.Add('RemoveRule', $true)
+                } #end If
+            } #end If
+
+            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Replicating Directory Changes?')) {
+                Set-AclConstructor4 @Splat
+            } #end If
 
             ####################
             # Replicating Directory Changes All
@@ -152,19 +155,25 @@ function Set-AdDirectoryReplication {
                 InheritedObjectType    : GuidNULL
                 IsInherited            : False
             #>
-            $parameters = @{
-                Id                    = $PSBoundParameters['Group']
-                LDAPPath              = $CurrentContext
-                AdRight               = 'ExtendedRight'
-                AccessControlType     = 'Allow'
-                ObjectType            = $Variables.ExtendedRightsMap['Replicating Directory Changes All']
+            $Splat = @{
+                Id                = $PSBoundParameters['Group']
+                LDAPPath          = $CurrentContext
+                AdRight           = 'ExtendedRight'
+                AccessControlType = 'Allow'
+                ObjectType        = $Variables.ExtendedRightsMap['Replicating Directory Changes All']
             }
             # Check if RemoveRule switch is present.
-            If($PSBoundParameters['RemoveRule']) {
-                # Add the parameter to remove the rule
-                $parameters.Add('RemoveRule', $true)
-            }
-            Set-AclConstructor4 @parameters
+            If ($PSBoundParameters['RemoveRule']) {
+
+                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Replicating Directory Changes All?')) {
+                    # Add the parameter to remove the rule
+                    $Splat.Add('RemoveRule', $true)
+                } #end If
+            } #end If
+
+            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Replicating Directory Changes All?')) {
+                Set-AclConstructor4 @Splat
+            } #end If
 
             ####################
             # Replicating Directory Changes In Filtered Set
@@ -179,19 +188,25 @@ function Set-AdDirectoryReplication {
                 InheritedObjectType    : GuidNULL
                 IsInherited            : False
             #>
-            $parameters = @{
-                Id                    = $PSBoundParameters['Group']
-                LDAPPath              = $CurrentContext
-                AdRight               = 'ExtendedRight'
-                AccessControlType     = 'Allow'
-                ObjectType            = $Variables.ExtendedRightsMap['Replicating Directory Changes In Filtered Set']
+            $Splat = @{
+                Id                = $PSBoundParameters['Group']
+                LDAPPath          = $CurrentContext
+                AdRight           = 'ExtendedRight'
+                AccessControlType = 'Allow'
+                ObjectType        = $Variables.ExtendedRightsMap['Replicating Directory Changes In Filtered Set']
             }
             # Check if RemoveRule switch is present.
-            If($PSBoundParameters['RemoveRule']) {
-                # Add the parameter to remove the rule
-                $parameters.Add('RemoveRule', $true)
-            }
-            Set-AclConstructor4 @parameters
+            If ($PSBoundParameters['RemoveRule']) {
+
+                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Replicating Directory Changes In Filtered Set?')) {
+                    # Add the parameter to remove the rule
+                    $Splat.Add('RemoveRule', $true)
+                } #end If
+            } #end If
+
+            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Replicating Directory Changes In Filtered Set?')) {
+                Set-AclConstructor4 @Splat
+            } #end If
 
             ####################
             # Manage Replication Topology
@@ -206,19 +221,25 @@ function Set-AdDirectoryReplication {
                 InheritedObjectType    : GuidNULL
                 IsInherited            : False
             #>
-            $parameters = @{
-                Id                    = $PSBoundParameters['Group']
-                LDAPPath              = $CurrentContext
-                AdRight               = 'ExtendedRight'
-                AccessControlType     = 'Allow'
-                ObjectType            = $Variables.ExtendedRightsMap['Manage Replication Topology']
+            $Splat = @{
+                Id                = $PSBoundParameters['Group']
+                LDAPPath          = $CurrentContext
+                AdRight           = 'ExtendedRight'
+                AccessControlType = 'Allow'
+                ObjectType        = $Variables.ExtendedRightsMap['Manage Replication Topology']
             }
             # Check if RemoveRule switch is present.
-            If($PSBoundParameters['RemoveRule']) {
-                # Add the parameter to remove the rule
-                $parameters.Add('RemoveRule', $true)
-            }
-            Set-AclConstructor4 @parameters
+            If ($PSBoundParameters['RemoveRule']) {
+
+                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Manage Replication Topology?')) {
+                    # Add the parameter to remove the rule
+                    $Splat.Add('RemoveRule', $true)
+                } #end If
+            } #end If
+
+            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Manage Replication Topology?')) {
+                Set-AclConstructor4 @Splat
+            } #end If
 
             ####################
             # Replication Synchronization
@@ -233,63 +254,96 @@ function Set-AdDirectoryReplication {
                 InheritedObjectType    : GuidNULL
                 IsInherited            : False
             #>
-            $parameters = @{
-                Id                    = $PSBoundParameters['Group']
-                LDAPPath              = $CurrentContext
-                AdRight               = 'ExtendedRight'
-                AccessControlType     = 'Allow'
-                ObjectType            = $Variables.ExtendedRightsMap['Replication Synchronization']
+            $Splat = @{
+                Id                = $PSBoundParameters['Group']
+                LDAPPath          = $CurrentContext
+                AdRight           = 'ExtendedRight'
+                AccessControlType = 'Allow'
+                ObjectType        = $Variables.ExtendedRightsMap['Replication Synchronization']
             }
             # Check if RemoveRule switch is present.
-            If($PSBoundParameters['RemoveRule']) {
-                # Add the parameter to remove the rule
-                $parameters.Add('RemoveRule', $true)
-            }
-            Set-AclConstructor4 @parameters
+            If ($PSBoundParameters['RemoveRule']) {
+
+                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Replication Synchronization?')) {
+                    # Add the parameter to remove the rule
+                    $Splat.Add('RemoveRule', $true)
+                } #end If
+            } #end If
+
+            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Replication Synchronization?')) {
+                Set-AclConstructor4 @Splat
+            } #end If
 
         } #end Foreach
 
-        $partitions = Get-ADObject -Filter * -SearchBase $Variables.PartitionsContainer -SearchScope OneLevel -Properties name,nCName,msDS-NC-Replica-Locations | Select-Object name,nCName,msDS-NC-Replica-Locations
+
+        $Splat = @{
+            Filter      = '*'
+            SearchBase  = $Variables.PartitionsContainer
+            SearchScope = 'OneLevel'
+            Properties  = 'name', 'nCName', 'msDS-NC-Replica-Locations'
+        }
+        $partitions = Get-ADObject @Splat | Select-Object name, nCName, msDS-NC-Replica-Locations
 
         ####################
         # Configure partitions attribute "msDS-NC-Replica-Locations"
         foreach ($part in $partitions) {
-            If($part."msDS-NC-Replica-Locations") {
+            If ($part.'msDS-NC-Replica-Locations') {
 
                 #
-                $parameters = @{
-                    Id                    = $PSBoundParameters['Group']
-                    LDAPPath              = 'CN={0},CN=Partitions,CN=Configuration,{1}' -f $part.name, $Variables.defaultNamingContext
-                    AdRight               = 'ReadProperty'
-                    AccessControlType     = 'Allow'
-                    ObjectType            = $Variables.GuidMap['msDS-NC-Replica-Locations']
+                $Splat = @{
+                    Id                = $PSBoundParameters['Group']
+                    LDAPPath          = 'CN={0},CN=Partitions,CN=Configuration,{1}' -f $part.name, $Variables.defaultNamingContext
+                    AdRight           = 'ReadProperty'
+                    AccessControlType = 'Allow'
+                    ObjectType        = $Variables.GuidMap['msDS-NC-Replica-Locations']
                 }
                 # Check if RemoveRule switch is present.
-                If($PSBoundParameters['RemoveRule']) {
-                    # Add the parameter to remove the rule
-                    $parameters.Add('RemoveRule', $true)
-                }
-                Set-AclConstructor4 @parameters
+                If ($PSBoundParameters['RemoveRule']) {
 
-                $parameters = @{
-                    Id                    = $PSBoundParameters['Group']
-                    LDAPPath              = 'CN={0},CN=Partitions,CN=Configuration,{1}' -f $part.name, $Variables.defaultNamingContext
-                    AdRight               = 'WriteProperty'
-                    AccessControlType     = 'Allow'
-                    ObjectType            = $Variables.GuidMap['msDS-NC-Replica-Locations']
+                    if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msDS-NC-Replica-Locations?')) {
+                        # Add the parameter to remove the rule
+                        $Splat.Add('RemoveRule', $true)
+                    } #end If
+                } #end If
+
+                If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to msDS-NC-Replica-Locations?')) {
+                    Set-AclConstructor4 @Splat
+                } #end If
+
+                $Splat = @{
+                    Id                = $PSBoundParameters['Group']
+                    LDAPPath          = 'CN={0},CN=Partitions,CN=Configuration,{1}' -f $part.name, $Variables.defaultNamingContext
+                    AdRight           = 'WriteProperty'
+                    AccessControlType = 'Allow'
+                    ObjectType        = $Variables.GuidMap['msDS-NC-Replica-Locations']
                 }
                 # Check if RemoveRule switch is present.
-                If($PSBoundParameters['RemoveRule']) {
-                    # Add the parameter to remove the rule
-                    $parameters.Add('RemoveRule', $true)
-                }
-                Set-AclConstructor4 @parameters
+                If ($PSBoundParameters['RemoveRule']) {
+
+                    if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msDS-NC-Replica-Locations?')) {
+                        # Add the parameter to remove the rule
+                        $Splat.Add('RemoveRule', $true)
+                    } #end If
+                } #end If
+
+                If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to msDS-NC-Replica-Locations?')) {
+                    Set-AclConstructor4 @Splat
+                } #end If
 
             } #end If
         } #end Foreach
 
     } #end Process
+
     End {
+
+        if ($RemoveRule) {
+            Write-Verbose ('Permissions removal process completed for group: {0}' -f $PSBoundParameters['Group'])
+        } else {
+            Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
+        } #end If-Else
+        
         Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished."
         Write-Verbose -Message ''
         Write-Verbose -Message '-------------------------------------------------------------------------------'
