@@ -84,6 +84,10 @@ Function Get-AttributeSchemaHashTable {
                 # Include "ALL [nullGUID]"
                 $TmpMap.Add('All', [System.GUID]'00000000-0000-0000-0000-000000000000')
             } #end If
+
+            Write-Verbose -Message '$Variables.GuidMap was empty. Adding values to it!'
+            $Variables.GuidMap = $TmpMap
+
         } catch {
             Get-CurrentErrorToDisplay -CurrentError $error[0]
         } #end Try-Catch
@@ -91,18 +95,9 @@ Function Get-AttributeSchemaHashTable {
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding members to the group."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) fill up GuidMap variable."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''
-
-        # Only fill $Variables.GuidMap in case is not empty
-        If (-not $TmpMap) {
-
-            Write-Verbose -Message '$Variables.GuidMap was empty. Adding values to it!'
-            $Variables.GuidMap = $TmpMap
-        }
-
-        Return $Variables.GuidMap
     } # end END
 }
