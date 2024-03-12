@@ -57,7 +57,6 @@
 
         ##############################
         # Variables Definition
-        $parameters = $null
         [Hashtable]$Splat = [hashtable]::New()
 
         If ( ($null -eq $Variables.GuidMap) -and
@@ -98,13 +97,13 @@
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
 
-            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Change Site-Link?')) {
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Create and Delete Site-Link?')) {
                 # Add the parameter to remove the rule
                 $Splat.Add('RemoveRule', $true)
             } #end If
         } #end If
 
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Change Site-Link?')) {
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Create and Delete Site-Link?')) {
             Set-AclConstructor5 @Splat
         } #end If
 
@@ -129,13 +128,13 @@
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
 
-            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Change Site-Link?')) {
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Create and Delete Site-Link?')) {
                 # Add the parameter to remove the rule
                 $Splat.Add('RemoveRule', $true)
             } #end If
         } #end If
 
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Change Site-Link?')) {
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Create and Delete Site-Link?')) {
             Set-AclConstructor5 @Splat
         } #end If
 
