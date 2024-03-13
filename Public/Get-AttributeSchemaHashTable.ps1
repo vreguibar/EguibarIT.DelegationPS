@@ -69,13 +69,13 @@ Function Get-AttributeSchemaHashTable {
                 Foreach ($item in $AllSchema) {
                     $i ++
 
-                    $parameters = @{
+                    $Splat = @{
                         Activity         = 'Adding {0} Schema attributes to Hashtable' -f $AllSchema.count
                         Status           = 'Reading attribute number {0}  ' -f $i
                         PercentComplete  = ($i / $AllSchema.count) * 100
                         CurrentOperation = '      Processing Attribute...: {0}' -f $item.lDAPDisplayName
                     }
-                    Write-Progress @parameters
+                    Write-Progress @Splat
 
 
                     $TmpMap.Add($item.lDAPDisplayName, [System.GUID]$item.schemaIDGUID)

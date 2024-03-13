@@ -33,6 +33,7 @@ Function New-ExtenderRightHashTable {
 
         [hashtable]$TmpMap = [hashtable]::New()
         [hashtable]$Splat = [hashtable]::New()
+        [int32]$i = 0
 
     } #end Begin
 
@@ -47,6 +48,7 @@ Function New-ExtenderRightHashTable {
                  ($Variables.ExtendedRightsMap -ne $false)
             ) {
 
+                Write-Verbose -Message 'Getting the GUID value of each Extended attribute'
                 # store the GUID value of each extended right in the forest
                 $Splat = @{
                     SearchBase = ('CN=Extended-Rights,{0}' -f $Variables.configurationNamingContext)
@@ -55,16 +57,31 @@ Function New-ExtenderRightHashTable {
                 }
                 $AllExtended = Get-ADObject @Splat
 
+                Write-Verbose -Message 'Processing all Extended attributes'
                 ForEach ($Item in $AllExtended) {
+                    $i ++
+
+                    $Splat = @{
+                        Activity         = 'Adding {0} Extended attributes to Hashtable' -f $AllExtended.count
+                        Status           = 'Reading extended attribute number {0}  ' -f $i
+                        PercentComplete  = ($i / $AllExtended.count) * 100
+                        CurrentOperation = '      Processing Extended Attribute...: {0}' -f $item.lDAPDisplayName
+                    }
+                    Write-Progress @Splat
+
                     $TmpMap.Add($Item.displayName, [system.guid]$Item.rightsGuid)
                 }
                 # Include "ALL [nullGUID]"
                 $TmpMap.Add('All', [System.GUID]'00000000-0000-0000-0000-000000000000')
+
             } #end If
+
+            Write-Verbose -Message '$Variables.GuidMap was empty. Adding values to it!'
+            $Variables.ExtendedRightsMap = $TmpMap
+
         } catch {
             Get-CurrentErrorToDisplay -CurrentError $error[0]
         } #end Try-Catch
-
 
     } #end Process
 
@@ -73,9 +90,5 @@ Function New-ExtenderRightHashTable {
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''
-
-        $Variables.ExtendedRightsMap = $TmpMap
-
-        Return $Variables.ExtendedRightsMap
     } #end END
 }
