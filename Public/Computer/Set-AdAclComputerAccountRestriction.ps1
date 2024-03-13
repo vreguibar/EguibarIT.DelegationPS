@@ -70,7 +70,6 @@ function Set-AdAclComputerAccountRestriction {
 
         ##############################
         # Variables Definition
-        $parameters = $null
         [Hashtable]$Splat = [hashtable]::New()
 
         If ( ($null -eq $Variables.GuidMap) -and
@@ -86,6 +85,19 @@ function Set-AdAclComputerAccountRestriction {
             Get-AttributeSchemaHashTable
 
         } #end If
+
+        If ( ($null -eq $Variables.ExtendedRightsMap) -and
+                 ($Variables.ExtendedRightsMap -ne 0) -and
+                 ($Variables.ExtendedRightsMap -ne '') -and
+                 (   ($Variables.ExtendedRightsMap -isnot [array]) -or
+                     ($Variables.ExtendedRightsMap.Length -ne 0)) -and
+                 ($Variables.ExtendedRightsMap -ne $false)
+        ) {
+            # $Variables.ExtendedRightsMap is empty. Call function to fill it up
+            Write-Verbose -Message 'Variable $Variables.ExtendedRightsMap is empty. Calling function to fill it up.'
+            New-ExtenderRightHashTable
+        } #end If
+
     } #end Begin
 
     Process {

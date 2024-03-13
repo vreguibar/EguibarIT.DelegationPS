@@ -94,6 +94,7 @@ function Set-AdAclComputerPublicInfo
             Write-Verbose -Message 'Variable $Variables.ExtendedRightsMap is empty. Calling function to fill it up.'
             New-ExtenderRightHashTable
         } #end If
+
     } #end Begin
 
     Process {
