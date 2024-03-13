@@ -27,6 +27,7 @@
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([void])]
 
     param (
         # PARAM1 STRING for the Delegated Group Name
@@ -34,7 +35,7 @@
             HelpMessage = 'Group Name which will get the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [Alias('IdentityReference','Identity','Trustee','GroupID')]
+        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         [String]
         $Group,
 
@@ -55,15 +56,15 @@
 
         ##############################
         # Variables Definition
-        $parameters = $null
+        [Hashtable]$Splat = [hashtable]::New()
 
         If ( ($null -eq $Variables.GuidMap) -and
-                 ($Variables.GuidMap -ne 0)     -and
-                 ($Variables.GuidMap -ne '')    -and
+                 ($Variables.GuidMap -ne 0) -and
+                 ($Variables.GuidMap -ne '') -and
                  (   ($Variables.GuidMap -isnot [array]) -or
                      ($Variables.GuidMap.Length -ne 0)) -and
                  ($Variables.GuidMap -ne $false)
-            ) {
+        ) {
             # $Variables.GuidMap is empty. Call function to fill it up
             Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
             New-GuidObjectHashTable
@@ -83,7 +84,7 @@
             IsInherited           : True
         #>
 
-        $parameters = @{
+        $Splat = @{
             Id                    = $PSBoundParameters['Group']
             LDAPPath              = 'CN=Policies,CN=System,{0}' -f $Variables.defaultNamingContext
             AdRight               = 'ReadProperty', 'WriteProperty'
@@ -92,14 +93,27 @@
             AdSecurityInheritance = 'All'
         }
         # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for Link GPO?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Link GPO?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
     }
 
     End {
+
+        if ($RemoveRule) {
+            Write-Verbose ('Permissions removal process completed for group: {0}' -f $PSBoundParameters['Group'])
+        } else {
+            Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
+        } #end If-Else
+
         Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding members to the group."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'

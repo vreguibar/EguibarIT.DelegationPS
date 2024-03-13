@@ -1,6 +1,5 @@
 # LAPS grant right to a group read computer PWD attributes
-function Set-AdmPwdReadPasswordPermission
-{
+function Set-AdmPwdReadPasswordPermission {
     <#
         .Synopsis
             The function will delegate the right to a group for reading the computer password.
@@ -31,6 +30,7 @@ function Set-AdmPwdReadPasswordPermission
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([void])]
 
     Param (
         # PARAM1 STRING for the Delegated Group Name
@@ -38,7 +38,7 @@ function Set-AdmPwdReadPasswordPermission
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [Alias('IdentityReference','Identity','Trustee','GroupID')]
+        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         [String]
         $Group,
 
@@ -67,15 +67,15 @@ function Set-AdmPwdReadPasswordPermission
 
         ##############################
         # Variables Definition
-        $parameters = $null
+        [Hashtable]$Splat = [hashtable]::New()
 
         If ( ($null -eq $Variables.GuidMap) -and
-                 ($Variables.GuidMap -ne 0)     -and
-                 ($Variables.GuidMap -ne '')    -and
+                 ($Variables.GuidMap -ne 0) -and
+                 ($Variables.GuidMap -ne '') -and
                  (   ($Variables.GuidMap -isnot [array]) -or
                      ($Variables.GuidMap.Length -ne 0)) -and
                  ($Variables.GuidMap -ne $false)
-            ) {
+        ) {
             # $Variables.GuidMap is empty. Call function to fill it up
             Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
             New-GuidObjectHashTable
@@ -94,7 +94,7 @@ function Set-AdmPwdReadPasswordPermission
                 InheritedObjectType : computer [ClassSchema]
                         IsInherited = False
         #>
-        $parameters = @{
+        $Splat = @{
             Id                    = $PSBoundParameters['Group']
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'ReadProperty', 'ExtendedRight'
@@ -104,11 +104,17 @@ function Set-AdmPwdReadPasswordPermission
             InheritedObjectType   = $Variables.GuidMap['computer']
         }
         # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor6 @parameters
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for ms-Mcs-AdmPwd?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for ms-Mcs-AdmPwd?')) {
+            Set-AclConstructor6 @Splat
+        } #end If
 
         <#
             ACE number: 2
@@ -121,7 +127,7 @@ function Set-AdmPwdReadPasswordPermission
                 InheritedObjectType : computer [ClassSchema]
                         IsInherited = False
         #>
-        $parameters = @{
+        $Splat = @{
             Id                    = $PSBoundParameters['Group']
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'ReadProperty'
@@ -131,14 +137,27 @@ function Set-AdmPwdReadPasswordPermission
             InheritedObjectType   = $Variables.GuidMap['computer']
         }
         # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor6 @parameters
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for ms-Mcs-AdmPwdExpirationTime?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for ms-Mcs-AdmPwdExpirationTime?')) {
+            Set-AclConstructor6 @Splat
+        } #end If
     }
 
     End {
+
+        if ($RemoveRule) {
+            Write-Verbose ('Permissions removal process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
+        } else {
+            Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
+        } #end If-Else
+
         Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding members to the group."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'

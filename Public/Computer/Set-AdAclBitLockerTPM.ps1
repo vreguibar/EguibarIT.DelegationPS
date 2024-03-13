@@ -222,7 +222,7 @@ function Set-AdAclBitLockerTPM {
         if ($RemoveRule) {
             Write-Verbose ('Permissions removal process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
         } else {
-            Write-Verbose ('Permissions delegation process completed for group: {0}on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
+            Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
         } #end If-Else
 
         Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding members to the group."

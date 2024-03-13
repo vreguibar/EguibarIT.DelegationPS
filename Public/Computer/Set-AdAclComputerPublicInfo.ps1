@@ -1,6 +1,5 @@
 # Read and write Public Info -  Public-Information property set - http://msdn.microsoft.com/en-us/library/ms684396(v=vs.85).aspx
-function Set-AdAclComputerPublicInfo
-{
+function Set-AdAclComputerPublicInfo {
     <#
         .Synopsis
             The function will delegate the premission for a group to read/write
@@ -33,6 +32,7 @@ function Set-AdAclComputerPublicInfo
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([void])]
 
     Param (
         # PARAM1 STRING for the Delegated Group Name
@@ -40,7 +40,7 @@ function Set-AdAclComputerPublicInfo
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [Alias('IdentityReference','Identity','Trustee','GroupID')]
+        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         [String]
         $Group,
 
@@ -69,27 +69,27 @@ function Set-AdAclComputerPublicInfo
 
         ##############################
         # Variables Definition
-        $parameters = $null
+        [Hashtable]$Splat = [hashtable]::New()
 
         If ( ($null -eq $Variables.GuidMap) -and
-                 ($Variables.GuidMap -ne 0)     -and
-                 ($Variables.GuidMap -ne '')    -and
+                 ($Variables.GuidMap -ne 0) -and
+                 ($Variables.GuidMap -ne '') -and
                  (   ($Variables.GuidMap -isnot [array]) -or
                      ($Variables.GuidMap.Length -ne 0)) -and
                  ($Variables.GuidMap -ne $false)
-            ) {
+        ) {
             # $Variables.GuidMap is empty. Call function to fill it up
             Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
             New-GuidObjectHashTable
         } #end If
 
         If ( ($null -eq $Variables.ExtendedRightsMap) -and
-                 ($Variables.ExtendedRightsMap -ne 0)     -and
-                 ($Variables.ExtendedRightsMap -ne '')    -and
+                 ($Variables.ExtendedRightsMap -ne 0) -and
+                 ($Variables.ExtendedRightsMap -ne '') -and
                  (   ($Variables.ExtendedRightsMap -isnot [array]) -or
                      ($Variables.ExtendedRightsMap.Length -ne 0)) -and
                  ($Variables.ExtendedRightsMap -ne $false)
-            ) {
+        ) {
             # $Variables.ExtendedRightsMap is empty. Call function to fill it up
             Write-Verbose -Message 'Variable $Variables.ExtendedRightsMap is empty. Calling function to fill it up.'
             New-ExtenderRightHashTable
@@ -109,7 +109,7 @@ function Set-AdAclComputerPublicInfo
                 InheritedObjectType : computer [ClassSchema]
                         IsInherited = False
         #>
-        $parameters = @{
+        $Splat = @{
             Id                    = $PSBoundParameters['Group']
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'ReadProperty', 'WriteProperty'
@@ -119,14 +119,27 @@ function Set-AdAclComputerPublicInfo
             InheritedObjectType   = $Variables.GuidMap['computer']
         }
         # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor6 @parameters
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for Public Information?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Public Information?')) {
+            Set-AclConstructor6 @Splat
+        } #end If
     } #end Process
 
     End {
+
+        if ($RemoveRule) {
+            Write-Verbose ('Permissions removal process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
+        } else {
+            Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
+        } #end If-Else
+
         Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding members to the group."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'

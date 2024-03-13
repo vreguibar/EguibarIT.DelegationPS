@@ -29,6 +29,8 @@ function Set-AdAclFullControlDFS {
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([void])]
+
     param (
         # PARAM1 STRING for the Delegated Group Name
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
@@ -55,10 +57,11 @@ function Set-AdAclFullControlDFS {
 
         ##############################
         # Variables Definition
-        $parameters     = $null
+        [Hashtable]$Splat = [hashtable]::New()
+
     } #end Begin
 
-    Process  {
+    Process {
         <#
             ACENumber              : 1
             IdentityReference      : EguibarIT\XXX
@@ -69,19 +72,25 @@ function Set-AdAclFullControlDFS {
             InheritedObjectType    : GuidNULL
             IsInherited            : False
         #>
-        $parameters = @{
-            Id                    = $PSBoundParameters['Group']
-            LDAPPath              = 'CN=DFSR-GlobalSettings,CN=System,{0}' -f $Variables.defaultNamingContext
-            AdRight               = 'GenericAll'
-            AccessControlType     = 'Allow'
-            ObjectType            = $Constants.guidNull
+        $Splat = @{
+            Id                = $PSBoundParameters['Group']
+            LDAPPath          = 'CN=DFSR-GlobalSettings,CN=System,{0}' -f $Variables.defaultNamingContext
+            AdRight           = 'GenericAll'
+            AccessControlType = 'Allow'
+            ObjectType        = $Constants.guidNull
         }
         # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-        # Add the parameter to remove the rule
-        $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor4 @parameters
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for Full Controll DFS Global Settings?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Full Controll DFS Global Settings?')) {
+            Set-AclConstructor4 @Splat
+        } #end If
 
         <#
             ACENumber              : 1
@@ -94,22 +103,35 @@ function Set-AdAclFullControlDFS {
             InheritedObjectType    : GuidNULL
             IsInherited            : False
         #>
-        $parameters = @{
-            Id                    = $PSBoundParameters['Group']
-            LDAPPath              = 'CN=Dfs-Configuration,CN=System,{0}' -f $Variables.defaultNamingContext
-            AdRight               = 'GenericAll'
-            AccessControlType     = 'Allow'
-            ObjectType            = $Constants.guidNull
+        $Splat = @{
+            Id                = $PSBoundParameters['Group']
+            LDAPPath          = 'CN=Dfs-Configuration,CN=System,{0}' -f $Variables.defaultNamingContext
+            AdRight           = 'GenericAll'
+            AccessControlType = 'Allow'
+            ObjectType        = $Constants.guidNull
         }
         # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-        # Add the parameter to remove the rule
-        $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor4 @parameters
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for Full Controll DFS Configuration?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Full Controll DFS Configuration?')) {
+            Set-AclConstructor4 @Splat
+        } #end If
     }
 
     End {
+
+        if ($RemoveRule) {
+            Write-Verbose ('Permissions removal process completed for group: {0}' -f $PSBoundParameters['Group'])
+        } else {
+            Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
+        } #end If-Else
+
         Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding members to the group."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'

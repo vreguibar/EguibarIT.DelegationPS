@@ -23,6 +23,7 @@ Function Remove-AuthUser {
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([void])]
 
     param (
         # PARAM1 STRING for the Object Name
@@ -30,6 +31,7 @@ Function Remove-AuthUser {
             HelpMessage = 'Distinguished Name of the object (or container) where the permissions are going to be removed.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
+        [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath
     )
@@ -42,13 +44,12 @@ Function Remove-AuthUser {
 
         ##############################
         # Variables Definition
+        [Hashtable]$Splat = [hashtable]::New()
 
-        [GUID]$guidNull = [System.guid]::New('00000000-0000-0000-0000-000000000000')
-        $parameters = $null
     } #end Begin
 
     Process {
-        $parameters = @{
+        $Splat = @{
             Id                    = 'AUTHENTICATED USERS'
             LDAPPath              = $PSBoundParameters['LDAPPath']
             AdRight               = 'GenericAll'
@@ -57,11 +58,13 @@ Function Remove-AuthUser {
             AdSecurityInheritance = 'All'
             RemoveRule            = $true
         }
-        Set-AclConstructor5 @parameters
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "AUTHENTICATED USERS"?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding members to the group."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) removed AUTHENTICATED USERS."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''

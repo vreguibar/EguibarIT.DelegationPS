@@ -23,6 +23,7 @@ Function Remove-AccountOperator {
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([void])]
 
     param (
         # PARAM1 STRING for the Object Name
@@ -30,6 +31,7 @@ Function Remove-AccountOperator {
             HelpMessage = 'Distinguished Name of the object (or container) where the permissions are going to be removed.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
+        [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath
     )
@@ -42,11 +44,12 @@ Function Remove-AccountOperator {
 
         ##############################
         # Variables Definition
-        $parameters = $null
+        [Hashtable]$Splat = [hashtable]::New()
+
     } #end Begin
 
     process {
-        $parameters = @{
+        $Splat = @{
             Id                    = 'Account Operators'
             LDAPPath              = $PSBoundParameters['LDAPPath']
             AdRight               = 'GenericAll'
@@ -55,11 +58,14 @@ Function Remove-AccountOperator {
             AdSecurityInheritance = 'All'
             RemoveRule            = $true
         }
-        Set-AclConstructor5 @parameters
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Account Operators"?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
     } #end Process
 
     end {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding members to the group."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) removed Account Operators."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''
