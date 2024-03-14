@@ -23,6 +23,7 @@ Function Remove-Everyone {
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([void])]
 
     param (
         # PARAM1 STRING for the Object Name
@@ -30,6 +31,7 @@ Function Remove-Everyone {
             HelpMessage = 'Distinguished Name of the object (or container) where the permissions are going to be removed.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
+        [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath
     )
@@ -42,7 +44,8 @@ Function Remove-Everyone {
 
         ##############################
         # Variables Definition
-        $parameters = $null
+        [Hashtable]$Splat = [hashtable]::New()
+
     } #end Begin
 
     process {
@@ -56,7 +59,7 @@ Function Remove-Everyone {
             InheritedObjectType    : GuidNULL
             IsInherited            : False
         #>
-        $parameters = @{
+        $Splat = @{
             Id                    = 'EVERYONE'
             LDAPPath              = $PSBoundParameters['LDAPPath']
             AdRight               = 'ReadProperty', 'WriteProperty', 'GenericExecute'
@@ -65,11 +68,13 @@ Function Remove-Everyone {
             AdSecurityInheritance = 'All'
             RemoveRule            = $true
         }
-        Set-AclConstructor5 @parameters
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "EVERYONE"?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
     } #end Process
 
     end {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding members to the group."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) removed Account Operators."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''

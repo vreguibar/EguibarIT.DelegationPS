@@ -23,6 +23,7 @@ Function Remove-PrintOperator {
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([void])]
 
     param (
         # PARAM1 STRING for the Object Name
@@ -30,6 +31,7 @@ Function Remove-PrintOperator {
             HelpMessage = 'Distinguished Name of the object (or container) where the permissions are going to be removed.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
+        [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath
     )
@@ -42,7 +44,7 @@ Function Remove-PrintOperator {
 
         ##############################
         # Variables Definition
-        $parameters = $null
+        [Hashtable]$Splat = [hashtable]::New()
 
         If ( ($null -eq $Variables.GuidMap) -and
                  ($Variables.GuidMap -ne 0)     -and
@@ -68,7 +70,7 @@ Function Remove-PrintOperator {
             InheritedObjectType    : GuidNULL
             IsInherited            : False
         #>
-        $parameters = @{
+        $Splat = @{
             Id                    = 'Print Operators'
             LDAPPath              = $PSBoundParameters['LDAPPath']
             AdRight               = 'CreateChild', 'DeleteChild'
@@ -77,11 +79,13 @@ Function Remove-PrintOperator {
             AdSecurityInheritance = 'None'
             RemoveRule            = $true
         }
-        Set-AclConstructor5 @parameters
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Print Operators"?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
     } #end Process
 
     end {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding members to the group."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) removed Print Operators."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''

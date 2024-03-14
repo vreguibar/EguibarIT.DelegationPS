@@ -22,12 +22,15 @@ Function Remove-PreWin2000 {
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([void])]
+
     param (
         # PARAM1 STRING for the Object Name
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the object (or container) where the permissions are going to be removed.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
+        [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath
     )
@@ -40,11 +43,12 @@ Function Remove-PreWin2000 {
 
         ##############################
         # Variables Definition
-        $parameters = $null
+        [Hashtable]$Splat = [hashtable]::New()
+
     } #end Begin
 
     process {
-        $parameters = @{
+        $Splat = @{
             Id                    = 'Pre-Windows 2000 Compatible Access'
             LDAPPath              = $PSBoundParameters['LDAPPath']
             AdRight               = 'GenericAll'
@@ -53,11 +57,14 @@ Function Remove-PreWin2000 {
             AdSecurityInheritance = 'All'
             RemoveRule            = $true
         }
-        Set-AclConstructor5 @parameters
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Pre-Windows 2000 Compatible Access"?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
     } #end Process
 
     end {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding members to the group."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) removed Pre-Windows 2000 Compatible Access."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''

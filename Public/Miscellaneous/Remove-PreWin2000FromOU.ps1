@@ -23,12 +23,15 @@ Function Remove-PreWin2000FromOU {
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([void])]
+
     param (
         # PARAM1 STRING for the Object Name
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Object Distinguished Name',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
+        [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath
     )
@@ -41,15 +44,15 @@ Function Remove-PreWin2000FromOU {
 
         ##############################
         # Variables Definition
-        $parameters = $null
+        [Hashtable]$Splat = [hashtable]::New()
 
         If ( ($null -eq $Variables.GuidMap) -and
-                 ($Variables.GuidMap -ne 0)     -and
-                 ($Variables.GuidMap -ne '')    -and
+                 ($Variables.GuidMap -ne 0) -and
+                 ($Variables.GuidMap -ne '') -and
                  (   ($Variables.GuidMap -isnot [array]) -or
                      ($Variables.GuidMap.Length -ne 0)) -and
                  ($Variables.GuidMap -ne $false)
-            ) {
+        ) {
             # $Variables.GuidMap is empty. Call function to fill it up
             Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
             New-GuidObjectHashTable
@@ -62,7 +65,7 @@ Function Remove-PreWin2000FromOU {
             Set-AdInheritance -LDAPPath $PSBoundParameters['LDAPpath'] -RemoveInheritance $true -RemovePermissions $true
 
             # Remove the List Children
-            $parameters = @{
+            $Splat = @{
                 Id                    = 'Pre-Windows 2000 Compatible Access'
                 LDAPPath              = $PSBoundParameters['LDAPpath']
                 AdRight               = 'ListChildren'
@@ -71,10 +74,12 @@ Function Remove-PreWin2000FromOU {
                 AdSecurityInheritance = 'All'
                 RemoveRule            = $true
             }
-            Set-AclConstructor5 @parameters
+            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Pre-Windows 2000 Compatible Access"?')) {
+                Set-AclConstructor5 @Splat
+            } #end If
 
             # Remove inetOrgPerson
-            $parameters = @{
+            $Splat = @{
                 Id                    = 'Pre-Windows 2000 Compatible Access'
                 LDAPPath              = $PSBoundParameters['LDAPpath']
                 AdRight               = 'ReadProperty', 'ListObject', 'ReadControl'
@@ -84,10 +89,12 @@ Function Remove-PreWin2000FromOU {
                 InheritedObjectType   = $Variables.GuidMap['inetOrgPerson']
                 RemoveRule            = $true
             }
-            Set-AclConstructor6 @parameters
+            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Pre-Windows 2000 Compatible Access"?')) {
+                Set-AclConstructor5 @Splat
+            } #end If
 
             # Remove Group
-            $parameters = @{
+            $Splat = @{
                 Id                    = 'Pre-Windows 2000 Compatible Access'
                 LDAPPath              = $PSBoundParameters['LDAPpath']
                 AdRight               = 'ReadProperty', 'ListObject', 'ReadControl'
@@ -97,10 +104,12 @@ Function Remove-PreWin2000FromOU {
                 InheritedObjectType   = $Variables.GuidMap['group']
                 RemoveRule            = $true
             }
-            Set-AclConstructor6 @parameters
+            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Pre-Windows 2000 Compatible Access"?')) {
+                Set-AclConstructor5 @Splat
+            } #end If
 
             # Remove User
-            $parameters = @{
+            $Splat = @{
                 Id                    = 'Pre-Windows 2000 Compatible Access'
                 LDAPPath              = $PSBoundParameters['LDAPpath']
                 AdRight               = 'ReadProperty', 'ListObject', 'ReadControl'
@@ -110,12 +119,16 @@ Function Remove-PreWin2000FromOU {
                 InheritedObjectType   = $Variables.GuidMap['user']
                 RemoveRule            = $true
             }
-            Set-AclConstructor6 @parameters
-        } catch { throw }
+            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Pre-Windows 2000 Compatible Access"?')) {
+                Set-AclConstructor5 @Splat
+            } #end If
+        } catch {
+            throw 
+        }
     } #end Process
 
     end {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding members to the group."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) removed Pre-Windows 2000 Compatible Access from OU."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''
