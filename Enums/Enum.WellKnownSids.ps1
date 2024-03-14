@@ -1,4 +1,4 @@
-﻿$WellKnownSIDs = [ordered] @{
+﻿$Variables.WellKnownSIDs = [ordered] @{
     'S-1-0'                                      = 'null authority'
     'S-1-0-0'                                    = 'nobody'
     'S-1-1'                                      = 'world authority'
@@ -93,7 +93,7 @@
     'S-1-5-80-0'                                 = 'all services'
     'S-1-5-83-0'                                 = 'virtual machines'
 }
-New-Variable -Name WellKnownSIDs -Value $WellKnownSIDs -Scope Script -Force
+New-Variable -Name WellKnownSIDs -Value $Variables.WellKnownSIDs -Scope Script -Force
 # Search by Key to get Value
 # $WellKnownSIDs['S-1-5-11']
 # Search by Value to get Key

@@ -52,13 +52,13 @@
 
         # $WellKnownSids variable is defined on .\Enums\Enum.WellKnownSids.ps1
         # Check is populated, otherwise fill it up
-        If ( ($null -eq $WellKnownSIDs) -or
-            (0 -eq $WellKnownSIDs) -or
-            ('' -eq $WellKnownSIDs) -or
-            ($WellKnownSIDs.length -eq 0) -or
-            ($WellKnownSIDs -eq $false)
+        If ( ($null -eq $Variables.WellKnownSIDs) -or
+            (0 -eq $Variables.WellKnownSIDs) -or
+            ('' -eq $Variables.WellKnownSIDs) -or
+            ($Variables.WellKnownSIDs.length -eq 0) -or
+            ($Variables.WellKnownSIDs -eq $false)
         ) {
-            #.\Enums\Enum.WellKnownSids.ps1
+            .\Enums\Enum.WellKnownSids.ps1
         }
 
     } # end Begin
@@ -73,7 +73,9 @@
                 $sidDescription = $WellKnownSIDs[$SID]
             }
 
-            Write-Verbose "Checked SID: $SID. Is Well-Known: $isWellKnownSid. Description: $sidDescription"
+            Write-Verbose "  Checked SID: $SID."
+            Write-Verbose "Is Well-Known: $isWellKnownSid"
+            Write-Verbose "  Description: $sidDescription"
         } catch {
             Get-CurrentErrorToDisplay -CurrentError $error[0]
         } #end Try-Catch

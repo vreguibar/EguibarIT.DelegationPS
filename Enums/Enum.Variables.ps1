@@ -29,5 +29,8 @@
 
     # Schema Naming Context
     SchemaNamingContext        = ([ADSI]'LDAP://RootDSE').SchemaNamingContext.ToString()
+
+    # Well-Known SIDs
+    WellKnownSIDs              = $null
 }
 New-Variable -Name Variables -Value $Variables -Scope Script -Force
