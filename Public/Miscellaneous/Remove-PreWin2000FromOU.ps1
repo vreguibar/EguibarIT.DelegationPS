@@ -13,7 +13,7 @@ Function Remove-PreWin2000FromOU {
                 Name                                   | Module
                 ---------------------------------------|--------------------------
                 Set-AclConstructor6                    | EguibarIT.Delegation
-                New-GuidObjectHashTable                | EguibarIT.Delegation
+                Get-AttributeSchemaHashTable                | EguibarIT.Delegation
         .NOTES
             Version:         1.1
             DateModified:    29/Sep/2016
@@ -55,7 +55,7 @@ Function Remove-PreWin2000FromOU {
         ) {
             # $Variables.GuidMap is empty. Call function to fill it up
             Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
-            New-GuidObjectHashTable
+            Get-AttributeSchemaHashTable
         } #end If
     } #end Begin
 
@@ -123,7 +123,7 @@ Function Remove-PreWin2000FromOU {
                 Set-AclConstructor5 @Splat
             } #end If
         } catch {
-            throw 
+            throw
         }
     } #end Process
 

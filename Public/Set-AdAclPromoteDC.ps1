@@ -20,7 +20,7 @@ function Set-AdAclPromoteDomain {
                 ---------------------------------------|--------------------------
                 Set-AclConstructor4                    | N/A - separate PowerShell script
                 Set-AclConstructor5                    | N/A - separate PowerShell script
-                New-GuidObjectHashTable                | N/A - separate PowerShell script
+                Get-AttributeSchemaHashTable                | N/A - separate PowerShell script
                 New-ExtenderRightHashTable             | N/A - separate PowerShell script
         .NOTES
             Version:         1.2
@@ -75,7 +75,7 @@ function Set-AdAclPromoteDomain {
         ) {
             # $Variables.GuidMap is empty. Call function to fill it up
             Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
-            New-GuidObjectHashTable
+            Get-AttributeSchemaHashTable
         } #end If
 
         If ( ($null -eq $Variables.ExtendedRightsMap) -and

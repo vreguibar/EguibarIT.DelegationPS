@@ -22,7 +22,7 @@ function Set-AdAclComputerPersonalInfo {
                 Name                                   | Module
                 ---------------------------------------|--------------------------
                 Set-AclConstructor6                    | EguibarIT.Delegation
-                New-GuidObjectHashTable                | EguibarIT.Delegation
+                Get-AttributeSchemaHashTable                | EguibarIT.Delegation
                 New-ExtenderRightHashTable             | EguibarIT.Delegation
         .NOTES
             Version:         1.2
@@ -81,7 +81,7 @@ function Set-AdAclComputerPersonalInfo {
         ) {
             # $Variables.GuidMap is empty. Call function to fill it up
             Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
-            New-GuidObjectHashTable
+            Get-AttributeSchemaHashTable
         } #end If
 
         If ( ($null -eq $Variables.ExtendedRightsMap) -and

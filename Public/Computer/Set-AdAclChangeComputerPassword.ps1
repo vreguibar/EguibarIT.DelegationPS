@@ -19,7 +19,7 @@ function Set-AdAclChangeComputerPassword {
                 Name                                   | Module
                 ---------------------------------------|--------------------------
                 Set-AclConstructor6                    | EguibarIT.Delegation
-                New-GuidObjectHashTable                | EguibarIT.Delegation
+                Get-AttributeSchemaHashTable                | EguibarIT.Delegation
                 New-ExtenderRightHashTable             | EguibarIT.Delegation
         .NOTES
             Version:         1.2

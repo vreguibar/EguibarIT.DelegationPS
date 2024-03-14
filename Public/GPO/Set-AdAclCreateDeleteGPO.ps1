@@ -19,7 +19,7 @@
                 Name                                   | Module
                 ---------------------------------------|--------------------------
                 Set-AclConstructor5                    | EguibarIT.Delegation
-                New-GuidObjectHashTable                | EguibarIT.Delegation
+                Get-AttributeSchemaHashTable                | EguibarIT.Delegation
         .NOTES
             Version:         1.1
             DateModified:    17/Oct/2016

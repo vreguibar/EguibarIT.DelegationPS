@@ -18,7 +18,7 @@ function Set-AdmPwdComputerSelfPermission {
                 Name                                   | Module
                 ---------------------------------------|--------------------------
                 Set-AclConstructor6                    | EguibarIT.Delegation
-                New-GuidObjectHashTable                | EguibarIT.Delegation
+                Get-AttributeSchemaHashTable                | EguibarIT.Delegation
         .NOTES
             Version:         1.0
             DateModified:    19/Oct/2016
@@ -67,7 +67,7 @@ function Set-AdmPwdComputerSelfPermission {
         ) {
             # $Variables.GuidMap is empty. Call function to fill it up
             Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
-            New-GuidObjectHashTable
+            Get-AttributeSchemaHashTable
         } #end If
     } #end Begin
 

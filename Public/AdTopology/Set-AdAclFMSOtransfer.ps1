@@ -19,7 +19,7 @@ Function Set-AdAclFMSOtransfer {
                 Name                                   | Module
                 ---------------------------------------|--------------------------
                 Set-AclConstructor4                    | EguibarIT.Delegation
-                New-GuidObjectHashTable                | EguibarIT.Delegation
+                Get-AttributeSchemaHashTable                | EguibarIT.Delegation
                 New-ExtenderRightHashTable             | EguibarIT.Delegation
         .NOTES
             Version:         1.0
