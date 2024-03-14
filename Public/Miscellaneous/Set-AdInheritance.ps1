@@ -23,6 +23,8 @@ Function Set-AdInheritance {
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([void])]
+
     param (
         # PARAM1 STRING for the Delegated Group Name
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
@@ -34,12 +36,14 @@ Function Set-AdInheritance {
 
         # PARAM2 Bool for the IsProtected parameter
         [Parameter(Mandatory = $False, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'If present inheritance of object will be removed.',
             Position = 1)]
         [bool]
         $RemoveInheritance,
 
         # PARAM3 Bool for the preserveInheritance parameter
         [Parameter(Mandatory = $False, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'If present the permissions from the parent object are copied to the object.',
             Position = 2)]
         [bool]
         $RemovePermissions
@@ -57,8 +61,8 @@ Function Set-AdInheritance {
         Set-Location -Path 'AD:\'
     }
 
-    Process  {
-        try  {
+    Process {
+        try {
             $acl = Get-Acl -Path ('AD:\{0}' -f $PSBoundParameters['LDAPPath'])
 
             # First value will set/Remove the inheritance Check-Box
@@ -71,14 +75,18 @@ Function Set-AdInheritance {
             #     If "preserverInheritance" is set to FALSE, it has the same effect as clicking �Remove�
             $acl.SetAccessRuleProtection($PSBoundParameters['RemoveInheritance'], $PSBoundParameters['RemovePermissions'])
 
-            Set-Acl -AclObject $acl -Path ('AD:\{0}' -f $PSBoundParameters['LDAPPath'])
-        } catch { throw }
+            If ($PSCmdlet.ShouldProcess($PSBoundParameters['LDAPPath'], 'Set/Remove Inheritance and permissions?')) {
+                Set-Acl -AclObject $acl -Path ('AD:\{0}' -f $PSBoundParameters['LDAPPath'])
+            } #end If
+        } catch {
+            throw
+        }
     } #end Process
 
     End {
         Set-Location -Path $env:HOMEDRIVE\
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding members to the group."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) setting Inheritance and permissions."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''
