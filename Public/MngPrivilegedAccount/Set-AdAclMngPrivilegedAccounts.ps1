@@ -1,5 +1,5 @@
 ﻿Function Set-AdAclMngPrivilegedAccounts {
-       <#
+    <#
         .Synopsis
             The function will delegate the premission for a group to Managed Privileged Accounts
         .DESCRIPTION
@@ -28,6 +28,7 @@
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([void])]
 
     Param (
         # PARAM1 STRING for the Delegated Group Name
@@ -35,7 +36,7 @@
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [Alias('IdentityReference','Identity','Trustee','GroupID')]
+        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         [String]
         $Group,
 
@@ -56,27 +57,27 @@
 
         ##############################
         # Variables Definition
-        $parameters = $null
+        [Hashtable]$Splat = [hashtable]::New()
 
         If ( ($null -eq $Variables.GuidMap) -and
-                 ($Variables.GuidMap -ne 0)     -and
-                 ($Variables.GuidMap -ne '')    -and
+                 ($Variables.GuidMap -ne 0) -and
+                 ($Variables.GuidMap -ne '') -and
                  (   ($Variables.GuidMap -isnot [array]) -or
                      ($Variables.GuidMap.Length -ne 0)) -and
                  ($Variables.GuidMap -ne $false)
-            ) {
+        ) {
             # $Variables.GuidMap is empty. Call function to fill it up
             Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
             New-GuidObjectHashTable
         } #end If
 
         If ( ($null -eq $Variables.ExtendedRightsMap) -and
-                 ($Variables.ExtendedRightsMap -ne 0)     -and
-                 ($Variables.ExtendedRightsMap -ne '')    -and
+                 ($Variables.ExtendedRightsMap -ne 0) -and
+                 ($Variables.ExtendedRightsMap -ne '') -and
                  (   ($Variables.ExtendedRightsMap -isnot [array]) -or
                      ($Variables.ExtendedRightsMap.Length -ne 0)) -and
                  ($Variables.ExtendedRightsMap -ne $false)
-            ) {
+        ) {
             # $Variables.ExtendedRightsMap is empty. Call function to fill it up
             Write-Verbose -Message 'Variable $Variables.ExtendedRightsMap is empty. Calling function to fill it up.'
             New-ExtenderRightHashTable
@@ -106,7 +107,7 @@
                 InheritedObjectType : GuidNULL
                         IsInherited = False
         #>
-        $parameters = @{
+        $Splat = @{
             Id                    = $PSBoundParameters['Group']
             LDAPPath              = 'CN=AdminSDHolder,CN=System,{0}' -f $Variables.defaultNamingContext
             AdRight               = 'ReadProperty', 'WriteProperty'
@@ -115,11 +116,17 @@
             AdSecurityInheritance = 'None'
         }
         # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for member?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for member?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
 
         <#
             ACE number: 2
@@ -132,7 +139,7 @@
                 InheritedObjectType : GuidNULL
                         IsInherited = False
         #>
-        $parameters = @{
+        $Splat = @{
             Id                    = $PSBoundParameters['Group']
             LDAPPath              = 'CN=AdminSDHolder,CN=System,{0}' -f $Variables.defaultNamingContext
             AdRight               = 'ReadProperty', 'WriteProperty'
@@ -141,11 +148,17 @@
             AdSecurityInheritance = 'None'
         }
         # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for lockoutTime?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for lockoutTime?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
 
         <#
             ACE number: 3
@@ -158,7 +171,7 @@
                 InheritedObjectType : GuidNULL
                         IsInherited = False
         #>
-        $parameters = @{
+        $Splat = @{
             Id                    = $PSBoundParameters['Group']
             LDAPPath              = 'CN=AdminSDHolder,CN=System,{0}' -f $Variables.defaultNamingContext
             AdRight               = 'ReadProperty', 'WriteProperty'
@@ -167,11 +180,18 @@
             AdSecurityInheritance = 'None'
         }
         # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for userAccountControl?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for userAccountControl?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
+
         <#
             ACE number: 4
             --------------------------------------------------------
@@ -183,7 +203,7 @@
                 InheritedObjectType : GuidNULL
                         IsInherited = False
         #>
-        $parameters = @{
+        $Splat = @{
             Id                    = $PSBoundParameters['Group']
             LDAPPath              = 'CN=AdminSDHolder,CN=System,{0}' -f $Variables.defaultNamingContext
             AdRight               = 'ReadProperty', 'WriteProperty'
@@ -192,11 +212,17 @@
             AdSecurityInheritance = 'None'
         }
         # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for pwdLastSet?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for pwdLastSet?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
 
         <#
             ACE number: 5
@@ -209,7 +235,7 @@
                 InheritedObjectType : GuidNULL
                         IsInherited = False
         #>
-        $parameters = @{
+        $Splat = @{
             Id                    = $PSBoundParameters['Group']
             LDAPPath              = 'CN=AdminSDHolder,CN=System,{0}' -f $Variables.defaultNamingContext
             AdRight               = 'ReadProperty', 'WriteProperty'
@@ -218,11 +244,17 @@
             AdSecurityInheritance = 'None'
         }
         # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for Reset Password?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Reset Password?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
 
         <#
             ACE number: 6
@@ -235,7 +267,7 @@
                 InheritedObjectType : GuidNULL
                         IsInherited = False
         #>
-        $parameters = @{
+        $Splat = @{
             Id                    = $PSBoundParameters['Group']
             LDAPPath              = 'CN=AdminSDHolder,CN=System,{0}' -f $Variables.defaultNamingContext
             AdRight               = 'ReadProperty', 'WriteProperty'
@@ -244,15 +276,28 @@
             AdSecurityInheritance = 'None'
         }
         # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for Change Password?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Change Password?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding members to the group."
+
+        if ($RemoveRule) {
+            Write-Verbose ('Permissions removal process completed for group: {0}' -f $PSBoundParameters['Group'])
+        } else {
+            Write-Verbose ('Permissions delegation process completed for group: {0} ' -f $PSBoundParameters['Group'])
+        } #end If-Else
+
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) delegation for MSA."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''
