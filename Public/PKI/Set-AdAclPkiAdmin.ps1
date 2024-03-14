@@ -30,6 +30,7 @@ function Set-AdAclPkiAdmin {
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([void])]
 
     param (
         # PARAM1 STRING for the Delegated Group Name
@@ -43,7 +44,7 @@ function Set-AdAclPkiAdmin {
         #PARAM2 Distinguished Name of the OU were the groups can be changed
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the OU having the Rights groups, where the "Cert Publishers" built-in group resides (Usually OU=Rights,OU=Admin,DC=EguibarIT,DC=local).',
-        Position = 1)]
+            Position = 1)]
         [ValidateNotNullOrEmpty()]
         [String]
         $ItRightsOuDN,
@@ -65,7 +66,8 @@ function Set-AdAclPkiAdmin {
 
         ##############################
         # Variables Definition
-        $parameters = $null
+        [Hashtable]$Splat = [hashtable]::New()
+
     } #end Begin
 
     Process {
@@ -80,7 +82,7 @@ function Set-AdAclPkiAdmin {
             IsInherited           : False
         #>
         # Certificate Authority Admin
-        $parameters = @{
+        $Splat = @{
             Id                    = $PSBoundParameters['Group']
             LDAPPath              = 'CN=Public Key Services,CN=Services,{0}' -f $Variables.configurationNamingContext
             AdRight               = 'GenericAll'
@@ -89,11 +91,17 @@ function Set-AdAclPkiAdmin {
             AdSecurityInheritance = 'All'
         }
         # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for PKI?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for PKI?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
 
         <#
             ACENumber             : 1
@@ -106,7 +114,7 @@ function Set-AdAclPkiAdmin {
             IsInherited           : False
         #>
         # rights to modify security permissions for Pre-Windows 2000 Compatible Access group.
-        $parameters = @{
+        $Splat = @{
             Id                    = $PSBoundParameters['Group']
             LDAPPath              = 'CN=Pre-Windows 2000 Compatible Access,CN=Builtin,{0}' -f $Variables.defaultNamingContext
             AdRight               = 'ListChildren', 'ReadProperty', 'GenericWrite'
@@ -115,11 +123,17 @@ function Set-AdAclPkiAdmin {
             AdSecurityInheritance = 'None'
         }
         # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for PKI?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for PKI?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
 
         <#
             ACENumber             : 2
@@ -132,7 +146,7 @@ function Set-AdAclPkiAdmin {
             IsInherited           : False
         #>
         # rights to modify security permissions for Cert Publishers group.
-        $parameters = @{
+        $Splat = @{
             Id                    = $PSBoundParameters['Group']
             LDAPPath              = 'CN=Cert Publishers,{0}' -f $PSBoundParameters['ItRightsOuDN']
             AdRight               = 'ListChildren', 'ReadProperty', 'GenericWrite'
@@ -141,15 +155,29 @@ function Set-AdAclPkiAdmin {
             AdSecurityInheritance = 'None'
         }
         # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for PKI?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for PKI?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
+
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding members to the group."
+
+        if ($RemoveRule) {
+            Write-Verbose ('Permissions removal process completed for group: {0}' -f $PSBoundParameters['Group'])
+        } else {
+            Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
+        } #end If-Else
+
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding PKI."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''

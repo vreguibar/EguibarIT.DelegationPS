@@ -27,6 +27,7 @@ function Set-AdAclPkiTemplateAdmin {
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([void])]
 
     param (
         # PARAM1 STRING for the Delegated Group Name
@@ -36,7 +37,7 @@ function Set-AdAclPkiTemplateAdmin {
             HelpMessage = 'Group Name which will get the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [Alias('IdentityReference','Identity','Trustee','GroupID')]
+        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         [String]
         $Group,
 
@@ -59,10 +60,11 @@ function Set-AdAclPkiTemplateAdmin {
 
         ##############################
         # Variables Definition
-        $parameters = $null
+        [Hashtable]$Splat = [hashtable]::New()
+
     } #end Begin
 
-    Process  {
+    Process {
         <#
             ACENumber             : 1
             IdentityReference     : EguibarIT\XXX
@@ -74,7 +76,7 @@ function Set-AdAclPkiTemplateAdmin {
             IsInherited           : False
         #>
         # Certificate Authority Template Admin
-        $parameters = @{
+        $Splat = @{
             Id                    = $PSBoundParameters['Group']
             LDAPPath              = 'CN=Certificate Templates,CN=Public Key Services,CN=Services,{0}' -f $Variables.configurationNamingContext
             AdRight               = 'GenericAll'
@@ -83,11 +85,17 @@ function Set-AdAclPkiTemplateAdmin {
             AdSecurityInheritance = 'All'
         }
         # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for PKI template?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for PKI template?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
 
         <#
             ACENumber             : 1
@@ -101,7 +109,7 @@ function Set-AdAclPkiTemplateAdmin {
             IsInherited           : False
         #>
         # Certificate Authority Template Admin
-        $parameters = @{
+        $Splat = @{
             Id                    = $PSBoundParameters['Group']
             LDAPPath              = 'CN=OID,CN=Public Key Services,CN=Services,{0}' -f $Variables.configurationNamingContext
             AdRight               = 'GenericAll'
@@ -110,15 +118,29 @@ function Set-AdAclPkiTemplateAdmin {
             AdSecurityInheritance = 'All'
         }
         # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for PKI template?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for PKI template?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
+
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding members to the group."
+
+        if ($RemoveRule) {
+            Write-Verbose ('Permissions removal process completed for group: {0}' -f $PSBoundParameters['Group'])
+        } else {
+            Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
+        } #end If-Else
+
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding PKI template."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''

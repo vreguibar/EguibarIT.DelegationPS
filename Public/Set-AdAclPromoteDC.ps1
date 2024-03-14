@@ -30,7 +30,9 @@ function Set-AdAclPromoteDomain {
                 Eguibar Information Technology S.L.
                 http://www.eguibarit.com
     #>
-    [CmdletBinding(ConfirmImpact = 'Low')]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [OutputType([void])]
+
     param (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation',
@@ -62,35 +64,57 @@ function Set-AdAclPromoteDomain {
 
         ##############################
         # Variables Definition
+        [Hashtable]$Splat = [hashtable]::New()
 
-        #Create a hashtable to store the GUID value of each schema class and attribute
-        $guidmap = New-GuidObjectHashTable
+        If ( ($null -eq $Variables.GuidMap) -and
+                 ($Variables.GuidMap -ne 0) -and
+                 ($Variables.GuidMap -ne '') -and
+                 (   ($Variables.GuidMap -isnot [array]) -or
+                     ($Variables.GuidMap.Length -ne 0)) -and
+                 ($Variables.GuidMap -ne $false)
+        ) {
+            # $Variables.GuidMap is empty. Call function to fill it up
+            Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
+            New-GuidObjectHashTable
+        } #end If
 
-        #Create a hashtable for Extended Rights GUID
-        $extendedrightsmap = New-ExtenderRightHashTable
+        If ( ($null -eq $Variables.ExtendedRightsMap) -and
+                 ($Variables.ExtendedRightsMap -ne 0) -and
+                 ($Variables.ExtendedRightsMap -ne '') -and
+                 (   ($Variables.ExtendedRightsMap -isnot [array]) -or
+                     ($Variables.ExtendedRightsMap.Length -ne 0)) -and
+                 ($Variables.ExtendedRightsMap -ne $false)
+        ) {
+            # $Variables.ExtendedRightsMap is empty. Call function to fill it up
+            Write-Verbose -Message 'Variable $Variables.ExtendedRightsMap is empty. Calling function to fill it up.'
+            New-ExtenderRightHashTable
+        } #end If
 
-        $parameters = $null
+    } #end Begin
 
-        # Get Corresponding context
-        [string]$DefaultNamingContext = ([ADSI]'LDAP://RootDSE').rootDomainNamingContext
-    }
     Process {
 
         ####################
         # Add/remove replica in domain
-        $parameters = @{
-            Id                    = $PSBoundParameters['Group']
-            LDAPPath              = $DefaultNamingContext
-            AdRight               = 'ExtendedRight'
-            AccessControlType     = 'Allow'
-            ObjectType            = $extendedrightsmap['Add/remove replica in domain']
+        $Splat = @{
+            Id                = $PSBoundParameters['Group']
+            LDAPPath          = $Variables.defaultNamingContext
+            AdRight           = 'ExtendedRight'
+            AccessControlType = 'Allow'
+            ObjectType        = $extendedrightsmap['Add/remove replica in domain']
         }
         # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor4 @parameters
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for Add/remove replica in domain?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Add/remove replica in domain?')) {
+            Set-AclConstructor4 @Splat
+        } #end If
 
         ####################
         # Grant special permissions on Sites
@@ -104,7 +128,30 @@ function Set-AdAclPromoteDomain {
             InheritanceType        : Descendents
             InheritedObjectType    : GuidNULL
             IsInherited            : False
+        #>
 
+        $Splat = @{
+            Id                    = $PSBoundParameters['Group']
+            LDAPPath              = 'CN=Sites,CN=Configuration,{0}' -f $Variables.defaultNamingContext
+            AdRight               = 'CreateChild'
+            AccessControlType     = 'Allow'
+            ObjectType            = $guidmap['nTDSDSA']
+            AdSecurityInheritance = 'Descendents'
+        }
+        # Check if RemoveRule switch is present.
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for nTDSDSA?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for nTDSDSA?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
+
+        <#
             ACENumber              : 2
             DistinguishedName      : CN=Sites,CN=Configuration,DC=EguibarIT,DC=local
             IdentityReference      : EguibarIT\XXXX
@@ -114,7 +161,29 @@ function Set-AdAclPromoteDomain {
             InheritanceType        : Descendents
             InheritedObjectType    : nTDSDSA [ClassSchema]
             IsInherited            : False
+        #>
+        $Splat = @{
+            Id                    = $PSBoundParameters['Group']
+            LDAPPath              = 'CN=Sites,CN=Configuration,{0}' -f $Variables.defaultNamingContext
+            AdRight               = 'WriteDacl'
+            AccessControlType     = 'Allow'
+            ObjectType            = $guidmap['nTDSDSA']
+            AdSecurityInheritance = 'Descendents'
+        }
+        # Check if RemoveRule switch is present.
+        If ($PSBoundParameters['RemoveRule']) {
 
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for nTDSDSA?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for nTDSDSA?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
+
+        <#
             ACENumber              : 3
             DistinguishedName      : CN=Sites,CN=Configuration,DC=EguibarIT,DC=local
             IdentityReference      : EguibarIT\XXXX
@@ -124,7 +193,29 @@ function Set-AdAclPromoteDomain {
             InheritanceType        : Descendents
             InheritedObjectType    : GuidNULL
             IsInherited            : False
+        #>
+        $Splat = @{
+            Id                    = $PSBoundParameters['Group']
+            LDAPPath              = 'CN=Sites,CN=Configuration,{0}' -f $Variables.defaultNamingContext
+            AdRight               = 'CreateChild'
+            AccessControlType     = 'Allow'
+            ObjectType            = $guidmap['server']
+            AdSecurityInheritance = 'Descendents'
+        }
+        # Check if RemoveRule switch is present.
+        If ($PSBoundParameters['RemoveRule']) {
 
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for server?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for server?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
+
+        <#
             ACENumber              : 4
             DistinguishedName      : CN=Sites,CN=Configuration,DC=EguibarIT,DC=local
             IdentityReference      : EguibarIT\XXXX
@@ -135,74 +226,34 @@ function Set-AdAclPromoteDomain {
             InheritedObjectType    : GuidNULL
             IsInherited            : False
         #>
-
-        $parameters = @{
+        $Splat = @{
             Id                    = $PSBoundParameters['Group']
-            LDAPPath              = 'CN=Sites,CN=Configuration,{0}' -f $DefaultNamingContext
-            AdRight               = 'CreateChild'
-            AccessControlType     = 'Allow'
-            ObjectType            = $guidmap['nTDSDSA']
-            AdSecurityInheritance = 'Descendents'
-        }
-        # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
-
-        $parameters = @{
-            Id                    = $PSBoundParameters['Group']
-            LDAPPath              = 'CN=Sites,CN=Configuration,{0}' -f $DefaultNamingContext
-            AdRight               = 'WriteDacl'
-            AccessControlType     = 'Allow'
-            ObjectType            = $guidmap['nTDSDSA']
-            AdSecurityInheritance = 'Descendents'
-        }
-        # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
-
-        $parameters = @{
-            Id                    = $PSBoundParameters['Group']
-            LDAPPath              = 'CN=Sites,CN=Configuration,{0}' -f $DefaultNamingContext
-            AdRight               = 'CreateChild'
-            AccessControlType     = 'Allow'
-            ObjectType            = $guidmap['server']
-            AdSecurityInheritance = 'Descendents'
-        }
-        # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
-
-        $parameters = @{
-            Id                    = $PSBoundParameters['Group']
-            LDAPPath              = 'CN=Sites,CN=Configuration,{0}' -f $DefaultNamingContext
+            LDAPPath              = 'CN=Sites,CN=Configuration,{0}' -f $Variables.defaultNamingContext
             AdRight               = 'CreateChild'
             AccessControlType     = 'Allow'
             ObjectType            = $guidmap['nTDSConnection']
             AdSecurityInheritance = 'Descendents'
         }
         # Check if RemoveRule switch is present.
-        If($PSBoundParameters['RemoveRule']) {
-            # Add the parameter to remove the rule
-            $parameters.Add('RemoveRule', $true)
-        }
-        Set-AclConstructor5 @parameters
+        If ($PSBoundParameters['RemoveRule']) {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for nTDSConnection?')) {
+                # Add the parameter to remove the rule
+                $Splat.Add('RemoveRule', $true)
+            } #end If
+        } #end If
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for nTDSConnection?')) {
+            Set-AclConstructor5 @Splat
+        } #end If
 
 
         ####################
         # Prepare Staging container for to-be-promoted server
-        If($StagingOU) {
+        If ($StagingOU) {
             $existingOU = Get-ADOrganizationalUnit -Filter { DistinguishedName -like $StagingOU } -ErrorAction SilentlyContinue
 
-            If(-not($existingOU)) {
+            If (-not($existingOU)) {
                 $parameters = @{
                     Message           = 'Staging OU is a controlled OU where the server to be promoted resides. Computer object must have the corresponding permissions.'
                     Category          = ObjectNotFound
@@ -217,7 +268,15 @@ function Set-AdAclPromoteDomain {
         # Set the necessary permissions on the domain controllers OU
 
     } #end Process
+
     End {
+
+        if ($RemoveRule) {
+            Write-Verbose ('Permissions removal process completed for group: {0}' -f $PSBoundParameters['Group'])
+        } else {
+            Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
+        } #end If-Else
+
         Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished."
         Write-Verbose -Message ''
         Write-Verbose -Message '-------------------------------------------------------------------------------'
