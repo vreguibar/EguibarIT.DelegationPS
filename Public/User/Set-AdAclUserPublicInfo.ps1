@@ -74,17 +74,8 @@ function Set-AdAclUserPublicInfo {
         Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case is empty a function is called to fill it up.'
             Get-AttributeSchemaHashTable
 
-        If ( ($null -eq $Variables.ExtendedRightsMap) -and
-                 ($Variables.ExtendedRightsMap -ne 0) -and
-                 ($Variables.ExtendedRightsMap -ne '') -and
-                 (   ($Variables.ExtendedRightsMap -isnot [array]) -or
-                     ($Variables.ExtendedRightsMap.Length -ne 0)) -and
-                 ($Variables.ExtendedRightsMap -ne $false)
-        ) {
-            # $Variables.ExtendedRightsMap is empty. Call function to fill it up
-            Write-Verbose -Message 'Variable $Variables.ExtendedRightsMap is empty. Calling function to fill it up.'
+        Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
             New-ExtenderRightHashTable
-        } #end If
     } #end Begin
 
     Process {
