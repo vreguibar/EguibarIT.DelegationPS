@@ -94,30 +94,96 @@ function Set-AdAclPromoteDomain {
 
     Process {
 
-        ####################
-        # Add/remove replica in domain
-        $Splat = @{
-            Id                = $PSBoundParameters['Group']
-            LDAPPath          = $Variables.defaultNamingContext
-            AdRight           = 'ExtendedRight'
-            AccessControlType = 'Allow'
-            ObjectType        = $extendedrightsmap['Add/remove replica in domain']
-        }
-        # Check if RemoveRule switch is present.
-        If ($PSBoundParameters['RemoveRule']) {
+        # Each defined "Naming Context" must have these permissions
+        # Variable $Variables.namingContexts contains all available naming contexts
+        # the CMDLet "Set-AdDirectoryReplication" does grants all requiered rights in all NC
+        # except for the "Add/Remove Replica In Domain"
 
-            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for Add/remove replica in domain?')) {
-                # Add the parameter to remove the rule
-                $Splat.Add('RemoveRule', $true)
+        Set-AdDirectoryReplication -Group $PSBoundParameters['Group']
+
+        Foreach ($Context in $Variables.namingContexts) {
+
+            ####################
+            # Add/Remove Replica In Domain
+            $Splat = @{
+                Id                = $PSBoundParameters['Group']
+                LDAPPath          = $Context
+                AdRight           = 'ExtendedRight'
+                AccessControlType = 'Allow'
+                ObjectType        = $Variables.ExtendedRightsMap['Add/Remove Replica In Domain']
+            }
+            # Check if RemoveRule switch is present.
+            If ($PSBoundParameters['RemoveRule']) {
+
+                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for Add/Remove Replica In Domain?')) {
+                    # Add the parameter to remove the rule
+                    $Splat.Add('RemoveRule', $true)
+                } #end If
             } #end If
-        } #end If
 
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Add/remove replica in domain?')) {
-            Set-AclConstructor4 @Splat
-        } #end If
+            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Add/Remove Replica In Domain?')) {
+                Set-AclConstructor4 @Splat
+            } #end If
+
+
+            ####################
+            # Configure msDS-NC-RO-Replica-Locations on all NC
+            # Not sure if ACENumber 1 is needed (ReadProperty, GenericExecute).
+            <#
+                ACENumber             : 1
+                Id                    : EguibarIT\XXX
+                LDAPpath              : CN=EguibarIT,CN=Partitions,CN=Configuration,DC=EguibarIT,DC=local
+                AdRight               : ReadProperty, GenericExecute
+                AccessControlType     : Allow
+                ObjectType            : All [GuidNULL]
+                AdSecurityInheritance : None
+                InheritedObjectType   : All [GuidNULL]
+                IsInherited           : False
+            #>
+
+
+            <#
+                ACENumber             : 2
+                IdentityReference     : EguibarIT\XXX
+                LDAPpath              : CN=EguibarIT,CN=Partitions,CN=Configuration,DC=EguibarIT,DC=local
+                AdRight               : WriteProperty
+                AccessControlType     : Allow
+                ObjectType            : msDS-NC-RO-Replica-Locations [attributeSchema]
+                AdSecurityInheritance : None
+                InheritedObjectType   : All [GuidNULL]
+                IsInherited           : False
+            #>
+            $Splat = @{
+                Id                = $PSBoundParameters['Group']
+                LDAPPath          = $Context
+                AdRight           = 'WriteProperty'
+                AccessControlType = 'Allow'
+                ObjectType        = $Variables.GuidMap['msDS-NC-RO-Replica-Locations']
+            }
+            # Check if RemoveRule switch is present.
+            If ($PSBoundParameters['RemoveRule']) {
+
+                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for computer?')) {
+                    # Add the parameter to remove the rule
+                    $Splat.Add('RemoveRule', $true)
+                } #end If
+            } #end If
+
+            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for computer?')) {
+                Set-AclConstructor4 @Splat
+            } #end If
+
+        } #end ForEach
+
+
+        # Needed permissions to create/Manage site
+        # All these permissions are already on the following CMDlets
+
+        Set-AdAclCreateDeleteSite -Group $PSBoundParameters['Group']
+        Set-AdAclChangeSite -Group $PSBoundParameters['Group']
 
         ####################
-        # Grant special permissions on Sites
+        # Grant permissions on Sites
         <#
             ACENumber              : 1
             DistinguishedName      : CN=Sites,CN=Configuration,DC=EguibarIT,DC=local
@@ -128,30 +194,7 @@ function Set-AdAclPromoteDomain {
             InheritanceType        : Descendents
             InheritedObjectType    : GuidNULL
             IsInherited            : False
-        #>
 
-        $Splat = @{
-            Id                    = $PSBoundParameters['Group']
-            LDAPPath              = 'CN=Sites,CN=Configuration,{0}' -f $Variables.defaultNamingContext
-            AdRight               = 'CreateChild'
-            AccessControlType     = 'Allow'
-            ObjectType            = $guidmap['nTDSDSA']
-            AdSecurityInheritance = 'Descendents'
-        }
-        # Check if RemoveRule switch is present.
-        If ($PSBoundParameters['RemoveRule']) {
-
-            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for nTDSDSA?')) {
-                # Add the parameter to remove the rule
-                $Splat.Add('RemoveRule', $true)
-            } #end If
-        } #end If
-
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for nTDSDSA?')) {
-            Set-AclConstructor5 @Splat
-        } #end If
-
-        <#
             ACENumber              : 2
             DistinguishedName      : CN=Sites,CN=Configuration,DC=EguibarIT,DC=local
             IdentityReference      : EguibarIT\XXXX
@@ -161,29 +204,7 @@ function Set-AdAclPromoteDomain {
             InheritanceType        : Descendents
             InheritedObjectType    : nTDSDSA [ClassSchema]
             IsInherited            : False
-        #>
-        $Splat = @{
-            Id                    = $PSBoundParameters['Group']
-            LDAPPath              = 'CN=Sites,CN=Configuration,{0}' -f $Variables.defaultNamingContext
-            AdRight               = 'WriteDacl'
-            AccessControlType     = 'Allow'
-            ObjectType            = $guidmap['nTDSDSA']
-            AdSecurityInheritance = 'Descendents'
-        }
-        # Check if RemoveRule switch is present.
-        If ($PSBoundParameters['RemoveRule']) {
 
-            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for nTDSDSA?')) {
-                # Add the parameter to remove the rule
-                $Splat.Add('RemoveRule', $true)
-            } #end If
-        } #end If
-
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for nTDSDSA?')) {
-            Set-AclConstructor5 @Splat
-        } #end If
-
-        <#
             ACENumber              : 3
             DistinguishedName      : CN=Sites,CN=Configuration,DC=EguibarIT,DC=local
             IdentityReference      : EguibarIT\XXXX
@@ -193,29 +214,7 @@ function Set-AdAclPromoteDomain {
             InheritanceType        : Descendents
             InheritedObjectType    : GuidNULL
             IsInherited            : False
-        #>
-        $Splat = @{
-            Id                    = $PSBoundParameters['Group']
-            LDAPPath              = 'CN=Sites,CN=Configuration,{0}' -f $Variables.defaultNamingContext
-            AdRight               = 'CreateChild'
-            AccessControlType     = 'Allow'
-            ObjectType            = $guidmap['server']
-            AdSecurityInheritance = 'Descendents'
-        }
-        # Check if RemoveRule switch is present.
-        If ($PSBoundParameters['RemoveRule']) {
 
-            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for server?')) {
-                # Add the parameter to remove the rule
-                $Splat.Add('RemoveRule', $true)
-            } #end If
-        } #end If
-
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for server?')) {
-            Set-AclConstructor5 @Splat
-        } #end If
-
-        <#
             ACENumber              : 4
             DistinguishedName      : CN=Sites,CN=Configuration,DC=EguibarIT,DC=local
             IdentityReference      : EguibarIT\XXXX
@@ -226,31 +225,12 @@ function Set-AdAclPromoteDomain {
             InheritedObjectType    : GuidNULL
             IsInherited            : False
         #>
-        $Splat = @{
-            Id                    = $PSBoundParameters['Group']
-            LDAPPath              = 'CN=Sites,CN=Configuration,{0}' -f $Variables.defaultNamingContext
-            AdRight               = 'CreateChild'
-            AccessControlType     = 'Allow'
-            ObjectType            = $guidmap['nTDSConnection']
-            AdSecurityInheritance = 'Descendents'
-        }
-        # Check if RemoveRule switch is present.
-        If ($PSBoundParameters['RemoveRule']) {
-
-            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for nTDSConnection?')) {
-                # Add the parameter to remove the rule
-                $Splat.Add('RemoveRule', $true)
-            } #end If
-        } #end If
-
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for nTDSConnection?')) {
-            Set-AclConstructor5 @Splat
-        } #end If
 
 
         ####################
         # Prepare Staging container for to-be-promoted server
-        If ($StagingOU) {
+        # In our DM the server staging is: "OU=InfraStaging,OU=Infra,OU=Admin,DC=EguibarIT,DC=local"
+        If ($PSBoundParameters['StagingOU']) {
             $existingOU = Get-ADOrganizationalUnit -Filter { DistinguishedName -like $StagingOU } -ErrorAction SilentlyContinue
 
             If (-not($existingOU)) {
@@ -258,14 +238,122 @@ function Set-AdAclPromoteDomain {
                     Message           = 'Staging OU is a controlled OU where the server to be promoted resides. Computer object must have the corresponding permissions.'
                     Category          = ObjectNotFound
                     CategoryReason    = 'Staging OU could not be found!'
-                    RecommendedAction = 'Ensure Staging OU {0} exists and is accessible.' -f $existingOU.DistinguishedName
+                    RecommendedAction = 'Ensure Staging OU {0} exists and is accessible.' -f $PSBoundParameters['StagingOU']
                 }
                 Write-Error @parameters
-            } #end If
+            } else {
+                Write-Verbose -Message ('Staging OU found ({0}). Setting the permissions.' -f $existingOU)
+
+                <#
+                    ACENumber             : 1
+                    Id                    : EguibarIT\XXX
+                    LDAPpath              : OU=InfraStaging,OU=Infra,OU=Admin,DC=EguibarIT,DC=local
+                    AdRight               : WriteProperty
+                    AccessControlType     : Allow
+                    ObjectType            : servicePrincipalName [attributeSchema]
+                    AdSecurityInheritance : Descendents
+                    InheritedObjectType   : computer [classSchema]
+                    IsInherited           : False
+
+                    ACENumber             : 2
+                    Id                    : EguibarIT\XXX
+                    LDAPpath              : OU=InfraStaging,OU=Infra,OU=Admin,DC=EguibarIT,DC=local
+                    AdRight               : WriteProperty
+                    AccessControlType     : Allow
+                    ObjectType            : serverReference [attributeSchema]
+                    AdSecurityInheritance : Descendents
+                    InheritedObjectType   : computer [classSchema]
+                    IsInherited           : False
+
+                    ACENumber             : 3
+                    Id                    : EguibarIT\XXX
+                    LDAPpath              : OU=InfraStaging,OU=Infra,OU=Admin,DC=EguibarIT,DC=local
+                    AdRight               : WriteProperty
+                    AccessControlType     : Allow
+                    ObjectType            : userAccountControl [attributeSchema]
+                    AdSecurityInheritance : Descendents
+                    InheritedObjectType   : computer [classSchema]
+                    IsInherited           : False
+
+                    ACENumber             : 4
+                    Id                    : EguibarIT\XXX
+                    LDAPpath              : OU=InfraStaging,OU=Infra,OU=Admin,DC=EguibarIT,DC=local
+                    AdRight               : WriteProperty
+                    AccessControlType     : Allow
+                    ObjectType            : cn [attributeSchema]
+                    AdSecurityInheritance : Descendents
+                    InheritedObjectType   : computer [classSchema]
+                    IsInherited           : False
+
+                    ACENumber             : 5
+                    Id                    : EguibarIT\XXX
+                    LDAPpath              : OU=InfraStaging,OU=Infra,OU=Admin,DC=EguibarIT,DC=local
+                    AdRight               : WriteProperty
+                    AccessControlType     : Allow
+                    ObjectType            : name [attributeSchema]
+                    AdSecurityInheritance : Descendents
+                    InheritedObjectType   : computer [classSchema]
+                    IsInherited           : False
+
+                    ACENumber             : 6
+                    Id                    : EguibarIT\XXX
+                    LDAPpath              : OU=InfraStaging,OU=Infra,OU=Admin,DC=EguibarIT,DC=local
+                    AdRight               : WriteProperty
+                    AccessControlType     : Allow
+                    ObjectType            : distinguishedName [attributeSchema]
+                    AdSecurityInheritance : Descendents
+                    InheritedObjectType   : computer [classSchema]
+                    IsInherited           : False
+
+                    ACENumber             : 7
+                    Id                    : EguibarIT\XXX
+                    LDAPpath              : OU=InfraStaging,OU=Infra,OU=Admin,DC=EguibarIT,DC=local
+                    AdRight               : DeleteChild
+                    AccessControlType     : Allow
+                    ObjectType            : computer [classSchema]
+                    AdSecurityInheritance : None
+                    InheritedObjectType   : All [GuidNULL]
+                    IsInherited           : False
+                #>
+
+            } #end If-Else
         } #end If
 
         ####################
         # Set the necessary permissions on the domain controllers OU
+
+        $Splat = @{
+            Group    = $PSBoundParameters['Group']
+            LDAPPath = 'DC=Domain Controllers,{0}' -f $Variables.AdDN
+        }
+
+        # Create/Delete Computers
+        Set-AdAclCreateDeleteComputer @Splat
+
+        # Reset Computer Password
+        Set-AdAclResetComputerPassword @Splat
+
+        # Change Computer Password
+        Set-AdAclChangeComputerPassword @Splat
+
+        # Validated write to DNS host name
+        Set-AdAclValidateWriteDnsHostName @Splat
+
+        # Validated write to SPN
+        Set-AdAclValidateWriteSPN @Splat
+
+        # Change Computer Account Restriction
+        Set-AdAclComputerAccountRestriction @Splat
+
+        # Change DNS Hostname Info
+        Set-AdAclDnsInfo @Splat
+
+        # Change MS TerminalServices info
+        Set-AdAclMsTsGatewayInfo @Splat
+
+        # Access to BitLocker & TMP info
+        Set-AdAclBitLockerTPM @Splat
+
 
     } #end Process
 
