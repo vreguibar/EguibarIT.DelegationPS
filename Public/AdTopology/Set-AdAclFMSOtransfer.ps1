@@ -139,13 +139,13 @@ Function Set-AdAclFMSOtransfer {
                     # Check if RemoveRule switch is present.
                     If ($PSBoundParameters['RemoveRule']) {
 
-                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer Schema Master?')) {
+                        if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer Schema Master?')) {
                             # Add the parameter to remove the rule
                             $Splat.Add('RemoveRule', $true)
                         } #end If
                     }
 
-                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Schema Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Schema Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
 
@@ -160,13 +160,13 @@ Function Set-AdAclFMSOtransfer {
                     # Check if RemoveRule switch is present.
                     If ($PSBoundParameters['RemoveRule']) {
 
-                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer Schema Master?')) {
+                        if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer Schema Master?')) {
                             # Add the parameter to remove the rule
                             $Splat.Add('RemoveRule', $true)
                         } #end If
                     } #end If
 
-                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Schema Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Schema Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
                 }
@@ -206,13 +206,13 @@ Function Set-AdAclFMSOtransfer {
                     # Check if RemoveRule switch is present.
                     If ($PSBoundParameters['RemoveRule']) {
 
-                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer Domain Naming Master?')) {
+                        if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer Domain Naming Master?')) {
                             # Add the parameter to remove the rule
                             $Splat.Add('RemoveRule', $true)
                         } #end If
                     } #end If
 
-                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Domain Naming Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Domain Naming Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
 
@@ -227,13 +227,13 @@ Function Set-AdAclFMSOtransfer {
                     # Check if RemoveRule switch is present.
                     If ($PSBoundParameters['RemoveRule']) {
 
-                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer Domain Naming Master?')) {
+                        if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer Domain Naming Master?')) {
                             # Add the parameter to remove the rule
                             $Splat.Add('RemoveRule', $true)
                         } #end If
                     }
 
-                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Domain Naming Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Domain Naming Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
                 }
@@ -274,13 +274,13 @@ Function Set-AdAclFMSOtransfer {
                     # Check if RemoveRule switch is present.
                     If ($PSBoundParameters['RemoveRule']) {
 
-                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer Infrastructure Master?')) {
+                        if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer Infrastructure Master?')) {
                             # Add the parameter to remove the rule
                             $Splat.Add('RemoveRule', $true)
                         } #end If
                     } #end If
 
-                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Infrastructure Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Infrastructure Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
 
@@ -295,13 +295,13 @@ Function Set-AdAclFMSOtransfer {
                     # Check if RemoveRule switch is present.
                     If ($PSBoundParameters['RemoveRule']) {
 
-                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer Infrastructure Master?')) {
+                        if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer Infrastructure Master?')) {
                             # Add the parameter to remove the rule
                             $Splat.Add('RemoveRule', $true)
                         } #end If
                     } #end If
 
-                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Infrastructure Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Infrastructure Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
                 }
@@ -341,13 +341,13 @@ Function Set-AdAclFMSOtransfer {
                     # Check if RemoveRule switch is present.
                     If ($PSBoundParameters['RemoveRule']) {
 
-                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer RID Master?')) {
+                        if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer RID Master?')) {
                             # Add the parameter to remove the rule
                             $Splat.Add('RemoveRule', $true)
                         } #end If
                     } #end If
 
-                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer RID Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer RID Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
 
@@ -362,13 +362,13 @@ Function Set-AdAclFMSOtransfer {
                     # Check if RemoveRule switch is present.
                     If ($PSBoundParameters['RemoveRule']) {
 
-                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer RID Master?')) {
+                        if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer RID Master?')) {
                             # Add the parameter to remove the rule
                             $Splat.Add('RemoveRule', $true)
                         } #end If
                     } #end If
 
-                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer RID Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer RID Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
                 }
@@ -408,13 +408,13 @@ Function Set-AdAclFMSOtransfer {
                     # Check if RemoveRule switch is present.
                     If ($PSBoundParameters['RemoveRule']) {
 
-                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer PDCemulator Master?')) {
+                        if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer PDCemulator Master?')) {
                             # Add the parameter to remove the rule
                             $Splat.Add('RemoveRule', $true)
                         } #end If
                     } #end If
 
-                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer PDCemulator Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer PDCemulator Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
 
@@ -429,13 +429,13 @@ Function Set-AdAclFMSOtransfer {
                     # Check if RemoveRule switch is present.
                     If ($PSBoundParameters['RemoveRule']) {
 
-                        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer PDCemulator Master?')) {
+                        if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to transfer PDCemulator Master?')) {
                             # Add the parameter to remove the rule
                             $Splat.Add('RemoveRule', $true)
                         } #end If
                     } #end If
 
-                    If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer PDCemulator Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer PDCemulator Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
                 }

@@ -124,13 +124,13 @@ function Set-AdAclComputerAccountRestriction {
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
 
-            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for Account Restrictions?')) {
+            if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for Account Restrictions?')) {
                 # Add the parameter to remove the rule
                 $Splat.Add('RemoveRule', $true)
             } #end If
         } #end If
 
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Account Restrictions?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Account Restrictions?')) {
             Set-AclConstructor6 @Splat
         } #end If
     } #end Process

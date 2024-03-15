@@ -230,7 +230,7 @@ function Set-AclConstructor4 {
         If ($PSBoundParameters['RemoveRule']) {
             # Action when TRUE is REMOVE
 
-            if ($PSCmdlet.ShouldProcess($object.DistinguishedName, "Removing access rule for $($PSBoundParameters['Id'])")) {
+            if ($Force -or $PSCmdlet.ShouldProcess($object.DistinguishedName, "Removing access rule for $($PSBoundParameters['Id'])")) {
 
                 #Create an Access Control Entry for new permission we wish to remove
                 [void]$acl.RemoveAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
@@ -240,7 +240,7 @@ function Set-AclConstructor4 {
         } else {
             # Action when FALSE is ADD
 
-            if ($PSCmdlet.ShouldProcess($object.DistinguishedName, "Adding access rule for $($PSBoundParameters['Id'])")) {
+            if ($Force -or $PSCmdlet.ShouldProcess($object.DistinguishedName, "Adding access rule for $($PSBoundParameters['Id'])")) {
 
                 #Create an Access Control Entry for new permission we wish to add
                 [void]$acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))

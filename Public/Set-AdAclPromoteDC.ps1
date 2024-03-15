@@ -115,13 +115,13 @@ function Set-AdAclPromoteDomain {
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
 
-                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for Add/Remove Replica In Domain?')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for Add/Remove Replica In Domain?')) {
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 } #end If
             } #end If
 
-            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Add/Remove Replica In Domain?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Add/Remove Replica In Domain?')) {
                 Set-AclConstructor4 @Splat
             } #end If
 
@@ -163,13 +163,13 @@ function Set-AdAclPromoteDomain {
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
 
-                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for computer?')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for computer?')) {
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 } #end If
             } #end If
 
-            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for computer?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for computer?')) {
                 Set-AclConstructor4 @Splat
             } #end If
 

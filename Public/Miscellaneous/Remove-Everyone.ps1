@@ -68,7 +68,7 @@ Function Remove-Everyone {
             AdSecurityInheritance = 'All'
             RemoveRule            = $true
         }
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "EVERYONE"?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "EVERYONE"?')) {
             Set-AclConstructor5 @Splat
         } #end If
     } #end Process

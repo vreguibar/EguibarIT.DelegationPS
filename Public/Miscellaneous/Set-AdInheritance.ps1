@@ -75,7 +75,7 @@ Function Set-AdInheritance {
             #     If "preserverInheritance" is set to FALSE, it has the same effect as clicking �Remove�
             $acl.SetAccessRuleProtection($PSBoundParameters['RemoveInheritance'], $PSBoundParameters['RemovePermissions'])
 
-            If ($PSCmdlet.ShouldProcess($PSBoundParameters['LDAPPath'], 'Set/Remove Inheritance and permissions?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['LDAPPath'], 'Set/Remove Inheritance and permissions?')) {
                 Set-Acl -AclObject $acl -Path ('AD:\{0}' -f $PSBoundParameters['LDAPPath'])
             } #end If
         } catch {

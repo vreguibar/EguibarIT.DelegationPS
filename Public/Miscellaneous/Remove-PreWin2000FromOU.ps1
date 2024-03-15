@@ -74,7 +74,7 @@ Function Remove-PreWin2000FromOU {
                 AdSecurityInheritance = 'All'
                 RemoveRule            = $true
             }
-            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Pre-Windows 2000 Compatible Access"?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Pre-Windows 2000 Compatible Access"?')) {
                 Set-AclConstructor5 @Splat
             } #end If
 
@@ -89,7 +89,7 @@ Function Remove-PreWin2000FromOU {
                 InheritedObjectType   = $Variables.GuidMap['inetOrgPerson']
                 RemoveRule            = $true
             }
-            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Pre-Windows 2000 Compatible Access"?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Pre-Windows 2000 Compatible Access"?')) {
                 Set-AclConstructor5 @Splat
             } #end If
 
@@ -104,7 +104,7 @@ Function Remove-PreWin2000FromOU {
                 InheritedObjectType   = $Variables.GuidMap['group']
                 RemoveRule            = $true
             }
-            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Pre-Windows 2000 Compatible Access"?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Pre-Windows 2000 Compatible Access"?')) {
                 Set-AclConstructor5 @Splat
             } #end If
 
@@ -119,7 +119,7 @@ Function Remove-PreWin2000FromOU {
                 InheritedObjectType   = $Variables.GuidMap['user']
                 RemoveRule            = $true
             }
-            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Pre-Windows 2000 Compatible Access"?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Pre-Windows 2000 Compatible Access"?')) {
                 Set-AclConstructor5 @Splat
             } #end If
         } catch {

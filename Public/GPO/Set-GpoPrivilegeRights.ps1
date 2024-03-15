@@ -191,7 +191,7 @@
                     Key     = 'SeNetworkLogonRight'
                     Members = $NetworkLogon
                 }
-                If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Network Logon?')) {
+                If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Network Logon?')) {
                     Set-IniFileSection @Splat
                 } #end If
                 Write-Verbose -Message ('Added members {0} to "Network Logon" section of the GPO' -f ($NetworkLogon -join '; '))
@@ -210,7 +210,7 @@
                     Key     = 'SeDenyNetworkLogonRight'
                     Members = $DenyNetworkLogon
                 }
-                If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for DENY Network Logon?')) {
+                If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for DENY Network Logon?')) {
                     Set-IniFileSection @Splat
                 } #end If
                 Write-Verbose -Message ('Added members {0} to "DENY Network Logon" section of the GPO' -f ($DenyNetworkLogon -join '; '))
@@ -229,7 +229,7 @@
                     Key     = 'SeInteractiveLogonRight'
                     Members = $InteractiveLogon
                 }
-                If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Interactive Logon?')) {
+                If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Interactive Logon?')) {
                     Set-IniFileSection @Splat
                 } #end If
                 Write-Verbose -Message ('Added members {0} to "Interactive Logon" section of the GPO' -f ($InteractiveLogon -join '; '))
@@ -248,7 +248,7 @@
                     Key     = 'SeDenyInteractiveLogonRight'
                     Members = $DenyInteractiveLogon
                 }
-                If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for DENY Interactive Logon?')) {
+                If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for DENY Interactive Logon?')) {
                     Set-IniFileSection @Splat
                 } #end If
                 Write-Verbose -Message ('Added members {0} to "Deny Interactive Logon" section of the GPO' -f ($DenyInteractiveLogon -join '; '))
@@ -267,7 +267,7 @@
                     Key     = 'SeRemoteInteractiveLogonRight'
                     Members = $RemoteInteractiveLogon
                 }
-                If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Remote Interactive Logon (RDP)?')) {
+                If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Remote Interactive Logon (RDP)?')) {
                     Set-IniFileSection @Splat
                 } #end If
                 Write-Verbose -Message ('Added members {0} to "Remote Interactive Logon (RDP)" section of the GPO' -f ($RemoteInteractiveLogon -join '; '))
@@ -286,7 +286,7 @@
                     Key     = 'SeDenyRemoteInteractiveLogonRight'
                     Members = $DenyRemoteInteractiveLogon
                 }
-                If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for DENY Remote Interactive Logon (RDP)?')) {
+                If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for DENY Remote Interactive Logon (RDP)?')) {
                     Set-IniFileSection @Splat
                 } #end If
                 Write-Verbose -Message ('Added members {0} to "Deny Remote Interactive Logon (RDP)" section of the GPO' -f ($DenyRemoteInteractiveLogon -join '; '))
@@ -305,7 +305,7 @@
                     Key     = 'SeBatchLogonRight'
                     Members = $BatchLogon
                 }
-                If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Batch Logon?')) {
+                If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Batch Logon?')) {
                     Set-IniFileSection @Splat
                 } #end If
                 Write-Verbose -Message ('Added members {0} to "Batch Logon" section of the GPO' -f ($BatchLogon -join '; '))
@@ -324,7 +324,7 @@
                     Key     = 'SeDenyBatchLogonRight'
                     Members = $DenyBatchLogon
                 }
-                If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for DENY Batch Logon?')) {
+                If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for DENY Batch Logon?')) {
                     Set-IniFileSection @Splat
                 } #end If
                 Write-Verbose -Message ('Added members {0} to "Deny Batch Logon" section of the GPO' -f ($DenyBatchLogon -join '; '))
@@ -343,7 +343,7 @@
                     Key     = 'SeServiceLogonRight'
                     Members = $ServiceLogon
                 }
-                If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Service Logon?')) {
+                If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Service Logon?')) {
                     Set-IniFileSection @Splat
                 } #end If
                 Write-Verbose -Message ('Added members {0} to "Service Logon" section of the GPO' -f ($ServiceLogon -join '; '))
@@ -362,7 +362,7 @@
                     Key     = 'SeDenyServiceLogonRight'
                     Members = $DenyServiceLogon
                 }
-                If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for DENY Service Logon?')) {
+                If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for DENY Service Logon?')) {
                     Set-IniFileSection @Splat
                 } #end If
                 Write-Verbose -Message ('Added members {0} to "Deny Service Logon" section of the GPO' -f ($DenyServiceLogon -join '; '))

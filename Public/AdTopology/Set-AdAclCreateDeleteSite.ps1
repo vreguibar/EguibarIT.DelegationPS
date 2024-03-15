@@ -111,11 +111,11 @@
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
                 # Add the parameter to remove the rule
-                if ($PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
                     $Splat.Add('RemoveRule', $true)
                 }
             }
-            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate permissions for creating and deleting AD sites?')) {
+            if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate permissions for creating and deleting AD sites?')) {
                 Set-AclConstructor6 @Splat
             }
         } Catch {
@@ -147,13 +147,13 @@
             }
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
-                if ($PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
 
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 }
             }
-            if ($PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
+            if ($Force -or $PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
                 Set-AclConstructor5 @Splat
             }
         } Catch {
@@ -186,13 +186,13 @@
             }
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
-                if ($PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
 
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 }
             }
-            if ($PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
+            if ($Force -or $PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
                 Set-AclConstructor6 @Splat
             }
         } Catch {
@@ -224,13 +224,13 @@
             }
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
-                if ($PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
 
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 }
             }
-            if ($PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
+            if ($Force -or $PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
                 Set-AclConstructor5 @Splat
             }
         } Catch {
@@ -260,13 +260,13 @@
             }
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
-                if ($PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
 
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 }
             }
-            if ($PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
+            if ($Force -or $PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
                 Set-AclConstructor4 @Splat
             }
         } Catch {
@@ -298,13 +298,13 @@
             }
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
-                if ($PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
 
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 }
             }
-            if ($PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
+            if ($Force -or $PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
                 Set-AclConstructor5 @Splat
             }
         } Catch {
@@ -337,13 +337,13 @@
             }
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
-                if ($PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
 
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 }
             }
-            if ($PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
+            if ($Force -or $PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
                 Set-AclConstructor5 @Splat
             }
         } Catch {
@@ -376,13 +376,13 @@
             }
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
-                if ($PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
 
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 }
             }
-            if ($PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
+            if ($Force -or $PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
                 Set-AclConstructor6 @Splat
             }
         } Catch {
@@ -413,13 +413,13 @@
             }
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
-                if ($PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($Group, 'Remove permissions for creating and deleting AD sites')) {
 
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 }
             }
-            if ($PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
+            if ($Force -or $PSCmdlet.ShouldProcess("$Group", 'Delegate permissions for creating and deleting AD sites')) {
                 Set-AclConstructor6 @Splat
             }
         } Catch {

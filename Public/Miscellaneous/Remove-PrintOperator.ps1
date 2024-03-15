@@ -79,7 +79,7 @@ Function Remove-PrintOperator {
             AdSecurityInheritance = 'None'
             RemoveRule            = $true
         }
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Print Operators"?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Print Operators"?')) {
             Set-AclConstructor5 @Splat
         } #end If
     } #end Process

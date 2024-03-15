@@ -58,7 +58,7 @@ Function Remove-AuthUser {
             AdSecurityInheritance = 'All'
             RemoveRule            = $true
         }
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "AUTHENTICATED USERS"?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "AUTHENTICATED USERS"?')) {
             Set-AclConstructor5 @Splat
         } #end If
     } #end Process

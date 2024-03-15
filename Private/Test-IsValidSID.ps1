@@ -42,7 +42,7 @@ function Test-IsValidSID {
     Process {
         Try {
             # Use ShouldProcess to confirm the operation
-            if ($PSCmdlet.ShouldProcess($ObjectDN, 'Validate objectSID')) {
+            if ($Force -or $PSCmdlet.ShouldProcess($ObjectDN, 'Validate objectSID')) {
                 # Perform the actual validation
                 $isValid = $ObjectSID -match $SidRegex
 

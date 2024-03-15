@@ -58,7 +58,7 @@ Function Remove-PreWin2000 {
             RemoveRule            = $true
         }
 
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Pre-Windows 2000 Compatible Access"?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Pre-Windows 2000 Compatible Access"?')) {
             Set-AclConstructor5 @Splat
         } #end If
     } #end Process

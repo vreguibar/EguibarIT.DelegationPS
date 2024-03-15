@@ -55,7 +55,7 @@ function Get-CurrentErrorToDisplay {
 
     Process {
 
-        if ($PSCmdlet.ShouldProcess("Processing error: $($CurrentError.Exception.Message)", 'Continue?')) {
+        if ($Force -or $PSCmdlet.ShouldProcess("Processing error: $($CurrentError.Exception.Message)", 'Continue?')) {
             try {
                 [void]$OutputError.AppendLine()
                 [void]$OutputError.AppendLine($Header)

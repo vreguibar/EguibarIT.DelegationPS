@@ -59,7 +59,7 @@ Function Remove-AccountOperator {
             RemoveRule            = $true
         }
 
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Account Operators"?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Account Operators"?')) {
             Set-AclConstructor5 @Splat
         } #end If
     } #end Process

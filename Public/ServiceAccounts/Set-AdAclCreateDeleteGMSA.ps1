@@ -107,13 +107,13 @@
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
 
-                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for GroupManagedServiceAccount?')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for GroupManagedServiceAccount?')) {
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 } #end If
             } #end If
 
-            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for GroupManagedServiceAccount?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for GroupManagedServiceAccount?')) {
                 Set-AclConstructor5 @Splat
             } #end If
 
@@ -139,13 +139,13 @@
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
 
-                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for msDS-GroupManagedServiceAccount?')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for msDS-GroupManagedServiceAccount?')) {
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 } #end If
             } #end If
 
-            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for msDS-GroupManagedServiceAccount?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for msDS-GroupManagedServiceAccount?')) {
                 Set-AclConstructor5 @Splat
             } #end If
 
@@ -171,13 +171,13 @@
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
 
-                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for msDS-GroupManagedServiceAccount?')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for msDS-GroupManagedServiceAccount?')) {
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 } #end If
             } #end If
 
-            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for msDS-GroupManagedServiceAccount?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for msDS-GroupManagedServiceAccount?')) {
                 Set-AclConstructor5 @Splat
             } #end If
 
@@ -204,13 +204,13 @@
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
 
-                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for applicationVersion?')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for applicationVersion?')) {
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 } #end If
             } #end If
 
-            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for applicationVersion?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for applicationVersion?')) {
                 Set-AclConstructor6 @Splat
             } #end If
         } #end Process

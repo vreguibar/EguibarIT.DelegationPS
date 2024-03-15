@@ -62,7 +62,7 @@ function Test-IsValidDN {
 
         Try {
             # Use ShouldProcess to confirm the operation
-            if ($PSCmdlet.ShouldProcess($ObjectDN, 'Validate DistinguishedName')) {
+            if ($Force -or $PSCmdlet.ShouldProcess($ObjectDN, 'Validate DistinguishedName')) {
                 # Perform the actual validation
                 #$isValid = $ObjectDN -match $distinguishedNameRegex
                 $isValid = $distinguishedNameRegex.IsMatch($ObjectDN)

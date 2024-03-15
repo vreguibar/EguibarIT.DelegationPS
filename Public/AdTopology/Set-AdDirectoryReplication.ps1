@@ -112,13 +112,13 @@ function Set-AdDirectoryReplication {
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
 
-                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Monitor Active Directory Replication?')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Monitor Active Directory Replication?')) {
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 } #end If
             } #end If
 
-            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Monitor Active Directory Replication?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Monitor Active Directory Replication?')) {
                 Set-AclConstructor4 @Splat
             } #end If
 
@@ -145,13 +145,13 @@ function Set-AdDirectoryReplication {
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
 
-                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Replicating Directory Changes?')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Replicating Directory Changes?')) {
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 } #end If
             } #end If
 
-            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Replicating Directory Changes?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Replicating Directory Changes?')) {
                 Set-AclConstructor4 @Splat
             } #end If
 
@@ -178,13 +178,13 @@ function Set-AdDirectoryReplication {
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
 
-                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Replicating Directory Changes All?')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Replicating Directory Changes All?')) {
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 } #end If
             } #end If
 
-            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Replicating Directory Changes All?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Replicating Directory Changes All?')) {
                 Set-AclConstructor4 @Splat
             } #end If
 
@@ -211,13 +211,13 @@ function Set-AdDirectoryReplication {
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
 
-                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Replicating Directory Changes In Filtered Set?')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Replicating Directory Changes In Filtered Set?')) {
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 } #end If
             } #end If
 
-            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Replicating Directory Changes In Filtered Set?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Replicating Directory Changes In Filtered Set?')) {
                 Set-AclConstructor4 @Splat
             } #end If
 
@@ -244,13 +244,13 @@ function Set-AdDirectoryReplication {
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
 
-                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Manage Replication Topology?')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Manage Replication Topology?')) {
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 } #end If
             } #end If
 
-            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Manage Replication Topology?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Manage Replication Topology?')) {
                 Set-AclConstructor4 @Splat
             } #end If
 
@@ -277,13 +277,13 @@ function Set-AdDirectoryReplication {
             # Check if RemoveRule switch is present.
             If ($PSBoundParameters['RemoveRule']) {
 
-                if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Replication Synchronization?')) {
+                if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to Replication Synchronization?')) {
                     # Add the parameter to remove the rule
                     $Splat.Add('RemoveRule', $true)
                 } #end If
             } #end If
 
-            If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Replication Synchronization?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Replication Synchronization?')) {
                 Set-AclConstructor4 @Splat
             } #end If
 
@@ -314,13 +314,13 @@ function Set-AdDirectoryReplication {
                 # Check if RemoveRule switch is present.
                 If ($PSBoundParameters['RemoveRule']) {
 
-                    if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msDS-NC-Replica-Locations?')) {
+                    if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msDS-NC-Replica-Locations?')) {
                         # Add the parameter to remove the rule
                         $Splat.Add('RemoveRule', $true)
                     } #end If
                 } #end If
 
-                If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to msDS-NC-Replica-Locations?')) {
+                If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to msDS-NC-Replica-Locations?')) {
                     Set-AclConstructor4 @Splat
                 } #end If
 
@@ -334,13 +334,13 @@ function Set-AdDirectoryReplication {
                 # Check if RemoveRule switch is present.
                 If ($PSBoundParameters['RemoveRule']) {
 
-                    if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msDS-NC-Replica-Locations?')) {
+                    if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msDS-NC-Replica-Locations?')) {
                         # Add the parameter to remove the rule
                         $Splat.Add('RemoveRule', $true)
                     } #end If
                 } #end If
 
-                If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to msDS-NC-Replica-Locations?')) {
+                If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to msDS-NC-Replica-Locations?')) {
                     Set-AclConstructor4 @Splat
                 } #end If
 
