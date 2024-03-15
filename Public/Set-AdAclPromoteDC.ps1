@@ -21,7 +21,7 @@ function Set-AdAclPromoteDomain {
                 Set-AclConstructor4                    | N/A - separate PowerShell script
                 Set-AclConstructor5                    | N/A - separate PowerShell script
                 Get-AttributeSchemaHashTable                | N/A - separate PowerShell script
-                New-ExtenderRightHashTable             | N/A - separate PowerShell script
+                Get-ExtendedRightHashTable             | N/A - separate PowerShell script
         .NOTES
             Version:         1.2
             DateModified:    4/May/2022
@@ -70,7 +70,7 @@ function Set-AdAclPromoteDomain {
         Get-AttributeSchemaHashTable
 
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
-        New-ExtenderRightHashTable
+        Get-ExtendedRightHashTable
 
     } #end Begin
 

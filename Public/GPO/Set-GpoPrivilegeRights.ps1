@@ -36,7 +36,7 @@
                 ---------------------------------------|--------------------------
                 Set-AclConstructor6                    | EguibarIT.Delegation
                 Get-AttributeSchemaHashTable                | EguibarIT.Delegation
-                New-ExtenderRightHashTable             | EguibarIT.Delegation
+                Get-ExtendedRightHashTable             | EguibarIT.Delegation
         .NOTES
             Version:         1.2
             DateModified:    07/Dec/2016

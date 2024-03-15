@@ -21,7 +21,7 @@
                 Set-AclConstructor5                    | EguibarIT.Delegation
                 Set-AclConstructor6                    | EguibarIT.Delegation
                 Get-AttributeSchemaHashTable                | EguibarIT.Delegation
-                New-ExtenderRightHashTable             | EguibarIT.Delegation
+                Get-ExtendedRightHashTable             | EguibarIT.Delegation
         .NOTES
             Version:         1.2
             DateModified:    07/Dec/2016
@@ -74,7 +74,7 @@
             Get-AttributeSchemaHashTable
 
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
-            New-ExtenderRightHashTable
+            Get-ExtendedRightHashTable
     } #end Begin
 
     Process {

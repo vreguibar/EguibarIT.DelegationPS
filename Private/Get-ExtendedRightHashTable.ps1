@@ -1,4 +1,4 @@
-Function New-ExtenderRightHashTable {
+Function Get-ExtendedRightHashTable {
     <#
         .Synopsis
             Function to Read all Extended Rights GUID from Schema
@@ -6,7 +6,7 @@ Function New-ExtenderRightHashTable {
             Function that reads all Extended Rights GUID from the Schema and stores into
             a Hash Table named $extendedrightsmap
         .EXAMPLE
-            New-ExtenderRightHashTable
+            Get-ExtendedRightHashTable
         .NOTES
             Version:         1.0
             DateModified:    19/Feb/2015

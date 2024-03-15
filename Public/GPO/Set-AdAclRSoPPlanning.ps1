@@ -17,7 +17,7 @@
                 Name                                   | Module
                 ---------------------------------------|--------------------------
                 Set-AclConstructor5                    | EguibarIT.Delegation
-                New-ExtenderRightHashTable             | EguibarIT.Delegation
+                Get-ExtendedRightHashTable             | EguibarIT.Delegation
         .NOTES
             Version:         1.1
             DateModified:    17/Oct/2016
@@ -59,10 +59,10 @@
         [Hashtable]$Splat = [hashtable]::New()
 
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
-            New-ExtenderRightHashTable
+            Get-ExtendedRightHashTable
 
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
-            New-ExtenderRightHashTable
+            Get-ExtendedRightHashTable
 
     } #end Begin
 

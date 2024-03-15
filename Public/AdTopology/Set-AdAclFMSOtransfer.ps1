@@ -20,7 +20,7 @@ Function Set-AdAclFMSOtransfer {
                 ---------------------------------------|--------------------------
                 Set-AclConstructor4                    | EguibarIT.Delegation
                 Get-AttributeSchemaHashTable                | EguibarIT.Delegation
-                New-ExtenderRightHashTable             | EguibarIT.Delegation
+                Get-ExtendedRightHashTable             | EguibarIT.Delegation
         .NOTES
             Version:         1.0
             DateModified:    26/Apr/2022
@@ -85,7 +85,7 @@ Function Set-AdAclFMSOtransfer {
         } #end If
 
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
-            New-ExtenderRightHashTable
+            Get-ExtendedRightHashTable
 
     } #end Begin
 

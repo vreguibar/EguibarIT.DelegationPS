@@ -22,7 +22,7 @@ function Set-AdAclUserLogonInfo {
                 ---------------------------------------|--------------------------
                 Set-AclConstructor6                    | EguibarIT.Delegation
                 Get-AttributeSchemaHashTable                | EguibarIT.Delegation
-                New-ExtenderRightHashTable             | EguibarIT.Delegation
+                Get-ExtendedRightHashTable             | EguibarIT.Delegation
         .NOTES
             Version:         1.1
             DateModified:    17/Oct/2016
@@ -75,7 +75,7 @@ function Set-AdAclUserLogonInfo {
             Get-AttributeSchemaHashTable
 
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
-            New-ExtenderRightHashTable
+            Get-ExtendedRightHashTable
     } #end Begin
 
     Process {

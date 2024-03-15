@@ -19,7 +19,7 @@ function Set-AdAclChangeUserPassword {
                 ---------------------------------------|--------------------------
                 Set-AclConstructor6                    | EguibarIT.Delegation
                 Get-AttributeSchemaHashTable                | EguibarIT.Delegation
-                New-ExtenderRightHashTable             | EguibarIT.Delegation
+                Get-ExtendedRightHashTable             | EguibarIT.Delegation
         .NOTES
             Version:         1.1
             DateModified:    17/Oct/2016
@@ -69,10 +69,10 @@ function Set-AdAclChangeUserPassword {
         [Hashtable]$Splat = [hashtable]::New()
 
         Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case is empty a function is called to fill it up.'
-            Get-AttributeSchemaHashTable
+        Get-AttributeSchemaHashTable
 
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
-            New-ExtenderRightHashTable
+        Get-ExtendedRightHashTable
 
     } #end Begin
 
