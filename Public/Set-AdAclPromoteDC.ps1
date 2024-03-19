@@ -18,10 +18,10 @@ function Set-AdAclPromoteDomain {
             Used Functions:
                 Name                                   | Module
                 ---------------------------------------|--------------------------
-                Set-AclConstructor4                    | N/A - separate PowerShell script
-                Set-AclConstructor5                    | N/A - separate PowerShell script
-                Get-AttributeSchemaHashTable                | N/A - separate PowerShell script
-                Get-ExtendedRightHashTable             | N/A - separate PowerShell script
+                Set-AclConstructor4                    | EguibarIT.DelegationPS
+                Set-AclConstructor5                    | EguibarIT.DelegationPS
+                Get-AttributeSchemaHashTable           | EguibarIT.DelegationPS
+                Get-ExtendedRightHashTable             | EguibarIT.DelegationPS
         .NOTES
             Version:         1.2
             DateModified:    4/May/2022
@@ -111,6 +111,7 @@ function Set-AdAclPromoteDomain {
             ####################
             # Configure msDS-NC-RO-Replica-Locations on all NC
             # Not sure if ACENumber 1 is needed (ReadProperty, GenericExecute).
+            # Included in DirRepl CMDlet
             <#
                 ACENumber             : 1
                 Id                    : EguibarIT\XXX
@@ -135,25 +136,6 @@ function Set-AdAclPromoteDomain {
                 InheritedObjectType   : All [GuidNULL]
                 IsInherited           : False
             #>
-            $Splat = @{
-                Id                = $PSBoundParameters['Group']
-                LDAPPath          = $Context
-                AdRight           = 'WriteProperty'
-                AccessControlType = 'Allow'
-                ObjectType        = $Variables.GuidMap['msDS-NC-RO-Replica-Locations']
-            }
-            # Check if RemoveRule switch is present.
-            If ($PSBoundParameters['RemoveRule']) {
-
-                if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for computer?')) {
-                    # Add the parameter to remove the rule
-                    $Splat.Add('RemoveRule', $true)
-                } #end If
-            } #end If
-
-            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for computer?')) {
-                Set-AclConstructor4 @Splat
-            } #end If
 
         } #end ForEach
 
