@@ -38,7 +38,7 @@
                 http://www.eguibarit.com
     #>
     [CmdletBinding(ConfirmImpact = 'Low')]
-    [OutputType([array])]
+    [OutputType([System.Collections.ArrayList])]
 
     param
     (
