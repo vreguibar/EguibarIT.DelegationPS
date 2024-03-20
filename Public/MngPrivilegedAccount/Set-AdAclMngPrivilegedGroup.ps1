@@ -1,13 +1,13 @@
-﻿Function Set-AdAclMngPrivilegedGroups {
+﻿Function Set-AdAclMngPrivilegedGroup {
     <#
         .Synopsis
             The function will delegate the premission for a group to Managed Privileged Groups
         .DESCRIPTION
             The function will delegate the premission for a group to Managed Privileged Groups
         .EXAMPLE
-            Set-AdAclMngPrivilegedGroups -Group "SL_PGM"
+            Set-AdAclMngPrivilegedGroup -Group "SL_PGM"
         .EXAMPLE
-            Set-AdAclMngPrivilegedGroups -Group "SL_PGM" -RemoveRule
+            Set-AdAclMngPrivilegedGroup -Group "SL_PGM" -RemoveRule
         .PARAMETER Group
             [STRING] Identity of the group getting the delegation.
         .PARAMETER RemoveRule
@@ -55,11 +55,10 @@
 
         ##############################
         # Variables Definition
-        $parameters = $null
         [Hashtable]$Splat = [hashtable]::New()
 
         Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case is empty a function is called to fill it up.'
-            Get-AttributeSchemaHashTable
+        Get-AttributeSchemaHashTable
 
     } #end Begin
 
