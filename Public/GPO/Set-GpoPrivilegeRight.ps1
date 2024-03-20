@@ -1,13 +1,13 @@
-﻿Function Set-GpoPrivilegeRights {
+﻿Function Set-GpoPrivilegeRight {
     <#
         .Synopsis
             Set the Privileged Rights into a Group Policy Objects (MUST be executed on DomainController)
         .DESCRIPTION
             The function will modify the Privileged Rights into a Group Policy Object based on the Delegation Model with Tiers
         .EXAMPLE
-            Set-GpoPrivilegeRights "Default Domain" "SL_InfraRight"
+            Set-GpoPrivilegeRight "Default Domain" "SL_InfraRight"
         .EXAMPLE
-            Set-GpoPrivilegeRights -GpoToModify "Default Domain" -NetworkLogon "SL_InfraRight"
+            Set-GpoPrivilegeRight -GpoToModify "Default Domain" -NetworkLogon "SL_InfraRight"
         .PARAMETER GpoToModify
             [STRING] Name of the GPO which will get the Restricted Groups modification.
         .PARAMETER NetworkLogon
