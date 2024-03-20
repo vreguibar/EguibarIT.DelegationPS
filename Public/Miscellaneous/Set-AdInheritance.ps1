@@ -1,4 +1,4 @@
-Function Set-AdInheritance {
+﻿Function Set-AdInheritance {
     <#
         .Synopsis
             The function will Set/Clear Inheritance of
