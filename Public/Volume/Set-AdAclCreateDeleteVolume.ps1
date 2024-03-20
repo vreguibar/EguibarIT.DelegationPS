@@ -67,7 +67,6 @@
 
         ##############################
         # Variables Definition
-        $parameters = $null
         [Hashtable]$Splat = [hashtable]::New()
 
         Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case is empty a function is called to fill it up.'

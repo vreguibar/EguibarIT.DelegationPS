@@ -443,12 +443,10 @@
             } #end IF
 
         } catch {
-            $satus = $false
 
             #Console.WriteLine("An error occurred: '{0}'", ex.Message);
             throw 'The GPTs.ini file could not be modified: {0}. Message is {1}', $_, $_.Message
         } finally {
-            $satus = $true
 
             Write-Verbose -Message ('Version of GPO updated. Original Number: {0}. New Number: {1}' -f $VersionObject.ToString(), $NewVersionObject.ToString())
         } #end Try
