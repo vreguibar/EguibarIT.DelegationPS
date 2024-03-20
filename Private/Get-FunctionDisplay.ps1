@@ -1,13 +1,13 @@
-﻿Function Set-FunctionDisplay {
+﻿Function Get-FunctionDisplay {
     <#
         .Synopsis
             Nice display PsBoundParameters
         .DESCRIPTION
             This function formats and displays the PsBoundParameters hashtable in a visually appealing way for Verbose output.
         .EXAMPLE
-            Set-FunctionDisplay $PsBoundParameters
+            Get-FunctionDisplay $PsBoundParameters
         .EXAMPLE
-            Set-FunctionDisplay -HashTable $PsBoundParameters
+            Get-FunctionDisplay -HashTable $PsBoundParameters
         .PARAMETER HashTable
             Hashtable variable from calling function containing PsBoundParameters to format accordingly
         .PARAMETER TabCount
