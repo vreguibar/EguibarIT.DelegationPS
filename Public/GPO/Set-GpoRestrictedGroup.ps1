@@ -1,4 +1,4 @@
-﻿Function Set-GpoRestrictedGroups {
+﻿Function Set-GpoRestrictedGroup {
     <#
         .Synopsis
 
