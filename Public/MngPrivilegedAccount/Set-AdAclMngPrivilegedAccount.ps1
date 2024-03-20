@@ -1,13 +1,13 @@
-﻿Function Set-AdAclMngPrivilegedAccounts {
+﻿Function Set-AdAclMngPrivilegedAccount {
     <#
         .Synopsis
             The function will delegate the premission for a group to Managed Privileged Accounts
         .DESCRIPTION
             The function will delegate the premission for a group to Managed Privileged Accounts
         .EXAMPLE
-            Set-AdAclMngPrivilegedAccounts -Group "SL_PUM" -RemoveRule
+            Set-AdAclMngPrivilegedAccount -Group "SL_PUM" -RemoveRule
         .EXAMPLE
-            Set-AdAclMngPrivilegedAccounts -Group "SL_PUM" -RemoveRule
+            Set-AdAclMngPrivilegedAccount -Group "SL_PUM" -RemoveRule
         .PARAMETER Group
             [STRING] Identity of the group getting the delegation.
         .PARAMETER RemoveRule
@@ -60,10 +60,10 @@
         [Hashtable]$Splat = [hashtable]::New()
 
         Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case is empty a function is called to fill it up.'
-            Get-AttributeSchemaHashTable
+        Get-AttributeSchemaHashTable
 
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
-            Get-ExtendedRightHashTable
+        Get-ExtendedRightHashTable
     } #end Begin
 
     Process {
