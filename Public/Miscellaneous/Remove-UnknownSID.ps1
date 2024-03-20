@@ -26,7 +26,7 @@
                 Eguibar IT
                 http://www.eguibarit.com
     #>
-    [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'Medium')]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     [OutputType([void])]
 
     Param (
@@ -90,7 +90,9 @@
 
                         try {
                             # Remove unknown SID from rule
-                            $myObject.ObjectSecurity.RemoveAccessRule($rule)
+                            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['LDAPpath'], 'Remove unknown SID?')) {
+                                $myObject.ObjectSecurity.RemoveAccessRule($rule)
+                            } #end If
 
                         } catch {
                             throw [System.ApplicationException]::new("An error occurred while removing access rule: '$($_.Exception)'. Message is $($_.Exception.Message)")
