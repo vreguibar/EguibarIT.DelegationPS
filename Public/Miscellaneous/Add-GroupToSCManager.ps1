@@ -41,7 +41,15 @@
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         [String]
-        $Group
+        $Group,
+
+        # PARAM1 STRING for the Delegated Group Name
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Remote computer to execute the commands..',
+            Position = 0)]
+        [Alias('Host', 'PC', 'Server', 'HostName')]
+        [String]
+        $Computer
     )
 
     Begin {
@@ -55,6 +63,8 @@
 
         ##############################
         # Variables Definition
+
+        [Hashtable]$Splat = [hashtable]::New()
 
         $MySDDL = $null
 
@@ -70,8 +80,14 @@
     Process {
 
         # get current 'Service Control Manager (SCM)' acl in SDDL format
-        Write-Verbose -Message 'get current "Service Control Manager (SCM)" acl in SDDL format'
-        $MySDDL = ((& (Get-Command "$($env:SystemRoot)\System32\sc.exe") @('sdshow', 'scmanager'))[1])
+        Write-Verbose -Message 'Get current "Service Control Manager (SCM)" acl in SDDL format'
+        $Splat = @{
+            ScriptBlock = ((& (Get-Command "$($env:SystemRoot)\System32\sc.exe") @('sdshow', 'scmanager'))[1])
+        }
+        If ($Computer) {
+            $Splat.Add('ComputerName', $Computer)
+        }
+        $MySDDL = Invoke-Command @Splat
 
         Write-Verbose -Message 'Original SDDL...'
         $MySDDL
