@@ -86,7 +86,7 @@
         }
         If ($Computer) {
             $Splat.Add('ComputerName', $Computer)
-        }
+        } #end If
         $MySDDL = Invoke-Command @Splat
 
         Write-Verbose -Message 'Original SDDL...'
@@ -109,8 +109,13 @@
         If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Update permissions on SCM?')) {
 
             Write-Verbose -Message 'Updating SCM Access'
-            $null = (& (Get-Command "$($env:SystemRoot)\System32\sc.exe") @('sdset', 'scmanager', "$($NewAcl.Sddl)"))
-
+            $Splat = @{
+                ScriptBlock = (& (Get-Command "$($env:SystemRoot)\System32\sc.exe") @('sdset', 'scmanager', "$($NewAcl.Sddl)"))
+            }
+            If ($Computer) {
+                $Splat.Add('ComputerName', $Computer)
+            } #end If
+            Invoke-Command @Splat
         } #end If
 
 
