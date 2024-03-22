@@ -1,4 +1,31 @@
-﻿Function Add-GroupToSCManager {
+﻿Add-Type @'
+  [System.FlagsAttribute]
+  public enum ServiceAccessFlags : uint
+  {
+      QueryConfig = 1,
+      ChangeConfig = 2,
+      QueryStatus = 4,
+      EnumerateDependents = 8,
+      Start = 16,
+      Stop = 32,
+      PauseContinue = 64,
+      Interrogate = 128,
+      UserDefinedControl = 256,
+      Delete = 65536,
+      ReadControl = 131072,
+      WriteDac = 262144,
+      WriteOwner = 524288,
+      Synchronize = 1048576,
+      AccessSystemSecurity = 16777216,
+      GenericAll = 268435456,
+      GenericExecute = 536870912,
+      GenericWrite = 1073741824,
+      GenericRead = 2147483648,
+      AllAccess = 983551
+  }
+'@
+
+Function Add-GroupToSCManager {
     <#
         .Synopsis
             Adds a group to the Service Control Manager (SCM) ACL.
@@ -7,12 +34,16 @@
             This function adds a specified group to the Service Control Manager (SCM) ACL with specified permissions.
 
         .EXAMPLE
-            Add-GroupToSCManager -Group "EguibarIT\SG_AdAdmins"
+            Add-GroupToSCManager -Group "SG_AdAdmins"
+
+        .EXAMPLE
+            Add-GroupToSCManager -Group "SG_AdAdmins" -computer DC1
 
         .EXAMPLE
             $Splat = @{
-                Group = "EguibarIT\SG_AdAdmins"
-                Verbose = $true
+                Group    = "SG_AdAdmins"
+                Computer = DC1
+                Verbose  = $true
             }
             Add-GroupToSCManager @Splat
 
@@ -66,14 +97,8 @@
 
         [Hashtable]$Splat = [hashtable]::New()
 
-        $MySDDL = $null
-
-        # New ACL variable
-        $NewAcl = [System.Security.AccessControl.DirectorySecurity]::New()
-
-        # Define new Access Rule using above indicated Account
-        $Rule = [System.Security.AccessControl.FileSystemAccessRule]::New($PSBoundParameters['Group'], 'ReadData, AppendData, ReadPermissions', 'None', 'None', 'Allow')
-
+        # Get group SID
+        $GroupSID = (Get-ADGroup -Identity $PSBoundParameters['Group']).SID.Value
 
     } #end Begin
 
@@ -81,48 +106,64 @@
 
         # get current 'Service Control Manager (SCM)' acl in SDDL format
         Write-Verbose -Message 'Get current "Service Control Manager (SCM)" acl in SDDL format'
+
         $Splat = @{
-            ScriptBlock = ((& (Get-Command "$($env:SystemRoot)\System32\sc.exe") @('sdshow', 'scmanager'))[1])
+            ScriptBlock = { ((& (Get-Command "$($env:SystemRoot)\System32\sc.exe") @('sdshow', 'scmanager'))[1]) }
         }
         If ($Computer) {
             $Splat.Add('ComputerName', $Computer)
         } #end If
         $MySDDL = Invoke-Command @Splat
 
-        Write-Verbose -Message 'Original SDDL...'
-        $MySDDL
+        # Build the Common Security Descriptor from SDDL
+        Write-Verbose -Message 'Build the Common Security Descriptor from SDDL'
+        $Permission = [System.Security.AccessControl.CommonSecurityDescriptor]::New($true, $False, $MySDDL)
 
-        # Import SDDL into variable
-        Write-Verbose -Message 'Import "Service Control Manager (SCM)" SDDL into NewAcl variable'
-        $NewAcl.SetSecurityDescriptorSddlForm($MySDDL)
+        # Add new DACL
+        Write-Verbose -Message 'Add new DACL'
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Add group from SCM?')) {
 
-        # Add new Access Rule to ACL variable
-        Write-Verbose -Message 'Add new Access Rule into NewAcl variable'
-        $NewAcl.SetAccessRule($Rule)
+            try {
+                $Permission.DiscretionaryAcl.AddAccess(
+                    [System.Security.AccessControl.AccessControlType]::Allow,
+                    [System.Security.Principal.SecurityIdentifier]"$($GroupSID)",
+                    131093, # int accessMask
+                    [System.Security.AccessControl.InheritanceFlags]::None,
+                    [System.Security.AccessControl.PropagationFlags]::None
+                )
+                # Combine the desired flags instead of 131093
+                # $combinedFlags = [ServiceAccessFlags]::QueryConfig -bor [ServiceAccessFlags]::QueryStatus -bor [ServiceAccessFlags]::Start -bor [ServiceAccessFlags]::ReadControl
 
-        Write-Verbose -Message 'New Access will be...'
-        $NewAcl.Access
-
-        Write-Verbose -Message 'Updated SDDL will be...'
-        $NewAcl.Sddl
-
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Update permissions on SCM?')) {
-
-            Write-Verbose -Message 'Updating SCM Access'
-            $Splat = @{
-                ScriptBlock = (& (Get-Command "$($env:SystemRoot)\System32\sc.exe") @('sdset', 'scmanager', "$($NewAcl.Sddl)"))
+                Write-Verbose -Message ('Successfully Added {0} for {1}' -f $_.AceType, $PSBoundParameters['Group'])
+            } catch {
+                Write-Warning -Message "Failed to add access because $($_.Exception.Message)"
             }
-            If ($Computer) {
-                $Splat.Add('ComputerName', $Computer)
-            } #end If
-            Invoke-Command @Splat
-        } #end If
 
+            # Commit changes
+            Write-Verbose -Message 'Commit changes.'
+            try {
+                # Get SDDL
+                Write-Verbose -Message 'Get SDDL from Common Security Descriptor.'
+                $sddl = $Permission.GetSddlForm([System.Security.AccessControl.AccessControlSections]::All)
+
+                # Make sure computer has 'sc.exe':
+                $ServiceControlCmd = Get-Command "$env:SystemRoot\system32\sc.exe"
+
+                If ($Computer) {
+                    & $ServiceControlCmd.Definition @("\\$Computer", 'sdset', 'scmanager', "$sddl")
+                } else {
+                    & $ServiceControlCmd.Definition @('sdset', 'scmanager', "$sddl")
+                }
+                Write-Verbose -Message 'Successfully set ACL in Service Control Manager'
+            } catch {
+                Write-Warning -Message "Failed to set Security in the registry because $($_.Exception.Message)"
+            } #end Try-Catch
+        } #end If
 
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished changing Service Control Manager (SCM) access."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished adding Service Control Manager (SCM) access."
         Write-Verbose -Message ''
         Write-Verbose -Message '-------------------------------------------------------------------------------'
         Write-Verbose -Message ''

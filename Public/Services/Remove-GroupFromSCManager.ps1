@@ -95,40 +95,43 @@
 
         # Search the DACL for the given Group SID. Delete if found!
         Write-Verbose -Message 'Search the DACL for the given Group SID. Delete if found!'
-        $Permission.DiscretionaryAcl | Where-Object { $_.SecurityIdentifier.Value -eq $GroupSID } | ForEach-Object {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove group from SCM?')) {
+
+            $Permission.DiscretionaryAcl | Where-Object { $_.SecurityIdentifier.Value -eq $GroupSID } | ForEach-Object {
+                try {
+                    $Permission.DiscretionaryAcl.RemoveAccessSpecific(
+                        $_.AceType,
+                        $_.SecurityIdentifier,
+                        $_.AccessMask,
+                        0,
+                        0
+                    )
+                    Write-Verbose -Message ('Successfully removed {0} for {1}' -f $_.AceType, $PSBoundParameters['Group'])
+                } catch {
+                    Write-Warning -Message "Failed to remove access because $($_.Exception.Message)"
+                } #end Try-Catch
+            } #end $Permission
+
+            # Commit changes
+            Write-Verbose -Message 'Commit changes.'
             try {
-                $Permission.DiscretionaryAcl.RemoveAccessSpecific(
-                    $_.AceType,
-                    $_.SecurityIdentifier,
-                    $_.AccessMask,
-                    0,
-                    0
-                )
-                Write-Verbose -Message ('Successfully removed {0} for {1}' -f $_.AceType, $PSBoundParameters['Group'])
+                # Get SDDL
+                Write-Verbose -Message 'Get SDDL from Common Security Descriptor.'
+                $sddl = $Permission.GetSddlForm([System.Security.AccessControl.AccessControlSections]::All)
+
+                # Make sure computer has 'sc.exe':
+                $ServiceControlCmd = Get-Command "$env:SystemRoot\system32\sc.exe"
+
+                If ($Computer) {
+                    & $ServiceControlCmd.Definition @("\\$Computer", 'sdset', 'scmanager', "$sddl")
+                } else {
+                    & $ServiceControlCmd.Definition @('sdset', 'scmanager', "$sddl")
+                }
+                Write-Verbose -Message 'Successfully set binary ACL in the registry' -Verbose
             } catch {
-                Write-Warning -Message "Failed to remove access because $($_.Exception.Message)"
-            }
-        }
-
-        # Commit changes
-        Write-Verbose -Message 'Commit changes.'
-        try {
-            # Get SDDL
-            Write-Verbose -Message 'Get SDDL from Common Security Descriptor.'
-            $sddl = $Permission.GetSddlForm([System.Security.AccessControl.AccessControlSections]::All)
-
-            # Make sure computer has 'sc.exe':
-            $ServiceControlCmd = Get-Command "$env:SystemRoot\system32\sc.exe"
-
-            If ($Computer) {
-                & $ServiceControlCmd.Definition @("\\$Computer", 'sdset', 'scmanager', "$sddl")
-            } else {
-                & $ServiceControlCmd.Definition @('sdset', 'scmanager', "$sddl")
-            }
-            Write-Verbose -Message 'Successfully set binary ACL in the registry' -Verbose
-        } catch {
-            Write-Warning -Message "Failed to set Security in the registry because $($_.Exception.Message)"
-        }
+                Write-Warning -Message "Failed to set Security in the registry because $($_.Exception.Message)"
+            } #end Try-Catch
+        } #end If
 
     } #end Process
 

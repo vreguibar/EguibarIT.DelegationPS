@@ -15,7 +15,9 @@ Function Get-SCManagerPermission {
         Select Transl*,Secu*,AccessMask,AceType | ft -AutoSize
 
     #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'low')]
+    [OutputType([void])]
+
     Param(
         # PARAM0 STRING for the Delegated Group Name
         [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
@@ -25,7 +27,19 @@ Function Get-SCManagerPermission {
         [String]
         $Computer
     )
+
     Begin {
+        $error.clear()
+
+        Write-Verbose -Message '|=> ************************************************************************ <=|'
+        Write-Verbose -Message (Get-Date).ToShortDateString()
+        Write-Verbose -Message ('  Starting: {0}' -f $MyInvocation.Mycommand)
+        Write-Verbose -Message ('Parameters used by the function... {0}' -f (Get-FunctionDisplay $PsBoundParameters -Verbose:$False))
+
+        Import-Module -Name ActiveDirectory -Verbose:$false
+
+        ##############################
+        # Variables Definition
 
         $Permission = $null
         $MySDDL = $null
@@ -57,5 +71,9 @@ Function Get-SCManagerPermission {
     } #end Process
 
     End {
-    } #end End
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished showing Service Control Manager (SCM) access."
+        Write-Verbose -Message ''
+        Write-Verbose -Message '-------------------------------------------------------------------------------'
+        Write-Verbose -Message ''
+    } #end END
 }
