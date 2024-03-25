@@ -2,26 +2,26 @@
   [System.FlagsAttribute]
   public enum ServiceAccessFlags : uint
   {
-      QueryConfig = 1,
-      ChangeConfig = 2,
-      QueryStatus = 4,
-      EnumerateDependents = 8,
-      Start = 16,
-      Stop = 32,
-      PauseContinue = 64,
-      Interrogate = 128,
-      UserDefinedControl = 256,
-      Delete = 65536,
-      ReadControl = 131072,
-      WriteDac = 262144,
-      WriteOwner = 524288,
-      Synchronize = 1048576,
+      QueryConfig          = 1,
+      ChangeConfig         = 2,
+      QueryStatus          = 4,
+      EnumerateDependents  = 8,
+      Start                = 16,
+      Stop                 = 32,
+      PauseContinue        = 64,
+      Interrogate          = 128,
+      UserDefinedControl   = 256,
+      Delete               = 65536,
+      ReadControl          = 131072,
+      WriteDac             = 262144,
+      WriteOwner           = 524288,
+      AllAccess            = 983551
+      Synchronize          = 1048576,
       AccessSystemSecurity = 16777216,
-      GenericAll = 268435456,
-      GenericExecute = 536870912,
-      GenericWrite = 1073741824,
-      GenericRead = 2147483648,
-      AllAccess = 983551
+      GenericAll           = 268435456,
+      GenericExecute       = 536870912,
+      GenericWrite         = 1073741824,
+      GenericRead          = 2147483648,
   }
 '@
 
@@ -29,7 +29,9 @@
 # https://learn.microsoft.com/en-us/windows/win32/services/service-security-and-access-rights?ranMID=46133&ranEAID=wizKxmN8no4&ranSiteID=wizKxmN8no4-IeZwvoh43192JZrq0xrt5A&epi=wizKxmN8no4-IeZwvoh43192JZrq0xrt5A&irgwc=1&OCID=AIDcmm549zy227_aff_7791_1243925&tduid=(ir__uh6z3jtojwkfby6tfvng2qx9i22xd0oxvpg0khbx00)(7791)(1243925)(wizKxmN8no4-IeZwvoh43192JZrq0xrt5A)()&irclickid=_uh6z3jtojwkfby6tfvng2qx9i22xd0oxvpg0khbx00
 
 function Get-ServiceAcl {
-    [CmdletBinding(DefaultParameterSetName = 'ByName')]
+    [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'Medium', DefaultParameterSetName = 'ByName')]
+    [OutputType([void])]
+
     param(
 
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
@@ -37,6 +39,7 @@ function Get-ServiceAcl {
             ParameterSetName = 'ByName',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
+        [Alias('ServiceName')]
         [string[]]
         $Name,
 
@@ -45,21 +48,40 @@ function Get-ServiceAcl {
             ParameterSetName = 'ByDisplayName',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
+        [Alias('ServiceDisplayName')]
         [string[]]
         $DisplayName,
 
         [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Name of the computer to get the service from.',
+            HelpMessage = 'Remote computer to execute the commands.',
             Position = 1)]
+        [Alias('Host', 'PC', 'Server', 'HostName', 'ComputerName')]
         [string]
-        $ComputerName = $env:COMPUTERNAME
+        $Computer
     )
 
     Begin {
+        $error.clear()
+
+        Write-Verbose -Message '|=> ************************************************************************ <=|'
+        Write-Verbose -Message (Get-Date).ToShortDateString()
+        Write-Verbose -Message ('  Starting: {0}' -f $MyInvocation.Mycommand)
+        Write-Verbose -Message ('Parameters used by the function... {0}' -f (Get-FunctionDisplay $PsBoundParameters -Verbose:$False))
+
+        ##############################
+        # Variables Definition
+
+
+        If (-Not $Computer) {
+            Write-Verbose -Message 'No computer name provided. Trying the local computer instead.'
+            $Computer = $env:COMPUTERNAME
+        }
+
         # If display name was provided, get the actual service name:
         switch ($PSCmdlet.ParameterSetName) {
             'ByDisplayName' {
-                $Name = Get-Service -DisplayName $DisplayName -ComputerName $ComputerName -ErrorAction Stop |
+                Write-Verbose -Message 'Query the service(s) using DisplayName'
+                $Name = Get-Service -DisplayName $DisplayName -ComputerName $Computer -ErrorAction Stop |
                 Select-Object -ExpandProperty Name
             }
         } #end Switch
@@ -73,20 +95,23 @@ function Get-ServiceAcl {
     } #end Begin
 
     Process {
+
+        Write-Verbose -Message 'Getting the services'
         # Get-Service does the work looking up the service the user requested:
         Get-Service -Name $Name | ForEach-Object {
 
             # We might need this info in catch block, so store it to a variable
             $CurrentName = $_.Name
 
+            Write-Verbose -Message 'Getting SDDL'
             # Get SDDL using sc.exe
-            $Sddl = & $ServiceControlCmd.Definition "\\$ComputerName" sdshow "$CurrentName" | Where-Object { $_ }
+            $Sddl = & $ServiceControlCmd.Definition "\\$Computer" sdshow "$CurrentName" | Where-Object { $_ }
 
             try {
                 # Get the DACL from the SDDL string
                 $Dacl = New-Object System.Security.AccessControl.RawSecurityDescriptor($Sddl)
             } catch {
-                Write-Warning "Couldn't get security descriptor for service '$CurrentName': $Sddl"
+                Write-Warning "Couldn't get security descriptor for service '$Current': $Sddl"
                 return
             } #end Try-Catch
 
@@ -128,6 +153,11 @@ function Get-ServiceAcl {
     } #end Process
 
     End {
-        $CustomObject
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished getting Service ACL."
+        Write-Verbose -Message ''
+        Write-Verbose -Message '-------------------------------------------------------------------------------'
+        Write-Verbose -Message ''
+
+        return $CustomObject
     } #end End
 }
