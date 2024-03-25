@@ -14,6 +14,9 @@ Function Get-SCManagerPermission {
         Get-SCManagerPermission |
         Select Transl*,Secu*,AccessMask,AceType | ft -AutoSize
 
+        .PARAMETER Computer
+            Remote computer to execute the commands.
+
     #>
     [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'low')]
     [OutputType([void])]

@@ -22,6 +22,9 @@
         .PARAMETER Group
             Specifies the group to be removed from the SCM ACL.
 
+        .PARAMETER Computer
+            Remote computer to execute the commands.
+
         .NOTES
             This function relies on SC.exe located at $env:SystemRoot\System32\
 

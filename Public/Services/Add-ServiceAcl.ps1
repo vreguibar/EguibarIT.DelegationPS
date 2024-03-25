@@ -25,19 +25,19 @@
   }
 '@
 
-Function Add-GroupToSCManager {
+Function Add-ServiceAcl {
     <#
         .Synopsis
-            Adds a group to the Service Control Manager (SCM) ACL.
+            Adds a group to the specified Service ACL.
 
         .DESCRIPTION
-            This function adds a specified group to the Service Control Manager (SCM) ACL with specified permissions.
+            This function adds a specified group to the Service  ACL with specified permissions.
 
         .EXAMPLE
-            Add-GroupToSCManager -Group "SG_AdAdmins"
+            Add-ServiceAcl -Group "SG_AdAdmins"
 
         .EXAMPLE
-            Add-GroupToSCManager -Group "SG_AdAdmins" -computer DC1
+            Add-ServiceAcl -Group "SG_AdAdmins" -computer DC1
 
         .EXAMPLE
             $Splat = @{
@@ -45,7 +45,10 @@ Function Add-GroupToSCManager {
                 Computer = DC1
                 Verbose  = $true
             }
-            Add-GroupToSCManager @Splat
+            Add-ServiceAcl @Splat
+
+        .PARAMETER Service
+            Specifies the service to be configured.
 
         .PARAMETER Group
             Specifies the group to be added to the SCM ACL.
@@ -68,22 +71,30 @@ Function Add-GroupToSCManager {
     [OutputType([void])]
 
     Param (
-        # PARAM1 STRING for the Delegated Group Name
+
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'Specifies the service to be configured.',
+            Position = 0)]
+        [ValidateNotNullOrEmpty()]
+        [Alias('ServiceName')]
+        [String]
+        $Service,
+
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
-            Position = 0)]
+            Position = 1)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         [String]
         $Group,
 
-        # PARAM1 STRING for the Delegated Group Name
         [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Remote computer to execute the commands.',
-            Position = 1)]
-        [Alias('Host', 'PC', 'Server', 'HostName', 'ComputerName')]
+            HelpMessage = 'Remote computer to execute the commands..',
+            Position = 2)]
+        [Alias('Host', 'PC', 'Server', 'HostName')]
         [String]
         $Computer
+
     )
 
     Begin {
@@ -108,10 +119,10 @@ Function Add-GroupToSCManager {
     Process {
 
         # get current 'Service Control Manager (SCM)' acl in SDDL format
-        Write-Verbose -Message 'Get current "Service Control Manager (SCM)" acl in SDDL format'
+        Write-Verbose -Message 'Get current Service acl in SDDL format'
 
         $Splat = @{
-            ScriptBlock = { ((& (Get-Command "$($env:SystemRoot)\System32\sc.exe") @('sdshow', 'scmanager'))[1]) }
+            ScriptBlock = { ((& (Get-Command "$($env:SystemRoot)\System32\sc.exe") @('sdshow', $PSBoundParameters['Service']))[1]) }
         }
         If ($Computer) {
             $Splat.Add('ComputerName', $Computer)
@@ -124,18 +135,20 @@ Function Add-GroupToSCManager {
 
         # Add new DACL
         Write-Verbose -Message 'Add new DACL'
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Add group from SCM?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Add group Service ACL?')) {
 
             try {
+                # Combine the desired flags instead of 983040
+                $combinedFlags = [ServiceAccessFlags]::Delete -bor [ServiceAccessFlags]::ReadControl -bor [ServiceAccessFlags]::WriteDac -bor [ServiceAccessFlags]::WriteOwner -bor [ServiceAccessFlags]::AllAccess
+
                 $Permission.DiscretionaryAcl.AddAccess(
                     [System.Security.AccessControl.AccessControlType]::Allow,
                     [System.Security.Principal.SecurityIdentifier]"$($GroupSID)",
-                    131093, # int accessMask
+                    $combinedFlags,
                     [System.Security.AccessControl.InheritanceFlags]::None,
                     [System.Security.AccessControl.PropagationFlags]::None
                 )
-                # Combine the desired flags instead of 131093
-                # $combinedFlags = [ServiceAccessFlags]::QueryConfig -bor [ServiceAccessFlags]::QueryStatus -bor [ServiceAccessFlags]::Start -bor [ServiceAccessFlags]::ReadControl
+
 
                 Write-Verbose -Message ('Successfully Added {0} for {1}' -f $_.AceType, $PSBoundParameters['Group'])
             } catch {
@@ -153,11 +166,11 @@ Function Add-GroupToSCManager {
                 $ServiceControlCmd = Get-Command "$env:SystemRoot\system32\sc.exe"
 
                 If ($Computer) {
-                    & $ServiceControlCmd.Definition @("\\$Computer", 'sdset', 'scmanager', "$sddl")
+                    & $ServiceControlCmd.Definition @("\\$Computer", 'sdset', $PSBoundParameters['Service'], "$sddl")
                 } else {
-                    & $ServiceControlCmd.Definition @('sdset', 'scmanager', "$sddl")
+                    & $ServiceControlCmd.Definition @('sdset', $PSBoundParameters['Service'], "$sddl")
                 }
-                Write-Verbose -Message 'Successfully set ACL in Service Control Manager'
+                Write-Verbose -Message ('Successfully set ACL in Service {0}' -f $PSBoundParameters['Service'])
             } catch {
                 Write-Warning -Message "Failed to set Security in the registry because $($_.Exception.Message)"
             } #end Try-Catch
@@ -166,7 +179,7 @@ Function Add-GroupToSCManager {
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished adding Service Control Manager (SCM) access."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished adding Service access."
         Write-Verbose -Message ''
         Write-Verbose -Message '-------------------------------------------------------------------------------'
         Write-Verbose -Message ''
