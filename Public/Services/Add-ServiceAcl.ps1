@@ -1,31 +1,4 @@
-﻿Add-Type -TypeDefinition @'
-  [System.FlagsAttribute]
-  public enum ServiceAccessFlags : uint
-  {
-      QueryConfig          = 1,
-      ChangeConfig         = 2,
-      QueryStatus          = 4,
-      EnumerateDependents  = 8,
-      Start                = 16,
-      Stop                 = 32,
-      PauseContinue        = 64,
-      Interrogate          = 128,
-      UserDefinedControl   = 256,
-      Delete               = 65536,
-      ReadControl          = 131072,
-      WriteDac             = 262144,
-      WriteOwner           = 524288,
-      AllAccess            = 983551,
-      Synchronize          = 1048576,
-      AccessSystemSecurity = 16777216,
-      GenericAll           = 268435456,
-      GenericExecute       = 536870912,
-      GenericWrite         = 1073741824,
-      GenericRead          = 2147483648,
-  }
-'@
-
-Function Add-ServiceAcl {
+﻿Function Add-ServiceAcl {
     <#
         .Synopsis
             Adds a group to the specified Service ACL.
