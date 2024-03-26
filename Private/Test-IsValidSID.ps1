@@ -23,8 +23,9 @@ function Test-IsValidSID {
                 Eguibar Information Technology S.L.
                 http://www.eguibarit.com
     #>
-    [CmdletBinding(ConfirmImpact = 'Low', SupportsShouldProcess = $true)]
+    [CmdletBinding(ConfirmImpact = 'Low', SupportsShouldProcess = $false)]
     [OutputType([bool])]
+
     param
     (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, ValueFromRemainingArguments = $false,
@@ -35,28 +36,31 @@ function Test-IsValidSID {
         [string]
         $ObjectSID
     )
+
     Begin {
         # Define DN Regex
-        $SidRegex = [RegEx]::new("^S-1-[0-59]-\d{2}-\d{8,10}-\d{8,10}-\d{8,10}-[1-9]\d{3}")
+        $SidRegex = [RegEx]::new('^S-1-[0-59]-\d{2}-\d{8,10}-\d{8,10}-\d{8,10}-[1-9]\d{3}')
     } #end Begin
+
     Process {
         Try {
-            # Use ShouldProcess to confirm the operation
-            if ($Force -or $PSCmdlet.ShouldProcess($ObjectDN, 'Validate objectSID')) {
-                # Perform the actual validation
-                $isValid = $ObjectSID -match $SidRegex
 
-                # Provide verbose output
-                if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
-                    Write-Verbose "objectSID validation result: $isValid"
-                } #end If
+            # Perform the actual validation
+            $isValid = $ObjectSID -match $SidRegex
+
+            # Provide verbose output
+            if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
+                Write-Verbose "objectSID validation result: $isValid"
             } #end If
+
         } catch {
             # Handle exceptions gracefully
             Write-Error "An error occurred: $_"
         } #end Try-Catch
     } #end Process
+
     end {
         return $isValid
     } #end End
+
 } #end Function
