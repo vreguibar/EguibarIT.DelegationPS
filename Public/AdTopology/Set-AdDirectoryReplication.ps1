@@ -73,7 +73,7 @@ function Set-AdDirectoryReplication {
         } #end If
 
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
-            Get-ExtendedRightHashTable
+        Get-ExtendedRightHashTable
     } #end Begin
 
     Process {
@@ -348,7 +348,7 @@ function Set-AdDirectoryReplication {
             Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating replication."
         Write-Verbose -Message ''
         Write-Verbose -Message '-------------------------------------------------------------------------------'
         Write-Verbose -Message ''

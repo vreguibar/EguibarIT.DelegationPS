@@ -140,7 +140,7 @@ function Set-AdAclPkiTemplateAdmin {
             Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding PKI template."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating management of PKI template."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''

@@ -3,33 +3,33 @@
     [OutputType([System.Collections.Hashtable])]
 
     Param (
-        [Parameter(Mandatory=$true, ValueFromPipeline=$True, ValueFromPipelineByPropertyName=$True, ValueFromRemainingArguments=$false,
-            HelpMessage='Hashtable containing the values from IniHashtable.inf file',
-            Position=0)]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+            HelpMessage = 'Hashtable containing the values from IniHashtable.inf file',
+            Position = 0)]
         [ValidateNotNull()]
         [ValidateNotNullOrEmpty()]
         [System.Collections.Hashtable]
         $IniData,
 
-        [Parameter(Mandatory=$true, ValueFromPipeline=$True, ValueFromPipelineByPropertyName=$True, ValueFromRemainingArguments=$false,
-            HelpMessage='String representing the section to configure/Change on the file',
-            Position=1)]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+            HelpMessage = 'String representing the section to configure/Change on the file',
+            Position = 1)]
         [ValidateNotNull()]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $Section,
 
-        [Parameter(Mandatory=$true, ValueFromPipeline=$True, ValueFromPipelineByPropertyName=$True, ValueFromRemainingArguments=$false,
-            HelpMessage='String representing the KEY to configure/Change on the file',
-            Position=2)]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+            HelpMessage = 'String representing the KEY to configure/Change on the file',
+            Position = 2)]
         [ValidateNotNull()]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $Key,
 
-        [Parameter(Mandatory=$true, ValueFromPipeline=$True, ValueFromPipelineByPropertyName=$True, ValueFromRemainingArguments=$false,
-            HelpMessage='ArrayList of members to be configured as a value for the KEY.',
-            Position=3)]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+            HelpMessage = 'ArrayList of members to be configured as a value for the KEY.',
+            Position = 3)]
         [ValidateNotNull()]
         [ValidateNotNullOrEmpty()]
         [System.String[]]
@@ -38,16 +38,16 @@
 
     Begin {
         $NewMembers = New-Object System.Collections.ArrayList
-        $UserSIDs   = New-Object System.Collections.ArrayList
+        $UserSIDs = New-Object System.Collections.ArrayList
 
     } #end Begin
 
     Process {
-        If(-not $IniData.Contains($Section)) {
+        If (-not $IniData.Contains($Section)) {
             $IniData.add($Section, [ordered]@{})
         }
 
-        If($IniData[$Section].Contains($Key)){
+        If ($IniData[$Section].Contains($Key)) {
             Write-Verbose -Message ('Key "{0}" found. Getting existing values.' -f $Key)
 
             # Get existing value and split it into a list
@@ -58,7 +58,7 @@
             foreach ($ExistingMember in $TempMembers) {
 
                 # Check if is a WellKnownSid
-                if($WellKnownSIDs[$ExistingMember.TrimStart('*')]) {
+                if ($WellKnownSIDs[$ExistingMember.TrimStart('*')]) {
                     $CurrentMember = New-Object System.Security.Principal.SecurityIdentifier($ExistingMember.TrimStart('*'))
                 } else {
 
@@ -91,14 +91,14 @@
                 Try {
                     # Retrive current SID
                     $principal = New-Object System.Security.Principal.NTAccount($Item)
-                    $identity  = $principal.Translate([System.Security.Principal.SecurityIdentifier]).Value
+                    $identity = $principal.Translate([System.Security.Principal.SecurityIdentifier]).Value
                 } Catch {
                     throw
                 }
 
-                If ( -Not (($null -eq $NewMembers)    -and
-                           ($NewMembers -ne 0)        -and
-                           ($NewMembers -ne '')       -and
+                If ( -Not (($null -eq $NewMembers) -and
+                           ($NewMembers -ne 0) -and
+                           ($NewMembers -ne '') -and
                            ($NewMembers -ne $false))) {
                     # Check if new sid is already defined on value. Add it if NOT.
                     if (-Not $NewMembers.Contains('*{0}' -f $identity.ToString())) {
@@ -124,20 +124,20 @@
                 # WellKnownSid function will return null if SID is not well known.
                 if ($null -eq $identity) {
                     # Retrive current SID
-                    $principal    = New-Object System.Security.Principal.NTAccount($Item)
+                    $principal = New-Object System.Security.Principal.NTAccount($Item)
                     $identity = $principal.Translate([System.Security.Principal.SecurityIdentifier]).Value
                 } #end If
 
-                If ( -Not (($null -eq $UserSIDs)    -and
-                           ($UserSIDs -ne 0)        -and
-                           ($UserSIDs -ne '')       -and
+                If ( -Not (($null -eq $UserSIDs) -and
+                           ($UserSIDs -ne 0) -and
+                           ($UserSIDs -ne '') -and
                            ($UserSIDs -ne $false))) {
                     # Check the current SID is not already on list
                     if (-Not $UserSIDs.Contains('*{0}' -f $identity.ToString())) {
                         # Add the new member to the List, adding * prefix
                         $UserSIDs.Add('*{0}' -f $identity.ToString())
                     } #end If
-                }  else {
+                } else {
                     $UserSIDs.Add('*{0}' -f $identity.ToString())
                 } #end If
             } #end Foreach
@@ -149,7 +149,7 @@
     }
 
     End {
-        Write-Verbose -Message 'Function $($MyInvocation.InvocationName) finished checking for Well-Known SIDs.'
+        Write-Verbose -Message 'Function $($MyInvocation.InvocationName) finished setting INI file section.'
         Write-Verbose -Message ''
         Write-Verbose -Message '-------------------------------------------------------------------------------'
         Write-Verbose -Message ''

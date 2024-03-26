@@ -123,8 +123,7 @@ function Get-CurrentErrorToDisplay {
                 [void]$OutputError.AppendLine($Header)
                 [void]$OutputError.AppendLine()
                 [void]$OutputError.AppendLine()
-            }
-            catch {
+            } catch {
                 Write-Error "Error processing the error: $_"
             } #end Try-Catch
         } #end If
@@ -134,7 +133,7 @@ function Get-CurrentErrorToDisplay {
         $result = $OutputError.ToString()
         Write-Verbose -Message 'Cleaning the $error variable'
         $error.Clear()
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished displaying current error."
         Write-Verbose -Message ''
         Write-Verbose -Message '-------------------------------------------------------------------------------'
         Write-Verbose -Message ''

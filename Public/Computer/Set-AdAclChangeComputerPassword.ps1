@@ -84,7 +84,7 @@ function Set-AdAclChangeComputerPassword {
         } #end If
 
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
-            Get-ExtendedRightHashTable
+        Get-ExtendedRightHashTable
 
     } #end Begin
 
@@ -129,7 +129,7 @@ function Set-AdAclChangeComputerPassword {
             Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding members to the group."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating change computer password."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''

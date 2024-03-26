@@ -72,10 +72,10 @@ function Set-AdAclUserAccountRestriction {
         [Hashtable]$Splat = [hashtable]::New()
 
         Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case is empty a function is called to fill it up.'
-            Get-AttributeSchemaHashTable
+        Get-AttributeSchemaHashTable
 
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
-            Get-ExtendedRightHashTable
+        Get-ExtendedRightHashTable
     } #end Begin
 
     Process {
@@ -121,7 +121,7 @@ function Set-AdAclUserAccountRestriction {
             Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finish user account restrictions."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegation user account restrictions."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''

@@ -118,7 +118,7 @@
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished creating central OU."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished getting ACL."
         Write-Verbose -Message ''
         Write-Verbose -Message '-------------------------------------------------------------------------------'
         Write-Verbose -Message ''

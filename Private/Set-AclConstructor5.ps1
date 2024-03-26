@@ -288,7 +288,7 @@ function Set-AclConstructor5 {
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished adding access rule with 5 arguments."
         Write-Verbose -Message ''
         Write-Verbose -Message '-------------------------------------------------------------------------------'
         Write-Verbose -Message ''

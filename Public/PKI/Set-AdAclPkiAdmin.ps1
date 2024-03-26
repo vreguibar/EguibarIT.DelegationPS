@@ -177,7 +177,7 @@ function Set-AdAclPkiAdmin {
             Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) adding PKI."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating management of PKI."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''

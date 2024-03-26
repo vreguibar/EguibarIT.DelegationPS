@@ -59,10 +59,10 @@
         [Hashtable]$Splat = [hashtable]::New()
 
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
-            Get-ExtendedRightHashTable
+        Get-ExtendedRightHashTable
 
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
-            Get-ExtendedRightHashTable
+        Get-ExtendedRightHashTable
 
     } #end Begin
 
@@ -109,7 +109,7 @@
             Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished creating central OU."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating RSoP Logging."
         Write-Verbose -Message ''
         Write-Verbose -Message '-------------------------------------------------------------------------------'
         Write-Verbose -Message ''

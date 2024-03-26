@@ -74,7 +74,7 @@ Function Remove-Everyone {
     } #end Process
 
     end {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) removed Account Operators."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) removed Everyone."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''

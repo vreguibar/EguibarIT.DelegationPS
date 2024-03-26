@@ -68,7 +68,7 @@ function Set-AdAclEnableDisableUser {
         [Hashtable]$Splat = [hashtable]::New()
 
         Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case is empty a function is called to fill it up.'
-            Get-AttributeSchemaHashTable
+        Get-AttributeSchemaHashTable
     } #end Begin
 
     Process {
@@ -114,7 +114,7 @@ function Set-AdAclEnableDisableUser {
             Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finish enable/disable user."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finish delegation enable/disable user."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''

@@ -86,7 +86,7 @@ Function Get-ExtendedRightHashTable {
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) Finished."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) fill up ExtendedRightsMap variable."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''
