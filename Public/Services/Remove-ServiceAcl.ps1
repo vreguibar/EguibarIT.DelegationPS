@@ -1,31 +1,4 @@
-﻿Add-Type -TypeDefinition @'
-  [System.FlagsAttribute]
-  public enum ServiceAccessFlags : uint
-  {
-      QueryConfig          = 1,
-      ChangeConfig         = 2,
-      QueryStatus          = 4,
-      EnumerateDependents  = 8,
-      Start                = 16,
-      Stop                 = 32,
-      PauseContinue        = 64,
-      Interrogate          = 128,
-      UserDefinedControl   = 256,
-      Delete               = 65536,
-      ReadControl          = 131072,
-      WriteDac             = 262144,
-      WriteOwner           = 524288,
-      AllAccess            = 983551,
-      Synchronize          = 1048576,
-      AccessSystemSecurity = 16777216,
-      GenericAll           = 268435456,
-      GenericExecute       = 536870912,
-      GenericWrite         = 1073741824,
-      GenericRead          = 2147483648,
-  }
-'@
-
-Function Add-ServiceAcl {
+﻿Function Remove-ServiceAcl {
     <#
         .Synopsis
             Adds a group to the specified Service ACL.
@@ -68,7 +41,7 @@ Function Add-ServiceAcl {
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
-    [OutputType([System.Management.Automation.PSCustomObject])]
+    [OutputType([void])]
 
     Param (
 
@@ -133,28 +106,24 @@ Function Add-ServiceAcl {
         Write-Verbose -Message 'Build the Common Security Descriptor from SDDL'
         $Permission = [System.Security.AccessControl.CommonSecurityDescriptor]::New($true, $False, $MySDDL)
 
-        # Add new DACL
-        Write-Verbose -Message 'Add new DACL'
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Add group Service ACL?')) {
+        # Search the DACL for the given Group SID. Delete if found!
+        Write-Verbose -Message 'Search the DACL for the given Group SID. Delete if found!'
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove group from Service DACL?')) {
 
-            try {
-                # Combine the desired flags instead of 983551
-                $combinedFlags = [ServiceAccessFlags] 'Delete, ReadControl, WriteDac, WriteOwner, AllAccess' -as [int]
-
-
-                $Permission.DiscretionaryAcl.AddAccess(
-                    [System.Security.AccessControl.AccessControlType]::Allow,
-                    [System.Security.Principal.SecurityIdentifier]"$($GroupSID)",
-                    $combinedFlags,
-                    [System.Security.AccessControl.InheritanceFlags]::None,
-                    [System.Security.AccessControl.PropagationFlags]::None
-                )
-
-
-                Write-Verbose -Message ('Successfully Added {0} for {1}' -f $_.AceType, $PSBoundParameters['Group'])
-            } catch {
-                Write-Warning -Message "Failed to add access because $($_.Exception.Message)"
-            }
+            $Permission.DiscretionaryAcl | Where-Object { $_.SecurityIdentifier.Value -eq $GroupSID } | ForEach-Object {
+                try {
+                    $Permission.DiscretionaryAcl.RemoveAccessSpecific(
+                        $_.AceType,
+                        $_.SecurityIdentifier,
+                        $_.AccessMask,
+                        [System.Security.AccessControl.InheritanceFlags]::None,
+                        [System.Security.AccessControl.PropagationFlags]::None
+                    )
+                    Write-Verbose -Message ('Successfully removed {0} for {1}' -f $_.AceType, $PSBoundParameters['Group'])
+                } catch {
+                    Write-Warning -Message "Failed to remove access because $($_.Exception.Message)"
+                } #end Try-Catch
+            } #end $Permission
 
             # Commit changes
             Write-Verbose -Message 'Commit changes.'
@@ -171,18 +140,19 @@ Function Add-ServiceAcl {
                 } else {
                     & $ServiceControlCmd.Definition @('sdset', $PSBoundParameters['Service'], "$sddl")
                 }
-                Write-Verbose -Message ('Successfully set ACL in Service {0}' -f $PSBoundParameters['Service'])
+                Write-Verbose -Message ('Successfully removed ACL in Service {0}' -f $PSBoundParameters['Service'])
             } catch {
-                Write-Warning -Message "Failed to set Security in the registry because $($_.Exception.Message)"
+                Write-Warning -Message "Failed to remove Security because $($_.Exception.Message)"
             } #end Try-Catch
         } #end If
 
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished adding Service access."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished removing Service access."
         Write-Verbose -Message ''
         Write-Verbose -Message '-------------------------------------------------------------------------------'
         Write-Verbose -Message ''
     } #end END
-} # End Function
+
+} #end Function

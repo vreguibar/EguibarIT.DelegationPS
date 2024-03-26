@@ -71,6 +71,7 @@ function Get-ServiceAcl {
         ##############################
         # Variables Definition
 
+        [Hashtable]$Splat = [hashtable]::New()
 
         If (-Not $Computer) {
             Write-Verbose -Message 'No computer name provided. Trying the local computer instead.'
@@ -99,7 +100,12 @@ function Get-ServiceAcl {
         Write-Verbose -Message 'Getting the services'
         # Get-Service does the work looking up the service the user requested:
 
-        $CurrentService = Invoke-Command -ComputerName $Computer -ScriptBlock { param($service) Get-Service -Name $service } -ArgumentList $PSBoundParameters['Name']
+        $Splat = @{
+            ComputerName = $Computer
+            ScriptBlock  = { param($service) Get-Service -Name $service }
+            ArgumentList = $PSBoundParameters['Name']
+        }
+        $CurrentService = Invoke-Command @splat
 
         ForEach ($_ in $CurrentService) {
 
