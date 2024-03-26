@@ -12,6 +12,8 @@
     }
 } #end Class
 
+# https://learn.microsoft.com/en-us/dotnet/api/system.directoryservices.activedirectorysecurityinheritance?view=dotnet-plat-ext-8.0
+
 # To get all enums in a namespace we use:
 # [enum]::GetNames([System.DirectoryServices.ActiveDirectorySecurityInheritance])
 
