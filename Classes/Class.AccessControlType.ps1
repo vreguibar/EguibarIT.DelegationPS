@@ -9,6 +9,8 @@
     }
 } #end Class
 
+# https://learn.microsoft.com/en-us/dotnet/api/system.security.accesscontrol.accesscontroltype?view=net-8.0
+
 # To get all enums in a namespace we use:
 # [enum]::GetNames([System.Security.AccessControl.AccessControlType])
 
