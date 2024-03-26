@@ -28,7 +28,7 @@ function Test-IsValidDN {
                 http://www.eguibarit.com
     #>
 
-    [CmdletBinding(ConfirmImpact = 'Low', SupportsShouldProcess = $true)]
+    [CmdletBinding(ConfirmImpact = 'Low', SupportsShouldProcess = $false)]
     [OutputType([bool])]
 
     param
@@ -61,18 +61,16 @@ function Test-IsValidDN {
     Process {
 
         Try {
-            # Use ShouldProcess to confirm the operation
-            if ($Force -or $PSCmdlet.ShouldProcess($ObjectDN, 'Validate DistinguishedName')) {
-                # Perform the actual validation
-                #$isValid = $ObjectDN -match $distinguishedNameRegex
-                $isValid = $distinguishedNameRegex.IsMatch($ObjectDN)
 
-                # Provide verbose output
-                if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
-                    Write-Verbose -Message ('DistinguishedName validation result: {0}' -f $isValid)
-                } #end If
+            # Perform the actual validation
+            #$isValid = $ObjectDN -match $distinguishedNameRegex
+            $isValid = $distinguishedNameRegex.IsMatch($ObjectDN)
 
+            # Provide verbose output
+            if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
+                Write-Verbose -Message ('DistinguishedName validation result: {0}' -f $isValid)
             } #end If
+
         } catch {
             # Handle exceptions gracefully
             Get-CurrentErrorToDisplay -CurrentError $error[0]

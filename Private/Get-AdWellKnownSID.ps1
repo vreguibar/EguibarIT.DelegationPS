@@ -58,7 +58,7 @@
             ($Variables.WellKnownSIDs.length -eq 0) -or
             ($Variables.WellKnownSIDs -eq $false)
         ) {
-            .\Enums\Enum.WellKnownSids.ps1
+            . "$PSScriptRoot\Enums\Enum.WellKnownSids.ps1"
         }
 
     } # end Begin
