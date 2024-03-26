@@ -25,4 +25,9 @@
         return $ActiveDirectoryRights
     }
 } #end Class
+
+# To get all enums in a namespace we use:
+# [enum]::GetNames([System.DirectoryServices.ActiveDirectoryRights])
+
+# To use ENUM in Param
 # [ValidateSet([ActiveDirectoryRights],ErrorMessage="Value '{0}' is invalid. Try one of: {1}")]

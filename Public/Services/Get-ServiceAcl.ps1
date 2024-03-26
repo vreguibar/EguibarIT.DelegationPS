@@ -39,7 +39,7 @@ function Get-ServiceAcl {
             ParameterSetName = 'ByName',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [Alias('ServiceName')]
+        [Alias('ServiceName', 'Service')]
         [string[]]
         $Name,
 
@@ -98,7 +98,10 @@ function Get-ServiceAcl {
 
         Write-Verbose -Message 'Getting the services'
         # Get-Service does the work looking up the service the user requested:
-        Get-Service -Name $Name | ForEach-Object {
+
+        $CurrentService = Invoke-Command -ComputerName $Computer -ScriptBlock { param($service) Get-Service -Name $service } -ArgumentList $PSBoundParameters['Name']
+
+        ForEach ($_ in $CurrentService) {
 
             # We might need this info in catch block, so store it to a variable
             $CurrentName = $_.Name
@@ -108,8 +111,10 @@ function Get-ServiceAcl {
             $Sddl = & $ServiceControlCmd.Definition "\\$Computer" sdshow "$CurrentName" | Where-Object { $_ }
 
             try {
-                # Get the DACL from the SDDL string
+
+                Write-Verbose -Message 'Get the DACL from the SDDL string'
                 $Dacl = New-Object System.Security.AccessControl.RawSecurityDescriptor($Sddl)
+
             } catch {
                 Write-Warning "Couldn't get security descriptor for service '$Current': $Sddl"
                 return
@@ -126,7 +131,10 @@ function Get-ServiceAcl {
                     $CurrentDacl = $_
 
                     try {
+
                         $IdentityReference = $CurrentDacl.SecurityIdentifier.Translate([System.Security.Principal.NTAccount])
+                        Write-Verbose -Message 'Translated SID to account'
+
                     } catch {
                         $IdentityReference = $CurrentDacl.SecurityIdentifier.Value
                     }
@@ -149,7 +157,8 @@ function Get-ServiceAcl {
                 } | Out-String
             }
 
-        } #end Get-Service
+        } #end Foreach
+
     } #end Process
 
     End {

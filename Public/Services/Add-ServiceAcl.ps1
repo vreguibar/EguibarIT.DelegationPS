@@ -1,4 +1,4 @@
-﻿Add-Type @'
+﻿Add-Type -TypeDefinition @'
   [System.FlagsAttribute]
   public enum ServiceAccessFlags : uint
   {
@@ -15,7 +15,7 @@
       ReadControl          = 131072,
       WriteDac             = 262144,
       WriteOwner           = 524288,
-      AllAccess            = 983551
+      AllAccess            = 983551,
       Synchronize          = 1048576,
       AccessSystemSecurity = 16777216,
       GenericAll           = 268435456,
@@ -138,8 +138,9 @@ Function Add-ServiceAcl {
         If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Add group Service ACL?')) {
 
             try {
-                # Combine the desired flags instead of 983040
-                $combinedFlags = [ServiceAccessFlags]::Delete -bor [ServiceAccessFlags]::ReadControl -bor [ServiceAccessFlags]::WriteDac -bor [ServiceAccessFlags]::WriteOwner -bor [ServiceAccessFlags]::AllAccess
+                # Combine the desired flags instead of 983551
+                $combinedFlags = [ServiceAccessFlags] 'Delete, ReadControl, WriteDac, WriteOwner, AllAccess' -as [int]
+
 
                 $Permission.DiscretionaryAcl.AddAccess(
                     [System.Security.AccessControl.AccessControlType]::Allow,

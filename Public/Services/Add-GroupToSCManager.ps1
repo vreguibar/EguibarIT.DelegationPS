@@ -15,7 +15,7 @@
       ReadControl          = 131072,
       WriteDac             = 262144,
       WriteOwner           = 524288,
-      AllAccess            = 983551
+      AllAccess            = 983551,
       Synchronize          = 1048576,
       AccessSystemSecurity = 16777216,
       GenericAll           = 268435456,
