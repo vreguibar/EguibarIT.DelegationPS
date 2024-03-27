@@ -18,8 +18,8 @@ Function Import-MyModule {
             and handling errors if the module is not available.
 
         .NOTES
-            Version:         1.0
-            DateModified:    16/Feb/2024
+            Version:         1.1
+            DateModified:    27/Mar/2024
             LasModifiedBy:   Vicente Rodriguez Eguibar
                 vicente@eguibar.com
                 Eguibar Information Technology S.L.
@@ -35,7 +35,11 @@ Function Import-MyModule {
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $name
+        $name,
+
+        # Indicates whether to force the import of the module
+        [switch]
+        $Force
     )
 
     Begin {
@@ -49,6 +53,8 @@ Function Import-MyModule {
         ##############################
         # Variables Definition
 
+        [Hashtable]$Splat = [hashtable]::New()
+
     } #end Begin
 
     Process {
@@ -61,7 +67,17 @@ Function Import-MyModule {
 
                 if ($availableModule) {
 
-                    Import-Module -Name $PSBoundParameters['name'] -Force -ErrorAction Stop
+                    $Splat = @{
+                        Name        = $PSBoundParameters['name']
+                        ErrorAction = 'Stop'
+                    }
+
+                    If ($Force) {
+                        $Splat.Add('Force', $True)
+                    }
+
+                    Import-Module @Splat
+
                     Write-Verbose -Message ('Successfully imported module {0}' -f $PSBoundParameters['name'])
 
                 } else {
