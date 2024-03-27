@@ -3,13 +3,14 @@
         .Synopsis
             The function will delegate the premission for a group to Managed Privileged Accounts
         .DESCRIPTION
-            The function will delegate the premission for a group to Managed Privileged Accounts
+            The function will delegate the premission for a group to
+            Managed Privileged Accounts by modifying the AdminSdHolder
         .EXAMPLE
-            Set-AdAclMngPrivilegedAccount -Group "SL_PUM" -RemoveRule
+            Set-AdAclMngPrivilegedAccount -Group "SL_PUM"
         .EXAMPLE
             Set-AdAclMngPrivilegedAccount -Group "SL_PUM" -RemoveRule
         .PARAMETER Group
-            [STRING] Identity of the group getting the delegation.
+            Identity of the group getting the delegation.
         .PARAMETER RemoveRule
             [SWITCH] If present, the access rule will be removed
         .NOTES
@@ -31,13 +32,12 @@
     [OutputType([void])]
 
     Param (
-        # PARAM1 STRING for the Delegated Group Name
+        # PARAM1 Delegated Group Name
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
-        [String]
         $Group,
 
         # PARAM3 SWITCH If present, the access rule will be removed.
@@ -64,6 +64,10 @@
 
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
         Get-ExtendedRightHashTable
+
+        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
+        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
+
     } #end Begin
 
     Process {
@@ -90,7 +94,7 @@
                         IsInherited = False
         #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = 'CN=AdminSDHolder,CN=System,{0}' -f $Variables.defaultNamingContext
             AdRight               = 'ReadProperty', 'WriteProperty'
             AccessControlType     = 'Allow'
@@ -122,7 +126,7 @@
                         IsInherited = False
         #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = 'CN=AdminSDHolder,CN=System,{0}' -f $Variables.defaultNamingContext
             AdRight               = 'ReadProperty', 'WriteProperty'
             AccessControlType     = 'Allow'
@@ -154,7 +158,7 @@
                         IsInherited = False
         #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = 'CN=AdminSDHolder,CN=System,{0}' -f $Variables.defaultNamingContext
             AdRight               = 'ReadProperty', 'WriteProperty'
             AccessControlType     = 'Allow'
@@ -186,7 +190,7 @@
                         IsInherited = False
         #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = 'CN=AdminSDHolder,CN=System,{0}' -f $Variables.defaultNamingContext
             AdRight               = 'ReadProperty', 'WriteProperty'
             AccessControlType     = 'Allow'
@@ -218,7 +222,7 @@
                         IsInherited = False
         #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = 'CN=AdminSDHolder,CN=System,{0}' -f $Variables.defaultNamingContext
             AdRight               = 'ReadProperty', 'WriteProperty'
             AccessControlType     = 'Allow'
@@ -250,7 +254,7 @@
                         IsInherited = False
         #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = 'CN=AdminSDHolder,CN=System,{0}' -f $Variables.defaultNamingContext
             AdRight               = 'ReadProperty', 'WriteProperty'
             AccessControlType     = 'Allow'
