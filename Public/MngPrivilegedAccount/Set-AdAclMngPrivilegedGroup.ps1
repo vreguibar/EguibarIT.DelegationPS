@@ -35,7 +35,6 @@
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [String]
         $Group,
 
         # PARAM3 SWITCH If present, the access rule will be removed.
@@ -60,6 +59,9 @@
         Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case is empty a function is called to fill it up.'
         Get-AttributeSchemaHashTable
 
+        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
+        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
+
     } #end Begin
 
     Process {
@@ -77,7 +79,7 @@
                         IsInherited = False
         #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = 'CN=AdminSDHolder,CN=System,{0}' -f $Variables.defaultNamingContext
             AdRight               = 'ReadProperty', 'WriteProperty'
             AccessControlType     = 'Allow'
@@ -104,7 +106,7 @@
             Write-Verbose ('Permissions delegation process completed for group: {0} ' -f $PSBoundParameters['Group'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating management of Privileged Groups."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating management of Privileged Groups (AdminSdHolder)."
         Write-Verbose -Message ''
         Write-Verbose -Message '-------------------------------------------------------------------------------'
         Write-Verbose -Message ''
