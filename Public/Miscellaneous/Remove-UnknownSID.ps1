@@ -84,7 +84,7 @@
 
                     Write-Verbose -Message ('Unresolved SID found! {0}' -f $($rule.IdentityReference.ToString()))
 
-                    if ($_removesid) {
+                    if ($PSBoundParameters['RemoveSID']) {
 
                         Write-Verbose -Message 'Preparing to remove un-resolved SID'
 
@@ -93,6 +93,8 @@
                             If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['LDAPpath'], 'Remove unknown SID?')) {
                                 $myObject.ObjectSecurity.RemoveAccessRule($rule)
                             } #end If
+
+                            Write-Verbose -Message 'Un-resolved SID removed'
 
                         } catch {
                             throw [System.ApplicationException]::new("An error occurred while removing access rule: '$($_.Exception)'. Message is $($_.Exception.Message)")
@@ -116,6 +118,8 @@
             # Re-apply the modified DACL to the OU
             # Now push these AccessRules to AD
             $myObject.CommitChanges()
+
+            Write-Verbose -Message 'Committing changes.'
         } catch {
             throw [System.ApplicationException]::new("An error occurred while committing changes to the access rule: '$($_.Exception)'. Message is $($_.Exception.Message)")
         } #end Try-Catch
