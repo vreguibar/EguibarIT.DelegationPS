@@ -10,6 +10,7 @@ if (Test-Path -Path "$PSScriptRoot\Enums") {
             . $Item.FullName
             Write-Verbose -Message "Imported $($Item.BaseName)"
         } Catch {
+            throw
             Write-Error -Message "Could not load Enum [$($Item.Name)] : $($_.Message)"
         } #end Try-Catch
     } #end Foreach
@@ -24,6 +25,7 @@ if (Test-Path -Path "$PSScriptRoot\Classes") {
             . $Item.FullName
             Write-Verbose -Message "Imported $($Item.BaseName)"
         } Catch {
+            throw
             Write-Error -Message "Could not load Enum [$($Item.Name)] : $($_.Message)"
         } #end Try-Catch
     } #end Foreach
