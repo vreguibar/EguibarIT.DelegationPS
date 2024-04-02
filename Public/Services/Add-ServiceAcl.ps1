@@ -41,7 +41,7 @@
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
-    [OutputType([System.Management.Automation.PSCustomObject])]
+    [OutputType([void])]
 
     Param (
 
