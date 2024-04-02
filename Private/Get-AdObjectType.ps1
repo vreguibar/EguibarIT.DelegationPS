@@ -5,18 +5,24 @@ function Get-AdObjectType {
 
     .DESCRIPTION
         The Get-AdObjectType function determines the type of an Active Directory object based on the given identity.
-        It supports various object types, including AD users, computers, and groups. The function provides verbose output
-        and implements the -WhatIf parameter to simulate actions.
+        It supports various object types, including AD users, computers, and groups. The function provides verbose output.
 
     .PARAMETER Identity
         Specifies the identity of the Active Directory object. This parameter is mandatory.
 
+        Possible values are:
+          ADAccount object
+          ADComputer object
+          ADGroup object
+          ADOrganizationalUnit object
+          String representing DistinguishedName
+          String representing SID
+          String representing samAccountName
+
+
     .EXAMPLE
         Get-AdObjectType -Identity "davader"
         Retrieves the type of the Active Directory object with the SamAccountName "davader".
-
-    .INPUTS
-        String: Accepts a string representing the identity of the Active Directory object.
 
     .OUTPUTS
         Microsoft.ActiveDirectory.Management.ADAccount or
