@@ -111,6 +111,7 @@
         If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Add group Service ACL?')) {
 
             try {
+                # https://learn.microsoft.com/en-us/windows/win32/services/service-security-and-access-rights
                 # Combine the desired flags instead of 983551
                 $combinedFlags = [ServiceAccessFlags] 'Delete, ReadControl, WriteDac, WriteOwner, AllAccess' -as [int]
 

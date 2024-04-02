@@ -100,15 +100,16 @@
         If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Add group from SCM?')) {
 
             try {
+                # https://learn.microsoft.com/en-us/windows/win32/services/service-security-and-access-rights
+                $combinedFlags = [ServiceAccessFlags] 'QueryConfig, ChangeConfig, QueryStatus, EnumerateDependents, Start, Stop, Delete, ReadControl, WriteDac, WriteOwner' -as [int]
+                
                 $Permission.DiscretionaryAcl.AddAccess(
                     [System.Security.AccessControl.AccessControlType]::Allow,
                     [System.Security.Principal.SecurityIdentifier]"$($GroupSID)",
-                    131093, # int accessMask
+                    $combinedFlags, # int accessMask
                     [System.Security.AccessControl.InheritanceFlags]::None,
                     [System.Security.AccessControl.PropagationFlags]::None
                 )
-                # Combine the desired flags instead of 131093
-                # $combinedFlags = [ServiceAccessFlags]::QueryConfig -bor [ServiceAccessFlags]::QueryStatus -bor [ServiceAccessFlags]::Start -bor [ServiceAccessFlags]::ReadControl
 
                 Write-Verbose -Message ('Successfully Added {0} for {1}' -f $_.AceType, $PSBoundParameters['Group'])
             } catch {
