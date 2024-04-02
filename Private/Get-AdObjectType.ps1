@@ -24,6 +24,21 @@ function Get-AdObjectType {
         Get-AdObjectType -Identity "davader"
         Retrieves the type of the Active Directory object with the SamAccountName "davader".
 
+    .EXAMPLE
+        Get-AdObjectType -Identity "CN=davade,OU=Users,OU=BAAD,OU=Sites,DC=EguibarIT,DC=local"
+        Retrieves the type of the Active Directory object with the
+        DistinguishedName "CN=davade,OU=Users,OU=BAAD,OU=Sites,DC=EguibarIT,DC=local".
+
+    .EXAMPLE
+        Get-AdObjectType -Identity "S-1-5-21-3484526001-1877030748-1169500100-1646"
+        Retrieves the type of the Active Directory object with the
+        SID "S-1-5-21-3484526001-1877030748-1169500100-1646".
+
+    .EXAMPLE
+        Get-AdObjectType -Identity "35b764b7-06df-4509-a54f-8fd4c26a0805"
+        Retrieves the type of the Active Directory object with the GUID
+        "35b764b7-06df-4509-a54f-8fd4c26a0805".
+
     .OUTPUTS
         Microsoft.ActiveDirectory.Management.ADAccount or
         Microsoft.ActiveDirectory.Management.ADComputer or
@@ -37,7 +52,7 @@ function Get-AdObjectType {
                 Eguibar Information Technology S.L.
                 http://www.eguibarit.com
     #>
-  [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'Medium')]
+  [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'low')]
 
   Param (
     # Param1
@@ -105,6 +120,11 @@ function Get-AdObjectType {
 
             Write-Verbose -Message 'Looking for ObjectSID'
             $newObject = Get-ADObject -Filter { ObjectSID -eq $Identity }
+
+          } elseif (Test-IsValidGUID -ObjectGUID $Identity) {
+
+            Write-Verbose -Message 'Looking for ObjectGUID'
+            $newObject = Get-ADObject -Filter { ObjectGUID -eq $Identity }
 
           } else {
 
