@@ -69,6 +69,7 @@ Function Import-MyModule {
 
                     $Splat = @{
                         Name        = $PSBoundParameters['name']
+                        Global      = $true
                         ErrorAction = 'Stop'
                     }
 
