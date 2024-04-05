@@ -31,6 +31,7 @@
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, ValueFromRemainingArguments = $true,
             HelpMessage = 'SID of the object to be translated',
             Position = 0)]
+        [ValidateScript({ Test-IsValidSID -ObjectSID $_ })]
         [ValidateNotNullOrEmpty()]
         $SID
     )
