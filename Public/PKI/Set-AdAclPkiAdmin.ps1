@@ -46,6 +46,8 @@ function Set-AdAclPkiAdmin {
             HelpMessage = 'Distinguished Name of the OU having the Rights groups, where the "Cert Publishers" built-in group resides (Usually OU=Rights,OU=Admin,DC=EguibarIT,DC=local).',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
+        [ValidateScript({ Test-IsValidDN -ObjectDN $_ })]
+        [Alias('DN', 'DistinguishedName')]
         [String]
         $ItRightsOuDN,
 
