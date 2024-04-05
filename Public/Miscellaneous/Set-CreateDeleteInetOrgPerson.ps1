@@ -47,6 +47,8 @@
             HelpMessage = 'Distinguished Name of the OU where the computer DnsInfo will be set',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
+        [ValidateScript({ Test-IsValidDN -ObjectDN $_ })]
+        [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath,
 

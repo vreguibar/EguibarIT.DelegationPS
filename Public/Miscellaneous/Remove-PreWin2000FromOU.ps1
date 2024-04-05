@@ -31,6 +31,7 @@ Function Remove-PreWin2000FromOU {
             HelpMessage = 'Object Distinguished Name',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
+        [ValidateScript({ Test-IsValidDN -ObjectDN $_ })]
         [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath
@@ -47,7 +48,7 @@ Function Remove-PreWin2000FromOU {
         [Hashtable]$Splat = [hashtable]::New()
 
         Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case is empty a function is called to fill it up.'
-            Get-AttributeSchemaHashTable
+        Get-AttributeSchemaHashTable
     } #end Begin
 
     process {

@@ -46,6 +46,8 @@ function Set-AdAclCreateDeletePrintQueue {
             HelpMessage = 'Distinguished Name of the object (or container) where the permissions are going to be configured.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
+        [ValidateScript({ Test-IsValidDN -ObjectDN $_ })]
+        [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath,
 

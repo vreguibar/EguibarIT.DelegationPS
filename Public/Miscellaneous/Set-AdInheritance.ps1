@@ -31,6 +31,8 @@
             HelpMessage = 'The Delegated Group Name',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
+        [ValidateScript({ Test-IsValidDN -ObjectDN $_ })]
+        [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath,
 

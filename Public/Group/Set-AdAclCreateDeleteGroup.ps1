@@ -48,6 +48,8 @@ function Set-AdAclCreateDeleteGroup {
             HelpMessage = 'Distinguished Name of the OU were the groups can be changed',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
+        [ValidateScript({ Test-IsValidDN -ObjectDN $_ })]
+        [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath,
 

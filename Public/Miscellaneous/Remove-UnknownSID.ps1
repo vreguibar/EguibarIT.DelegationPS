@@ -35,6 +35,7 @@
             HelpMessage = 'Distinguished Name of the object (or container) where the Unknown SID is located.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
+        [ValidateScript({ Test-IsValidDN -ObjectDN $_ })]
         [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath,
