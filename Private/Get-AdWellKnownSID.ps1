@@ -31,6 +31,7 @@
         [Parameter(Mandatory = $true, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (Security IDentifier or SID) to check if it IS a WellKnownSID.',
             Position = 0)]
+        [ValidateScript({ Test-IsValidSID -ObjectSID $_ })]
         [ValidateNotNullOrEmpty()]
         $SID
     )
