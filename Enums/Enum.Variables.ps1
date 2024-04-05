@@ -1,16 +1,16 @@
 ﻿$Variables = [ordered] @{
 
     # Active Directory DistinguishedName
-    AdDN                       = ([ADSI]'LDAP://RootDSE').DefaultNamingContext.ToString()
+    AdDN                       = $null
 
     # Configuration Naming Context
-    configurationNamingContext = ([ADSI]'LDAP://RootDSE').configurationNamingContext.ToString()
+    configurationNamingContext = $null
 
     # Active Directory DistinguishedName
-    defaultNamingContext       = ([ADSI]'LDAP://RootDSE').DefaultNamingContext.ToString()
+    defaultNamingContext       = $null
 
     # Get current DNS domain name
-    DnsFqdn                    = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain().Name
+    DnsFqdn                    = $null
 
     # Hashtable containing the mappings between SchemaExtendedRights and GUID's
     ExtendedRightsMap          = $null
@@ -19,18 +19,20 @@
     GuidMap                    = $null
 
     # Naming Contexts
-    namingContexts             = ([ADSI]'LDAP://RootDSE').namingContexts
+    namingContexts             = $null
 
     # Partitions Container
-    PartitionsContainer        = (([ADSI]'LDAP://RootDSE').configurationNamingContext.ToString())
+    PartitionsContainer        = $null
 
     # Root Domain Naming Context
-    rootDomainNamingContext    = ([ADSI]'LDAP://RootDSE').rootDomainNamingContext.ToString()
+    rootDomainNamingContext    = $null
 
     # Schema Naming Context
-    SchemaNamingContext        = ([ADSI]'LDAP://RootDSE').SchemaNamingContext.ToString()
+    SchemaNamingContext        = $null
 
     # Well-Known SIDs
     WellKnownSIDs              = $null
 }
 New-Variable -Name Variables -Value $Variables -Scope Script -Force
+
+# Create variable with $Nulls, then call Initialize-ModuleVariable to fill it up.
