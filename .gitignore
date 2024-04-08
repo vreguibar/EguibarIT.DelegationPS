@@ -2,7 +2,6 @@
 Template.txt
 *.html
 Publish.ps1
-build.ps1
 Ignore/*
 .vs/*
 .vscode/*
