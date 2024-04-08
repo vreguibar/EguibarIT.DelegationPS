@@ -66,7 +66,7 @@
         $Variables.SchemaNamingContext = ([ADSI]'LDAP://RootDSE').SchemaNamingContext.ToString()
 
         # Well-Known SIDs
-        . "$PSScriptRoot\Private\Get-AdWellKnownSID.ps1"
+        . "$PSScriptRoot\Get-AdWellKnownSID.ps1"
 
     } #end Process
 
