@@ -39,7 +39,6 @@ function Set-AdAclBitLockerTPM {
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
-        [String]
         $Group,
 
         # PARAM2 Distinguished Name of the OU where the computer ValidateWriteSPN will be set
@@ -71,19 +70,13 @@ function Set-AdAclBitLockerTPM {
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New()
 
-        If ( ($null -eq $Variables.GuidMap) -and
-                 ($Variables.GuidMap -ne 0) -and
-                 ($Variables.GuidMap -ne '') -and
-                 (   ($Variables.GuidMap -isnot [array]) -or
-                     ($Variables.GuidMap.Length -ne 0)) -and
-                 ($Variables.GuidMap -ne $false)
-        ) {
+        # $Variables.GuidMap is empty. Call function to fill it up
+        Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
+        Get-AttributeSchemaHashTable
 
-            # $Variables.GuidMap is empty. Call function to fill it up
-            Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
-            Get-AttributeSchemaHashTable
+        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
+        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
 
-        } #end If
     } #end Begin
 
     Process {
@@ -132,7 +125,7 @@ function Set-AdAclBitLockerTPM {
                         IsInherited = False
         #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'ReadProperty'
             AccessControlType     = 'Allow'
@@ -165,7 +158,7 @@ function Set-AdAclBitLockerTPM {
              IsInherited            : False
         #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'GenericAll'
             AccessControlType     = 'Allow'
@@ -197,7 +190,7 @@ function Set-AdAclBitLockerTPM {
             IsInherited            : False
         #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'ReadProperty', 'WriteProperty'
             AccessControlType     = 'Allow'
@@ -227,7 +220,7 @@ function Set-AdAclBitLockerTPM {
             Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating BitLocker."
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating BitLocker & TPM."
         Write-Verbose -Message ''
         Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''

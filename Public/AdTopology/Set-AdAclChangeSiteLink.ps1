@@ -36,7 +36,6 @@
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
-        [String]
         $Group,
 
         # PARAM2 SWITCH If present, the access rule will be removed.
@@ -58,19 +57,12 @@
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New()
 
-        If ( ($null -eq $Variables.GuidMap) -and
-                 ($Variables.GuidMap -ne 0) -and
-                 ($Variables.GuidMap -ne '') -and
-                 (   ($Variables.GuidMap -isnot [array]) -or
-                     ($Variables.GuidMap.Length -ne 0)) -and
-                 ($Variables.GuidMap -ne $false)
-        ) {
+        # $Variables.GuidMap is empty. Call function to fill it up
+        Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
+        Get-AttributeSchemaHashTable
 
-            # $Variables.GuidMap is empty. Call function to fill it up
-            Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
-            Get-AttributeSchemaHashTable
-
-        } #end If
+        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
+        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
 
     } #end Begin
 
@@ -86,7 +78,7 @@
             IsInherited           : False
         #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
             AdRight               = 'ReadProperty', 'WriteProperty'
             AccessControlType     = 'Allow'

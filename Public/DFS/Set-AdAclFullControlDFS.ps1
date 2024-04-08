@@ -37,7 +37,7 @@ function Set-AdAclFullControlDFS {
             HelpMessage = 'Group Name which will get the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         $Group,
 
         # PARAM2 SWITCH If present, the access rule will be removed.
@@ -59,6 +59,9 @@ function Set-AdAclFullControlDFS {
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New()
 
+        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
+        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
+
     } #end Begin
 
     Process {
@@ -73,7 +76,7 @@ function Set-AdAclFullControlDFS {
             IsInherited            : False
         #>
         $Splat = @{
-            Id                = $PSBoundParameters['Group']
+            Id                = $CurrentGroup
             LDAPPath          = 'CN=DFSR-GlobalSettings,CN=System,{0}' -f $Variables.defaultNamingContext
             AdRight           = 'GenericAll'
             AccessControlType = 'Allow'
@@ -104,7 +107,7 @@ function Set-AdAclFullControlDFS {
             IsInherited            : False
         #>
         $Splat = @{
-            Id                = $PSBoundParameters['Group']
+            Id                = $CurrentGroup
             LDAPPath          = 'CN=Dfs-Configuration,CN=System,{0}' -f $Variables.defaultNamingContext
             AdRight           = 'GenericAll'
             AccessControlType = 'Allow'

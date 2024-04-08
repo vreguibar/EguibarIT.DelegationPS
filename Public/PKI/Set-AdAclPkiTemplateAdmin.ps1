@@ -38,7 +38,6 @@ function Set-AdAclPkiTemplateAdmin {
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
-        [String]
         $Group,
 
         # PARAM2 SWITCH If present, the access rule will be removed.
@@ -62,6 +61,9 @@ function Set-AdAclPkiTemplateAdmin {
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New()
 
+        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
+        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
+
     } #end Begin
 
     Process {
@@ -77,7 +79,7 @@ function Set-AdAclPkiTemplateAdmin {
         #>
         # Certificate Authority Template Admin
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = 'CN=Certificate Templates,CN=Public Key Services,CN=Services,{0}' -f $Variables.configurationNamingContext
             AdRight               = 'GenericAll'
             AccessControlType     = 'Allow'
@@ -110,7 +112,7 @@ function Set-AdAclPkiTemplateAdmin {
         #>
         # Certificate Authority Template Admin
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = 'CN=OID,CN=Public Key Services,CN=Services,{0}' -f $Variables.configurationNamingContext
             AdRight               = 'GenericAll'
             AccessControlType     = 'Allow'

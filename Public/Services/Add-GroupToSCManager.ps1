@@ -47,7 +47,6 @@
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
-        [String]
         $Group,
 
         # PARAM1 STRING for the Delegated Group Name
@@ -73,8 +72,11 @@
 
         [Hashtable]$Splat = [hashtable]::New()
 
+        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
+        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
+
         # Get group SID
-        $GroupSID = (Get-ADGroup -Identity $PSBoundParameters['Group']).SID.Value
+        $GroupSID = $CurrentGroup.SID.Value
 
     } #end Begin
 
@@ -102,7 +104,7 @@
             try {
                 # https://learn.microsoft.com/en-us/windows/win32/services/service-security-and-access-rights
                 $combinedFlags = [ServiceAccessFlags] 'QueryConfig, ChangeConfig, QueryStatus, EnumerateDependents, Start, Stop, Delete, ReadControl, WriteDac, WriteOwner' -as [int]
-                
+
                 $Permission.DiscretionaryAcl.AddAccess(
                     [System.Security.AccessControl.AccessControlType]::Allow,
                     [System.Security.Principal.SecurityIdentifier]"$($GroupSID)",

@@ -39,7 +39,6 @@ function Set-AdAclChangeGroup {
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
-        [String]
         $Group,
 
         #PARAM2 Distinguished Name of the OU were the groups can be changed
@@ -73,6 +72,10 @@ function Set-AdAclChangeGroup {
 
         Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case is empty a function is called to fill it up.'
         Get-AttributeSchemaHashTable
+
+        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
+        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
+
     } #end Begin
 
     Process {
@@ -88,7 +91,7 @@ function Set-AdAclChangeGroup {
                         IsInherited = False
         #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'ReadProperty', 'WriteProperty'
             AccessControlType     = 'Allow'

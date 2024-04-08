@@ -48,7 +48,6 @@
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
-        [String]
         $Group,
 
         # PARAM2 SWITCH If present, the access rule will be removed.
@@ -70,17 +69,12 @@
         # Variables Definition
         [hashtable]$Splat = [hashtable]::New()
 
-        # Check and fill GuidMap variable
-        If ( ($null -eq $Variables.GuidMap) -or
-            ($Variables.GuidMap -eq 0) -or
-            ($Variables.GuidMap -eq '') -or
-            ($Variables.GuidMap.Length -eq 0) -or
-            ($Variables.GuidMap -eq $false)
-        ) {
-            # $Variables.GuidMap is empty. Call function to fill it up
-            Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
-            Get-AttributeSchemaHashTable
-        } #end If
+        # $Variables.GuidMap is empty. Call function to fill it up
+        Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
+        Get-AttributeSchemaHashTable
+
+        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
+        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
 
     } #end Begin
 
@@ -100,7 +94,7 @@
         try {
             Write-Verbose 'Attempting to set ACL 1 for permissions...'
             $Splat = @{
-                Id                    = $PSBoundParameters['Group']
+                Id                    = $CurrentGroup
                 LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext
                 AdRight               = 'CreateChild', 'DeleteChild'
                 AccessControlType     = 'Allow'
@@ -138,7 +132,7 @@
         try {
             Write-Verbose 'Attempting to set ACL 2 for permissions...'
             $Splat = @{
-                Id                    = $PSBoundParameters['Group']
+                Id                    = $CurrentGroup
                 LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext
                 AdRight               = 'CreateChild', 'DeleteChild'
                 AccessControlType     = 'Allow'
@@ -176,7 +170,7 @@
         try {
             Write-Verbose 'Attempting to set ACL 3 for permissions...'
             $Splat = @{
-                Id                    = $PSBoundParameters['Group']
+                Id                    = $CurrentGroup
                 LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext
                 AdRight               = 'CreateChild', 'DeleteChild'
                 AccessControlType     = 'Allow'
@@ -215,7 +209,7 @@
         try {
             Write-Verbose 'Attempting to set ACL 4 for permissions...'
             $Splat = @{
-                Id                    = $PSBoundParameters['Group']
+                Id                    = $CurrentGroup
                 LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext
                 AdRight               = 'CreateChild', 'DeleteChild'
                 AccessControlType     = 'Allow'
@@ -252,7 +246,7 @@
         try {
             Write-Verbose 'Attempting to set ACL 5 for permissions...'
             $Splat = @{
-                Id                = $PSBoundParameters['Group']
+                Id                = $CurrentGroup
                 LDAPPath          = 'CN=Sites,{0}' -f $Variables.configurationNamingContext
                 AdRight           = 'WriteDacl'
                 AccessControlType = 'Allow'
@@ -289,7 +283,7 @@
         try {
             Write-Verbose 'Attempting to set ACL 6 for permissions...'
             $Splat = @{
-                Id                    = $PSBoundParameters['Group']
+                Id                    = $CurrentGroup
                 LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext
                 AdRight               = 'CreateChild', 'DeleteChild'
                 AccessControlType     = 'Allow'
@@ -328,7 +322,7 @@
         try {
             Write-Verbose 'Attempting to set ACL 7 for permissions...'
             $Splat = @{
-                Id                    = $PSBoundParameters['Group']
+                Id                    = $CurrentGroup
                 LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext
                 AdRight               = 'CreateChild', 'DeleteChild'
                 AccessControlType     = 'Allow'
@@ -366,7 +360,7 @@
         try {
             Write-Verbose 'Attempting to set ACL 8 for permissions...'
             $Splat = @{
-                Id                    = $PSBoundParameters['Group']
+                Id                    = $CurrentGroup
                 LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext
                 AdRight               = 'GenericAll'
                 AccessControlType     = 'Allow'
@@ -403,7 +397,7 @@
         try {
             Write-Verbose 'Attempting to set ACL 9 for permissions...'
             $Splat = @{
-                Id                    = $PSBoundParameters['Group']
+                Id                    = $CurrentGroup
                 LDAPPath              = 'CN=Sites,{0}' -f $Variables.configurationNamingContext
                 AdRight               = 'GenericAll'
                 AccessControlType     = 'Allow'

@@ -39,7 +39,6 @@
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
-        [String]
         $Group,
 
         # PARAM2 Distinguished Name of the OU where the computer will get password reset
@@ -71,17 +70,12 @@
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New()
 
-        If ( ($null -eq $Variables.GuidMap) -and
-                     ($Variables.GuidMap -ne 0) -and
-                     ($Variables.GuidMap -ne '') -and
-                     (   ($Variables.GuidMap -isnot [array]) -or
-                         ($Variables.GuidMap.Length -ne 0)) -and
-                     ($Variables.GuidMap -ne $false)
-        ) {
-            # $Variables.GuidMap is empty. Call function to fill it up
-            Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
-            Get-AttributeSchemaHashTable
-        } #end If
+        # $Variables.GuidMap is empty. Call function to fill it up
+        Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
+        Get-AttributeSchemaHashTable
+
+        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
+        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
 
     } #end Begin
 
@@ -98,7 +92,7 @@
                         IsInherited = False
             #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'ListChildren', 'ReadProperty', 'Delete', 'GenericWrite', 'WriteDacl'
             AccessControlType     = 'Allow'
@@ -130,7 +124,7 @@
                         IsInherited = False
             #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'CreateChild', 'DeleteChild'
             AccessControlType     = 'Allow'
@@ -162,7 +156,7 @@
                         IsInherited = False
             #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'ReadProperty', 'WriteProperty'
             AccessControlType     = 'Allow'
@@ -194,7 +188,7 @@
                             IsInherited = False
             #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'CreateChild', 'DeleteChild'
             AccessControlType     = 'Allow'

@@ -21,7 +21,7 @@
                 Name                                   | Module
                 ---------------------------------------|--------------------------
                 Set-AclConstructor5                    | EguibarIT.Delegation
-                Get-AttributeSchemaHashTable                | EguibarIT.Delegation
+                Get-AttributeSchemaHashTable           | EguibarIT.Delegation
         .NOTES
             Version:         1.1
             DateModified:    14/Oct/2016
@@ -39,7 +39,7 @@
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         $Group,
 
         # PARAM2 Distinguished Name of the OU where the computer DnsInfo will be set

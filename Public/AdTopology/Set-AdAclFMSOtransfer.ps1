@@ -39,7 +39,6 @@ Function Set-AdAclFMSOtransfer {
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
-        [String]
         $Group,
 
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
@@ -70,22 +69,15 @@ Function Set-AdAclFMSOtransfer {
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New()
 
-        If ( ($null -eq $Variables.GuidMap) -and
-                 ($Variables.GuidMap -ne 0) -and
-                 ($Variables.GuidMap -ne '') -and
-                 (   ($Variables.GuidMap -isnot [array]) -or
-                     ($Variables.GuidMap.Length -ne 0)) -and
-                 ($Variables.GuidMap -ne $false)
-        ) {
-
             # $Variables.GuidMap is empty. Call function to fill it up
             Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
             Get-AttributeSchemaHashTable
 
-        } #end If
-
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
         Get-ExtendedRightHashTable
+
+        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
+        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
 
     } #end Begin
 
@@ -120,7 +112,7 @@ Function Set-AdAclFMSOtransfer {
                     #>
 
                     $Splat = @{
-                        Id                = $PSBoundParameters['Group']
+                        Id                = $CurrentGroup
                         LDAPPath          = 'CN=Schema,CN=Configuration,{0}' -f $Variables.defaultNamingContext
                         AdRight           = 'ExtendedRight'
                         AccessControlType = 'Allow'
@@ -141,7 +133,7 @@ Function Set-AdAclFMSOtransfer {
                     } #end If
 
                     $Splat = @{
-                        Id                = $PSBoundParameters['Group']
+                        Id                = $CurrentGroup
                         LDAPPath          = 'CN=Schema,CN=Configuration,{0}' -f $Variables.defaultNamingContext
                         AdRight           = 'WriteProperty'
                         AccessControlType = 'Allow'
@@ -187,7 +179,7 @@ Function Set-AdAclFMSOtransfer {
                     #>
 
                     $Splat = @{
-                        Id                = $PSBoundParameters['Group']
+                        Id                = $CurrentGroup
                         LDAPPath          = 'CN=Partitions,CN=Configuration,{0}' -f $Variables.defaultNamingContext
                         AdRight           = 'WriteProperty'
                         AccessControlType = 'Allow'
@@ -208,7 +200,7 @@ Function Set-AdAclFMSOtransfer {
                     } #end If
 
                     $Splat = @{
-                        Id                = $PSBoundParameters['Group']
+                        Id                = $CurrentGroup
                         LDAPPath          = 'CN=Partitions,CN=Configuration,{0}' -f $Variables.defaultNamingContext
                         AdRight           = 'ExtendedRight'
                         AccessControlType = 'Allow'
@@ -255,7 +247,7 @@ Function Set-AdAclFMSOtransfer {
                     #>
 
                     $Splat = @{
-                        Id                = $PSBoundParameters['Group']
+                        Id                = $CurrentGroup
                         LDAPPath          = 'CN=Infrastructure,{0}' -f $Variables.defaultNamingContext
                         AdRight           = 'WriteProperty'
                         AccessControlType = 'Allow'
@@ -276,7 +268,7 @@ Function Set-AdAclFMSOtransfer {
                     } #end If
 
                     $Splat = @{
-                        Id                = $PSBoundParameters['Group']
+                        Id                = $CurrentGroup
                         LDAPPath          = 'CN=Infrastructure,{0}' -f $Variables.defaultNamingContext
                         AdRight           = 'ExtendedRight'
                         AccessControlType = 'Allow'
@@ -322,7 +314,7 @@ Function Set-AdAclFMSOtransfer {
                     #>
 
                     $Splat = @{
-                        Id                = $PSBoundParameters['Group']
+                        Id                = $CurrentGroup
                         LDAPPath          = 'CN=RID Manager$,CN=System,{0}' -f $Variables.defaultNamingContext
                         AdRight           = 'WriteProperty'
                         AccessControlType = 'Allow'
@@ -343,7 +335,7 @@ Function Set-AdAclFMSOtransfer {
                     } #end If
 
                     $Splat = @{
-                        Id                = $PSBoundParameters['Group']
+                        Id                = $CurrentGroup
                         LDAPPath          = 'CN=RID Manager$,CN=System,{0}' -f $Variables.defaultNamingContext
                         AdRight           = 'ExtendedRight'
                         AccessControlType = 'Allow'
@@ -389,7 +381,7 @@ Function Set-AdAclFMSOtransfer {
                     #>
 
                     $Splat = @{
-                        Id                = $PSBoundParameters['Group']
+                        Id                = $CurrentGroup
                         LDAPPath          = $Variables.defaultNamingContext
                         AdRight           = 'WriteProperty'
                         AccessControlType = 'Allow'
@@ -410,7 +402,7 @@ Function Set-AdAclFMSOtransfer {
                     } #end If
 
                     $Splat = @{
-                        Id                = $PSBoundParameters['Group']
+                        Id                = $CurrentGroup
                         LDAPPath          = $Variables.defaultNamingContext
                         AdRight           = 'ExtendedRight'
                         AccessControlType = 'Allow'

@@ -39,7 +39,7 @@ function Set-AdAclCreateDeleteContact {
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         $Group,
 
         # PARAM2 Distinguished Name of the OU where the computer will get password reset

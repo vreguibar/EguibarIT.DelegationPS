@@ -36,7 +36,6 @@
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
-        [String]
         $Group,
 
         # PARAM2 SWITCH If present, the access rule will be removed.
@@ -64,6 +63,9 @@
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
         Get-ExtendedRightHashTable
 
+        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
+        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
+
     } #end Begin
 
     Process {
@@ -80,7 +82,7 @@
         #>
 
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = $Variables.defaultNamingContext
             AdRight               = 'ExtendedRight'
             AccessControlType     = 'Allow'

@@ -47,17 +47,10 @@ Function Remove-PrintOperator {
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New()
 
-        If ( ($null -eq $Variables.GuidMap) -and
-                 ($Variables.GuidMap -ne 0) -and
-                 ($Variables.GuidMap -ne '') -and
-                 (   ($Variables.GuidMap -isnot [array]) -or
-                     ($Variables.GuidMap.Length -ne 0)) -and
-                 ($Variables.GuidMap -ne $false)
-        ) {
-            # $Variables.GuidMap is empty. Call function to fill it up
-            Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
-            Get-AttributeSchemaHashTable
-        } #end If
+        # $Variables.GuidMap is empty. Call function to fill it up
+        Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
+        Get-AttributeSchemaHashTable
+
     } #end Begin
 
     process {

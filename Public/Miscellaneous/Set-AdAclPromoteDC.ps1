@@ -38,7 +38,7 @@ function Set-AdAclPromoteDomain {
             HelpMessage = 'Identity of the group getting the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         $Group,
 
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
@@ -72,6 +72,9 @@ function Set-AdAclPromoteDomain {
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
         Get-ExtendedRightHashTable
 
+        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
+        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
+
     } #end Begin
 
     Process {
@@ -88,7 +91,7 @@ function Set-AdAclPromoteDomain {
             ####################
             # Add/Remove Replica In Domain
             $Splat = @{
-                Id                = $PSBoundParameters['Group']
+                Id                = $CurrentGroup
                 LDAPPath          = $Context
                 AdRight           = 'ExtendedRight'
                 AccessControlType = 'Allow'
@@ -143,8 +146,8 @@ function Set-AdAclPromoteDomain {
         # Needed permissions to create/Manage site
         # All these permissions are already on the following CMDlets
 
-        Set-AdAclCreateDeleteSite -Group $PSBoundParameters['Group']
-        Set-AdAclChangeSite -Group $PSBoundParameters['Group']
+        Set-AdAclCreateDeleteSite -Group $CurrentGroup
+        Set-AdAclChangeSite -Group $CurrentGroup
 
         ####################
         # Grant permissions on Sites
@@ -287,7 +290,7 @@ function Set-AdAclPromoteDomain {
         # Set the necessary permissions on the domain controllers OU
 
         $Splat = @{
-            Group    = $PSBoundParameters['Group']
+            Group    = $CurrentGroup
             LDAPPath = 'DC=Domain Controllers,{0}' -f $Variables.AdDN
         }
 

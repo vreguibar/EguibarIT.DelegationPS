@@ -58,7 +58,6 @@
             Position = 1)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
-        [String]
         $Group,
 
         [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
@@ -84,8 +83,11 @@
 
         [Hashtable]$Splat = [hashtable]::New()
 
+        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
+        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
+
         # Get group SID
-        $GroupSID = (Get-ADGroup -Identity $PSBoundParameters['Group']).SID.Value
+        $GroupSID = $CurrentGroup.SID.Value
 
     } #end Begin
 

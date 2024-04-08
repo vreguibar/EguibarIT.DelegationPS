@@ -39,7 +39,7 @@
             HelpMessage = 'Group Name which will get the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         $Group,
 
         #PARAM2 Distinguished Name of the OU were the groups can be changed
@@ -73,6 +73,10 @@
 
         Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case is empty a function is called to fill it up.'
         Get-AttributeSchemaHashTable
+
+        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
+        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
+
     } #end Begin
 
     Process {
@@ -88,7 +92,7 @@
                         IsInherited = False
         #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'CreateChild', 'DeleteChild'
             AccessControlType     = 'Allow'
@@ -121,7 +125,7 @@
                         IsInherited = False
         #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'CreateChild', 'DeleteChild'
             AccessControlType     = 'Allow'
@@ -153,7 +157,7 @@
                         IsInherited = False
         #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'CreateChild', 'DeleteChild'
             AccessControlType     = 'Allow'

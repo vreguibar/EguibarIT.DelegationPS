@@ -36,7 +36,6 @@ function Set-AdDirectoryReplication {
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
-        [String]
         $Group,
 
         # PARAM2 SWITCH If present, the access rule will be removed.
@@ -58,22 +57,16 @@ function Set-AdDirectoryReplication {
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New()
 
-        If ( ($null -eq $Variables.GuidMap) -and
-                 ($Variables.GuidMap -ne 0) -and
-                 ($Variables.GuidMap -ne '') -and
-                 (   ($Variables.GuidMap -isnot [array]) -or
-                     ($Variables.GuidMap.Length -ne 0)) -and
-                 ($Variables.GuidMap -ne $false)
-        ) {
-
-            # $Variables.GuidMap is empty. Call function to fill it up
-            Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
-            Get-AttributeSchemaHashTable
-
-        } #end If
+        # $Variables.GuidMap is empty. Call function to fill it up
+        Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
+        Get-AttributeSchemaHashTable
 
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
         Get-ExtendedRightHashTable
+
+        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
+        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
+
     } #end Begin
 
     Process {
@@ -94,7 +87,7 @@ function Set-AdDirectoryReplication {
                 IsInherited            : False
             #>
             $Splat = @{
-                Id                = $PSBoundParameters['Group']
+                Id                = $CurrentGroup
                 LDAPPath          = $CurrentContext
                 AdRight           = 'ExtendedRight'
                 AccessControlType = 'Allow'
@@ -127,7 +120,7 @@ function Set-AdDirectoryReplication {
                 IsInherited            : False
             #>
             $Splat = @{
-                Id                = $PSBoundParameters['Group']
+                Id                = $CurrentGroup
                 LDAPPath          = $CurrentContext
                 AdRight           = 'ExtendedRight'
                 AccessControlType = 'Allow'
@@ -160,7 +153,7 @@ function Set-AdDirectoryReplication {
                 IsInherited            : False
             #>
             $Splat = @{
-                Id                = $PSBoundParameters['Group']
+                Id                = $CurrentGroup
                 LDAPPath          = $CurrentContext
                 AdRight           = 'ExtendedRight'
                 AccessControlType = 'Allow'
@@ -193,7 +186,7 @@ function Set-AdDirectoryReplication {
                 IsInherited            : False
             #>
             $Splat = @{
-                Id                = $PSBoundParameters['Group']
+                Id                = $CurrentGroup
                 LDAPPath          = $CurrentContext
                 AdRight           = 'ExtendedRight'
                 AccessControlType = 'Allow'
@@ -226,7 +219,7 @@ function Set-AdDirectoryReplication {
                 IsInherited            : False
             #>
             $Splat = @{
-                Id                = $PSBoundParameters['Group']
+                Id                = $CurrentGroup
                 LDAPPath          = $CurrentContext
                 AdRight           = 'ExtendedRight'
                 AccessControlType = 'Allow'
@@ -259,7 +252,7 @@ function Set-AdDirectoryReplication {
                 IsInherited            : False
             #>
             $Splat = @{
-                Id                = $PSBoundParameters['Group']
+                Id                = $CurrentGroup
                 LDAPPath          = $CurrentContext
                 AdRight           = 'ExtendedRight'
                 AccessControlType = 'Allow'
@@ -296,7 +289,7 @@ function Set-AdDirectoryReplication {
 
                 #
                 $Splat = @{
-                    Id                = $PSBoundParameters['Group']
+                    Id                = $CurrentGroup
                     LDAPPath          = 'CN={0},CN=Partitions,CN=Configuration,{1}' -f $part.name, $Variables.defaultNamingContext
                     AdRight           = 'ReadProperty'
                     AccessControlType = 'Allow'
@@ -316,7 +309,7 @@ function Set-AdDirectoryReplication {
                 } #end If
 
                 $Splat = @{
-                    Id                = $PSBoundParameters['Group']
+                    Id                = $CurrentGroup
                     LDAPPath          = 'CN={0},CN=Partitions,CN=Configuration,{1}' -f $part.name, $Variables.defaultNamingContext
                     AdRight           = 'WriteProperty'
                     AccessControlType = 'Allow'

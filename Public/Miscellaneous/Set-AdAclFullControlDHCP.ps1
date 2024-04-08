@@ -37,7 +37,6 @@
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
-        [String]
         $Group,
 
         # PARAM3 SWITCH If present, the access rule will be removed.
@@ -60,7 +59,10 @@
         [Hashtable]$Splat = [hashtable]::New()
 
         Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case is empty a function is called to fill it up.'
-            Get-AttributeSchemaHashTable
+        Get-AttributeSchemaHashTable
+
+        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
+        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
 
     } #end Begin
 
@@ -76,7 +78,7 @@
             IsInherited            : False
         #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = 'CN=NetServices,CN=Services,{0}' -f $Variables.configurationNamingContext
             AdRight               = 'GenericAll'
             AccessControlType     = 'Allow'
@@ -108,7 +110,7 @@
             IsInherited            : False
         #>
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = 'CN=NetServices,CN=Services,{0}' -f $Variables.configurationNamingContext
             AdRight               = 'CreateChild', 'DeleteChild'
             AccessControlType     = 'Allow'

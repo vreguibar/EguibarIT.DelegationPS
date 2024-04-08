@@ -38,7 +38,7 @@ function Set-AdAclPkiAdmin {
             HelpMessage = 'Group Name which will get the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         $Group,
 
         #PARAM2 Distinguished Name of the OU were the groups can be changed
@@ -70,6 +70,9 @@ function Set-AdAclPkiAdmin {
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New()
 
+        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
+        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
+
     } #end Begin
 
     Process {
@@ -85,7 +88,7 @@ function Set-AdAclPkiAdmin {
         #>
         # Certificate Authority Admin
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = 'CN=Public Key Services,CN=Services,{0}' -f $Variables.configurationNamingContext
             AdRight               = 'GenericAll'
             AccessControlType     = 'Allow'
@@ -117,7 +120,7 @@ function Set-AdAclPkiAdmin {
         #>
         # rights to modify security permissions for Pre-Windows 2000 Compatible Access group.
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = 'CN=Pre-Windows 2000 Compatible Access,CN=Builtin,{0}' -f $Variables.defaultNamingContext
             AdRight               = 'ListChildren', 'ReadProperty', 'GenericWrite'
             AccessControlType     = 'Allow'
@@ -149,7 +152,7 @@ function Set-AdAclPkiAdmin {
         #>
         # rights to modify security permissions for Cert Publishers group.
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = 'CN=Cert Publishers,{0}' -f $PSBoundParameters['ItRightsOuDN']
             AdRight               = 'ListChildren', 'ReadProperty', 'GenericWrite'
             AccessControlType     = 'Allow'

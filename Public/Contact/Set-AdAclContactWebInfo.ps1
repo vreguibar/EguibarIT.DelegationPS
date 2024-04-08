@@ -41,7 +41,7 @@ function Set-AdAclContactWebInfo {
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         $Group,
 
         # PARAM2 Distinguished Name of the OU where the computer will get password reset
@@ -78,6 +78,10 @@ function Set-AdAclContactWebInfo {
 
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
         Get-ExtendedRightHashTable
+
+        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
+        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
+
     } #end Begin
 
     process {
@@ -94,7 +98,7 @@ function Set-AdAclContactWebInfo {
         #>
 
         $Splat = @{
-            Id                    = $PSBoundParameters['Group']
+            Id                    = $CurrentGroup
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'ReadProperty, WriteProperty'
             AccessControlType     = 'Allow'
