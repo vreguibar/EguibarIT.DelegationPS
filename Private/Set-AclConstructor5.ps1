@@ -94,7 +94,6 @@ function Set-AclConstructor5 {
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
-        [String]
         $Id,
 
         # PARAM2 STRING for the object's LDAP path
