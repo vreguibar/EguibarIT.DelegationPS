@@ -99,7 +99,7 @@ function Set-AclConstructor6 {
             HelpMessage = 'Identity of the Delegated Group',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
+        [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID', 'Group')]
         $Id,
 
         # PARAM2 STRING for the object's LDAP path
