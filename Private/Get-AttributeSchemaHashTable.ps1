@@ -34,7 +34,7 @@ Function Get-AttributeSchemaHashTable {
         Write-Verbose -Message '|=> ************************************************************************ <=|'
         Write-Verbose -Message (Get-Date).ToShortDateString()
         Write-Verbose -Message ('  Starting: {0}' -f $MyInvocation.Mycommand)
-        Write-Verbose -Message ('This function does not uses any Parameter' )
+        Write-Verbose -Message 'This function does not uses any Parameter.'
 
         ##############################
         # Variables Definition
