@@ -41,20 +41,18 @@
 
     Begin {
 
-        $NewLine = [System.Environment]::NewLine
-        $HorizontalTab = "`t"
-
         # Validate TabCount and set default if needed
         if ($TabCount -lt 2) {
             $TabCount = 2
         }
+
     } # end Begin
 
     Process {
 
         # Display PSBoundparameters formatted nicely for Verbose output
 
-        $display = $NewLine
+        $display = $Constants.NL
 
         # Validate if HashTable is not empty
         if ($HashTable.Count -gt 0) {
@@ -62,11 +60,11 @@
             $pb = $HashTable | Format-Table -AutoSize | Out-String
 
             # Add corresponding tabs and new lines to each table member
-            $display += $pb -split $NewLine | ForEach-Object { "$($HorizontalTab * $TabCount)$_" } | Out-String
+            $display += $pb -split $Constants.NL | ForEach-Object { "$($Constants.HTab * $TabCount)$_" } | Out-String
         } else {
             $display = 'No PsBoundParameters to display.'
         } #end If
-        $display += $NewLine
+        $display += $Constants.NL
 
     } # end Process
 
