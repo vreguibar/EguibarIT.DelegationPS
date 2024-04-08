@@ -10,4 +10,4 @@
     # New Line
     NL       = [System.Environment]::NewLine
 }
-New-Variable -Name Constants -Value $Constants -Scope Script -Force
+New-Variable -Name Constants -Value $Constants -Scope Global -Force

@@ -33,6 +33,6 @@
     # Well-Known SIDs
     WellKnownSIDs              = $null
 }
-New-Variable -Name Variables -Value $Variables -Scope Script -Force
+New-Variable -Name Variables -Value $Variables -Scope Global -Force
 
 # Create variable with $Nulls, then call Initialize-ModuleVariable to fill it up.
