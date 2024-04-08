@@ -71,7 +71,7 @@ function Get-AdObjectType {
     Write-Verbose -Message ('Parameters used by the function... {0}' -f (Get-FunctionDisplay $PsBoundParameters -Verbose:$False))
 
 
-    Import-MyModule -name 'ActiveDirectory' -Verbose:$false
+    #Import-MyModule -name 'ActiveDirectory' -Verbose:$false
 
 
     ##############################

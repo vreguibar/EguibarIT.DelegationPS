@@ -40,7 +40,6 @@ function Set-AdAclCreateDeleteUser {
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
-        [String]
         $Group,
 
         #PARAM2 Distinguished Name of the OU were the groups can be changed
