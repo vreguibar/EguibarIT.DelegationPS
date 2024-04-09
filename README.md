@@ -15,7 +15,37 @@
   <a href="https://www.linkedin.com/in/VicenteRodriguezEguibar"><img src="https://img.shields.io/badge/LinkedIn-VicenteRodriguezEguibar-0077B5.svg?logo=LinkedIn"></a>
 </p>
 
-# EguibarIT.DelegationPS
+# EguibarIT.DelegationPS - Simplifying Active Directory Delegation
+
+## Overview
+The EguibarIT.DelegationPS module is a powerful tool for managing access control and delegation within your Active Directory (AD) environment. Whether you’re an IT administrator, security professional, or system architect, this module streamlines the process of defining roles, permissions, and administrative boundaries.
+
+## Key Features:
+-Role-Based Access Control (RBAC):
+--The module introduces a Tier Model and a Delegation Model to organize administrative tasks.
+--RBAC ensures that users have the right permissions based on their roles, minimizing security risks.
+-Components:
+--Administration Organizational Unit (OU) (Tier 0):
+--Represents the highest level of administrative control.
+--Contains groups corresponding to specific roles (e.g., Domain Admins, Help Desk).
+-Servers OU (Tier 1):
+--Organizes servers based on function (e.g., File Servers, Web Servers).
+--Each server group inherits permissions from the Administration OU.
+-Sites OU (Tier 2):
+--Represents geographical or logical groupings of servers.
+--Further refines permissions based on site-specific needs.
+
+## Basic Functions:
+The module provides essential functions for creating and managing the above components.
+Examples include:
+New-DelegationRoleGroup: Creates role-based groups within the Administration OU.
+Set-ServerPermissions: Assigns permissions to servers based on their OU membership.
+
+## Best Practices:
+Follow industry best practices for delegation:
+Limit permissions to what’s necessary for each role.
+Regularly review and adjust permissions.
+Document the delegation structure.
 
 Set corresponding permissions to AD for the Delegation Model / Tier Model (PowerShell based)
 
