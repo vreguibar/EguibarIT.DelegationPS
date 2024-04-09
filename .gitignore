@@ -11,6 +11,7 @@ Examples/Logs/*
 Releases/*
 Artefacts/*
 Output/*
+Public/Template.txt
 ReleasedUnpacked/*
 Sources/.vs
 Sources/*/.vs
