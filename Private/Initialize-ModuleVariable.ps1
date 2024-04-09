@@ -1,13 +1,20 @@
 ﻿Function Initialize-ModuleVariable {
     <#
         .SYNOPSIS
-
+            Initializes module variables related to this module
 
         .DESCRIPTION
+            This function initializes module variables required for CMDlets to delegate.
 
+        .PARAMETER None
+            This function does not accept any parameters.
 
-        .PARAMETER
-
+        .NOTES
+            Used Functions:
+                Name                                   | Module
+                ---------------------------------------|--------------------------
+                Get-ExtendedRightHashTable             | ActiveDirectory
+                Get-AttributeSchemaHashTable           | ActiveDirectory
 
         .NOTES
             Version:         1.0
@@ -63,6 +70,8 @@
 
         # Well-Known SIDs
         . "$PSScriptRoot\Get-AdWellKnownSID.ps1"
+
+        # Following functions must be the last ones to be called, otherwise error is thrown.
 
         # Hashtable containing the mappings between SchemaExtendedRights and GUID's
         Get-ExtendedRightHashTable
