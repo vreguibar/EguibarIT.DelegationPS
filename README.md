@@ -53,8 +53,11 @@ Set-ServerPermissions: Assigns permissions to servers based on their OU membersh
 ## Best Practices
 
 Follow industry best practices for delegation:
+
 Limit permissions to what’s necessary for each role.
+
 Regularly review and adjust permissions.
+
 Document the delegation structure.
 
 ## Set corresponding permissions to AD for the Delegation Model / Tier Model (PowerShell based)
