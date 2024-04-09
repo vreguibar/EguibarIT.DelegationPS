@@ -12,7 +12,7 @@
 RootModule = 'EguibarIT.DelegationPS.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.26.2'
+ModuleVersion = '1.26.3'
 
 # Supported PSEditions
 CompatiblePSEditions = 'Desktop'
@@ -69,7 +69,49 @@ PowerShellVersion = '5.1'
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = @()
+FunctionsToExport = 'Set-AdAclChangeSite', 'Set-AdAclChangeSiteLink', 
+               'Set-AdAclChangeSubnet', 'Set-AdAclCreateDeleteSite', 
+               'Set-AdAclCreateDeleteSiteLink', 'Set-AdAclCreateDeleteSubnet', 
+               'Set-AdAclFMSOtransfer', 'Set-AdDirectoryReplication', 
+               'Set-AdAclBitLockerTPM', 'Set-AdAclChangeComputerPassword', 
+               'Set-AdAclComputerAccountRestriction', 
+               'Set-AdAclComputerGroupMembership', 'Set-AdAclComputerPersonalInfo', 
+               'Set-AdAclComputerPublicInfo', 'Set-AdAclCreateDeleteComputer', 
+               'Set-AdAclDnsInfo', 'Set-AdAclEnableDisableComputer', 
+               'Set-AdAclMsTsGatewayInfo', 'Set-AdAclRenameComputer', 
+               'Set-AdAclResetComputerPassword', 
+               'Set-AdAclValidateWriteDnsHostName', 'Set-AdAclValidateWriteSPN', 
+               'Set-AdmPwdComputerSelfPermission', 
+               'Set-AdmPwdReadPasswordPermission', 
+               'Set-AdmPwdResetPasswordPermission', 'Set-DeleteOnlyComputer', 
+               'Set-DomainJoinComputer', 'Set-AdAclContactPersonalInfo', 
+               'Set-AdAclContactWebInfo', 'Set-AdAclCreateDeleteContact', 
+               'Set-AdAclFullControlDFS', 'Set-AdAclCreateDeleteGPO', 
+               'Set-AdAclGPoption', 'Set-AdAclLinkGPO', 'Set-AdAclRSoPLogging', 
+               'Set-AdAclRSoPPlanning', 'Set-GpoPrivilegeRight', 
+               'Set-GpoRestrictedGroup', 'Rename-AdAclGroup', 'Set-AdAclChangeGroup', 
+               'Set-AdAclCreateDeleteGroup', 'Set-AdAclUserGroupMembership', 
+               'Get-AclAccessRule', 'Get-AclAuditRule', 'Import-MyModule', 
+               'Remove-AccountOperator', 'Remove-AuthUser', 'Remove-Everyone', 
+               'Remove-PreWin2000', 'Remove-PreWin2000FromOU', 
+               'Remove-PrintOperator', 'Remove-UnknownSID', 
+               'Set-AdAclFullControlDHCP', 'Set-AdAclPromoteDC', 'Set-AdInheritance', 
+               'Set-CreateDeleteInetOrgPerson', 'Set-AdAclMngPrivilegedAccount', 
+               'Set-AdAclMngPrivilegedGroup', 'Rename-AdAclOU', 'Set-AdAclChangeOU', 
+               'Set-AdAclCreateDeleteOU', 'Set-AdAclPkiAdmin', 
+               'Set-AdAclPkiTemplateAdmin', 'Rename-AdAclPrintQueue', 
+               'Set-AdAclChangePrintQueue', 'Set-AdAclCreateDeletePrintQueue', 
+               'Set-AdAclCreateDeleteGMSA', 'Set-AdAclCreateDeleteMSA', 
+               'Add-GroupToSCManager', 'Add-ServiceAcl', 'Get-SCManagerPermission', 
+               'Get-ServiceAcl', 'Remove-GroupFromSCManager', 'Remove-ServiceAcl', 
+               'Rename-AdAclUser', 'Set-AdAclChangeUserPassword', 
+               'Set-AdAclCreateDeleteUser', 'Set-AdAclEnableDisableUser', 
+               'Set-AdAclResetUserPassword', 'Set-AdAclUnlockUser', 
+               'Set-AdAclUserAccountRestriction', 'Set-AdAclUserEmailInfo', 
+               'Set-AdAclUserGeneralInfo', 'Set-AdAclUserLogonInfo', 
+               'Set-AdAclUserPersonalInfo', 'Set-AdAclUserPublicInfo', 
+               'Set-AdAclUserWebInfo', 'Set-AdAclChangeVolume', 
+               'Set-AdAclCreateDeleteVolume'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
@@ -95,7 +137,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = 'Windows','ActiveDirectory','AD','Security','DelegationModel','TierModel','RBACmodel','Infrastructure','Testing','Checks','Audits','Checklist','Validation'
+        Tags = 'Windows','ActiveDirectory','Active Directory','Active Directory Delegation','Active Directory Security','AD Security','Seccurity','Delegation','AD Delegation','DelegationModel','TierModel','RBACmodel','Role Based Access Control model','Delegation Model','Tier Model','RBAC model','Infrastructure','Testing','Checks','Audits','Checklist','Validation','Credential Theaf','Pass-the-Hash','Pass-the-Ticket','Golden Ticket','Silver Ticket'
 
         # A URL to the license for this module.
         # LicenseUri = ''
