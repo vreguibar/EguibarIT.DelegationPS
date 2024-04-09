@@ -43,8 +43,11 @@ The EguibarIT.DelegationPS module is a powerful tool for managing access control
 ## Basic Functions
 
 The module provides essential functions for creating and managing the above components.
+
 Examples include:
+
 New-DelegationRoleGroup: Creates role-based groups within the Administration OU.
+
 Set-ServerPermissions: Assigns permissions to servers based on their OU membership.
 
 ## Best Practices
