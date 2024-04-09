@@ -10,6 +10,7 @@ Examples/Output/*
 Examples/Logs/*
 Releases/*
 Artefacts/*
+Output/*
 ReleasedUnpacked/*
 Sources/.vs
 Sources/*/.vs
