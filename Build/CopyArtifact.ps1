@@ -90,6 +90,8 @@ Function CopyArtifacts {
 
         Write-Verbose -Message 'Updating Module Manifest with Public Functions'
         try {
+            $publicFunctions = Get-ChildItem -Path '.\Public\*.ps1'
+            
             Write-Verbose -Message 'Appending Public functions to the psm file'
             $functionsToExport = New-Object -TypeName System.Collections.ArrayList
             foreach ($function in $publicFunctions.Name) {
