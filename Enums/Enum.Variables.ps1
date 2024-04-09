@@ -33,6 +33,14 @@
     # Well-Known SIDs
     WellKnownSIDs              = $null
 }
-New-Variable -Name Variables -Value $Variables -Scope Global -Force
+
+Splat = @{
+    Name        = 'Variables'
+    Value       = $Variables
+    Description = 'Define a Module variable, containing Schema GUIDs, Naminc Contexts or Well Known SIDs'
+    Scope       = 'Global'
+    Force       = $true
+}
+New-Variable @Splat
 
 # Create variable with $Nulls, then call Initialize-ModuleVariable to fill it up.
