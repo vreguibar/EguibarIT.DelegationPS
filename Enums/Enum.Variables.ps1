@@ -34,7 +34,7 @@
     WellKnownSIDs              = $null
 }
 
-Splat = @{
+$Splat = @{
     Name        = 'Variables'
     Value       = $Variables
     Description = 'Define a Module variable, containing Schema GUIDs, Naminc Contexts or Well Known SIDs'
