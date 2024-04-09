@@ -31,6 +31,8 @@
         ##############################
         # Variables Definition
 
+        Import-Module ActiveDirectory -Verbose:$false
+
     } #end Begin
 
     Process {
@@ -47,12 +49,6 @@
         # Get current DNS domain name
         $Variables.DnsFqdn = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain().Name
 
-        # Hashtable containing the mappings between SchemaExtendedRights and GUID's
-        Get-ExtendedRightHashTable
-
-        # Hashtable containing the mappings between ClassSchema/AttributeSchema and GUID's
-        Get-AttributeSchemaHashTable
-
         # Naming Contexts
         $Variables.namingContexts = ([ADSI]'LDAP://RootDSE').namingContexts
 
@@ -67,6 +63,13 @@
 
         # Well-Known SIDs
         . "$PSScriptRoot\Get-AdWellKnownSID.ps1"
+
+        # Hashtable containing the mappings between SchemaExtendedRights and GUID's
+        Get-ExtendedRightHashTable
+
+        # Hashtable containing the mappings between ClassSchema/AttributeSchema and GUID's
+        Get-AttributeSchemaHashTable
+
 
     } #end Process
 
