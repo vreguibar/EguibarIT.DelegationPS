@@ -80,19 +80,16 @@ Function CopyArtifacts {
 
         Write-Verbose -Message 'Generating the Module Manifest for temp build and generating new Module File'
         try {
-            Copy-Item -Path ".\$($ModuleName).psd1" -Destination ".\Output\$($ModuleName)\$ModuleVersion\"
-
+            Copy-Item -Path ".\$($ModuleName).psd1" -Destination ".\Output\$($ModuleName)\$ModuleVersion\" -Force
+            Copy-Item -Path ".\$($ModuleName).psm1" -Destination ".\Output\$($ModuleName)\$ModuleVersion\" -Force
         } catch {
             throw "Failed copying Module Manifest from: .\$($ModuleName).psd1 to .\Output\$($ModuleName)\$ModuleVersion\ or Generating the new psm file."
         } #end Try-Catch
 
 
-
-
         Write-Verbose -Message 'Copying Public .ps1 files'
         try {
             New-Item -Path ".\Output\$($ModuleName)\$($ModuleVersion)\Public" -ItemType Directory -ErrorAction Continue
-            Copy-Item -Path ".\$($ModuleName).psm1" -Destination ".\Output\$($ModuleName)\$ModuleVersion\"
             Copy-Item -Path '.\Public\*.ps1' -Destination ".\Output\$($ModuleName)\$ModuleVersion\Public\"
         } catch {
             throw "Failed copying Public functions from: .\$($ModuleName)\Public\ to .\Output\$($ModuleName)\$ModuleVersion\Public\"
@@ -129,7 +126,7 @@ Function CopyArtifacts {
         } #end Try-Catch
 
 
-
+        <#
         Write-Verbose -Message 'Updating Module Manifest with root module'
         try {
             Write-Verbose -Message 'Updating the Module Manifest'
@@ -137,6 +134,7 @@ Function CopyArtifacts {
         } catch {
             Write-Warning -Message 'Failed appinding the rootmodule to the Module Manifest'
         }
+        #>
 
     } #end Process
 
