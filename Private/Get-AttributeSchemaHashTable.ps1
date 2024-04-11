@@ -83,11 +83,11 @@ Function Get-AttributeSchemaHashTable {
 
                 # Include "ALL [nullGUID]"
                 $TmpMap.Add('All', [System.GUID]'00000000-0000-0000-0000-000000000000')
+
+                Write-Verbose -Message '$Variables.GuidMap was empty. Adding values to it!'
+                $Variables.GuidMap = $TmpMap
+
             } #end If
-
-            Write-Verbose -Message '$Variables.GuidMap was empty. Adding values to it!'
-            $Variables.GuidMap = $TmpMap
-
         } catch {
             Get-CurrentErrorToDisplay -CurrentError $error[0]
         } #end Try-Catch
