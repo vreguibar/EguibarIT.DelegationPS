@@ -58,7 +58,8 @@ jobs:
         id: update_manifest
         shell: pwsh
         run: |
-          $oldModuleVersion = (Test-ModuleManifest -Path ".\EguibarIT.DelegationPS.psd1").Version
+          $ModuleName = (Test-ModuleManifest -Path '.\*.psd1').Name
+          $oldModuleVersion = (Test-ModuleManifest -Path ".\*.psd1").Version
           $publicFunctions = Get-ChildItem -Path '.\Public\*.ps1'
           $privateFunctions = Get-ChildItem -Path '.\Private\*.ps1'
           $ClassesFunctions = Get-ChildItem -Path '.\Classes\*.ps1'
@@ -66,7 +67,7 @@ jobs:
           $totalFunctions = $publicFunctions.count + $privateFunctions.count + $ClassesFunctions.count + $EnumsFunctions.count
           $ModuleBuildNumber = $oldModuleVersion.Build + 1
           $ModuleVersion = "$($oldModuleVersion.Major).$($totalFunctions).$($ModuleBuildNumber)"
-          Update-ModuleManifest -Path ".\EguibarIT.DelegationPS.psd1" -ModuleVersion $ModuleVersion
+          Update-ModuleManifest -Path ".\$($ModuleName).psd1" -ModuleVersion $ModuleVersion
 
           Write-Output "BUILD_NUMBER=$ModuleVersion" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
@@ -118,7 +119,7 @@ jobs:
         id: Read_Var
         shell: pwsh
         run: |
-          $ModuleVersion = (Test-ModuleManifest -Path ".\EguibarIT.DelegationPS.psd1").Version
+          $ModuleVersion = (Test-ModuleManifest -Path ".\*.psd1").Version
           $PS_Module_Version = ('v{0}' -f $ModuleVersion)
           $ModuleName = (Test-ModuleManifest -Path '.\*.psd1').Name
 
@@ -191,31 +192,30 @@ jobs:
             Tags = @(
               'Windows',
               'ActiveDirectory',
-              'Active Directory',
-              'Active Directory Delegation',
-              'Active Directory Security',
-              'AD Security',
-              'Seccurity',
+              'ActiveDirectory_Delegation',
+              'ActiveDirectory_Security',
+              'AD_Security',
+              'Security',
               'Delegation',
-              'AD Delegation',
+              'AD_Delegation',
               'DelegationModel',
               'TierModel',
               'RBACmodel',
-              'Role Based Access Control model',
-              'Delegation Model',
-              'Tier Model',
-              'RBAC model',
+              'RoleBasedAccessControl_model',
+              'DelegationModel',
+              'TierModel',
+              'RBACmodel',
               'Infrastructure',
               'Testing',
               'Checks',
               'Audits',
               'Checklist',
               'Validation',
-              'Credential Theaf',
+              'CredentialTheaf',
               'Pass-the-Hash',
               'Pass-the-Ticket',
-              'Golden Ticket',
-              'Silver Ticket'
+              'Golden_Ticket',
+              'Silver_Ticket'
             )
             Verbose = $true
           }
