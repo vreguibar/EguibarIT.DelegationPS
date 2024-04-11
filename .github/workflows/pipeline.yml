@@ -58,6 +58,34 @@ jobs:
         id: update_manifest
         shell: pwsh
         run: |
+          $Tags = @(
+                'Windows',
+                'ActiveDirectory',
+                'ActiveDirectory_Delegation',
+                'ActiveDirectory_Security',
+                'AD_Security',
+                'Security',
+                'Delegation',
+                'AD_Delegation',
+                'DelegationModel',
+                'TierModel',
+                'RBACmodel',
+                'RoleBasedAccessControl_model',
+                'DelegationModel',
+                'TierModel',
+                'RBACmodel',
+                'Infrastructure',
+                'Testing',
+                'Checks',
+                'Audits',
+                'Checklist',
+                'Validation',
+                'CredentialTheaf',
+                'Pass-the-Hash',
+                'Pass-the-Ticket',
+                'Golden_Ticket',
+                'Silver_Ticket'
+              )
           $ModuleName = (Test-ModuleManifest -Path '.\*.psd1').Name
           $oldModuleVersion = (Test-ModuleManifest -Path ".\*.psd1").Version
           $publicFunctions = Get-ChildItem -Path '.\Public\*.ps1'
@@ -67,7 +95,7 @@ jobs:
           $totalFunctions = $publicFunctions.count + $privateFunctions.count + $ClassesFunctions.count + $EnumsFunctions.count
           $ModuleBuildNumber = $oldModuleVersion.Build + 1
           $ModuleVersion = "$($oldModuleVersion.Major).$($totalFunctions).$($ModuleBuildNumber)"
-          Update-ModuleManifest -Path ".\$($ModuleName).psd1" -ModuleVersion $ModuleVersion
+          Update-ModuleManifest -Path ".\$($ModuleName).psd1" -ModuleVersion $ModuleVersion -Tags $Tags
 
           Write-Output "BUILD_NUMBER=$ModuleVersion" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
@@ -190,5 +218,33 @@ jobs:
             Path = '.'
             ProjectUri = 'https://www.delegationmodel.com/'
             Verbose = $true
+            Tags = @(
+              'Windows',
+              'ActiveDirectory',
+              'ActiveDirectory_Delegation',
+              'ActiveDirectory_Security',
+              'AD_Security',
+              'Security',
+              'Delegation',
+              'AD_Delegation',
+              'DelegationModel',
+              'TierModel',
+              'RBACmodel',
+              'RoleBasedAccessControl_model',
+              'DelegationModel',
+              'TierModel',
+              'RBACmodel',
+              'Infrastructure',
+              'Testing',
+              'Checks',
+              'Audits',
+              'Checklist',
+              'Validation',
+              'CredentialTheaf',
+              'Pass-the-Hash',
+              'Pass-the-Ticket',
+              'Golden_Ticket',
+              'Silver_Ticket'
+            )
           }
           Publish-Module @PublishParams

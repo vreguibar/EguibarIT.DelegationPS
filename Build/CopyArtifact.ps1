@@ -81,7 +81,7 @@ Function CopyArtifacts {
         Write-Verbose -Message 'Generating the Module Manifest for temp build and generating new Module File'
         try {
             Copy-Item -Path ".\$($ModuleName).psd1" -Destination ".\Output\$($ModuleName)\$ModuleVersion\"
-            New-Item -Path ".\Output\$($ModuleName)\$ModuleVersion\$($ModuleName).psm1" -ItemType File
+
         } catch {
             throw "Failed copying Module Manifest from: .\$($ModuleName).psd1 to .\Output\$($ModuleName)\$ModuleVersion\ or Generating the new psm file."
         } #end Try-Catch
@@ -94,11 +94,16 @@ Function CopyArtifacts {
 
             Write-Verbose -Message 'Appending Public functions to the psm file'
             $functionsToExport = New-Object -TypeName System.Collections.ArrayList
+
             foreach ($function in $publicFunctions.Name) {
+
                 Write-Verbose -Message "Exporting function: $(($function.split('.')[0]).ToString())"
-                $functionsToExport.Add(($function.split('.')[0]).ToString())
+                [void]$functionsToExport.Add(($function.split('.')[0]).ToString())
+
             }
+
             Update-ModuleManifest -Path ".\Output\$($ModuleName)\$($ModuleVersion)\$($ModuleName).psd1" -FunctionsToExport $functionsToExport
+            
         } catch {
             throw 'Failed updating Module manifest with public functions'
         } #end Try-Catch
