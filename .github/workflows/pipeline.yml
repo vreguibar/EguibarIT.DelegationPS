@@ -82,6 +82,15 @@ jobs:
 
           Update-ModuleManifest -Path ".\$($ModuleName).psd1" -ModuleVersion $ModuleVersion -Tags $Tags -FunctionsToExport $functionsToExport
 
+          if (!(Get-PackageProvider | Where-Object { $_.Name -eq 'NuGet' })) {
+              Install-PackageProvider -Name NuGet -force | Out-Null
+          }
+          Import-PackageProvider -Name NuGet -force | Out-Null
+
+          if ((Get-PSRepository -Name PSGallery).InstallationPolicy -ne 'Trusted') {
+              Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          }
+
           Write-Output "BUILD_NUMBER=$ModuleVersion" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           Write-Output "MODULE_NAME=$ModuleName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         env:
@@ -105,15 +114,6 @@ jobs:
           Invoke-ScriptAnalyzer -Path .\Classes -recurse
 
 
-      - name: Copy Artifact
-        id: Copy_Artifact
-        shell: pwsh
-        run: |
-          $ModuleName = "${{ env.MODULE_NAME }}"
-          $ModuleVersion = "${{ env.BUILD_NUMBER }}"
-          pwsh -command ".\Build\CopyArtifact.ps1 -ModuleName $ModuleName -ModuleVersion $ModuleVersion -Verbose"
-
-
         # Pushing the changes from InvokeBuild to the main branch
       - name: Push changes to Git Repository
         run: |
@@ -123,16 +123,6 @@ jobs:
           git add .
           git commit -m "Build Module"
           git push
-
-        # Uploads the build powershell module as an artifact
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ env.MODULE_NAME }} # Naming the powershell module artifact
-          path: ./Output/${{ env.MODULE_NAME }}/${{ env.BUILD_NUMBER }}/ # Saving the powershell module artifact to the path
-
-      - name: List Module Directory
-        run: ls -R . || true
 
 
 
@@ -161,13 +151,6 @@ jobs:
           BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
           VERSION_NUMBER: ${{ env.VERSION_NUMBER }}
 
-      - name: show variable
-        run: |
-          echo "Module Name: ${{ env.MODULE_NAME }}"
-          echo "Build Number: ${{ env.BUILD_NUMBER }}"
-          echo "Version Number: ${{ env.VERSION_NUMBER }}"
-          echo "Current Working Directory: $(pwd)"
-          echo "Expected Module Path: ./Output/${{ env.MODULE_NAME }}/${{ env.BUILD_NUMBER }}/"
 
       - name: Check if Release Exists
         id: check_release
@@ -184,16 +167,6 @@ jobs:
             console.log(`Release ${tagName} exists: ${releaseExists}`);
             console.log(`::set-output name=exists::${releaseExists}`);
 
-
-      - name: Download Artifact
-        uses: aochmann/actions-download-artifact@1.0.4
-        with:
-          repo: ${{github.repository}}
-          name: ${{ env.MODULE_NAME }} # Name of the PowerShell module artifact
-          path: . # Downloads the module to the path ./Artifact/
-
-      - name: List Module Directory
-        run: ls -R . || true
 
         # Create a release to github
       - name: Create Release

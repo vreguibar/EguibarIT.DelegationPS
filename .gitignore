@@ -5,11 +5,13 @@ Publish.ps1
 Ignore/*
 .vs/*
 .vscode/*
+.github/*
 .gitignore
 Examples/Output/*
 Examples/Logs/*
 Releases/*
 Artefacts/*
+Build/*
 Output/*
 Public/Template.txt
 ReleasedUnpacked/*
