@@ -99,10 +99,8 @@ jobs:
           $functionsToExport = New-Object -TypeName System.Collections.ArrayList
 
             foreach ($function in $publicFunctions.Name) {
-
                 Write-Verbose -Message "Exporting function: $(($function.split('.')[0]).ToString())"
                 [void]$functionsToExport.Add(($function.split('.')[0]).ToString())
-
             }
 
           Update-ModuleManifest -Path ".\$($ModuleName).psd1" -ModuleVersion $ModuleVersion -Tags $Tags -FunctionsToExport $functionsToExport
