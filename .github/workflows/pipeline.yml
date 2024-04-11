@@ -88,10 +88,12 @@ jobs:
               )
           $ModuleName = (Test-ModuleManifest -Path '.\*.psd1').Name
           $oldModuleVersion = (Test-ModuleManifest -Path ".\*.psd1").Version
+
           $publicFunctions = Get-ChildItem -Path '.\Public\*.ps1'
           $privateFunctions = Get-ChildItem -Path '.\Private\*.ps1'
           $ClassesFunctions = Get-ChildItem -Path '.\Classes\*.ps1'
           $EnumsFunctions = Get-ChildItem -Path '.\Enums\*.ps1'
+          
           $totalFunctions = $publicFunctions.count + $privateFunctions.count + $ClassesFunctions.count + $EnumsFunctions.count
           $ModuleBuildNumber = $oldModuleVersion.Build + 1
           $ModuleVersion = "$($oldModuleVersion.Major).$($totalFunctions).$($ModuleBuildNumber)"
