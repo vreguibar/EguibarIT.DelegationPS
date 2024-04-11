@@ -191,6 +191,10 @@ function Set-AclConstructor6 {
             $GroupObject = Get-AdObjectType -Identity $PSBoundParameters['Id']
 
             Write-Verbose -Message 'Identity is already a Group Object. Retriving the Group'
+        } else {
+
+            # ID (the passed group) IS an AdGroup
+            $GroupObject = $PSBoundParameters['Id']
         }
 
         # $groupObject will be NULL if ID is a WellKnownSid
