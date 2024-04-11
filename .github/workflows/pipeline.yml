@@ -189,34 +189,6 @@ jobs:
             NuGetApiKey = $NugetAPIKey
             Path = '.'
             ProjectUri = 'https://www.delegationmodel.com/'
-            Tags = @(
-              'Windows',
-              'ActiveDirectory',
-              'ActiveDirectory_Delegation',
-              'ActiveDirectory_Security',
-              'AD_Security',
-              'Security',
-              'Delegation',
-              'AD_Delegation',
-              'DelegationModel',
-              'TierModel',
-              'RBACmodel',
-              'RoleBasedAccessControl_model',
-              'DelegationModel',
-              'TierModel',
-              'RBACmodel',
-              'Infrastructure',
-              'Testing',
-              'Checks',
-              'Audits',
-              'Checklist',
-              'Validation',
-              'CredentialTheaf',
-              'Pass-the-Hash',
-              'Pass-the-Ticket',
-              'Golden_Ticket',
-              'Silver_Ticket'
-            )
             Verbose = $true
           }
           Publish-Module @PublishParams
