@@ -95,7 +95,17 @@ jobs:
           $totalFunctions = $publicFunctions.count + $privateFunctions.count + $ClassesFunctions.count + $EnumsFunctions.count
           $ModuleBuildNumber = $oldModuleVersion.Build + 1
           $ModuleVersion = "$($oldModuleVersion.Major).$($totalFunctions).$($ModuleBuildNumber)"
-          Update-ModuleManifest -Path ".\$($ModuleName).psd1" -ModuleVersion $ModuleVersion -Tags $Tags
+
+          $functionsToExport = New-Object -TypeName System.Collections.ArrayList
+
+            foreach ($function in $publicFunctions.Name) {
+
+                Write-Verbose -Message "Exporting function: $(($function.split('.')[0]).ToString())"
+                [void]$functionsToExport.Add(($function.split('.')[0]).ToString())
+
+            }
+
+          Update-ModuleManifest -Path ".\$($ModuleName).psd1" -ModuleVersion $ModuleVersion -Tags $Tags -FunctionsToExport $functionsToExport
 
           Write-Output "BUILD_NUMBER=$ModuleVersion" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 

@@ -88,27 +88,6 @@ Function CopyArtifacts {
 
 
 
-        Write-Verbose -Message 'Updating Module Manifest with Public Functions'
-        try {
-            $publicFunctions = Get-ChildItem -Path '.\Public\*.ps1' -Recurse
-
-            Write-Verbose -Message 'Appending Public functions to the psm file'
-            $functionsToExport = New-Object -TypeName System.Collections.ArrayList
-
-            foreach ($function in $publicFunctions.Name) {
-
-                Write-Verbose -Message "Exporting function: $(($function.split('.')[0]).ToString())"
-                [void]$functionsToExport.Add(($function.split('.')[0]).ToString())
-
-            }
-
-            Update-ModuleManifest -Path ".\Output\$($ModuleName)\$($ModuleVersion)\$($ModuleName).psd1" -FunctionsToExport $functionsToExport
-            
-        } catch {
-            throw 'Failed updating Module manifest with public functions'
-        } #end Try-Catch
-
-
 
         Write-Verbose -Message 'Copying Public .ps1 files'
         try {
