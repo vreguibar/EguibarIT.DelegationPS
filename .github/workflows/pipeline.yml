@@ -32,32 +32,6 @@ jobs:
       - name: Get Module Name
         shell: pwsh
         run: |
-          $ModuleName = (Test-ModuleManifest -Path '.\*.psd1').Name
-          Write-Output "MODULE_NAME=$ModuleName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-        env:
-          MODULE_NAME: ${{ env.MODULE_NAME }}
-
-
-      - name: Install PSScriptAnalyzer module
-        shell: pwsh
-        run: |
-          Set-PSRepository PSGallery -InstallationPolicy Trusted
-          Install-Module PSScriptAnalyzer -ErrorAction Stop
-
-
-      - name: Lint with PSScriptAnalyzer
-        shell: pwsh
-        run: |
-          Invoke-ScriptAnalyzer -Path .\Public  -recurse
-          Invoke-ScriptAnalyzer -Path .\Private -recurse
-          Invoke-ScriptAnalyzer -Path .\Enums   -recurse
-          Invoke-ScriptAnalyzer -Path .\Classes -recurse
-
-
-      - name: Update Module Manifest
-        id: update_manifest
-        shell: pwsh
-        run: |
           $Tags = @(
                 'Windows',
                 'ActiveDirectory',
@@ -87,13 +61,14 @@ jobs:
                 'Silver_Ticket'
               )
           $ModuleName = (Test-ModuleManifest -Path '.\*.psd1').Name
+
           $oldModuleVersion = (Test-ModuleManifest -Path ".\*.psd1").Version
 
           $publicFunctions = Get-ChildItem -Path '.\Public\*.ps1'
           $privateFunctions = Get-ChildItem -Path '.\Private\*.ps1'
           $ClassesFunctions = Get-ChildItem -Path '.\Classes\*.ps1'
           $EnumsFunctions = Get-ChildItem -Path '.\Enums\*.ps1'
-          
+
           $totalFunctions = $publicFunctions.count + $privateFunctions.count + $ClassesFunctions.count + $EnumsFunctions.count
           $ModuleBuildNumber = $oldModuleVersion.Build + 1
           $ModuleVersion = "$($oldModuleVersion.Major).$($totalFunctions).$($ModuleBuildNumber)"
@@ -108,9 +83,26 @@ jobs:
           Update-ModuleManifest -Path ".\$($ModuleName).psd1" -ModuleVersion $ModuleVersion -Tags $Tags -FunctionsToExport $functionsToExport
 
           Write-Output "BUILD_NUMBER=$ModuleVersion" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-
+          Write-Output "MODULE_NAME=$ModuleName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         env:
+          MODULE_NAME: ${{ env.MODULE_NAME }}
           BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
+
+
+      - name: Install PSScriptAnalyzer module
+        shell: pwsh
+        run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module PSScriptAnalyzer -ErrorAction Stop
+
+
+      - name: Lint with PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Invoke-ScriptAnalyzer -Path .\Public  -recurse
+          Invoke-ScriptAnalyzer -Path .\Private -recurse
+          Invoke-ScriptAnalyzer -Path .\Enums   -recurse
+          Invoke-ScriptAnalyzer -Path .\Classes -recurse
 
 
       - name: Copy Artifact
@@ -226,7 +218,6 @@ jobs:
           $PublishParams = @{
             NuGetApiKey = $NugetAPIKey
             Path = '.'
-            ProjectUri = 'https://www.delegationmodel.com/'
             Verbose = $true
           }
           Publish-Module @PublishParams
