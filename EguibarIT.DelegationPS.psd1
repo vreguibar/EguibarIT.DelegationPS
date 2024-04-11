@@ -11,13 +11,8 @@
     # Script module or binary module file associated with this manifest.
     RootModule            = 'EguibarIT.DelegationPS.psm1'
 
-<<<<<<< HEAD
     # Version number of this module.
     ModuleVersion         = '1.26.5'
-=======
-# Version number of this module.
-ModuleVersion = '1.26.6'
->>>>>>> c4f65da8b969ceb49a944c7f1ee610ab44c76c1f
 
     # Supported PSEditions
     CompatiblePSEditions  = 'Desktop', 'Core'
@@ -37,7 +32,6 @@ ModuleVersion = '1.26.6'
     # Description of the functionality provided by this module
     Description           = 'Functions used to implement the Delegation Model with Tiers on the given Active Directory.'
 
-<<<<<<< HEAD
     # Minimum version of the Windows PowerShell engine required by this module
     PowerShellVersion     = '5.1'
 
@@ -46,27 +40,12 @@ ModuleVersion = '1.26.6'
 
     # Minimum version of the Windows PowerShell host required by this module
     # PowerShellHostVersion = ''
-=======
-# Minimum version of the PowerShell engine required by this module
-PowerShellVersion = '5.1'
-
-# Name of the PowerShell host required by this module
-# PowerShellHostName = ''
-
-# Minimum version of the PowerShell host required by this module
-# PowerShellHostVersion = ''
->>>>>>> c4f65da8b969ceb49a944c7f1ee610ab44c76c1f
 
     # Minimum version of Microsoft .NET Framework required by this module. This prerequisite is valid for the PowerShell Desktop edition only.
     # DotNetFrameworkVersion = ''
 
-<<<<<<< HEAD
     # Minimum version of the common language runtime (CLR) required by this module. This prerequisite is valid for the PowerShell Desktop edition only.
     # CLRVersion = ''
-=======
-# Minimum version of the common language runtime (CLR) required by this module. This prerequisite is valid for the PowerShell Desktop edition only.
-# ClrVersion = ''
->>>>>>> c4f65da8b969ceb49a944c7f1ee610ab44c76c1f
 
     # Processor architecture (None, X86, Amd64) required by this module
     ProcessorArchitecture = 'Amd64'
@@ -172,25 +151,10 @@ PowerShellVersion = '5.1'
             # ReleaseNotes of this module
             # ReleaseNotes = ''
 
-<<<<<<< HEAD
             # External dependent modules of this module
             ExternalModuleDependencies = 'ActiveDirectory', 'GroupPolicy', 'ServerManager', 'EguibarIT.DelegationPS'
 
         } # End of PSData hashtable
-=======
-        # Prerelease string of this module
-        # Prerelease = ''
-
-        # Flag to indicate whether the module requires explicit user acceptance for install/update/save
-        # RequireLicenseAcceptance = $false
-
-        # External dependent modules of this module
-        ExternalModuleDependencies = @('ActiveDirectory','GroupPolicy','ServerManager','EguibarIT.DelegationPS')
-
-    } # End of PSData hashtable
-
- } # End of PrivateData hashtable
->>>>>>> c4f65da8b969ceb49a944c7f1ee610ab44c76c1f
 
     } # End of PrivateData hashtable
 
