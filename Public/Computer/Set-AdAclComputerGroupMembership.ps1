@@ -19,9 +19,9 @@ function Set-AdAclComputerGroupMembership {
             Used Functions:
                 Name                                   | Module
                 ---------------------------------------|--------------------------
-                Set-AclConstructor6                    | EguibarIT.Delegation
-                Get-AttributeSchemaHashTable                | EguibarIT.Delegation
-                Get-ExtendedRightHashTable             | EguibarIT.Delegation
+                Set-AclConstructor6                    | EguibarIT.DelegationPS
+                Get-AttributeSchemaHashTable           | EguibarIT.DelegationPS
+                Get-ExtendedRightHashTable             | EguibarIT.DelegationPS
         .NOTES
             Version:         1.2
             DateModified:    07/Dec/2016
@@ -71,9 +71,9 @@ function Set-AdAclComputerGroupMembership {
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New()
 
-            # $Variables.GuidMap is empty. Call function to fill it up
-            Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
-            Get-AttributeSchemaHashTable
+        # $Variables.GuidMap is empty. Call function to fill it up
+        Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
+        Get-AttributeSchemaHashTable
 
         # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
         $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']

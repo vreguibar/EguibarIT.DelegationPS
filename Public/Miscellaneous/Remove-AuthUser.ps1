@@ -13,7 +13,7 @@ Function Remove-AuthUser {
             Used Functions:
                 Name                                   | Module
                 ---------------------------------------|--------------------------
-                Set-AclConstructor5                    | EguibarIT.Delegation
+                Set-AclConstructor5                    | EguibarIT.DelegationPS
         .NOTES
             Version:         1.1
             DateModified:    29/Sep/2016

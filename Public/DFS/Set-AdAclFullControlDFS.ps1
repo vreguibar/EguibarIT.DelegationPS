@@ -18,7 +18,7 @@ function Set-AdAclFullControlDFS {
             Used Functions:
                 Name                                   | Module
                 ---------------------------------------|--------------------------
-                Set-AclConstructor4                    | EguibarIT.Delegation
+                Set-AclConstructor4                    | EguibarIT.DelegationPS
                 Get-AdDomain                           | ActiveDirectory
         .NOTES
             Version:         1.1

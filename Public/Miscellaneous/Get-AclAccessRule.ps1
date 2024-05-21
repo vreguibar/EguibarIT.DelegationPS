@@ -28,7 +28,7 @@
                 ---------------------------------------|--------------------------
                 Get-ACL                                | Microsoft.PowerShell.Security
                 Set-Location                           | Microsoft.PowerShell.Management
-                Convert-GUIDToName                     | EguibarIT.Delegation
+                Convert-GUIDToName                     | EguibarIT.DelegationPS
         .NOTES
             Version:         1.1
             DateModified:    17/Oct/2022

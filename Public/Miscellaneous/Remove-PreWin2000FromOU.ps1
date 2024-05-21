@@ -12,8 +12,8 @@ Function Remove-PreWin2000FromOU {
             Used Functions:
                 Name                                   | Module
                 ---------------------------------------|--------------------------
-                Set-AclConstructor6                    | EguibarIT.Delegation
-                Get-AttributeSchemaHashTable                | EguibarIT.Delegation
+                Set-AclConstructor6                    | EguibarIT.DelegationPS
+                Get-AttributeSchemaHashTable           | EguibarIT.DelegationPS
         .NOTES
             Version:         1.1
             DateModified:    29/Sep/2016

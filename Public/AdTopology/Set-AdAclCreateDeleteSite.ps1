@@ -25,9 +25,9 @@
                 Name                                   | Module
                 ---------------------------------------|--------------------------
                 Set-AclConstructor4                    | EguibarIT.DelegationPS
-                Set-AclConstructor5                    | EguibarIT.Delegation
-                Set-AclConstructor6                    | EguibarIT.Delegation
-                Get-AttributeSchemaHashTable           | EguibarIT.Delegation
+                Set-AclConstructor5                    | EguibarIT.DelegationPS
+                Set-AclConstructor6                    | EguibarIT.DelegationPS
+                Get-AttributeSchemaHashTable           | EguibarIT.DelegationPS
                 Get-CurrentErrorToDisplay              | EguibarIT.DelegationPS
 
         .NOTES

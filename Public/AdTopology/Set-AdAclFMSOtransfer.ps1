@@ -18,9 +18,9 @@ Function Set-AdAclFMSOtransfer {
             Used Functions:
                 Name                                   | Module
                 ---------------------------------------|--------------------------
-                Set-AclConstructor4                    | EguibarIT.Delegation
-                Get-AttributeSchemaHashTable                | EguibarIT.Delegation
-                Get-ExtendedRightHashTable             | EguibarIT.Delegation
+                Set-AclConstructor4                    | EguibarIT.DelegationPS
+                Get-AttributeSchemaHashTable           | EguibarIT.DelegationPS
+                Get-ExtendedRightHashTable             | EguibarIT.DelegationPS
         .NOTES
             Version:         1.0
             DateModified:    26/Apr/2022
@@ -69,9 +69,9 @@ Function Set-AdAclFMSOtransfer {
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New()
 
-            # $Variables.GuidMap is empty. Call function to fill it up
-            Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
-            Get-AttributeSchemaHashTable
+        # $Variables.GuidMap is empty. Call function to fill it up
+        Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
+        Get-AttributeSchemaHashTable
 
         Write-Verbose -Message 'Checking variable $Variables.ExtendedRightsMap. In case is empty a function is called to fill it up.'
         Get-ExtendedRightHashTable

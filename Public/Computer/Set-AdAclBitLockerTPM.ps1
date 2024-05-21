@@ -19,8 +19,8 @@ function Set-AdAclBitLockerTPM {
             Used Functions:
                 Name                                   | Module
                 ---------------------------------------|--------------------------
-                Set-AclConstructor6                    | EguibarIT.Delegation
-                Get-AttributeSchemaHashTable                | EguibarIT.Delegation
+                Set-AclConstructor6                    | EguibarIT.DelegationPS
+                Get-AttributeSchemaHashTable           | EguibarIT.DelegationPS
         .NOTES
             Version:         1.0
             DateModified:    18/Oct/2016

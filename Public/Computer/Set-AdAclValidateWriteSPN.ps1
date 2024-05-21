@@ -20,8 +20,8 @@ function Set-AdAclValidateWriteSPN {
             Used Functions:
                 Name                                   | Module
                 ---------------------------------------|--------------------------
-                Set-AclConstructor6                    | EguibarIT.Delegation
-                Get-AttributeSchemaHashTable                | EguibarIT.Delegation
+                Set-AclConstructor6                    | EguibarIT.DelegationPS
+                Get-AttributeSchemaHashTable           | EguibarIT.DelegationPS
         .NOTES
             Version:         1.2
             DateModified:    07/Dec/2016

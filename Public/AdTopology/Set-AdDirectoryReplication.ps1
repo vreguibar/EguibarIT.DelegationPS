@@ -16,9 +16,9 @@ function Set-AdDirectoryReplication {
             Used Functions:
                 Name                                   | Module
                 ---------------------------------------|--------------------------
-                Set-AclConstructor4                    | EguibarIT.Delegation
-                Get-AttributeSchemaHashTable                | EguibarIT.Delegation
-                Get-ExtendedRightHashTable             | EguibarIT.Delegation
+                Set-AclConstructor4                    | EguibarIT.DelegationPS
+                Get-AttributeSchemaHashTable           | EguibarIT.DelegationPS
+                Get-ExtendedRightHashTable             | EguibarIT.DelegationPS
         .NOTES
             Version:         1.2
             DateModified:    4/May/2022

@@ -20,8 +20,8 @@ function Set-AdAclChangePrintQueue {
             Used Functions:
                 Name                                   | Module
                 ---------------------------------------|--------------------------
-                Set-AclConstructor5                    | EguibarIT.Delegation
-                Get-AttributeSchemaHashTable                | EguibarIT.Delegation
+                Set-AclConstructor5                    | EguibarIT.DelegationPS
+                Get-AttributeSchemaHashTable           | EguibarIT.DelegationPS
         .NOTES
             Version:         1.1
             DateModified:    17/Oct/2016
