@@ -1,4 +1,4 @@
-using module .\Classes\Class.ActiveDirectoryRights.ps1
+#using module .\Classes\Class.ActiveDirectoryRights.ps1
 
 # Get Enums
 if (Test-Path -Path "$PSScriptRoot\Enums") {
@@ -8,7 +8,7 @@ if (Test-Path -Path "$PSScriptRoot\Enums") {
     foreach ($Item in $Enums) {
         Try {
             . $Item.FullName
-            Write-Verbose -Message "Imported $($Item.BaseName)"
+            Write-Verbose -Message ('Enum Imported {0}' -f $($Item.BaseName))
         } Catch {
             throw
             Write-Error -Message "Could not load Enum [$($Item.Name)] : $($_.Message)"
@@ -23,10 +23,10 @@ if (Test-Path -Path "$PSScriptRoot\Classes") {
     foreach ($Item in $Classes) {
         Try {
             . $Item.FullName
-            Write-Verbose -Message "Imported $($Item.BaseName)"
+            Write-Verbose -Message ('Class Imported {0}' -f $($Item.BaseName))
         } Catch {
             throw
-            Write-Error -Message "Could not load Enum [$($Item.Name)] : $($_.Message)"
+            Write-Error -Message "Could not load Class [$($Item.Name)] : $($_.Message)"
         } #end Try-Catch
     } #end Foreach
 } #end If
@@ -39,7 +39,7 @@ $Public = @( Get-ChildItem -Path "$PSScriptRoot\Public\" -Filter *.ps1 -ErrorAct
 Foreach ($Item in @($Private + $Public)) {
     Try {
         . $Item.fullname
-        # Write-Warning $import.fullname
+        Write-Verbose -Message ('Function Imported {0}' -f $($Item.BaseName))
     } Catch {
         Write-Error -Message "Failed to import functions from $($Item.Fullname): $_"
     }
