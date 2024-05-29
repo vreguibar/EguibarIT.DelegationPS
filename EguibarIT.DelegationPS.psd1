@@ -11,13 +11,8 @@
     # Script module or binary module file associated with this manifest.
     RootModule            = 'EguibarIT.DelegationPS.psm1'
 
-<<<<<<< HEAD
     # Version number of this module.
-    ModuleVersion         = '1.26.20'
-=======
-# Version number of this module.
-ModuleVersion = '1.27.22'
->>>>>>> cc536e0396fae7d0f662fcd67297473846f926d1
+    ModuleVersion         = '1.27.22'
 
     # Supported PSEditions
     CompatiblePSEditions  = 'Desktop', 'Core'
