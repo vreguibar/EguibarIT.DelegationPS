@@ -57,5 +57,4 @@ foreach ($Item in $Public) {
 Export-ModuleMember -Function '*' -Alias '*'
 
 # Call function Initialize-ModuleVariable to fill-up $Variables
-# . "$PSScriptRoot\Private\Initialize-ModuleVariable"
 Initialize-ModuleVariable
