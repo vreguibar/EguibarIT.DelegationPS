@@ -90,7 +90,17 @@ Function Get-AttributeSchemaHashTable {
             } #end If
         } catch {
             Get-CurrentErrorToDisplay -CurrentError $error[0]
-        } #end Try-Catch
+        } Finally {
+            # Remove completed progress bar
+            $Splat = @{
+                Activity         = 'Adding Schema attributes to Hashtable'
+                Status           = 'Completed'
+                CurrentOperation = 'Finished'
+                PercentComplete  = 100
+                Completed        = $true
+            }
+            Write-Progress @Splat
+        } #end Try-Catch-Finally
 
     } #end Process
 
