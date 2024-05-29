@@ -69,7 +69,7 @@
         $Variables.SchemaNamingContext = ([ADSI]'LDAP://RootDSE').SchemaNamingContext.ToString()
 
         # Well-Known SIDs
-        . "$PSScriptRoot\Get-AdWellKnownSID.ps1"
+        #. "$PSScriptRoot\Enum.WellKnownSids.ps1"
         #Get-AdWellKnownSID -SID 'S-1-5-18' | Out-Null  # Just to ensure it's loaded and callable
 
         # Following functions must be the last ones to be called, otherwise error is thrown.
