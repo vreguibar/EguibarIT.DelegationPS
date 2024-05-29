@@ -49,7 +49,3 @@ if (-not (Get-Variable -Name 'Variables' -Scope Global -ErrorAction SilentlyCont
 } else {
     Write-Verbose -Message 'Variables already exist.'
 }
-
-# Call Initialize-ModuleVariable to fill the variables
-Initialize-ModuleVariable -Verbose
-
