@@ -33,7 +33,7 @@
     Description           = 'Functions used to implement the Delegation Model with Tiers on the given Active Directory.'
 
     # Minimum version of the PowerShell engine required by this module
-    PowerShellVersion7    = '7'
+    PowerShellVersion     = '7.4'
 
     # Name of the PowerShell host required by this module
     # PowerShellHostName = ''
@@ -69,13 +69,106 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport     = @()
+    FunctionsToExport     = @(
+        'Set-AdAclChangeSite',
+        'Set-AdAclChangeSiteLink',
+        'Set-AdAclChangeSubnet',
+        'Set-AdAclCreateDeleteSite',
+        'Set-AdAclCreateDeleteSiteLink',
+        'Set-AdAclCreateDeleteSubnet',
+        'Set-AdAclFMSOtransfer',
+        'Set-AdDirectoryReplication',
+        'Set-AdAclBitLockerTPM',
+        'Set-AdAclChangeComputerPassword',
+        'Set-AdAclComputerAccountRestriction',
+        'Set-AdAclComputerGroupMembership',
+        'Set-AdAclComputerPersonalInfo',
+        'Set-AdAclComputerPublicInfo',
+        'Set-AdAclCreateDeleteComputer',
+        'Set-AdAclDnsInfo',
+        'Set-AdAclEnableDisableComputer',
+        'Set-AdAclMsTsGatewayInfo',
+        'Set-AdAclRenameComputer',
+        'Set-AdAclResetComputerPassword',
+        'Set-AdAclValidateWriteDnsHostName',
+        'Set-AdAclValidateWriteSPN',
+        'Set-AdmPwdComputerSelfPermission',
+        'Set-AdmPwdReadPasswordPermission',
+        'Set-AdmPwdResetPasswordPermission',
+        'Set-DeleteOnlyComputer',
+        'Set-DomainJoinComputer',
+        'Set-AdAclContactPersonalInfo',
+        'Set-AdAclContactWebInfo',
+        'Set-AdAclCreateDeleteContact',
+        'Set-AdAclFullControlDFS',
+        'Set-AdAclCreateDeleteGPO',
+        'Set-AdAclGPoption',
+        'Set-AdAclLinkGPO',
+        'Set-AdAclRSoPLogging',
+        'Set-AdAclRSoPPlanning',
+        'Set-GpoPrivilegeRight',
+        'Set-GpoRestrictedGroup',
+        'Rename-AdAclGroup',
+        'Set-AdAclChangeGroup',
+        'Set-AdAclCreateDeleteGroup',
+        'Set-AdAclUserGroupMembership',
+        'Get-AclAccessRule',
+        'Get-AclAuditRule',
+        'Get-AttributeSchemaHashTable',
+        'Get-ExtendedRightHashTable',
+        'Import-MyModule',
+        'Remove-AccountOperator',
+        'Remove-AuthUser',
+        'Remove-Everyone',
+        'Remove-PreWin2000',
+        'Remove-PreWin2000FromOU',
+        'Remove-PrintOperator',
+        'Remove-UnknownSID',
+        'Set-AdAclFullControlDHCP',
+        'Set-AdAclPromoteDC',
+        'Set-AdInheritance',
+        'Set-CreateDeleteInetOrgPerson',
+        'Set-AdAclMngPrivilegedAccount',
+        'Set-AdAclMngPrivilegedGroup',
+        'Rename-AdAclOU',
+        'Set-AdAclChangeOU',
+        'Set-AdAclCreateDeleteOU',
+        'Set-AdAclPkiAdmin',
+        'Set-AdAclPkiTemplateAdmin',
+        'Rename-AdAclPrintQueue',
+        'Set-AdAclChangePrintQueue',
+        'Set-AdAclCreateDeletePrintQueue',
+        'Set-AdAclCreateDeleteGMSA',
+        'Set-AdAclCreateDeleteMSA',
+        'Add-GroupToSCManager',
+        'Add-ServiceAcl',
+        'Get-SCManagerPermission',
+        'Get-ServiceAcl',
+        'Remove-GroupFromSCManager',
+        'Remove-ServiceAcl',
+        'Rename-AdAclUser',
+        'Set-AdAclChangeUserPassword',
+        'Set-AdAclCreateDeleteUser',
+        'Set-AdAclEnableDisableUser',
+        'Set-AdAclResetUserPassword',
+        'Set-AdAclUnlockUser',
+        'Set-AdAclUserAccountRestriction',
+        'Set-AdAclUserEmailInfo',
+        'Set-AdAclUserGeneralInfo',
+        'Set-AdAclUserGroupMembership',
+        'Set-AdAclUserLogonInfo',
+        'Set-AdAclUserPersonalInfo',
+        'Set-AdAclUserPublicInfo',
+        'Set-AdAclUserWebInfo',
+        'Set-AdAclChangeVolume',
+        'Set-AdAclCreateDeleteVolume'
+    )
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     CmdletsToExport       = @()
 
     # Variables to export from this module
-    # VariablesToExport = @()
+    #VariablesToExport     = @('Variables', 'Constants')
 
     # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
     AliasesToExport       = @()
