@@ -71,6 +71,7 @@ jobs:
 
           $totalFunctions = $publicFunctions.count + $privateFunctions.count + $ClassesFunctions.count + $EnumsFunctions.count
           $ModuleBuildNumber = $oldModuleVersion.Build + 1
+          While($totalFunctions -le $oldModuleVersion.Minor) { $totalFunctions++ }
           $ModuleVersion = "$($oldModuleVersion.Major).$($totalFunctions).$($ModuleBuildNumber)"
 
           $functionsToExport = New-Object -TypeName System.Collections.ArrayList
