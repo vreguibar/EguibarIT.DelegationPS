@@ -1,21 +1,21 @@
-<p align="center">
-  <a href="https://www.powershellgallery.com/packages/EguibarIT.DelegationPS"><img src="https://img.shields.io/powershellgallery/v/EguibarIT.DelegationPS.svg"></a>
-  <a href="https://www.powershellgallery.com/packages/EguibarIT.DelegationPS"><img src="https://img.shields.io/powershellgallery/vpre/EguibarIT.DelegationPS.svg?label=powershell%20gallery%20preview&colorB=yellow"></a>
-  <a href="https://github.com/vreguibar/EguibarIT.DelegationPS"><img src="https://img.shields.io/github/license/vreguibar/EguibarIT.DelegationPS.svg"></a>
-</p>
-
-<p align="center">
-  <a href="https://www.powershellgallery.com/packages/EguibarIT.DelegationPS"><img src="https://img.shields.io/powershellgallery/p/EguibarIT.DelegationPS.svg"></a>
-  <a href="https://github.com/vreguibar/EguibarIT.DelegationPS"><img src="https://img.shields.io/github/languages/top/vreguibar/EguibarIT.DelegationPS.svg"></a>
-  <a href="https://github.com/vreguibar/EguibarIT.DelegationPS"><img src="https://img.shields.io/github/languages/code-size/vreguibar/EguibarIT.DelegationPS.svg"></a>
-  <a href="https://www.powershellgallery.com/packages/EguibarIT.DelegationPS"><img src="https://img.shields.io/powershellgallery/dt/EguibarIT.DelegationPS.svg"></a>
-</p>
-
-<p align="center">
-  <a href="https://www.linkedin.com/in/VicenteRodriguezEguibar"><img src="https://img.shields.io/badge/LinkedIn-VicenteRodriguezEguibar-0077B5.svg?logo=LinkedIn"></a>
-</p>
 
 # EguibarIT.DelegationPS - Simplifying Active Directory Delegation
+
+[![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/EguibarIT.DelegationPS.svg)](https://www.powershellgallery.com/packages/EguibarIT.DelegationPS)
+
+[![PowerShell Gallery Preview Version](https://img.shields.io/powershellgallery/vpre/EguibarIT.DelegationPS.svg?label=powershell%20gallery%20preview&colorB=yellow)](https://www.powershellgallery.com/packages/EguibarIT.DelegationPS)
+
+[![GitHub License](https://img.shields.io/github/license/vreguibar/EguibarIT.DelegationPS.svg)](https://github.com/vreguibar/EguibarIT.DelegationPS)
+
+[![PowerShell Gallery](https://img.shields.io/powershellgallery/p/EguibarIT.DelegationPS.svg)](https://www.powershellgallery.com/packages/EguibarIT.DelegationPS)
+
+[![GitHub Top Language](https://img.shields.io/github/languages/top/vreguibar/EguibarIT.DelegationPS.svg)](https://github.com/vreguibar/EguibarIT.DelegationPS)
+
+[![GitHub Code Size](https://img.shields.io/github/languages/code-size/vreguibar/EguibarIT.DelegationPS.svg)](https://github.com/vreguibar/EguibarIT.DelegationPS)
+
+[![PowerShell Gallery Downloads](https://img.shields.io/powershellgallery/dt/EguibarIT.DelegationPS.svg)](https://www.powershellgallery.com/packages/EguibarIT.DelegationPS)
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-VicenteRodriguezEguibar-0077B5.svg?logo=LinkedIn)](https://www.linkedin.com/in/VicenteRodriguezEguibar)
 
 ## Overview
 
