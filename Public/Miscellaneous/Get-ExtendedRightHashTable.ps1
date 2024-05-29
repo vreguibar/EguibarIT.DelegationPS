@@ -40,14 +40,14 @@ Function Get-ExtendedRightHashTable {
     Process {
         try {
 
-            If ( ($null -eq $Variables.ExtendedRightsMap) -and
-                 ($Variables.ExtendedRightsMap -ne 0) -and
-                 ($Variables.ExtendedRightsMap -ne '') -and
-                 (   ($Variables.ExtendedRightsMap -isnot [array]) -or
-                     ($Variables.ExtendedRightsMap.Length -ne 0)) -and
-                 ($Variables.ExtendedRightsMap -ne $false)
+            If ( (-not $Variables.ExtendedRightsMap) -or
+                ($Variables.ExtendedRightsMap.Count -eq 0) -or
+                ($Variables.ExtendedRightsMap -eq 0) -or
+                ($Variables.ExtendedRightsMap -eq '') -or
+                ($Variables.ExtendedRightsMap -eq $false)
             ) {
 
+                Write-Verbose -Message 'The Extended Rights map is null, empty, zero, or false.'
                 Write-Verbose -Message 'Getting the GUID value of each Extended attribute'
                 # store the GUID value of each extended right in the forest
                 $Splat = @{
@@ -72,7 +72,7 @@ Function Get-ExtendedRightHashTable {
                     $TmpMap.Add($Item.displayName, [system.guid]$Item.rightsGuid)
                 }
                 # Include "ALL [nullGUID]"
-                $TmpMap.Add('All', [System.GUID]'00000000-0000-0000-0000-000000000000')
+                $TmpMap.Add('All', $Constants.guidNull)
 
                 Write-Verbose -Message '$Variables.GuidMap was empty. Adding values to it!'
                 $Variables.ExtendedRightsMap = $TmpMap

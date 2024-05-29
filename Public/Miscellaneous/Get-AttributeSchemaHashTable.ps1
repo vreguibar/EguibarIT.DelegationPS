@@ -48,14 +48,14 @@ Function Get-AttributeSchemaHashTable {
     Process {
         try {
 
-            If ( ($null -eq $Variables.GuidMap) -and
-                 ($Variables.GuidMap -ne 0) -and
-                 ($Variables.GuidMap -ne '') -and
-                 (   ($Variables.GuidMap -isnot [array]) -or
-                     ($Variables.GuidMap.Length -ne 0)) -and
-                 ($Variables.GuidMap -ne $false)
+            If ( (-not $Variables.GuidMap) -or
+                ($Variables.GuidMap.Count -eq 0) -or
+                ($Variables.GuidMap -eq 0) -or
+                ($Variables.GuidMap -eq '') -or
+                ($Variables.GuidMap -eq $false)
             ) {
 
+                Write-Verbose -Message 'The GUID map is null, empty, zero, or false.'
                 Write-Verbose -Message 'Getting the GUID value of each schema class and attribute'
                 #store the GUID value of each schema class and attribute
                 $Splat = @{
@@ -82,7 +82,7 @@ Function Get-AttributeSchemaHashTable {
                 } #end ForEach
 
                 # Include "ALL [nullGUID]"
-                $TmpMap.Add('All', [System.GUID]'00000000-0000-0000-0000-000000000000')
+                $TmpMap.Add('All', $Constants.guidNull)
 
                 Write-Verbose -Message '$Variables.GuidMap was empty. Adding values to it!'
                 $Variables.GuidMap = $TmpMap
