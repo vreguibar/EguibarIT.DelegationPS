@@ -53,10 +53,10 @@
 
         # $WellKnownSids variable is defined on .\Enums\Enum.WellKnownSids.ps1
         # Check is populated, otherwise fill it up
-        If ( ($null -eq $Variables.WellKnownSIDs) -or
-            (0 -eq $Variables.WellKnownSIDs) -or
-            ('' -eq $Variables.WellKnownSIDs) -or
-            ($Variables.WellKnownSIDs.length -eq 0) -or
+        If ( (-not $Variables.WellKnownSIDs) -or
+            ($Variables.WellKnownSIDs.Count -eq 0) -or
+            ($Variables.WellKnownSIDs -eq 0) -or
+            ($Variables.WellKnownSIDs -eq '') -or
             ($Variables.WellKnownSIDs -eq $false)
         ) {
             . "$PSScriptRoot\Enums\Enum.WellKnownSids.ps1"
@@ -69,14 +69,14 @@
         try {
 
             # Assuming $WellKnownSIDs is a hashtable where keys are the well-known SID values
-            if ($WellKnownSIDs.Contains($sid)) {
+            if ($Variables.WellKnownSIDs.ContainsKey($SID)) {
                 $isWellKnownSid = $true
-                $sidDescription = $WellKnownSIDs[$SID]
+                $sidDescription = $Variables.WellKnownSIDs[$SID]
             }
 
-            Write-Verbose "  Checked SID: $SID."
-            Write-Verbose "Is Well-Known: $isWellKnownSid"
-            Write-Verbose "  Description: $sidDescription"
+            Write-Verbose -Message ('  Checked SID: {0}.' -f $SID)
+            Write-Verbose -Message ('Is Well-Known: {0}' -f $isWellKnownSid)
+            Write-Verbose -Message ('  Description: {0}' -f $sidDescription)
         } catch {
             Get-CurrentErrorToDisplay -CurrentError $error[0]
         } #end Try-Catch

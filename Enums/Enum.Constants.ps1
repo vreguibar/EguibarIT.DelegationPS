@@ -20,7 +20,10 @@ $Splat = @{
     Force       = $true
 }
 
-# Check if Constants exist. Create it if not
-If ( -Not (Test-Path $Constants)) {
+# Check if the 'Constants' variable exists. Create it if not.
+if (-not (Get-Variable -Name 'Constants' -Scope Global -ErrorAction SilentlyContinue)) {
     New-Variable @Splat
 }
+
+# Optional: Output the Constants for verification (verbose)
+Write-Verbose -Message ('Constants have been initialized: {0}' -f $Constants)

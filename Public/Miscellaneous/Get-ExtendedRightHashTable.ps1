@@ -4,7 +4,7 @@ Function Get-ExtendedRightHashTable {
             Function to Read all Extended Rights GUID from Schema
         .DESCRIPTION
             Function that reads all Extended Rights GUID from the Schema and stores into
-            a Hash Table named $extendedrightsmap
+            a Hash Table named $Variables.ExtendedRightsMap
         .EXAMPLE
             Get-ExtendedRightHashTable
         .NOTES
@@ -44,6 +44,7 @@ Function Get-ExtendedRightHashTable {
                 ($Variables.ExtendedRightsMap.Count -eq 0) -or
                 ($Variables.ExtendedRightsMap -eq 0) -or
                 ($Variables.ExtendedRightsMap -eq '') -or
+                ([string]::IsNullOrEmpty($Variables.ExtendedRightsMap)) -or
                 ($Variables.ExtendedRightsMap -eq $false)
             ) {
 
@@ -64,7 +65,7 @@ Function Get-ExtendedRightHashTable {
                     $Splat = @{
                         Activity         = 'Adding {0} Extended attributes to Hashtable' -f $AllExtended.count
                         Status           = 'Reading extended attribute number {0}  ' -f $i
-                        PercentComplete  = ($i / $AllExtended.count) * 100
+                        PercentComplete  = [math]::Round(($i / $AllExtended.Count) * 100, 2)
                         CurrentOperation = '      Processing Extended Attribute...: {0}' -f $item.lDAPDisplayName
                     }
                     Write-Progress @Splat

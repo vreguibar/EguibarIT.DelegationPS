@@ -3,11 +3,11 @@ Function Get-AttributeSchemaHashTable {
         .Synopsis
             Function to Read all GUID from Schema
         .DESCRIPTION
-            Function that reads all GUID from the Schema and stores into a Hashtable named $guidmap
+            Function that reads all GUID from the Schema and stores into a Hashtable named $Variables.GuidMap
         .EXAMPLE
             Get-AttributeSchemaHashTable
         .EXAMPLE
-            $guidmap = Get-AttributeSchemaHashTable
+            Get-AttributeSchemaHashTable
         .NOTES
             Used Functions:
                 Name                                   | Module
@@ -51,7 +51,7 @@ Function Get-AttributeSchemaHashTable {
             If ( (-not $Variables.GuidMap) -or
                 ($Variables.GuidMap.Count -eq 0) -or
                 ($Variables.GuidMap -eq 0) -or
-                ($Variables.GuidMap -eq '') -or
+                ([string]::IsNullOrEmpty($Variables.GuidMap)) -or
                 ($Variables.GuidMap -eq $false)
             ) {
 
@@ -72,7 +72,7 @@ Function Get-AttributeSchemaHashTable {
                     $Splat = @{
                         Activity         = 'Adding {0} Schema attributes to Hashtable' -f $AllSchema.count
                         Status           = 'Reading attribute number {0}  ' -f $i
-                        PercentComplete  = ($i / $AllSchema.count) * 100
+                        PercentComplete  = [math]::Round(($i / $AllSchema.Count) * 100, 2)
                         CurrentOperation = '      Processing Attribute...: {0}' -f $item.lDAPDisplayName
                     }
                     Write-Progress @Splat
