@@ -77,7 +77,7 @@ Function Get-AttributeSchemaHashTable {
                     }
                     Write-Progress @Splat
 
-
+                    # add current Guid to $TempMap
                     $TmpMap.Add($item.lDAPDisplayName, [System.GUID]$item.schemaIDGUID)
                 } #end ForEach
 
@@ -90,6 +90,7 @@ Function Get-AttributeSchemaHashTable {
             } #end If
         } catch {
             Get-CurrentErrorToDisplay -CurrentError $error[0]
+            throw
         } Finally {
             # Remove completed progress bar
             $Splat = @{

@@ -43,7 +43,6 @@ Function Get-ExtendedRightHashTable {
             If ( (-not $Variables.ExtendedRightsMap) -or
                 ($Variables.ExtendedRightsMap.Count -eq 0) -or
                 ($Variables.ExtendedRightsMap -eq 0) -or
-                ($Variables.ExtendedRightsMap -eq '') -or
                 ([string]::IsNullOrEmpty($Variables.ExtendedRightsMap)) -or
                 ($Variables.ExtendedRightsMap -eq $false)
             ) {
@@ -70,8 +69,10 @@ Function Get-ExtendedRightHashTable {
                     }
                     Write-Progress @Splat
 
+                    # add current Guid to $TempMap
                     $TmpMap.Add($Item.displayName, [system.guid]$Item.rightsGuid)
-                }
+                } #end Foreach
+
                 # Include "ALL [nullGUID]"
                 $TmpMap.Add('All', $Constants.guidNull)
 
@@ -83,6 +84,7 @@ Function Get-ExtendedRightHashTable {
             } #end If-Else
         } catch {
             Get-CurrentErrorToDisplay -CurrentError $error[0]
+            throw
         } Finally {
             # Remove completed progress bar
             $Splat = @{

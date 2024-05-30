@@ -47,11 +47,14 @@ Function Remove-AccountOperator {
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
+        # Get 'Account Operators' group by SID
+        $AccountOperators = Get-AdGroup -Filter * | Where-Object { $_.SID -like 'S-1-5-32-548' }
+
     } #end Begin
 
     process {
         $Splat = @{
-            Id                    = 'Account Operators'
+            Id                    = $AccountOperators
             LDAPPath              = $PSBoundParameters['LDAPPath']
             AdRight               = 'GenericAll'
             AccessControlType     = 'Allow'
