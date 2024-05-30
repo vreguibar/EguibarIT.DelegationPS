@@ -67,7 +67,7 @@
 
         ##############################
         # Variables Definition
-        [hashtable]$Splat = [hashtable]::New()
+        [hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
         # $Variables.GuidMap is empty. Call function to fill it up
         Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'

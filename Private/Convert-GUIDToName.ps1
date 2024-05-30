@@ -86,7 +86,7 @@ function Convert-GUIDToName {
         # Variables Definition
 
         [String]$Output = $null
-        [hashtable]$Splat = [hashtable]::New()
+        [hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
         # Ensure string is converted to GUID
         if ($guid -is [String]) {

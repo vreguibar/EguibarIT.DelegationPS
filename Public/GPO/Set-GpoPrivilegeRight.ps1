@@ -301,7 +301,7 @@
 
         ##############################
         # Variables Definition
-        [Hashtable]$Splat = [hashtable]::New()
+        [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
         $ArrayList = [System.Collections.ArrayList]::New()
 
 

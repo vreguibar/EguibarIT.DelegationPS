@@ -39,8 +39,8 @@ Function Get-AttributeSchemaHashTable {
         ##############################
         # Variables Definition
 
-        [hashtable]$TmpMap = [hashtable]::New()
-        [hashtable]$Splat = [hashtable]::New()
+        [hashtable]$TmpMap = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
+        [hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
         [int32]$i = 0
 
     } #end Begin

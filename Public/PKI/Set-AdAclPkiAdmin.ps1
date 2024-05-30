@@ -68,7 +68,7 @@ function Set-AdAclPkiAdmin {
 
         ##############################
         # Variables Definition
-        [Hashtable]$Splat = [hashtable]::New()
+        [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
         # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
         $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']

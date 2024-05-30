@@ -71,7 +71,7 @@ function Set-AdAclComputerAccountRestriction {
 
         ##############################
         # Variables Definition
-        [Hashtable]$Splat = [hashtable]::New()
+        [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
         # $Variables.GuidMap is empty. Call function to fill it up
         Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'

@@ -67,7 +67,7 @@ function Set-AdAclChangeUserPassword {
 
         ##############################
         # Variables Definition
-        [Hashtable]$Splat = [hashtable]::New()
+        [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
         Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case is empty a function is called to fill it up.'
         Get-AttributeSchemaHashTable

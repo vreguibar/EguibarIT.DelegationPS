@@ -41,7 +41,7 @@
         ##############################
         # Variables Definition
 
-        [Hashtable]$Splat = [hashtable]::New()
+        [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
         If (-Not $Computer) {
             Write-Verbose -Message 'No computer name provided. Trying the local computer instead.'

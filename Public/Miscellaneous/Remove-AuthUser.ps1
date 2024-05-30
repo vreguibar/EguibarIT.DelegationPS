@@ -45,7 +45,7 @@ Function Remove-AuthUser {
 
         ##############################
         # Variables Definition
-        [Hashtable]$Splat = [hashtable]::New()
+        [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
     } #end Begin
 
