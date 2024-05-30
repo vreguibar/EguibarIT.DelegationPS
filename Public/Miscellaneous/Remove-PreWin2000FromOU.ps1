@@ -47,6 +47,9 @@ Function Remove-PreWin2000FromOU {
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
+        # Get 'Pre-Windows 2000 Compatible Access' group by SID
+        $PreWin2000 = Get-AdGroup -Filter * | Where-Object { $_.SID -like 'S-1-1-0' }
+
         Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case is empty a function is called to fill it up.'
         Get-AttributeSchemaHashTable
     } #end Begin
@@ -58,7 +61,7 @@ Function Remove-PreWin2000FromOU {
 
             # Remove the List Children
             $Splat = @{
-                Id                    = 'Pre-Windows 2000 Compatible Access'
+                Id                    = $PreWin2000
                 LDAPPath              = $PSBoundParameters['LDAPpath']
                 AdRight               = 'ListChildren'
                 AccessControlType     = 'Allow'

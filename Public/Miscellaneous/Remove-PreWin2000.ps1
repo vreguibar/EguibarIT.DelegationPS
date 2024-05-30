@@ -53,7 +53,7 @@ Function Remove-PreWin2000 {
 
     process {
         $Splat = @{
-            Id                    = 'Pre-Windows 2000 Compatible Access'
+            Id                    = $PreWin2000
             LDAPPath              = $PSBoundParameters['LDAPPath']
             AdRight               = 'GenericAll'
             AccessControlType     = 'Allow'
