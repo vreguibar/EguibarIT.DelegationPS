@@ -38,7 +38,7 @@
         ##############################
         # Variables Definition
 
-        Import-Module ActiveDirectory -Verbose:$false
+        Import-MyModule ActiveDirectory -Verbose:$false
 
     } #end Begin
 

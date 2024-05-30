@@ -72,7 +72,7 @@
         ##############################
         # Variables Definition
 
-        Import-Module -Name ActiveDirectory -Verbose:$false
+        Import-MyModule -Name ActiveDirectory -Verbose:$false
 
         Set-Location -Path AD:\
 
@@ -82,10 +82,10 @@
     Process {
         If ($PSBoundParameters['searchBy']) {
             $AclAccess = Get-Acl -Path $PSBoundParameters['LDAPpath'] |
-            Select-Object -ExpandProperty Access |
-            Where-Object -FilterScript {
-                $_.IdentityReference -match $PSBoundParameters['searchBy']
-            }
+                Select-Object -ExpandProperty Access |
+                    Where-Object -FilterScript {
+                        $_.IdentityReference -match $PSBoundParameters['searchBy']
+                    }
 
             Write-Verbose -Message ('{0}    ACE (Access Control Entry)  Filtered By: {1}' -f $Constants.NL, $PSBoundParameters['searchBy'])
 
