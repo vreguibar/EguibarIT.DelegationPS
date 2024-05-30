@@ -48,7 +48,7 @@ Function Remove-PreWin2000FromOU {
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
         # Get 'Pre-Windows 2000 Compatible Access' group by SID
-        $PreWin2000 = Get-AdGroup -Filter * | Where-Object { $_.SID -like 'S-1-1-0' }
+        $PreWin2000 = Get-AdGroup -Filter * | Where-Object { $_.SID -like 'S-1-5-32-554' }
 
         Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case is empty a function is called to fill it up.'
         Get-AttributeSchemaHashTable
@@ -85,7 +85,7 @@ Function Remove-PreWin2000FromOU {
                 RemoveRule            = $true
             }
             If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Pre-Windows 2000 Compatible Access"?')) {
-                Set-AclConstructor5 @Splat
+                Set-AclConstructor6 @Splat
             } #end If
 
             # Remove Group
@@ -100,7 +100,7 @@ Function Remove-PreWin2000FromOU {
                 RemoveRule            = $true
             }
             If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Pre-Windows 2000 Compatible Access"?')) {
-                Set-AclConstructor5 @Splat
+                Set-AclConstructor6 @Splat
             } #end If
 
             # Remove User
@@ -115,7 +115,7 @@ Function Remove-PreWin2000FromOU {
                 RemoveRule            = $true
             }
             If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Pre-Windows 2000 Compatible Access"?')) {
-                Set-AclConstructor5 @Splat
+                Set-AclConstructor6 @Splat
             } #end If
         } catch {
             throw
