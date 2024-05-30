@@ -47,7 +47,7 @@ Function Remove-AuthUser {
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
-        # Get 'Print Operators' group by SID
+        # Get 'Authenticated Users' group by SID
         $AuthenticatedUsers = Get-AdGroup -Filter * | Where-Object { $_.SID -like 'S-1-5-11' }
 
     } #end Begin
