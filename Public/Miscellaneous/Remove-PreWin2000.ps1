@@ -46,6 +46,9 @@ Function Remove-PreWin2000 {
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
+        # Get 'Pre-Windows 2000 Compatible Access' group by SID
+        $PreWin2000 = Get-AdGroup -Filter * | Where-Object { $_.SID -like 'S-1-1-0' }
+
     } #end Begin
 
     process {
