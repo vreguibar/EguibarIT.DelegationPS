@@ -100,7 +100,7 @@ function Set-AdAclContactWebInfo {
         $Splat = @{
             Id                    = $CurrentGroup
             LDAPPath              = $PSBoundParameters['LDAPpath']
-            AdRight               = 'ReadProperty, WriteProperty'
+            AdRight               = 'ReadProperty', 'WriteProperty'
             AccessControlType     = 'Allow'
             ObjectType            = $Variables.ExtendedRightsMap['Web Information']
             InheritedObjectType   = $Variables.GuidMap['Contact']

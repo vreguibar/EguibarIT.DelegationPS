@@ -99,7 +99,7 @@ function Set-AdAclUserPublicInfo {
         $Splat = @{
             Id                    = $CurrentGroup
             LDAPPath              = $PSBoundParameters['LDAPpath']
-            AdRight               = 'ReadProperty, WriteProperty'
+            AdRight               = 'ReadProperty', 'WriteProperty'
             AccessControlType     = 'Allow'
             ObjectType            = $Variables.ExtendedRightsMap['Public Information']
             AdSecurityInheritance = 'Descendents'

@@ -94,7 +94,7 @@
         $Splat = @{
             Id                    = $CurrentGroup
             LDAPPath              = $PSBoundParameters['LDAPpath']
-            AdRight               = 'ReadProperty, WriteProperty'
+            AdRight               = 'ReadProperty', 'WriteProperty'
             AccessControlType     = 'Allow'
             ObjectType            = $Constants.GuidNULL
             AdSecurityInheritance = 'Descendents'

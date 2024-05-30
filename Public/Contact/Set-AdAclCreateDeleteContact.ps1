@@ -95,7 +95,7 @@ function Set-AdAclCreateDeleteContact {
         $Splat = @{
             Id                    = $CurrentGroup
             LDAPPath              = $PSBoundParameters['LDAPpath']
-            AdRight               = 'CreateChild,DeleteChild'
+            AdRight               = 'CreateChild', 'DeleteChild'
             AccessControlType     = 'Allow'
             ObjectType            = $Variables.GuidMap['Contact']
             AdSecurityInheritance = 'All'
@@ -103,13 +103,13 @@ function Set-AdAclCreateDeleteContact {
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
 
-            if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for MS-TS-GatewayAccess?')) {
+            if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for Create/Delete Contact object?')) {
                 # Add the parameter to remove the rule
                 $Splat.Add('RemoveRule', $true)
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for MS-TS-GatewayAccess?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for Create/Delete Contact object?')) {
             Set-AclConstructor5 @Splat
         } #end If
     }

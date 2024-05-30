@@ -112,8 +112,6 @@ function Set-AclConstructor5 {
             HelpMessage = 'Active Directory Right',
             Position = 2)]
         [ValidateNotNullOrEmpty()]
-        #[ValidateScript({ [ActiveDirectoryRights]::new().GetValidValues().Contains($_) })]
-        #[ValidateSet('CreateChild', 'DeleteChild', 'Delete', 'DeleteTree', 'ExtendedRight', 'GenericAll', 'GenericExecute', 'GenericRead', 'GenericWrite', 'ListChildren', 'ListObject', 'ReadControl', 'ReadProperty', 'Self', 'Synchronize', 'WriteDacl', 'WriteOwner', 'WriteProperty')]
         [ValidateSet([ActiveDirectoryRights])]
         [Alias('ActiveDirectoryRights')]
         [String[]]
