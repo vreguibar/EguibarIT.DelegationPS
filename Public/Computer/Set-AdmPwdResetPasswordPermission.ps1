@@ -95,9 +95,9 @@ function Set-AdmPwdResetPasswordPermission {
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'ReadProperty', 'WriteProperty'
             AccessControlType     = 'Allow'
-            ObjectType            = $guidmap['ms-Mcs-AdmPwdExpirationTime']
+            ObjectType            = $Variables.GuidMap['ms-Mcs-AdmPwdExpirationTime']
             AdSecurityInheritance = 'Descendents'
-            InheritedObjectType   = $guidmap['computer']
+            InheritedObjectType   = $Variables.GuidMap['computer']
         }
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {

@@ -94,9 +94,9 @@
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'ReadProperty', 'WriteProperty'
             AccessControlType     = 'Allow'
-            ObjectType            = $guidmap['distinguishedName']
+            ObjectType            = $Variables.GuidMap['distinguishedName']
             AdSecurityInheritance = 'All'
-            InheritedObjectType   = $guidmap['group']
+            InheritedObjectType   = $Variables.GuidMap['group']
         }
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
@@ -107,7 +107,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for distinguishedName?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for distinguishedName?')) {
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -127,9 +127,9 @@
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'ReadProperty', 'WriteProperty'
             AccessControlType     = 'Allow'
-            ObjectType            = $guidmap['cn']
+            ObjectType            = $Variables.GuidMap['cn']
             AdSecurityInheritance = 'All'
-            InheritedObjectType   = $guidmap['group']
+            InheritedObjectType   = $Variables.GuidMap['group']
         }
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
@@ -140,7 +140,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for cn?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for cn?')) {
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -160,9 +160,9 @@
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'ReadProperty', 'WriteProperty'
             AccessControlType     = 'Allow'
-            ObjectType            = $guidmap['name']
+            ObjectType            = $Variables.GuidMap['name']
             AdSecurityInheritance = 'All'
-            InheritedObjectType   = $guidmap['group']
+            InheritedObjectType   = $Variables.GuidMap['group']
         }
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
@@ -173,7 +173,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for name?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for name?')) {
             Set-AclConstructor6 @Splat
         } #end If
     } # end Process

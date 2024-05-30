@@ -85,7 +85,7 @@
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'CreateChild,DeleteChild'
             AccessControlType     = 'Allow'
-            ObjectType            = $guidmap['inetOrgPerson']
+            ObjectType            = $Variables.GuidMap['inetOrgPerson']
             AdSecurityInheritance = 'All'
         }
         # Check if RemoveRule switch is present.
