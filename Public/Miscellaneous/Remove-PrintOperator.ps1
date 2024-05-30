@@ -47,6 +47,11 @@ Function Remove-PrintOperator {
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
+
+        # Get 'Print Operators' group by SID
+        $PrintOperators = Get-AdGroup -Filter * | Where-Object { $_.SID -like 'S-1-5-32-550' }
+
+
         # $Variables.GuidMap is empty. Call function to fill it up
         Write-Verbose -Message 'Variable $Variables.GuidMap is empty. Calling function to fill it up.'
         Get-AttributeSchemaHashTable
@@ -65,7 +70,7 @@ Function Remove-PrintOperator {
             IsInherited            : False
         #>
         $Splat = @{
-            Id                    = 'Print Operators'
+            Id                    =  $PrintOperators
             LDAPPath              = $PSBoundParameters['LDAPPath']
             AdRight               = 'CreateChild', 'DeleteChild'
             AccessControlType     = 'Allow'
