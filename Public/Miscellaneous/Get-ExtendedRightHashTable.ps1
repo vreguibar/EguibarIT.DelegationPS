@@ -31,7 +31,7 @@ Function Get-ExtendedRightHashTable {
         ##############################
         # Variables Definition
 
-        [hashtable]$TmpMap = [hashtable]::New()
+        [hashtable]$TmpMap = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
         [hashtable]$Splat = [hashtable]::New()
         [int32]$i = 0
 
@@ -75,10 +75,12 @@ Function Get-ExtendedRightHashTable {
                 # Include "ALL [nullGUID]"
                 $TmpMap.Add('All', $Constants.guidNull)
 
-                Write-Verbose -Message '$Variables.GuidMap was empty. Adding values to it!'
+                Write-Verbose -Message '$Variables.ExtendedRightsMap was empty. Adding values to it!'
                 $Variables.ExtendedRightsMap = $TmpMap
 
-            } #end If
+            } else {
+                Write-Verbose -Message '$Variables.ExtendedRightsMap id defined. You can use it!'
+            } #end If-Else
         } catch {
             Get-CurrentErrorToDisplay -CurrentError $error[0]
         } Finally {

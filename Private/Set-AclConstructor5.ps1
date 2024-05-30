@@ -29,7 +29,7 @@ function Set-AclConstructor5 {
             If specified, the access rule will be removed. If omitted, the access rule will be added.
 
         .PARAMETER AdSecurityInheritance
-            Security inheritance of the new right (All, Children, Descendents, None, SelfAndChildren)
+            Security inheritance of the new right (All, Children, Descendent, None, SelfAndChildren)
 
         .EXAMPLE
             Set-AclConstructor5 -Id "SG_SiteAdmins_XXXX"
@@ -140,7 +140,8 @@ function Set-AclConstructor5 {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Security inheritance of the new right (All, Children, Descendents, None, SelfAndChildren)',
             Position = 5)]
-        [ValidateSet('All', 'Children', 'Descendents', 'None', 'SelfAndChildren')]
+        #[ValidateSet('All', 'Children', 'Descendents', 'None', 'SelfAndChildren')]
+        [ValidateSet([ActiveDirectorySecurityInheritance], ErrorMessage = "Value '{0}' is invalid. Try one of: {1}")]
         [Alias('InheritanceType', 'ActiveDirectorySecurityInheritance')]
         [String]
         $AdSecurityInheritance,
@@ -170,17 +171,10 @@ function Set-AclConstructor5 {
 
         # Collect the SID for the trustee we will be delegating to.
         # NULL will be returned if ID is a WellKnownSid
-        If (-not ($PSBoundParameters['Id'] -is [Microsoft.ActiveDirectory.Management.AdGroup])) {
+        #
+        $GroupObject = Get-AdObjectType -Identity $PSBoundParameters['Id']
 
-            #
-            $GroupObject = Get-AdObjectType -Identity $PSBoundParameters['Id']
-
-            Write-Verbose -Message 'Identity is already a Group Object. Retriving the Group'
-        } else {
-
-            # ID (the passed group) IS an AdGroup
-            $GroupObject = $PSBoundParameters['Id']
-        }
+        Write-Verbose -Message 'Identity is already a Group Object. Retrieving the Group'
 
         # $groupObject will be NULL if ID is a WellKnownSid
         If ($null -eq $GroupObject) {
@@ -192,40 +186,38 @@ function Set-AclConstructor5 {
                 # return SID of the WellKnownSid
                 $groupSID = $WellKnownSIDs.keys.where{ $WellKnownSIDs[$_].Contains($PSBoundParameters['Id']) }
 
-                Write-Verbose -Message 'Identity is Well-Known SID. Retriving the Well-Known SID'
+                Write-Verbose -Message 'Identity is Well-Known SID. Retrieving the Well-Known SID'
             }
         } else {
 
             # If identity is NOT a WellKnownSID, the function will translate to existing Object SID.
             $groupSID = New-Object -TypeName System.Security.Principal.SecurityIdentifier -ArgumentList $groupObject.SID
 
-            Write-Verbose -Message 'Retriving SID of Identity'
+            Write-Verbose -Message 'Retrieving SID of Identity'
         }
 
         #Get a reference to the Object we want to delegate
-        If (Test-IsValidDN -ObjectDN $PSBoundParameters['LDAPPath']) {
-            try {
+        try {
 
-                #
-                $object = Get-ADObject -Identity $PSBoundParameters['LDAPPath']
+            #
+            $object = Get-ADObject -Identity $PSBoundParameters['LDAPPath']
 
-                Write-Verbose -Message 'Accessing the object from given LdapPath.'
+            Write-Verbose -Message ('Accessing the object from given LdapPath {0}.' -f $PSBoundParameters['LDAPPath'])
 
-            } Catch {
-                Get-CurrentErrorToDisplay -CurrentError $error[0]
-            } #end Try-Catch
-        }
+        } Catch {
+            Write-Error -Message ('Error while trying to access LDAP object {0}' -f $PSBoundParameters['LDAPPath'])
+            Get-CurrentErrorToDisplay -CurrentError $error[0]
+        } #end Try-Catch
 
 
         #Get a copy of the current DACL on the object
         try {
-
-            #
             $acl = Get-Acl -Path ('AD:\{0}' -f $object.DistinguishedName)
 
-            Write-Verbose -Message 'Get a copy of the current DACL on the object (LdapPath).'
+            Write-Verbose -Message ('Get a copy of the current DACL on the object DN {0}.' -f $object.DistinguishedName)
 
         } Catch {
+            Write-Error -Message ('Error while trying to Get a copy of the current DACL {0}' -f $object.DistinguishedName)
             Get-CurrentErrorToDisplay -CurrentError $error[0]
         } #end Try-Catch
 
@@ -285,6 +277,7 @@ function Set-AclConstructor5 {
             Write-Verbose -Message ('Re-apply the modified DACL to the {0}' -f $objectDN.DistinguishedName)
 
         } Catch {
+            Write-Error -Message ('Error when trying to re-apply the modified DACL to the {0}' -f $objectDN.DistinguishedName)
             Get-CurrentErrorToDisplay -CurrentError $error[0]
         } #end Try-Catch
 

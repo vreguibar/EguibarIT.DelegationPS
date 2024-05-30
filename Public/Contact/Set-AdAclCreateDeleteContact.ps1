@@ -1,10 +1,10 @@
 function Set-AdAclCreateDeleteContact {
     <#
         .Synopsis
-            The function will delegate the premission for a group to create/Delete
+            The function will delegate the permission for a group to create/Delete
             Contact objects in an OU
         .DESCRIPTION
-            The function will delegate the premission for a group to create/Delete
+            The function will delegate the permission for a group to create/Delete
             Contact objects in an OU
         .EXAMPLE
             Set-AdAclCreateDeleteContact -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"

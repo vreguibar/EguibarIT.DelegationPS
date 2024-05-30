@@ -1,9 +1,9 @@
 ﻿Function Set-AdAclMsTsGatewayInfo {
     <#
         .Synopsis
-            The function will delegate the premission for a group to Modify MS TerminalServices Gateway Information Set of Computer object
+            The function will delegate the permission for a group to Modify MS TerminalServices Gateway Information Set of Computer object
         .DESCRIPTION
-            The function will delegate the premission for a group to Modify MS TerminalServices Gateway Information Set of Computer object
+            The function will delegate the permission for a group to Modify MS TerminalServices Gateway Information Set of Computer object
         .EXAMPLE
             Set-AdAclMsTsGatewayInfo -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
         .EXAMPLE
@@ -111,7 +111,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for MS-TS-GatewayAccess?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for MS-TS-GatewayAccess?')) {
             Set-AclConstructor6 @Splat
         } #end If
     } #end Process
