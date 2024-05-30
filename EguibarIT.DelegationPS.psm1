@@ -31,32 +31,29 @@ if (Test-Path -Path "$PSScriptRoot\Classes") {
 
 
 # Load Private Functions
-if (Test-Path -Path "$PSScriptRoot\Private") {
-    $Private = @( Get-ChildItem -Path "$PSScriptRoot\Private\" -Filter *.ps1 -ErrorAction SilentlyContinue -Recurse )
-    foreach ($Item in $Private) {
-        Try {
-            . $Item.Fullname
-            Write-Verbose -Message ('Private Function Imported {0}' -f $($Item.BaseName))
-        } Catch {
-            Write-Error -Message "Failed to import private function from $($Item.Fullname): $($_.Exception.Message)"
-            Throw
-        } #end Try-Catch
-    } #end Foreach
-} #end If
+$Private = @( Get-ChildItem -Path "$PSScriptRoot\Private\" -Filter *.ps1 -ErrorAction SilentlyContinue -Recurse )
+foreach ($Item in $Private) {
+    Try {
+        . $Item.Fullname
+        Write-Verbose -Message ('Private Function Imported {0}' -f $($Item.BaseName))
+    } Catch {
+        Write-Error -Message "Failed to import private function from $($Item.Fullname): $($_.Exception.Message)"
+        Throw
+    } #end Try-Catch
+} #end Foreach
 
 # Load Public Functions
-if (Test-Path -Path "$PSScriptRoot\Public") {
-    $Public = @( Get-ChildItem -Path "$PSScriptRoot\Public\" -Filter *.ps1 -ErrorAction SilentlyContinue -Recurse )
-    foreach ($Item in $Public) {
-        Try {
-            . $Item.Fullname
-            Write-Verbose -Message ('Public Function Imported {0}' -f $($Item.BaseName))
-        } Catch {
-            Write-Error -Message "Failed to import public function from $($Item.Fullname): $($_.Exception.Message)"
-            Throw
-        } #end Try-Catch
-    } #end Foreach
-} #end If
+
+$Public = @( Get-ChildItem -Path "$PSScriptRoot\Public\" -Filter *.ps1 -ErrorAction SilentlyContinue -Recurse )
+foreach ($Item in $Public) {
+    Try {
+        . $Item.Fullname
+        Write-Verbose -Message ('Public Function Imported {0}' -f $($Item.BaseName))
+    } Catch {
+        Write-Error -Message "Failed to import public function from $($Item.Fullname): $($_.Exception.Message)"
+        Throw
+    } #end Try-Catch
+} #end Foreach
 
 Export-ModuleMember -Function '*' -Alias '*'
 
