@@ -277,6 +277,7 @@ function Set-AclConstructor5 {
         } Catch {
             Write-Error -Message ('Error when trying to re-apply the modified DACL to the {0}' -f $objectDN.DistinguishedName)
             Get-CurrentErrorToDisplay -CurrentError $error[0]
+            throw
         } #end Try-Catch
 
     } #end Process
