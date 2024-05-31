@@ -35,16 +35,12 @@
             HelpMessage = 'Amount of Tabs to be used on the formatting.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
+        [PSDefaultValue(Help = 'Default Value is "4"')]
         [int]
-        $TabCount
+        $TabCount = 4
     )
 
     Begin {
-
-        # Validate TabCount and set default if needed
-        if ($TabCount -lt 2) {
-            $TabCount = 2
-        }
 
     } # end Begin
 
@@ -64,6 +60,7 @@
         } else {
             $display = 'No PsBoundParameters to display.'
         } #end If
+        $display += $Constants.NL
         $display += $Constants.NL
 
     } # end Process
