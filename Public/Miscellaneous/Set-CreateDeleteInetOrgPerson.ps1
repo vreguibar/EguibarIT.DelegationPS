@@ -83,7 +83,7 @@
         $Splat = @{
             Id                    = $CurrentGroup
             LDAPPath              = $PSBoundParameters['LDAPpath']
-            AdRight               = 'CreateChild,DeleteChild'
+            AdRight               = 'CreateChild', 'DeleteChild'
             AccessControlType     = 'Allow'
             ObjectType            = $Variables.GuidMap['inetOrgPerson']
             AdSecurityInheritance = 'All'
