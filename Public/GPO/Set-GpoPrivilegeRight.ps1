@@ -315,7 +315,7 @@
         [System.String[]]
         $SyncAgent,
 
-        [Parameter(Mandatory = $false, Mandatory = $false,
+        [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName =
             $True, ValueFromRemainingArguments = $false,
