@@ -114,6 +114,7 @@
             }
         } Catch {
             Get-CurrentErrorToDisplay -CurrentError $error[0]
+            throw
         } #end Try-Catch
 
 
@@ -152,6 +153,7 @@
             }
         } Catch {
             Get-CurrentErrorToDisplay -CurrentError $error[0]
+            throw
         } #end Try-Catch
 
 
@@ -191,6 +193,7 @@
             }
         } Catch {
             Get-CurrentErrorToDisplay -CurrentError $error[0]
+            throw
         } #end Try-Catch
 
 
@@ -229,6 +232,7 @@
             }
         } Catch {
             Get-CurrentErrorToDisplay -CurrentError $error[0]
+            throw
         } #end Try-Catch
 
 
@@ -265,6 +269,7 @@
             }
         } Catch {
             Get-CurrentErrorToDisplay -CurrentError $error[0]
+            throw
         } #end Try-Catch
 
 
@@ -303,6 +308,7 @@
             }
         } Catch {
             Get-CurrentErrorToDisplay -CurrentError $error[0]
+            throw
         } #end Try-Catch
 
 
@@ -342,6 +348,7 @@
             }
         } Catch {
             Get-CurrentErrorToDisplay -CurrentError $error[0]
+            throw
         } #end Try-Catch
 
 
@@ -381,6 +388,7 @@
             }
         } Catch {
             Get-CurrentErrorToDisplay -CurrentError $error[0]
+            throw
         } #end Try-Catch
 
         <#
@@ -418,6 +426,7 @@
             }
         } Catch {
             Get-CurrentErrorToDisplay -CurrentError $error[0]
+            throw
         } #end Try-Catch
 
 

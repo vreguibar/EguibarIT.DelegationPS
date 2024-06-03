@@ -192,6 +192,7 @@ function Set-AclConstructor4 {
 
             } Catch {
                 Get-CurrentErrorToDisplay -CurrentError $error[0]
+                throw
             } #end Try-Catch
         }
 
@@ -206,6 +207,7 @@ function Set-AclConstructor4 {
 
         } Catch {
             Get-CurrentErrorToDisplay -CurrentError $error[0]
+            throw
         } #end Try-Catch
 
 
