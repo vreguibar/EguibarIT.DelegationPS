@@ -83,7 +83,7 @@ Function Get-ExtendedRightHashTable {
                 Write-Verbose -Message '$Variables.ExtendedRightsMap id defined. You can use it!'
             } #end If-Else
         } catch {
-            Get-CurrentErrorToDisplay -CurrentError $error[0]
+            ## Get-CurrentErrorToDisplay -CurrentError $error[0]
             throw
         } Finally {
             # Remove completed progress bar

@@ -191,7 +191,7 @@ function Set-AclConstructor4 {
                 Write-Verbose -Message 'Accessing the object from given LdapPath.'
 
             } Catch {
-                Get-CurrentErrorToDisplay -CurrentError $error[0]
+                ## Get-CurrentErrorToDisplay -CurrentError $error[0]
                 throw
             } #end Try-Catch
         }
@@ -206,7 +206,7 @@ function Set-AclConstructor4 {
             Write-Verbose -Message 'Get a copy of the current DACL on the object (LdapPath).'
 
         } Catch {
-            Get-CurrentErrorToDisplay -CurrentError $error[0]
+            ## Get-CurrentErrorToDisplay -CurrentError $error[0]
             throw
         } #end Try-Catch
 
@@ -263,7 +263,7 @@ function Set-AclConstructor4 {
 
         } Catch {
             Write-Error -Message ('Error when trying to re-apply the modified DACL to the {0}' -f $objectDN.DistinguishedName)
-            Get-CurrentErrorToDisplay -CurrentError $error[0]
+            ## Get-CurrentErrorToDisplay -CurrentError $error[0]
             throw
         } #end Try-Catch
     } #end Process
