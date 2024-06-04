@@ -2,10 +2,10 @@
 function Set-DeleteOnlyComputer {
     <#
         .Synopsis
-            The function will delegate premission for a group to Only Delete
+            The function will delegate permission for a group to Only Delete
             Computer objects in an OU
         .DESCRIPTION
-            The function will delegate premission for a group to Only Delete Computer objects from given container
+            The function will delegate permission for a group to Only Delete Computer objects from given container
         .EXAMPLE
             Set-DeleteOnlyComputer -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
         .EXAMPLE

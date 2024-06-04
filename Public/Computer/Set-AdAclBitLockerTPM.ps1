@@ -4,7 +4,7 @@ function Set-AdAclBitLockerTPM {
         .Synopsis
             The function will delegate the right to access BitLocker and TPM computer information in an OU
         .DESCRIPTION
-            The function will delegate the premission for a group to Modify BitLocker and TPM information of Computer object
+            The function will delegate the permission for a group to Modify BitLocker and TPM information of Computer object
         .EXAMPLE
             Set-AdAclBitLockerTPM -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
         .EXAMPLE

@@ -4,7 +4,7 @@ function Set-AdAclValidateWriteDnsHostName {
         .Synopsis
             The function will delegate the extended right to validate DNS Host Name in an OU
         .DESCRIPTION
-            The function will delegate the premission for a group to Modify the extended right to validate DNS Host Name of Computer object
+            The function will delegate the permission for a group to Modify the extended right to validate DNS Host Name of Computer object
         .EXAMPLE
             Set-AdAclValidateWriteDnsHostName -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
         .EXAMPLE

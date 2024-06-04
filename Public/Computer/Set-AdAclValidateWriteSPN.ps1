@@ -4,7 +4,7 @@ function Set-AdAclValidateWriteSPN {
         .Synopsis
             The function will delegate the extended right to validate Service Principal Name in an OU
         .DESCRIPTION
-            The function will delegate the premission for a group to Modify the the extended right
+            The function will delegate the permission for a group to Modify the the extended right
             to validate Service Principal Name of Computer object
         .EXAMPLE
             Set-AdAclValidateWriteSPN -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"

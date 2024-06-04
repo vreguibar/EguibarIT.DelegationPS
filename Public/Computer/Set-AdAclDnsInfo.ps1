@@ -1,10 +1,10 @@
 ﻿Function Set-AdAclDnsInfo {
     <#
         .Synopsis
-            The function will delegate the premission for a group to set DNS Info for
+            The function will delegate the permission for a group to set DNS Info for
             Computer objects in an OU
         .DESCRIPTION
-            The function will delegate the premission for a group to Modify DNS Information Set of Computer object
+            The function will delegate the permission for a group to Modify DNS Information Set of Computer object
         .EXAMPLE
             Set-AdAclDnsInfo -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
         .EXAMPLE

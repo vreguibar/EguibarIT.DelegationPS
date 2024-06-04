@@ -2,7 +2,7 @@
 function Set-AdAclComputerAccountRestriction {
     <#
         .Synopsis
-            The function will delegate the premission for a group to read/write
+            The function will delegate the permission for a group to read/write
             Account Restriction Computer objects in an OU
         .DESCRIPTION
             The function will delegate the premission for a group to read/write
