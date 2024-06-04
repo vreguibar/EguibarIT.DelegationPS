@@ -1,4 +1,4 @@
-# Read and write group membership     - Membership property set                - http://msdn.microsoft.com/en-us/library/ms684372(v=vs.85).aspx
+﻿# Read and write group membership     - Membership property set                - http://msdn.microsoft.com/en-us/library/ms684372(v=vs.85).aspx
 function Set-AdAclUserGroupMembership {
     <#
         .Synopsis

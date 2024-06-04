@@ -1,4 +1,4 @@
-# Read-Write Print Queue properties
+﻿# Read-Write Print Queue properties
 function Set-AdAclChangePrintQueue {
     <#
         .Synopsis

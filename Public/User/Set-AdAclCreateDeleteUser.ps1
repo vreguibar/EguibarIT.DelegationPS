@@ -1,4 +1,4 @@
-# Create-Delete Users
+﻿# Create-Delete Users
 function Set-AdAclCreateDeleteUser {
     <#
         .Synopsis

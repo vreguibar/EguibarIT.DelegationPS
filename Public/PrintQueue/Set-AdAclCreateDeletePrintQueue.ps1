@@ -1,4 +1,4 @@
-function Set-AdAclCreateDeletePrintQueue {
+﻿function Set-AdAclCreateDeletePrintQueue {
     <#
         .Synopsis
             The function will delegate the premission for a group to create/Delete

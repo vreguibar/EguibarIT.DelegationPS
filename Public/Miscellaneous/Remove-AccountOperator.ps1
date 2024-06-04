@@ -1,4 +1,4 @@
-# Remove Account Operators Built-In Group from object
+﻿# Remove Account Operators Built-In Group from object
 Function Remove-AccountOperator {
     <#
         .SYNOPSIS

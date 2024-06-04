@@ -1,4 +1,4 @@
-# Reset User Password
+﻿# Reset User Password
 function Set-AdAclResetUserPassword {
     <#
         .Synopsis

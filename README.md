@@ -1,4 +1,4 @@
-
+﻿
 # EguibarIT.DelegationPS - Simplifying Active Directory Delegation
 
 [![PowerShell Gallery Version](https://img.shields.io/powershellgallery/v/EguibarIT.DelegationPS.svg)](https://www.powershellgallery.com/packages/EguibarIT.DelegationPS) [![PowerShell Gallery Preview Version](https://img.shields.io/powershellgallery/vpre/EguibarIT.DelegationPS.svg?label=powershell%20gallery%20preview&colorB=yellow)](https://www.powershellgallery.com/packages/EguibarIT.DelegationPS) [![GitHub License](https://img.shields.io/github/license/vreguibar/EguibarIT.DelegationPS.svg)](https://github.com/vreguibar/EguibarIT.DelegationPS)

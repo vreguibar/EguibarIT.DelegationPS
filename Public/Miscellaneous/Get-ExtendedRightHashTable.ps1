@@ -1,4 +1,4 @@
-Function Get-ExtendedRightHashTable {
+﻿Function Get-ExtendedRightHashTable {
     <#
         .Synopsis
             Function to Read all Extended Rights GUID from Schema

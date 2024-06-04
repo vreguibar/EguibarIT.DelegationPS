@@ -1,4 +1,4 @@
-function Set-AdAclPkiAdmin {
+﻿function Set-AdAclPkiAdmin {
     <#
         .Synopsis
             The function will delegate full control premission for a group

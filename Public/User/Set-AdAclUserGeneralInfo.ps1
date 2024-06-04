@@ -1,4 +1,4 @@
-# Read and write general information  - General-Information property set       - http://msdn.microsoft.com/en-us/library/ms684366(v=vs.85).aspx
+﻿# Read and write general information  - General-Information property set       - http://msdn.microsoft.com/en-us/library/ms684366(v=vs.85).aspx
 function Set-AdAclUserGeneralInfo {
     <#
         .Synopsis

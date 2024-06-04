@@ -1,4 +1,4 @@
-Function Remove-PreWin2000FromOU {
+﻿Function Remove-PreWin2000FromOU {
     <#
         .SYNOPSIS
             Remove Pre-Windows 2000 Compatible Access built-in group from the specified OU.

@@ -1,4 +1,4 @@
-# Validated write to service principal name - http://msdn.microsoft.com/en-us/library/ms684417(v=vs.85).aspx
+﻿# Validated write to service principal name - http://msdn.microsoft.com/en-us/library/ms684417(v=vs.85).aspx
 function Set-AdAclValidateWriteSPN {
     <#
         .Synopsis

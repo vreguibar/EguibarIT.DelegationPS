@@ -1,4 +1,4 @@
-# Validated write to DNS host name - http://msdn.microsoft.com/en-us/library/ms684416(v=vs.85).aspx
+﻿# Validated write to DNS host name - http://msdn.microsoft.com/en-us/library/ms684416(v=vs.85).aspx
 function Set-AdAclValidateWriteDnsHostName {
     <#
         .Synopsis

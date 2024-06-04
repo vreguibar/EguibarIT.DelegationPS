@@ -1,4 +1,4 @@
-Function Import-MyModule {
+﻿Function Import-MyModule {
     <#
         .SYNOPSIS
             Imports a PowerShell module with enhanced error handling.

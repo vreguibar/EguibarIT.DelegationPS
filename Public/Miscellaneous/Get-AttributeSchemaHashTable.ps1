@@ -1,4 +1,4 @@
-Function Get-AttributeSchemaHashTable {
+﻿Function Get-AttributeSchemaHashTable {
     <#
         .Synopsis
             Function to Read all GUID from Schema

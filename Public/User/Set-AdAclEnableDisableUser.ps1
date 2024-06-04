@@ -1,4 +1,4 @@
-# Enable and/or Disable user account
+﻿# Enable and/or Disable user account
 function Set-AdAclEnableDisableUser {
     <#
         .Synopsis

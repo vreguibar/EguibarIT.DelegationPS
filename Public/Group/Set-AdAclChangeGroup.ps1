@@ -1,4 +1,4 @@
-function Set-AdAclChangeGroup {
+﻿function Set-AdAclChangeGroup {
     <#
         .Synopsis
             The function will delegate the premission for a group to Change

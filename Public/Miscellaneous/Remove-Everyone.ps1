@@ -1,4 +1,4 @@
-# Remove Everyone ('S-1-1-0') Built-In Group from object
+﻿# Remove Everyone ('S-1-1-0') Built-In Group from object
 Function Remove-Everyone {
     <#
         .SYNOPSIS

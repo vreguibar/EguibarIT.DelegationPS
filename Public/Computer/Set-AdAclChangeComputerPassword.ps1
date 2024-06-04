@@ -1,4 +1,4 @@
-function Set-AdAclChangeComputerPassword {
+﻿function Set-AdAclChangeComputerPassword {
     <#
         .Synopsis
             The function will delegate the premission for a group to Change Computer password in an OU

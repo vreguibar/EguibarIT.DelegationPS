@@ -1,4 +1,4 @@
-# LAPS grant right to computer to SELF update PWD attributes
+﻿# LAPS grant right to computer to SELF update PWD attributes
 function Set-AdmPwdComputerSelfPermission {
     <#
         .Synopsis

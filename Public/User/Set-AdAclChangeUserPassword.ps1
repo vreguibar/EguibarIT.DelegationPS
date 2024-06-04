@@ -1,4 +1,4 @@
-# Change User Password
+﻿# Change User Password
 function Set-AdAclChangeUserPassword {
     <#
         .Synopsis

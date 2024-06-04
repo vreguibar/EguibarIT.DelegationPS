@@ -1,4 +1,4 @@
-function Set-AdAclPromoteDomain {
+﻿function Set-AdAclPromoteDomain {
     <#
         .Synopsis
             The function will delegate the premission for a group to Promote and Demote Domain Controllers

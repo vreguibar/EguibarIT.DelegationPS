@@ -1,4 +1,4 @@
-# LAPS grant right to a group read computer PWD attributes
+﻿# LAPS grant right to a group read computer PWD attributes
 function Set-AdmPwdReadPasswordPermission {
     <#
         .Synopsis

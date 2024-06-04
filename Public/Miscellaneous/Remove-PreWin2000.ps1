@@ -1,4 +1,4 @@
-Function Remove-PreWin2000 {
+﻿Function Remove-PreWin2000 {
     <#
         .SYNOPSIS
             Remove Pre-Windows 2000 Compatible Access built-in group from the given object.

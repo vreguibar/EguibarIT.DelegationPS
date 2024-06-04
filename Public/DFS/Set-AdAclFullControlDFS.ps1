@@ -1,4 +1,4 @@
-function Set-AdAclFullControlDFS {
+﻿function Set-AdAclFullControlDFS {
     <#
         .Synopsis
             The function will delegate full control premission for a group

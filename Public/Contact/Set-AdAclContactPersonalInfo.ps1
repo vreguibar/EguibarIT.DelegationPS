@@ -1,4 +1,4 @@
-# Read and write personal information - Personal-Information property set      - http://msdn.microsoft.com/en-us/library/ms684394(v=vs.85).aspx
+﻿# Read and write personal information - Personal-Information property set      - http://msdn.microsoft.com/en-us/library/ms684394(v=vs.85).aspx
 function Set-AdAclContactPersonalInfo {
     <#
         .Synopsis

@@ -1,4 +1,4 @@
-function Set-AdAclCreateDeleteGroup {
+﻿function Set-AdAclCreateDeleteGroup {
     <#
         .Synopsis
             The function will delegate the premission for a group to create/Delete

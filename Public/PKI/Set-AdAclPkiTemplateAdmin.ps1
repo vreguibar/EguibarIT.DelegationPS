@@ -1,4 +1,4 @@
-function Set-AdAclPkiTemplateAdmin {
+﻿function Set-AdAclPkiTemplateAdmin {
     <#
         .Synopsis
             The function will delegate template management premission for a group

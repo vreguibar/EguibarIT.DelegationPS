@@ -1,4 +1,4 @@
-# Remove AUTHENTICATED USERS ('S-1-5-11') Built-In Group from object
+﻿# Remove AUTHENTICATED USERS ('S-1-5-11') Built-In Group from object
 Function Remove-AuthUser {
     <#
         .SYNOPSIS

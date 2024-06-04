@@ -1,4 +1,4 @@
-# LAPS grant right to a group reset computer PWD attributes
+﻿# LAPS grant right to a group reset computer PWD attributes
 function Set-AdmPwdResetPasswordPermission {
     <#
         .Synopsis

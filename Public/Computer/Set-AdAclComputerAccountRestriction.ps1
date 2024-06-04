@@ -1,4 +1,4 @@
-# Read and write Computer Account Restriction -  Computer-Account-Restrictions property set - http://msdn.microsoft.com/en-us/library/ms684412(v=vs.85).aspx
+﻿# Read and write Computer Account Restriction -  Computer-Account-Restrictions property set - http://msdn.microsoft.com/en-us/library/ms684412(v=vs.85).aspx
 function Set-AdAclComputerAccountRestriction {
     <#
         .Synopsis

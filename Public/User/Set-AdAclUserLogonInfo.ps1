@@ -1,4 +1,4 @@
-# Read and write User Logon info      - User-Logon property set                - http://msdn.microsoft.com/en-us/library/ms684415(v=vs.85).aspx
+﻿# Read and write User Logon info      - User-Logon property set                - http://msdn.microsoft.com/en-us/library/ms684415(v=vs.85).aspx
 function Set-AdAclUserLogonInfo {
     <#
         .Synopsis

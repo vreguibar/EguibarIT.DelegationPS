@@ -1,4 +1,4 @@
-# Read and write User Web Info        - Web-Information property set           - http://msdn.microsoft.com/en-us/library/ms684418(v=vs.85).aspx
+﻿# Read and write User Web Info        - Web-Information property set           - http://msdn.microsoft.com/en-us/library/ms684418(v=vs.85).aspx
 function Set-AdAclUserWebInfo {
     <#
         .Synopsis

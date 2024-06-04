@@ -1,4 +1,4 @@
-function Set-AdAclResetComputerPassword {
+﻿function Set-AdAclResetComputerPassword {
     <#
         .Synopsis
             The function will delegate the premission for a group to reset Computer password in an OU

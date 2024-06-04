@@ -1,4 +1,4 @@
-# Read and write public information   - Public-Information property set        - http://msdn.microsoft.com/en-us/library/ms684396(v=vs.85).aspx
+﻿# Read and write public information   - Public-Information property set        - http://msdn.microsoft.com/en-us/library/ms684396(v=vs.85).aspx
 function Set-AdAclUserPublicInfo {
     <#
         .Synopsis

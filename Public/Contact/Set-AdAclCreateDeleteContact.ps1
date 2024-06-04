@@ -1,4 +1,4 @@
-function Set-AdAclCreateDeleteContact {
+﻿function Set-AdAclCreateDeleteContact {
     <#
         .Synopsis
             The function will delegate the permission for a group to create/Delete

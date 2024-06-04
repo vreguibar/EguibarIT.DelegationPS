@@ -1,4 +1,4 @@
-# Read and write User Restrictions    - User-Account-Restrictions property set - http://msdn.microsoft.com/en-us/library/ms684412(v=vs.85).aspx
+﻿# Read and write User Restrictions    - User-Account-Restrictions property set - http://msdn.microsoft.com/en-us/library/ms684412(v=vs.85).aspx
 function Set-AdAclUserAccountRestriction {
     <#
         .Synopsis

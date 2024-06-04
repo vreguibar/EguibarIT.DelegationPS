@@ -1,4 +1,4 @@
-# Unlock user account
+﻿# Unlock user account
 function Set-AdAclUnlockUser {
     <#
         .Synopsis

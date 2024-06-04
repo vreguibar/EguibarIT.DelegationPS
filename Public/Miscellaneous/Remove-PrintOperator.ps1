@@ -1,4 +1,4 @@
-Function Remove-PrintOperator {
+﻿Function Remove-PrintOperator {
     <#
         .SYNOPSIS
             Remove Print Operators built-in group from the given object.
@@ -70,7 +70,7 @@ Function Remove-PrintOperator {
             IsInherited            : False
         #>
         $Splat = @{
-            Id                    =  $PrintOperators
+            Id                    = $PrintOperators
             LDAPPath              = $PSBoundParameters['LDAPPath']
             AdRight               = 'CreateChild', 'DeleteChild'
             AccessControlType     = 'Allow'

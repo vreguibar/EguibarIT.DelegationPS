@@ -1,4 +1,4 @@
-# Ability to only delete computer objects from "default" container
+﻿# Ability to only delete computer objects from "default" container
 function Set-DeleteOnlyComputer {
     <#
         .Synopsis

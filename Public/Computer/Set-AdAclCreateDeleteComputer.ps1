@@ -1,4 +1,4 @@
-function Set-AdAclCreateDeleteComputer {
+﻿function Set-AdAclCreateDeleteComputer {
     <#
         .Synopsis
             The function will delegate the premission for a group to create/Delete
