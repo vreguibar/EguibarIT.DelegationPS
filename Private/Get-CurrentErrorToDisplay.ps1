@@ -1,4 +1,4 @@
-function Get-CurrentErrorToDisplay {
+﻿function Get-CurrentErrorToDisplay {
     <#
         .Synopsis
             Process and displays all information from $Error variable

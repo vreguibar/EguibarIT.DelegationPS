@@ -1,4 +1,4 @@
-function Test-IsValidDN {
+﻿function Test-IsValidDN {
     <#
         .SYNOPSIS
             Validates if the input string is a valid distinguished name (DN).

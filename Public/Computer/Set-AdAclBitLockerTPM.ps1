@@ -1,4 +1,4 @@
-#Permissions on Computers to access BitLocker and TPM information
+﻿#Permissions on Computers to access BitLocker and TPM information
 function Set-AdAclBitLockerTPM {
     <#
         .Synopsis

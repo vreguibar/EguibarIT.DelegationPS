@@ -1,4 +1,4 @@
-function Test-IsValidSID {
+﻿function Test-IsValidSID {
     <#
         .SYNOPSIS
             Cmdlet will check if the input string is a valid SID.

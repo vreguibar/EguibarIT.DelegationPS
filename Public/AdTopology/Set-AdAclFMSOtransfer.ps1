@@ -1,4 +1,4 @@
-Function Set-AdAclFMSOtransfer {
+﻿Function Set-AdAclFMSOtransfer {
     <#
         .Synopsis
             Delegate the management rights of FMSO roles

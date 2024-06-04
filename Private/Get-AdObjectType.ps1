@@ -1,4 +1,4 @@
-function Get-AdObjectType {
+﻿function Get-AdObjectType {
     <#
     .SYNOPSIS
         This function retrieves the type of an Active Directory object based on the provided identity.

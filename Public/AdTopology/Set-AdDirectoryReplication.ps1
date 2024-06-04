@@ -1,4 +1,4 @@
-function Set-AdDirectoryReplication {
+﻿function Set-AdDirectoryReplication {
     <#
         .Synopsis
             The function will delegate the premission for a group to replicate the directory

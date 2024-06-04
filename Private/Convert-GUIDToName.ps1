@@ -1,4 +1,4 @@
-function Convert-GUIDToName {
+﻿function Convert-GUIDToName {
     <#
         .SYNOPSIS
             Translates a GUID to a human-readable Display Name within Active Directory.
