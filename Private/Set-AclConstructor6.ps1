@@ -95,7 +95,10 @@ function Set-AclConstructor6 {
     param (
         # PARAM1 STRING for the Delegated Identity
         # An IdentityReference object that identifies the trustee of the access rule.
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity of the Delegated Group',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -104,7 +107,10 @@ function Set-AclConstructor6 {
 
         # PARAM2 STRING for the object's LDAP path
         # The LDAP path to the object where the ACL will be changed
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Distinguished Name of the object',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -114,7 +120,10 @@ function Set-AclConstructor6 {
         $LDAPpath,
 
         # PARAM3 STRING representing AdRight
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Active Directory Right',
             Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -127,7 +136,6 @@ function Set-AclConstructor6 {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Allow or Deny access to the given object',
             Position = 3)]
-        #[ValidateSet('Allow', 'Deny')]
         [ValidateSet([AccessControlType])]
         [String]
         $AccessControlType,
@@ -142,9 +150,8 @@ function Set-AclConstructor6 {
 
         # PARAM6 STRING representing ActiveDirectory Security Inheritance
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Security inheritance of the new right (All, Children, Descendents, None, SelfAndChildren)',
+            HelpMessage = 'Security inheritance of the new right (All, Children, Descendent, None, SelfAndChildren)',
             Position = 5)]
-        #[ValidateSet('All', 'Children', 'Descendents', 'None', 'SelfAndChildren')]
         [ValidateSet([ActiveDirectorySecurityInheritance])]
         [Alias('InheritanceType', 'ActiveDirectorySecurityInheritance')]
         [String]
@@ -192,11 +199,11 @@ function Set-AclConstructor6 {
         If ($null -eq $GroupObject) {
 
             # Check if Identity is a WellKnownSID
-            # Looking in var $WellKnownSid by Value (ej. 'authenticated users')
-            If ($WellKnownSIDs.Values.Contains($PSBoundParameters['Id'])) {
+            # Looking in var $Variables.WellKnownSIDs by Value (ej. 'authenticated users')
+            If ($Variables.WellKnownSIDs.Values.Contains($PSBoundParameters['Id'])) {
 
                 # return SID of the WellKnownSid
-                $groupSID = $WellKnownSIDs.keys.where{ $WellKnownSIDs[$_].Contains($PSBoundParameters['Id']) }
+                $groupSID = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_].Contains($PSBoundParameters['Id']) }
 
                 Write-Verbose -Message 'Identity is Well-Known SID. Retrieving the Well-Known SID'
             }

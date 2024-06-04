@@ -178,11 +178,11 @@ function Set-AclConstructor5 {
         If ($null -eq $GroupObject) {
 
             # Check if Identity is a WellKnownSID
-            # Looking in var $WellKnownSid by Value (ej. 'authenticated users')
-            If ($WellKnownSIDs.Values.Contains($PSBoundParameters['Id'])) {
+            # Looking in var $Variables.WellKnownSIDs by Value (ej. 'authenticated users')
+            If ($Variables.WellKnownSIDs.Values.Contains($PSBoundParameters['Id'])) {
 
                 # return SID of the WellKnownSid
-                $groupSID = $WellKnownSIDs.keys.where{ $WellKnownSIDs[$_].Contains($PSBoundParameters['Id']) }
+                $groupSID = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_].Contains($PSBoundParameters['Id']) }
 
                 Write-Verbose -Message 'Identity is Well-Known SID. Retrieving the Well-Known SID'
             }

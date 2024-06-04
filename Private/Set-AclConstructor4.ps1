@@ -153,7 +153,7 @@ function Set-AclConstructor4 {
             #
             $GroupObject = Get-AdObjectType -Identity $PSBoundParameters['Id']
 
-            Write-Verbose -Message 'Identity is already a Group Object. Retriving the Group'
+            Write-Verbose -Message 'Identity is already a Group Object. Retrieving the Group'
         } else {
 
             # ID (the passed group) IS an AdGroup
@@ -164,11 +164,11 @@ function Set-AclConstructor4 {
         If ($null -eq $GroupObject) {
 
             # Check if Identity is a WellKnownSID
-            # Looking in var $WellKnownSid by Value (ej. 'authenticated users')
-            If ($WellKnownSIDs.Values.Contains($PSBoundParameters['Id'])) {
+            # Looking in var $Variables.WellKnownSIDs by Value (ej. 'authenticated users')
+            If ($Variables.WellKnownSIDs.Values.Contains($PSBoundParameters['Id'])) {
 
                 # return SID of the WellKnownSid
-                $groupSID = $WellKnownSIDs.keys.where{ $WellKnownSIDs[$_].Contains($PSBoundParameters['Id']) }
+                $groupSID = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_].Contains($PSBoundParameters['Id']) }
 
                 Write-Verbose -Message 'Identity is Well-Known SID. Retriving the Well-Known SID'
             }
@@ -177,7 +177,7 @@ function Set-AclConstructor4 {
             # If identity is NOT a WellKnownSID, the function will translate to existing Object SID.
             $groupSID = New-Object -TypeName System.Security.Principal.SecurityIdentifier -ArgumentList $groupObject.SID
 
-            Write-Verbose -Message 'Retriving SID of Identity'
+            Write-Verbose -Message 'Retrieving SID of Identity'
         }
 
 
