@@ -148,17 +148,11 @@ function Set-AclConstructor4 {
 
         # Collect the SID for the trustee we will be delegating to.
         # NULL will be returned if ID is a WellKnownSid
-        If (-not ($PSBoundParameters['Id'] -is [Microsoft.ActiveDirectory.Management.AdGroup])) {
 
-            #
-            $GroupObject = Get-AdObjectType -Identity $PSBoundParameters['Id']
+        #
+        $GroupObject = Get-AdObjectType -Identity $PSBoundParameters['Id']
 
-            Write-Verbose -Message 'Identity is already a Group Object. Retrieving the Group'
-        } else {
-
-            # ID (the passed group) IS an AdGroup
-            $GroupObject = $PSBoundParameters['Id']
-        }
+        Write-Verbose -Message 'Identity is already a Group Object. Retrieving the Group'
 
         # $groupObject will be NULL if ID is a WellKnownSid
         If ($null -eq $GroupObject) {
