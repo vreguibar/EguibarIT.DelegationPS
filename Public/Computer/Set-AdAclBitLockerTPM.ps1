@@ -109,7 +109,7 @@ function Set-AdAclBitLockerTPM {
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to msTPM-OwnerInformation?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msTPM-OwnerInformation?')) {
             Set-AclConstructor6 @Splat
         } #end If
 

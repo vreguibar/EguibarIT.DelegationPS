@@ -40,12 +40,7 @@
     Process {
         try {
 
-            If ( (-not $Variables.ExtendedRightsMap) -or
-                ($Variables.ExtendedRightsMap.Count -eq 0) -or
-                ($Variables.ExtendedRightsMap -eq 0) -or
-                ([string]::IsNullOrEmpty($Variables.ExtendedRightsMap)) -or
-                ($Variables.ExtendedRightsMap -eq $false)
-            ) {
+            If ( [string]::IsNullOrEmpty($Variables.ExtendedRightsMap) ) {
 
                 Write-Verbose -Message 'The Extended Rights map is null, empty, zero, or false.'
                 Write-Verbose -Message 'Getting the GUID value of each Extended attribute'
@@ -70,7 +65,7 @@
                     Write-Progress @Splat
 
                     # add current Guid to $TempMap
-                    $TmpMap.Add($Item.displayName, [system.guid]$Item.rightsGuid)
+                    $TmpMap.Add($Item.displayName, ([system.guid]$Item.rightsGuid).GUID)
                 } #end Foreach
 
                 # Include "ALL [nullGUID]"

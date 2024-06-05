@@ -48,12 +48,7 @@
     Process {
         try {
 
-            If ( (-not $Variables.GuidMap) -or
-                ($Variables.GuidMap.Count -eq 0) -or
-                ($Variables.GuidMap -eq 0) -or
-                ([string]::IsNullOrEmpty($Variables.GuidMap)) -or
-                ($Variables.GuidMap -eq $false)
-            ) {
+            If ( [string]::IsNullOrEmpty($Variables.GuidMap) ) {
 
                 Write-Verbose -Message 'The GUID map is null, empty, zero, or false.'
                 Write-Verbose -Message 'Getting the GUID value of each schema class and attribute'
@@ -78,7 +73,7 @@
                     Write-Progress @Splat
 
                     # add current Guid to $TempMap
-                    $TmpMap.Add($item.lDAPDisplayName, [System.GUID]$item.schemaIDGUID)
+                    $TmpMap.Add($item.lDAPDisplayName, ([System.GUID]$item.schemaIDGUID).GUID)
                 } #end ForEach
 
                 # Include "ALL [nullGUID]"
