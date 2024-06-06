@@ -47,9 +47,6 @@ Function Remove-Everyone {
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
-        # Get 'Everyone' group by SID
-        $Everyone = Get-ADGroup -Filter * | Where-Object { $_.SID -like 'S-1-1-0' }
-
     } #end Begin
 
     process {
@@ -64,7 +61,7 @@ Function Remove-Everyone {
             IsInherited            : False
         #>
         $Splat = @{
-            Id                    = $Everyone
+            Id                    = 'EVERYONE'
             LDAPPath              = $PSBoundParameters['LDAPPath']
             AdRight               = 'ReadProperty', 'WriteProperty', 'GenericExecute'
             AccessControlType     = 'Allow'
