@@ -42,13 +42,26 @@
         [hashtable]$TmpMap = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
         [hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
         [int32]$i = 0
+        [bool]$FillUp = $false
 
     } #end Begin
 
     Process {
+
+        # Check if $Variables.GuidMap is Null or Empty
+        If ( [string]::IsNullOrEmpty($Variables.GuidMap) ) {
+            # We have to fill it up
+            $FillUp = $true
+        }
+
+        If ($Force) {
+            # We are FORCED to fill it up
+            $FillUp = $true
+        }
+
         try {
 
-            If ( [string]::IsNullOrEmpty($Variables.GuidMap) ) {
+            If ( $FillUp ) {
 
                 Write-Verbose -Message 'The GUID map is null, empty, zero, or false.'
                 Write-Verbose -Message 'Getting the GUID value of each schema class and attribute'
