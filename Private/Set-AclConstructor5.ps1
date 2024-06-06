@@ -179,10 +179,12 @@ function Set-AclConstructor5 {
 
             # Check if Identity is a WellKnownSID
             # Looking in var $Variables.WellKnownSIDs by Value (ej. 'authenticated users')
-            If ($Variables.WellKnownSIDs.Values.Contains($PSBoundParameters['Id'])) {
+            # must be in lowercase to work
+            If ($Variables.WellKnownSIDs.Values.Contains($Id.ToLower())) {
 
                 # return SID of the WellKnownSid
-                $groupSID = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_].Contains($PSBoundParameters['Id']) }
+                #$groupSID = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_].Contains($Id.ToLower()) }
+                $Arg1 = ($Variables.WellKnownSIDs.GetEnumerator() | Where-Object { $_.value -eq $Id.ToLower() }).Name
 
                 Write-Verbose -Message 'Identity is Well-Known SID. Retrieving the Well-Known SID'
             }
@@ -226,7 +228,9 @@ function Set-AclConstructor5 {
 
         # Start creating the Access Rule Arguments
         #  Provide the trustee identity (Group who gets the permissions)
-        $Arg1 = [Security.Principal.IdentityReference] $groupSID
+        If ( -not $Arg1 ) {
+            $Arg1 = [Security.Principal.IdentityReference] $groupSID
+        }
 
         # Set what to do (AD Rights http://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectoryrights(v=vs.110).aspx)
         $Arg2 = [DirectoryServices.ActiveDirectoryRights] $PSBoundParameters['AdRight']
