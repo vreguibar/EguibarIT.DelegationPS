@@ -159,12 +159,14 @@ function Set-AclConstructor4 {
 
             # Check if Identity is a WellKnownSID
             # Looking in var $Variables.WellKnownSIDs by Value (ej. 'authenticated users')
-            If ($Variables.WellKnownSIDs.Values.Contains($PSBoundParameters['Id'])) {
+            # must be in lowercase to work
+            If ($Variables.WellKnownSIDs.Values.Contains($Id.ToLower())) {
 
                 # return SID of the WellKnownSid
-                $groupSID = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_].Contains($PSBoundParameters['Id']) }
+                #$groupSID = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_].Contains($Id.ToLower()) }
+                $Arg1 = ($Variables.WellKnownSIDs.GetEnumerator() | Where-Object { $_.value -eq $Id.ToLower() }).Name
 
-                Write-Verbose -Message 'Identity is Well-Known SID. Retriving the Well-Known SID'
+                Write-Verbose -Message 'Identity is Well-Known SID. Retrieving the Well-Known SID'
             }
         } else {
 
@@ -176,30 +178,28 @@ function Set-AclConstructor4 {
 
 
         #Get a reference to the Object we want to delegate
-        If (Test-IsValidDN -ObjectDN $PSBoundParameters['LDAPPath']) {
-            try {
+        try {
 
-                #
-                $object = Get-ADObject -Identity $PSBoundParameters['LDAPPath']
+            #
+            $object = Get-ADObject -Identity $PSBoundParameters['LDAPPath']
 
-                Write-Verbose -Message 'Accessing the object from given LdapPath.'
+            Write-Verbose -Message ('Accessing the object from given LdapPath {0}.' -f $PSBoundParameters['LDAPPath'])
 
-            } Catch {
-                ## Get-CurrentErrorToDisplay -CurrentError $error[0]
-                throw
-            } #end Try-Catch
-        }
+        } Catch {
+            Write-Error -Message ('Error while trying to access LDAP object {0}' -f $PSBoundParameters['LDAPPath'])
+            ## Get-CurrentErrorToDisplay -CurrentError $error[0]
+            throw
+        } #end Try-Catch
 
 
         #Get a copy of the current DACL on the object
         try {
-
-            #
             $acl = Get-Acl -Path ('AD:\{0}' -f $object.DistinguishedName)
 
-            Write-Verbose -Message 'Get a copy of the current DACL on the object (LdapPath).'
+            Write-Verbose -Message ('Get a copy of the current DACL on the object DN {0}.' -f $object.DistinguishedName)
 
         } Catch {
+            Write-Error -Message ('Error while trying to Get a copy of the current DACL {0}' -f $object.DistinguishedName)
             ## Get-CurrentErrorToDisplay -CurrentError $error[0]
             throw
         } #end Try-Catch
@@ -208,7 +208,9 @@ function Set-AclConstructor4 {
 
         # Start creating the Access Rule Arguments
         #  Provide the trustee identity (Group who gets the permissions)
-        $Arg1 = [Security.Principal.IdentityReference] $groupSID
+        If ( -not $Arg1 ) {
+            $Arg1 = [Security.Principal.IdentityReference] $groupSID
+        }
 
         # Set what to do (AD Rights http://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectoryrights(v=vs.110).aspx)
         $Arg2 = [DirectoryServices.ActiveDirectoryRights] $PSBoundParameters['AdRight']
