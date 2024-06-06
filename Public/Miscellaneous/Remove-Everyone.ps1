@@ -48,7 +48,7 @@ Function Remove-Everyone {
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
         # Get 'Everyone' group by SID
-        $Everyone = Get-AdGroup -Filter * | Where-Object { $_.SID -like 'S-1-5-32-554' }
+        $Everyone = Get-ADGroup -Filter * | Where-Object { $_.SID -like 'S-1-1-0' }
 
     } #end Begin
 
