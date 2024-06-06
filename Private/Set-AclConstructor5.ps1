@@ -161,7 +161,7 @@ function Set-AclConstructor5 {
         ##############################
         # Variables Definition
 
-        $groupObject, $groupSID, $acl, $Arg1, $Arg2, $Arg3, $Arg4, $Arg5, $RuleArguments = $null
+        $groupObject, $groupSID, $TmpSid, $acl, $Arg1, $Arg2, $Arg3, $Arg4, $Arg5, $RuleArguments = $null
 
     } #end Begin
 
@@ -184,7 +184,9 @@ function Set-AclConstructor5 {
 
                 # return SID of the WellKnownSid
                 #$groupSID = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_].Contains($Id.ToLower()) }
-                $Arg1 = ($Variables.WellKnownSIDs.GetEnumerator() | Where-Object { $_.value -eq $Id.ToLower() }).Name
+                $TmpSid = ($Variables.WellKnownSIDs.GetEnumerator() | Where-Object { $_.value -eq $Id.ToLower() }).Name
+
+                $groupSID = New-Object -TypeName System.Security.Principal.SecurityIdentifier -ArgumentList $TmpSid
 
                 Write-Verbose -Message 'Identity is Well-Known SID. Retrieving the Well-Known SID'
             }
@@ -228,9 +230,8 @@ function Set-AclConstructor5 {
 
         # Start creating the Access Rule Arguments
         #  Provide the trustee identity (Group who gets the permissions)
-        If ( -not $Arg1 ) {
-            $Arg1 = [Security.Principal.IdentityReference] $groupSID
-        }
+        $Arg1 = [Security.Principal.IdentityReference] $groupSID
+
 
         # Set what to do (AD Rights http://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectoryrights(v=vs.110).aspx)
         $Arg2 = [DirectoryServices.ActiveDirectoryRights] $PSBoundParameters['AdRight']
@@ -266,6 +267,7 @@ function Set-AclConstructor5 {
             if ($Force -or $PSCmdlet.ShouldProcess($object.DistinguishedName, "Adding access rule for $($PSBoundParameters['Id'])")) {
 
                 #Create an Access Control Entry for new permission we wish to add
+                [void]$acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
                 $null = $acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
 
                 Write-Verbose -Message ('Added access rule to {0}' -f $objectDN.DistinguishedName)
