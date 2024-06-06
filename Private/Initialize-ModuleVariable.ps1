@@ -76,14 +76,14 @@
 
         # Hashtable containing the mappings between SchemaExtendedRights and GUID's
         Try {
-            Get-ExtendedRightHashTable
+            Get-ExtendedRightHashTable -Force
         } catch {
             Throw
         }
 
         # Hashtable containing the mappings between ClassSchema/AttributeSchema and GUID's
         Try {
-            Get-AttributeSchemaHashTable
+            Get-AttributeSchemaHashTable -Force
         } Catch {
             Throw
         }
