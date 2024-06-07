@@ -115,6 +115,7 @@
             #Get-AttributeSchemaHashTable
 
         } catch {
+            Write-Error -Message 'Something went wrong while trying to fill $Variables.GuidMap!'
             Throw
         }
 
@@ -158,6 +159,7 @@
 
             #Get-ExtendedRightHashTable
         } Catch {
+            Write-Error -Message 'Something went wrong while trying to fill $Variables.ExtendedRightsMap!'
             Throw
         }
 
