@@ -268,7 +268,7 @@ function Set-AclConstructor5 {
 
                 #Create an Access Control Entry for new permission we wish to add
                 [void]$acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
-                $null = $acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
+                #$null = $acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
 
                 Write-Verbose -Message ('Added access rule to {0}' -f $objectDN.DistinguishedName)
             } #end If
