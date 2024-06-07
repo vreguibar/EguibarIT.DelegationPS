@@ -80,7 +80,7 @@
         #>
         $Splat = @{
             Id                    = $CurrentGroup
-            LDAPPath              = 'CN=Subnets,CN=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
+            LDAPPath              = 'CN=Subnets,CN=Sites,{0}' -f $Variables.configurationNamingContext
             AdRight               = 'CreateChild', 'DeleteChild'
             AccessControlType     = 'Allow'
             ObjectType            = $Constants.guidNull

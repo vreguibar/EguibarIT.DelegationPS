@@ -80,7 +80,7 @@
         #>
         $Splat = @{
             Id                    = $CurrentGroup
-            LDAPPath              = 'cn=subnets,cn=Sites,{0}' -f $Variables.configurationNamingContext.ToString()
+            LDAPPath              = 'cn=subnets,cn=Sites,{0}' -f $Variables.configurationNamingContext
             AdRight               = 'ReadProperty', 'WriteProperty'
             AccessControlType     = 'Allow'
             ObjectType            = $Variables.GuidMap['subnet']
