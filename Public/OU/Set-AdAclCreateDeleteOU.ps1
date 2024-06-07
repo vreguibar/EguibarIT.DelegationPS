@@ -96,7 +96,7 @@
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'CreateChild', 'DeleteChild'
             AccessControlType     = 'Allow'
-            ObjectType            = $Constants.GuidNULLL
+            ObjectType            = ($Constants.GuidNULLL).Guid
             AdSecurityInheritance = 'Descendents'
             InheritedObjectType   = $Variables.GuidMap['organizationalUnit']
         }
