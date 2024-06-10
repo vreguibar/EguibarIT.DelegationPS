@@ -97,7 +97,7 @@
         }
 
         If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Create/Delete Subnets?')) {
-            Set-AclConstructor5 @Splat
+            Set-AclConstructor6 @Splat
         } #end If
 
         <#
@@ -127,7 +127,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Create/Delete Subnets?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to Create/Delete Subnets?')) {
             Set-AclConstructor5 @Splat
         } #end If
     } #end Process
