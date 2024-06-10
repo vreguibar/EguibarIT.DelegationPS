@@ -1,9 +1,9 @@
 ﻿Function Set-AdAclCreateDeleteMSA {
     <#
         .Synopsis
-            The function will delegate the premission for a group to Create/Delete Managed Service Accounts
+            The function will delegate the permission for a group to Create/Delete Managed Service Accounts
         .DESCRIPTION
-            The function will delegate the premission for a group to Create/Delete Managed Service Accounts
+            The function will delegate the permission for a group to Create/Delete Managed Service Accounts
         .EXAMPLE
             Set-AdAclCreateDeleteMSA -Group "SL_CreateUserRight" -LDAPpath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
         .EXAMPLE
@@ -83,7 +83,7 @@
             ACE number: 1
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : CreateChild, DeleteChild
+              ActiveDirectoryRights : CreateChild, DeleteChild
                   AccessControlType : Allow
                          ObjectType : msDS-ManagedServiceAccount [ClassSchema]
                     InheritanceType : All
@@ -107,7 +107,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for msDS-ManagedServiceAccount?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for msDS-ManagedServiceAccount?')) {
             Set-AclConstructor5 @Splat
         } #end If
 
@@ -149,7 +149,7 @@
             ACE number: 3
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : ReadProperty, WriteProperty
+              ActiveDirectoryRights : ReadProperty, WriteProperty
                   AccessControlType : Allow
                          ObjectType : accountExpires [AttributeSchema]
                     InheritanceType : Descendents
@@ -174,7 +174,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for accountExpires?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for accountExpires?')) {
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -182,7 +182,7 @@
             ACE number: 4
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : CreateChild, DeleteChild
+              ActiveDirectoryRights : CreateChild, DeleteChild
                   AccessControlType : Allow
                          ObjectType : applicationVersion [ClassSchema]
                     InheritanceType : Descendents

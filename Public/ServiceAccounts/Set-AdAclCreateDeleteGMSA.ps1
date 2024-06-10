@@ -1,9 +1,9 @@
-﻿Function Set-AdAclCreateDeleteMSA {
+﻿Function Set-AdAclCreateDeleteGMSA {
     <#
             .Synopsis
-                The function will delegate the premission for a group to Create/Delete Group Managed Service Accounts
+                The function will delegate the permission for a group to Create/Delete Group Managed Service Accounts
             .DESCRIPTION
-                The function will delegate the premission for a group to Create/Delete Group Managed Service Accounts
+                The function will delegate the permission for a group to Create/Delete Group Managed Service Accounts
             .EXAMPLE
                 Set-AdAclCreateDeleteGMSA -Group "SL_CreateUserRight" -LDAPpath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
             .EXAMPLE
