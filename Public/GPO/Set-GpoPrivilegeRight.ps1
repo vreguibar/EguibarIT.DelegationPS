@@ -64,7 +64,7 @@
                 Eguibar Information Technology S.L.
                 http://www.eguibarit.com
     #>
-    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'medium')]
     [OutputType([void])]
 
     Param (
@@ -352,7 +352,7 @@
                     Section     = 'Privilege Rights'
                     Key         = $Key
                     Members     = $Members
-                    Description = $Description
+                    #Description = $Description
                 }
                 $ArrayList.Add($Splat)
             }
@@ -425,7 +425,7 @@
         $Splat = @{
             Key         = 'SeTrustedCredManAccessPrivilege'
             Members     = ''
-            Description = 'Access Credential Manager as a trusted caller'
+            #Description = 'Access Credential Manager as a trusted caller'
         }
         Add-Right @Splat
 
@@ -433,7 +433,7 @@
         $Splat = @{
             Key         = 'SeTcbPrivilege'
             Members     = ''
-            Description = 'Act as part of the operating system'
+            #Description = 'Act as part of the operating system'
         }
         Add-Right @Splat
 
@@ -441,7 +441,7 @@
         $Splat = @{
             Key         = 'SeCreateTokenPrivilege'
             Members     = ''
-            Description = 'Create a token object'
+            #Description = 'Create a token object'
         }
         Add-Right @Splat
 
@@ -449,7 +449,7 @@
         $Splat = @{
             Key         = 'SeCreatePermanentPrivilege'
             Members     = ''
-            Description = 'Create permanent shared objects'
+            #Description = 'Create permanent shared objects'
         }
         Add-Right @Splat
 
@@ -457,7 +457,7 @@
         $Splat = @{
             Key         = 'SeDebugPrivilege'
             Members     = ''
-            Description = 'Debug Programs'
+            #Description = 'Debug Programs'
         }
         Add-Right @Splat
 
@@ -465,7 +465,7 @@
         $Splat = @{
             Key         = 'SeLockMemoryPrivilege'
             Members     = ''
-            Description = 'Lock pages in memory'
+            ##Description = 'Lock pages in memory'
         }
         Add-Right @Splat
 
@@ -483,7 +483,7 @@
             $Splat = @{
                 Key         = 'SeNetworkLogonRight'
                 Members     = $NetworkLogon
-                Description = 'Access this computer from the network'
+                #Description = 'Access this computer from the network'
             }
             Add-Right @Splat
         } #end If
@@ -493,7 +493,7 @@
             $Splat = @{
                 Key         = 'SeDenyNetworkLogonRight'
                 Members     = $DenyNetworkLogon
-                Description = 'Deny access to this computer from the network'
+                #Description = 'Deny access to this computer from the network'
             }
             Add-Right @Splat
         } #end If
@@ -503,7 +503,7 @@
             $Splat = @{
                 Key         = 'SeInteractiveLogonRight'
                 Members     = $InteractiveLogon
-                Description = 'Allow log on locally'
+                #Description = 'Allow log on locally'
             }
             Add-Right @Splat
         } #end If
@@ -513,7 +513,7 @@
             $Splat = @{
                 Key         = 'SeDenyInteractiveLogonRight'
                 Members     = $DenyInteractiveLogon
-                Description = 'Deny log on locally'
+                #Description = 'Deny log on locally'
             }
             Add-Right @Splat
         } #end If
@@ -523,7 +523,7 @@
             $Splat = @{
                 Key         = 'SeRemoteInteractiveLogonRight'
                 Members     = $RemoteInteractiveLogon
-                Description = 'Allow log on through Remote Desktop Services'
+                #Description = 'Allow log on through Remote Desktop Services'
             }
             Add-Right @Splat
         } #end If
@@ -533,7 +533,7 @@
             $Splat = @{
                 Key         = 'SeDenyRemoteInteractiveLogonRight'
                 Members     = $DenyRemoteInteractiveLogon
-                Description = 'Deny log on through Remote Desktop Services'
+                #Description = 'Deny log on through Remote Desktop Services'
             }
             Add-Right @Splat
         } #end If
@@ -543,7 +543,7 @@
             $Splat = @{
                 Key         = 'SeBatchLogonRight'
                 Members     = $BatchLogon
-                Description = 'Log on as a batch job'
+                #Description = 'Log on as a batch job'
             }
             Add-Right @Splat
         } #end If
@@ -553,7 +553,7 @@
             $Splat = @{
                 Key         = 'SeDenyBatchLogonRight'
                 Members     = $DenyBatchLogon
-                Description = 'Deny log on as a batch job'
+                #Description = 'Deny log on as a batch job'
             }
             Add-Right @Splat
         } #end If
@@ -563,7 +563,7 @@
             $Splat = @{
                 Key         = 'SeServiceLogonRight'
                 Members     = $ServiceLogon
-                Description = 'Log on as a service'
+                #Description = 'Log on as a service'
             }
             Add-Right @Splat
         } #end If
@@ -573,7 +573,7 @@
             $Splat = @{
                 Key         = 'SeDenyServiceLogonRight'
                 Members     = $DenyServiceLogon
-                Description = 'Deny log on as a service'
+                #Description = 'Deny log on as a service'
             }
             Add-Right @Splat
         } #end If
@@ -590,7 +590,7 @@
             $Splat = @{
                 Key         = 'SeMachineAccountPrivilege'
                 Members     = $MachineAccount
-                Description = 'Add workstations to domain'
+                #Description = 'Add workstations to domain'
             }
             Add-Right @Splat
         } #end If
@@ -600,7 +600,7 @@
             $Splat = @{
                 Key         = 'SeIncreaseQuotaPrivilege'
                 Members     = $IncreaseQuota
-                Description = 'Adjust memory quotas for a process'
+                #Description = 'Adjust memory quotas for a process'
             }
             Add-Right @Splat
         } #end If
@@ -610,7 +610,7 @@
             $Splat = @{
                 Key         = 'SeBackupPrivilege'
                 Members     = $Backup
-                Description = 'Back up files and directories'
+                #Description = 'Back up files and directories'
             }
             Add-Right @Splat
         } #end If
@@ -620,7 +620,7 @@
             $Splat = @{
                 Key         = 'SeChangeNotifyPrivilege'
                 Members     = $ChangeNotify
-                Description = 'Bypass traverse checking'
+                #Description = 'Bypass traverse checking'
             }
             Add-Right @Splat
         } #end If
@@ -630,7 +630,7 @@
             $Splat = @{
                 Key         = 'SeSystemtimePrivilege'
                 Members     = $Systemtime
-                Description = 'Change the system time'
+                #Description = 'Change the system time'
             }
             Add-Right @Splat
         } #end If
@@ -640,7 +640,7 @@
             $Splat = @{
                 Key         = 'SeTimeZonePrivilege'
                 Members     = $SeTimeZonePrivilege
-                Description = 'Change the time zone'
+                #Description = 'Change the time zone'
             }
             Add-Right @Splat
         } #end If
@@ -650,7 +650,7 @@
             $Splat = @{
                 Key         = 'SeCreatePagefilePrivilege'
                 Members     = $CreatePagefile
-                Description = 'Create a pagefile'
+                #Description = 'Create a pagefile'
             }
             Add-Right @Splat
         } #end If
@@ -660,7 +660,7 @@
             $Splat = @{
                 Key         = 'SeCreateGlobalPrivilege'
                 Members     = $CreateGlobal
-                Description = 'Create global objects'
+                #Description = 'Create global objects'
             }
             Add-Right @Splat
         } #end If
@@ -670,7 +670,7 @@
             $Splat = @{
                 Key         = 'SeCreateSymbolicLinkPrivilege'
                 Members     = $CreateSymbolicLink
-                Description = 'Create symbolic links'
+                #Description = 'Create symbolic links'
             }
             Add-Right @Splat
         } #end If
@@ -680,7 +680,7 @@
             $Splat = @{
                 Key         = 'SeEnableDelegationPrivilege'
                 Members     = $EnableDelegation
-                Description = 'Enable computer and user accounts to be trusted for delegation'
+                #Description = 'Enable computer and user accounts to be trusted for delegation'
             }
             Add-Right @Splat
         } #end If
@@ -690,7 +690,7 @@
             $Splat = @{
                 Key         = 'SeRemoteShutdownPrivilege'
                 Members     = $RemoteShutdown
-                Description = 'Force shutdown from a remote system'
+                #Description = 'Force shutdown from a remote system'
             }
             Add-Right @Splat
         } #end If
@@ -700,7 +700,7 @@
             $Splat = @{
                 Key         = 'SeAuditPrivilege'
                 Members     = $Audit
-                Description = 'Generate security audits'
+                #Description = 'Generate security audits'
             }
             Add-Right @Splat
         } #end If
@@ -710,7 +710,7 @@
             $Splat = @{
                 Key         = 'SeImpersonatePrivilege'
                 Members     = $Impersonate
-                Description = 'Impersonate a client after authentication'
+                #Description = 'Impersonate a client after authentication'
             }
             Add-Right @Splat
         } #end If
@@ -720,7 +720,7 @@
             $Splat = @{
                 Key         = 'SeIncreaseWorkingSetPrivilege'
                 Members     = $IncreaseWorkingSet
-                Description = 'Increase a process working set'
+                #Description = 'Increase a process working set'
             }
             Add-Right @Splat
         } #end If
@@ -730,7 +730,7 @@
             $Splat = @{
                 Key         = 'SeIncreaseBasePriorityPrivilege'
                 Members     = $IncreaseBasePriority
-                Description = 'Increase scheduling priority'
+                #Description = 'Increase scheduling priority'
             }
             Add-Right @Splat
         } #end If
@@ -740,7 +740,7 @@
             $Splat = @{
                 Key         = 'SeLoadDriverPrivilege'
                 Members     = $LoadDriver
-                Description = 'Load and unload device drivers'
+                #Description = 'Load and unload device drivers'
             }
             Add-Right @Splat
         } #end If
@@ -750,7 +750,7 @@
             $Splat = @{
                 Key         = 'SeSecurityPrivilege'
                 Members     = $AuditSecurity
-                Description = 'Manage auditing and security log'
+                #Description = 'Manage auditing and security log'
             }
             Add-Right @Splat
         } #end If
@@ -760,7 +760,7 @@
             $Splat = @{
                 Key         = 'SeRelabelPrivilege'
                 Members     = $Relabel
-                Description = 'Modify an object label'
+                #Description = 'Modify an object label'
             }
             Add-Right @Splat
         } #end If
@@ -770,7 +770,7 @@
             $Splat = @{
                 Key         = 'SeSystemEnvironmentPrivilege'
                 Members     = $SystemEnvironment
-                Description = 'Modify firmware environment values'
+                #Description = 'Modify firmware environment values'
             }
             Add-Right @Splat
         } #end If
@@ -780,7 +780,7 @@
             $Splat = @{
                 Key         = 'SeDelegateSessionUserImpersonatePrivilege'
                 Members     = $DelegateSessionUserImpersonate
-                Description = 'Obtain an impersonation token for another user in the same session'
+                #Description = 'Obtain an impersonation token for another user in the same session'
             }
             Add-Right @Splat
         } #end If
@@ -790,7 +790,7 @@
             $Splat = @{
                 Key         = 'SeManageVolumePrivilege'
                 Members     = $ManageVolume
-                Description = 'Perform volume maintenance tasks'
+                #Description = 'Perform volume maintenance tasks'
             }
             Add-Right @Splat
         } #end If
@@ -800,7 +800,7 @@
             $Splat = @{
                 Key         = 'SeProfileSingleProcessPrivilege'
                 Members     = $ProfileSingleProcess
-                Description = 'Profile single process'
+                #Description = 'Profile single process'
             }
             Add-Right @Splat
         } #end If
@@ -810,7 +810,7 @@
             $Splat = @{
                 Key         = 'SeSystemProfilePrivilege'
                 Members     = $SystemProfile
-                Description = 'Profile system performance'
+                #Description = 'Profile system performance'
             }
             Add-Right @Splat
         } #end If
@@ -820,7 +820,7 @@
             $Splat = @{
                 Key         = 'SeUndockPrivilege'
                 Members     = $Undock
-                Description = 'Remove computer from docking station'
+                #Description = 'Remove computer from docking station'
             }
             Add-Right @Splat
         } #end If
@@ -830,7 +830,7 @@
             $Splat = @{
                 Key         = 'SeAssignPrimaryTokenPrivilege'
                 Members     = $AssignPrimaryToken
-                Description = 'Replace a process level token'
+                #Description = 'Replace a process level token'
             }
             Add-Right @Splat
         } #end If
@@ -840,7 +840,7 @@
             $Splat = @{
                 Key         = 'SeRestorePrivilege'
                 Members     = $Restore
-                Description = 'Restore files and directories'
+                #Description = 'Restore files and directories'
             }
             Add-Right @Splat
         } #end If
@@ -850,7 +850,7 @@
             $Splat = @{
                 Key         = 'SeShutdownPrivilege'
                 Members     = $Shutdown
-                Description = 'Shut down the system'
+                #Description = 'Shut down the system'
             }
             Add-Right @Splat
         } #end If
@@ -860,7 +860,7 @@
             $Splat = @{
                 Key         = 'SeSyncAgentPrivilege'
                 Members     = $SyncAgent
-                Description = 'Synchronize directory service data'
+                #Description = 'Synchronize directory service data'
             }
             Add-Right @Splat
         } #end If
@@ -870,7 +870,7 @@
             $Splat = @{
                 Key         = 'SeTakeOwnershipPrivilege'
                 Members     = $TakeOwnership
-                Description = 'Take ownership of files or other objects'
+                #Description = 'Take ownership of files or other objects'
             }
             Add-Right @Splat
         } #end If

@@ -116,14 +116,14 @@
             Set-IniContent -InputObject $IniData -Sections $Section -Key $Key -value ($NewMembers -join ',')
 
         } else {
-            Write-Verbose -Message ('Key "{0}" not existing. Proceeeding to create it.' -f $Key)
+            Write-Verbose -Message ('Key "{0}" not existing. Proceeding to create it.' -f $Key)
 
             # Iterate through all members from parameter
             foreach ($item in $members) {
 
                 # WellKnownSid function will return null if SID is not well known.
                 if ($null -eq $identity) {
-                    # Retrive current SID
+                    # Retrieve current SID
                     $principal = New-Object System.Security.Principal.NTAccount($Item)
                     $identity = $principal.Translate([System.Security.Principal.SecurityIdentifier]).Value
                 } #end If
