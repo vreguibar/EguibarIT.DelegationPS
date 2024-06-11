@@ -110,6 +110,8 @@
 
         # Update or add the name/value pairs to the section.
         Function Update-IniEntry {
+            [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'low')]
+
             param (
                 [Parameter(Mandatory = $true)]
                 [System.Collections.Hashtable]
@@ -144,8 +146,8 @@
                     if ($Force -or $PSCmdlet.ShouldProcess("Section: $section", "Update key '$Key' with value '$Value'")) {
 
                         Write-Verbose -Message ('Processing {0} section.' -f $section)
-
                         Update-IniEntry $InputObject $section
+
                     } #end If
                 } #end ForEach
             } else {
@@ -154,9 +156,10 @@
                     $section = $item.key
 
                     if ($Force -or $PSCmdlet.ShouldProcess("Section: $section", "Update key '$Key' with value '$Value'")) {
-                        Write-Verbose -Message ('Processing {0} section.' -f $section)
 
+                        Write-Verbose -Message ('Processing {0} section.' -f $section)
                         Update-IniEntry $InputObject $section
+
                     } #end If
                 } #end ForEach
             } #end If-Else

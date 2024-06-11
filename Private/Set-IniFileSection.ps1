@@ -6,21 +6,27 @@
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $false,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Hashtable containing the values from IniHashtable.inf file',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [System.Collections.Hashtable]
         $IniData,
 
-        [Parameter(Mandatory = $true, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'String representing the section to configure/Change on the file',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $Section,
 
-        [Parameter(Mandatory = $true, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'String representing the KEY to configure/Change on the file',
             Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -28,7 +34,9 @@
         $Key,
 
         [Parameter(Mandatory = $false,
-            ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'ArrayList of members to be configured as a value for the KEY.',
             Position = 3)]
         [System.String[]]
@@ -44,13 +52,14 @@
         ##############################
         # Variables Definition
 
-        $NewMembers = New-Object System.Collections.ArrayList
-        $UserSIDs = New-Object System.Collections.ArrayList
+        $NewMembers = [System.Collections.ArrayList]::New()
+        $UserSIDs = [System.Collections.ArrayList]::New()
 
     } #end Begin
 
     Process {
         If (-not $IniData.Contains($Section)) {
+            Write-Verbose -Message ('Section "{0}" does not exist. Creating it!.' -f $Section)
             $IniData.add($Section, [ordered]@{})
         }
 
@@ -74,7 +83,9 @@
                         $ObjMember = New-Object System.Security.Principal.SecurityIdentifier($ExistingMember.TrimStart('*'))
                         $CurrentMember = $ObjMember.Translate([System.Security.Principal.NTAccount]).ToString()
                     } catch {
+                        Write-Error -Message ('Error when trying to translate to SID. {0}' -f $_)
                         $CurrentMember = $null;
+                        throw
                     }
                 }
 
@@ -96,9 +107,14 @@
             foreach ($item in $members) {
 
                 Try {
-                    # Retrieve current SID
-                    $principal = New-Object System.Security.Principal.NTAccount($Item)
-                    $identity = $principal.Translate([System.Security.Principal.SecurityIdentifier]).Value
+                    # Check if is a WellKnownSid
+                    if ($Variables.WellKnownSIDs[$item.TrimStart('*')]) {
+                        $CurrentMember = New-Object System.Security.Principal.SecurityIdentifier($ExistingMember.TrimStart('*'))
+                    } else {
+                        # Retrieve current SID
+                        $principal = New-Object System.Security.Principal.NTAccount($Item)
+                        $identity = $principal.Translate([System.Security.Principal.SecurityIdentifier]).Value
+                    } #end If-Else
                 } Catch {
                     throw
                 }
