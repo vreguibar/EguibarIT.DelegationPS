@@ -30,7 +30,8 @@
         [System.String]
         $Key,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
             HelpMessage = 'ArrayList of members to be configured as a value for the KEY.',
             Position = 3)]
         [System.String[]]
