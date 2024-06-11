@@ -98,8 +98,8 @@
                 $CurrentMember = $null;
             } #end Foreach
 
-            # Add new members from $Members parameter
-            # Iterate through all members
+            # Add new members from $Members parameter.
+            # Iterate through all members.
             foreach ($item in $members) {
 
                 # Check if current item is string. If item is other, then try to get the object and its SID
