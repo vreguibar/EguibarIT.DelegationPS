@@ -111,9 +111,14 @@
                     if ($Variables.WellKnownSIDs[$item.TrimStart('*')]) {
                         $CurrentMember = New-Object System.Security.Principal.SecurityIdentifier($ExistingMember.TrimStart('*'))
                     } else {
-                        # Retrieve current SID
-                        $principal = New-Object System.Security.Principal.NTAccount($Item)
-                        $identity = $principal.Translate([System.Security.Principal.SecurityIdentifier]).Value
+                        # Check for empty members
+                        if ( '' -eq $item ) {
+                            $identity = ''
+                        } else {
+                            # Retrieve current SID
+                            $principal = New-Object System.Security.Principal.NTAccount($Item)
+                            $identity = $principal.Translate([System.Security.Principal.SecurityIdentifier]).Value
+                        }
                     } #end If-Else
                 } Catch {
                     throw
@@ -121,7 +126,6 @@
 
                 If ( -Not (($null -eq $NewMembers) -and
                            ($NewMembers -ne 0) -and
-                           ($NewMembers -ne '') -and
                            ($NewMembers -ne $false))) {
                     # Check if new sid is already defined on value. Add it if NOT.
                     if (-Not $NewMembers.Contains('*{0}' -f $identity.ToString())) {
@@ -146,14 +150,17 @@
 
                 # WellKnownSid function will return null if SID is not well known.
                 if ($null -eq $identity) {
-                    # Retrieve current SID
-                    $principal = New-Object System.Security.Principal.NTAccount($Item)
-                    $identity = $principal.Translate([System.Security.Principal.SecurityIdentifier]).Value
+                    if ( '' -eq $item) {
+                        $identity = ''
+                    } else {
+                        # Retrieve current SID
+                        $principal = New-Object System.Security.Principal.NTAccount($Item)
+                        $identity = $principal.Translate([System.Security.Principal.SecurityIdentifier]).Value
+                    } #end If
                 } #end If
 
                 If ( -Not (($null -eq $UserSIDs) -and
                            ($UserSIDs -ne 0) -and
-                           ($UserSIDs -ne '') -and
                            ($UserSIDs -ne $false))) {
                     # Check the current SID is not already on list
                     if (-Not $UserSIDs.Contains('*{0}' -f $identity.ToString())) {
@@ -161,7 +168,12 @@
                         $UserSIDs.Add('*{0}' -f $identity.ToString())
                     } #end If
                 } else {
-                    $UserSIDs.Add('*{0}' -f $identity.ToString())
+                    if ('' -eq $identity) {
+                        $UserSIDs.Add('')
+                    } else {
+                        $UserSIDs.Add('*{0}' -f $identity.ToString())
+                    }
+
                 } #end If
             } #end Foreach
 

@@ -449,7 +449,7 @@
                 [string]
                 $Key,
 
-                [System.Collections.ArrayList]
+                [string[]]
                 $Members
             )
 
@@ -492,7 +492,7 @@
         If (Test-Path -Path $GptTmplFile) {
             try {
                 $GptTmpl = Get-IniContent -FilePath $GptTmplFile
-                Write-Verbose -Message (' ...GPT template file retrieved succesfully: {0}' -f $PathToGptTmpl)
+                Write-Verbose -Message (' ...GPT template file retrieved successfully: {0}' -f $PathToGptTmpl)
             } Catch {
                 Throw
             } #end TRY
