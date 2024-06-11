@@ -342,20 +342,21 @@
         function Add-Right {
             param (
                 [string]$Key,
-                [string[]]$Members,
-                [string]$Description
+                [string[]]$Members
             )
 
-            if ($PSCmdlet.ShouldProcess($Key, "Assign $Description")) {
-                $Splat = @{
-                    IniData = $GptTmpl
-                    Section = 'Privilege Rights'
-                    Key     = $Key
-                    Members = $Members
-                    #Description = $Description
-                }
-                $ArrayList.Add($Splat)
+            [Hashtable]$TmpHash = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
+
+            #if ($PSCmdlet.ShouldProcess($Key, "Assign $Description")) {
+            $TmpHash = @{
+                IniData = $GptTmpl
+                Section = 'Privilege Rights'
+                Key     = $Key
+                Members = $Members
+                #Description = $Description
             }
+            [void]$ArrayList.Add($TmpHash)
+            #}
         }
 
 
