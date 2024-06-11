@@ -84,7 +84,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to be GRANTED the right "Access this computer from the network".',
             Position = 1)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $NetworkLogon,
 
         [Parameter(Mandatory = $false,
@@ -93,7 +93,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Deny access this computer from the network".',
             Position = 2)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $DenyNetworkLogon,
 
         [Parameter(Mandatory = $false,
@@ -102,7 +102,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to be GRANTED the right "Allow Log On Locally"',
             Position = 3)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $InteractiveLogon,
 
         [Parameter(Mandatory = $false,
@@ -111,7 +111,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to be DENIED the right "Allow Log On Locally"',
             Position = 4)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $DenyInteractiveLogon,
 
         [Parameter(Mandatory = $false,
@@ -120,7 +120,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to be GRANTED the right "Allow Log On through Remote Desktop Services".',
             Position = 5)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $RemoteInteractiveLogon,
 
         [Parameter(Mandatory = $false,
@@ -129,7 +129,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to be DENIED the right "Allow Log On through Remote Desktop Services".',
             Position = 6)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $DenyRemoteInteractiveLogon,
 
         [Parameter(Mandatory = $false,
@@ -138,7 +138,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to be GRANTED the right "Log On as a Batch Job".',
             Position = 7)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $BatchLogon,
 
         [Parameter(Mandatory = $false,
@@ -147,7 +147,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Deny Log On as a Batch Job".',
             Position = 8)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $DenyBatchLogon,
 
         [Parameter(Mandatory = $false,
@@ -156,7 +156,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to be GRANTED the right "Log On as a Service".',
             Position = 9)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $ServiceLogon,
 
         [Parameter(Mandatory = $false,
@@ -165,7 +165,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Deny Log On as a Service".',
             Position = 10)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $DenyServiceLogon,
 
         [Parameter(Mandatory = $false,
@@ -174,7 +174,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Add workstations to Domain (Domain Join)".',
             Position = 11)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $MachineAccount,
 
         [Parameter(Mandatory = $false,
@@ -183,7 +183,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Adjust memory quotas for a process".',
             Position = 12)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $IncreaseQuota,
 
         [Parameter(Mandatory = $false,
@@ -192,7 +192,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Back up files and directories".',
             Position = 13)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $Backup,
 
         [Parameter(Mandatory = $false,
@@ -201,7 +201,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Bypass traverse checking".',
             Position = 14)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $ChangeNotify,
 
         [Parameter(Mandatory = $false,
@@ -210,7 +210,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Change the system time".',
             Position = 15)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $SystemTime,
 
         [Parameter(Mandatory = $false,
@@ -219,7 +219,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Change the time zone".',
             Position = 16)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $TimeZone,
 
         [Parameter(Mandatory = $false,
@@ -228,7 +228,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Create a pagefile".',
             Position = 17)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $CreatePagefile,
 
         [Parameter(Mandatory = $false,
@@ -237,7 +237,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Create global objects".',
             Position = 18)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $CreateGlobal,
 
         [Parameter(Mandatory = $false,
@@ -246,7 +246,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Create symbolic links".',
             Position = 19)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $CreateSymbolicLink,
 
         [Parameter(Mandatory = $false,
@@ -255,7 +255,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Enable computer and user accounts to be trusted for delegation".',
             Position = 20)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $EnableDelegation,
 
         [Parameter(Mandatory = $false,
@@ -264,7 +264,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Force shutdown from a remote system".',
             Position = 21)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $RemoteShutdown,
 
         [Parameter(Mandatory = $false,
@@ -273,7 +273,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Generate security audits".',
             Position = 22)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $Audit,
 
         [Parameter(Mandatory = $false,
@@ -282,7 +282,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Impersonate a client after authentication".',
             Position = 23)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $Impersonate,
 
         [Parameter(Mandatory = $false,
@@ -291,7 +291,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Increase a process working set".',
             Position = 24)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $IncreaseWorkingSet,
 
         [Parameter(Mandatory = $false,
@@ -300,7 +300,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Increase scheduling priority".',
             Position = 25)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $IncreaseBasePriority,
 
         [Parameter(Mandatory = $false,
@@ -309,7 +309,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Load and unload device drivers".',
             Position = 26)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $LoadDriver,
 
         [Parameter(Mandatory = $false,
@@ -318,7 +318,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Manage auditing and security log".',
             Position = 27)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $AuditSecurity,
 
         [Parameter(Mandatory = $false,
@@ -327,7 +327,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Modify an object label".',
             Position = 28)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $Relabel,
 
         [Parameter(Mandatory = $false,
@@ -336,7 +336,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Modify firmware environment values".',
             Position = 29)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $SystemEnvironment,
 
         [Parameter(Mandatory = $false,
@@ -345,7 +345,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Obtain an impersonation token for another user in the same session".',
             Position = 30)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $DelegateSessionUserImpersonate,
 
         [Parameter(Mandatory = $false,
@@ -354,7 +354,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Perform volume maintenance tasks".',
             Position = 31)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $ManageVolume,
 
         [Parameter(Mandatory = $false,
@@ -363,7 +363,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Profile single process".',
             Position = 32)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $ProfileSingleProcess,
 
         [Parameter(Mandatory = $false,
@@ -372,7 +372,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Profile system performance".',
             Position = 33)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $SystemProfile,
 
         [Parameter(Mandatory = $false,
@@ -381,7 +381,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Remove computer from docking station".',
             Position = 34)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $Undock,
 
         [Parameter(Mandatory = $false,
@@ -390,7 +390,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Replace a process level token".',
             Position = 35)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $AssignPrimaryToken,
 
         [Parameter(Mandatory = $false,
@@ -399,7 +399,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Restore files and directories".',
             Position = 36)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $Restore,
 
         [Parameter(Mandatory = $false,
@@ -408,7 +408,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Shut down the system".',
             Position = 37)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $Shutdown,
 
         [Parameter(Mandatory = $false,
@@ -417,7 +417,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Synchronize directory service data".',
             Position = 38)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $SyncAgent,
 
         [Parameter(Mandatory = $false,
@@ -426,7 +426,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Take ownership of files or other objects".',
             Position = 39)]
-        [System.Collections.ArrayList]
+        [System.Collections.Generic.List[object]]
         $TakeOwnership
 
     )
@@ -440,7 +440,7 @@
         ##############################
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
-        $ArrayList = [System.Collections.ArrayList]::New()
+        $ArrayList = [System.Collections.Generic.List[object]]::New()
 
 
         # Helper function to add rights
@@ -449,7 +449,7 @@
                 [string]
                 $Key,
 
-                [string[]]
+                [System.Collections.Generic.List[object]]
                 $Members
             )
 

@@ -39,7 +39,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'ArrayList of members to be configured as a value for the KEY.',
             Position = 3)]
-        [System.String[]]
+        [System.Collections.Generic.List[object]]
         $Members
     )
 
@@ -52,8 +52,8 @@
         ##############################
         # Variables Definition
 
-        $NewMembers = [System.Collections.ArrayList]::New()
-        $UserSIDs = [System.Collections.ArrayList]::New()
+        $NewMembers = [System.Collections.Generic.List[object]]::New()
+        $UserSIDs = [System.Collections.Generic.List[object]]::New()
 
     } #end Begin
 
