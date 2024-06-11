@@ -155,7 +155,7 @@
             Set-IniContent -InputObject $IniData -Sections $Section -Key $Key -Value ($UserSIDs -join ',')
         } #end If-Else
 
-    }
+    } #end Process
 
     End {
         Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating Privileged Rights."
