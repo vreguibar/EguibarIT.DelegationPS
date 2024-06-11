@@ -348,10 +348,10 @@
 
             if ($PSCmdlet.ShouldProcess($Key, "Assign $Description")) {
                 $Splat = @{
-                    IniData     = $GptTmpl
-                    Section     = 'Privilege Rights'
-                    Key         = $Key
-                    Members     = $Members
+                    IniData = $GptTmpl
+                    Section = 'Privilege Rights'
+                    Key     = $Key
+                    Members = $Members
                     #Description = $Description
                 }
                 $ArrayList.Add($Splat)
@@ -423,48 +423,48 @@
 
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/access-credential-manager-as-a-trusted-caller
         $Splat = @{
-            Key         = 'SeTrustedCredManAccessPrivilege'
-            Members     = ''
+            Key     = 'SeTrustedCredManAccessPrivilege'
+            Members = ''
             #Description = 'Access Credential Manager as a trusted caller'
         }
         Add-Right @Splat
 
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/act-as-part-of-the-operating-system
         $Splat = @{
-            Key         = 'SeTcbPrivilege'
-            Members     = ''
+            Key     = 'SeTcbPrivilege'
+            Members = ''
             #Description = 'Act as part of the operating system'
         }
         Add-Right @Splat
 
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/create-a-token-object
         $Splat = @{
-            Key         = 'SeCreateTokenPrivilege'
-            Members     = ''
+            Key     = 'SeCreateTokenPrivilege'
+            Members = ''
             #Description = 'Create a token object'
         }
         Add-Right @Splat
 
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/create-permanent-shared-objects
         $Splat = @{
-            Key         = 'SeCreatePermanentPrivilege'
-            Members     = ''
+            Key     = 'SeCreatePermanentPrivilege'
+            Members = ''
             #Description = 'Create permanent shared objects'
         }
         Add-Right @Splat
 
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/debug-programs
         $Splat = @{
-            Key         = 'SeDebugPrivilege'
-            Members     = ''
+            Key     = 'SeDebugPrivilege'
+            Members = ''
             #Description = 'Debug Programs'
         }
         Add-Right @Splat
 
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/lock-pages-in-memory
         $Splat = @{
-            Key         = 'SeLockMemoryPrivilege'
-            Members     = ''
+            Key     = 'SeLockMemoryPrivilege'
+            Members = ''
             ##Description = 'Lock pages in memory'
         }
         Add-Right @Splat
@@ -481,8 +481,8 @@
         # NetworkLogon
         if ($PSBoundParameters.ContainsKey('NetworkLogon')) {
             $Splat = @{
-                Key         = 'SeNetworkLogonRight'
-                Members     = $NetworkLogon
+                Key     = 'SeNetworkLogonRight'
+                Members = $NetworkLogon
                 #Description = 'Access this computer from the network'
             }
             Add-Right @Splat
@@ -491,8 +491,8 @@
         # DENY NetworkLogon
         If ($PSBoundParameters.ContainsKey('DenyNetworkLogon')) {
             $Splat = @{
-                Key         = 'SeDenyNetworkLogonRight'
-                Members     = $DenyNetworkLogon
+                Key     = 'SeDenyNetworkLogonRight'
+                Members = $DenyNetworkLogon
                 #Description = 'Deny access to this computer from the network'
             }
             Add-Right @Splat
@@ -501,8 +501,8 @@
         # InteractiveLogon
         If ($PSBoundParameters.ContainsKey('InteractiveLogon')) {
             $Splat = @{
-                Key         = 'SeInteractiveLogonRight'
-                Members     = $InteractiveLogon
+                Key     = 'SeInteractiveLogonRight'
+                Members = $InteractiveLogon
                 #Description = 'Allow log on locally'
             }
             Add-Right @Splat
@@ -511,8 +511,8 @@
         # DENY InteractiveLogon
         If ($PSBoundParameters.ContainsKey('DenyInteractiveLogon')) {
             $Splat = @{
-                Key         = 'SeDenyInteractiveLogonRight'
-                Members     = $DenyInteractiveLogon
+                Key     = 'SeDenyInteractiveLogonRight'
+                Members = $DenyInteractiveLogon
                 #Description = 'Deny log on locally'
             }
             Add-Right @Splat
@@ -521,8 +521,8 @@
         # RemoteInteractiveLogon (RDP)
         If ($PSBoundParameters.ContainsKey('RemoteInteractiveLogon')) {
             $Splat = @{
-                Key         = 'SeRemoteInteractiveLogonRight'
-                Members     = $RemoteInteractiveLogon
+                Key     = 'SeRemoteInteractiveLogonRight'
+                Members = $RemoteInteractiveLogon
                 #Description = 'Allow log on through Remote Desktop Services'
             }
             Add-Right @Splat
@@ -531,8 +531,8 @@
         # DENY RemoteInteractiveLogon (RDP)
         If ($PSBoundParameters.ContainsKey('DenyRemoteInteractiveLogon')) {
             $Splat = @{
-                Key         = 'SeDenyRemoteInteractiveLogonRight'
-                Members     = $DenyRemoteInteractiveLogon
+                Key     = 'SeDenyRemoteInteractiveLogonRight'
+                Members = $DenyRemoteInteractiveLogon
                 #Description = 'Deny log on through Remote Desktop Services'
             }
             Add-Right @Splat
@@ -541,8 +541,8 @@
         # BatchLogon
         If ($PSBoundParameters.ContainsKey('BatchLogon')) {
             $Splat = @{
-                Key         = 'SeBatchLogonRight'
-                Members     = $BatchLogon
+                Key     = 'SeBatchLogonRight'
+                Members = $BatchLogon
                 #Description = 'Log on as a batch job'
             }
             Add-Right @Splat
@@ -551,8 +551,8 @@
         # DENY BatchLogon
         If ($PSBoundParameters.ContainsKey('DenyBatchLogon')) {
             $Splat = @{
-                Key         = 'SeDenyBatchLogonRight'
-                Members     = $DenyBatchLogon
+                Key     = 'SeDenyBatchLogonRight'
+                Members = $DenyBatchLogon
                 #Description = 'Deny log on as a batch job'
             }
             Add-Right @Splat
@@ -561,8 +561,8 @@
         # ServiceLogon
         If ($PSBoundParameters.ContainsKey('ServiceLogon')) {
             $Splat = @{
-                Key         = 'SeServiceLogonRight'
-                Members     = $ServiceLogon
+                Key     = 'SeServiceLogonRight'
+                Members = $ServiceLogon
                 #Description = 'Log on as a service'
             }
             Add-Right @Splat
@@ -571,8 +571,8 @@
         # DENY ServiceLogon
         If ($PSBoundParameters.ContainsKey('DenyServiceLogon')) {
             $Splat = @{
-                Key         = 'SeDenyServiceLogonRight'
-                Members     = $DenyServiceLogon
+                Key     = 'SeDenyServiceLogonRight'
+                Members = $DenyServiceLogon
                 #Description = 'Deny log on as a service'
             }
             Add-Right @Splat
@@ -588,8 +588,8 @@
         # Add workstations to domain
         If ($PSBoundParameters.ContainsKey('MachineAccount')) {
             $Splat = @{
-                Key         = 'SeMachineAccountPrivilege'
-                Members     = $MachineAccount
+                Key     = 'SeMachineAccountPrivilege'
+                Members = $MachineAccount
                 #Description = 'Add workstations to domain'
             }
             Add-Right @Splat
@@ -598,8 +598,8 @@
         # Adjust memory quotas for a process
         If ($PSBoundParameters.ContainsKey('IncreaseQuota')) {
             $Splat = @{
-                Key         = 'SeIncreaseQuotaPrivilege'
-                Members     = $IncreaseQuota
+                Key     = 'SeIncreaseQuotaPrivilege'
+                Members = $IncreaseQuota
                 #Description = 'Adjust memory quotas for a process'
             }
             Add-Right @Splat
@@ -608,8 +608,8 @@
         # Back up files and directories
         If ($PSBoundParameters.ContainsKey('Backup')) {
             $Splat = @{
-                Key         = 'SeBackupPrivilege'
-                Members     = $Backup
+                Key     = 'SeBackupPrivilege'
+                Members = $Backup
                 #Description = 'Back up files and directories'
             }
             Add-Right @Splat
@@ -618,8 +618,8 @@
         # Bypass traverse checking
         If ($PSBoundParameters.ContainsKey('ChangeNotify')) {
             $Splat = @{
-                Key         = 'SeChangeNotifyPrivilege'
-                Members     = $ChangeNotify
+                Key     = 'SeChangeNotifyPrivilege'
+                Members = $ChangeNotify
                 #Description = 'Bypass traverse checking'
             }
             Add-Right @Splat
@@ -628,8 +628,8 @@
         # Change the system time
         If ($PSBoundParameters.ContainsKey('Systemtime')) {
             $Splat = @{
-                Key         = 'SeSystemtimePrivilege'
-                Members     = $Systemtime
+                Key     = 'SeSystemtimePrivilege'
+                Members = $Systemtime
                 #Description = 'Change the system time'
             }
             Add-Right @Splat
@@ -638,8 +638,8 @@
         # Change the time zone
         If ($PSBoundParameters.ContainsKey('TimeZone')) {
             $Splat = @{
-                Key         = 'SeTimeZonePrivilege'
-                Members     = $SeTimeZonePrivilege
+                Key     = 'SeTimeZonePrivilege'
+                Members = $SeTimeZonePrivilege
                 #Description = 'Change the time zone'
             }
             Add-Right @Splat
@@ -648,8 +648,8 @@
         # Create a pagefile
         If ($PSBoundParameters.ContainsKey('CreatePagefile')) {
             $Splat = @{
-                Key         = 'SeCreatePagefilePrivilege'
-                Members     = $CreatePagefile
+                Key     = 'SeCreatePagefilePrivilege'
+                Members = $CreatePagefile
                 #Description = 'Create a pagefile'
             }
             Add-Right @Splat
@@ -658,8 +658,8 @@
         # Create global objects
         If ($PSBoundParameters.ContainsKey('CreateGlobal')) {
             $Splat = @{
-                Key         = 'SeCreateGlobalPrivilege'
-                Members     = $CreateGlobal
+                Key     = 'SeCreateGlobalPrivilege'
+                Members = $CreateGlobal
                 #Description = 'Create global objects'
             }
             Add-Right @Splat
@@ -668,8 +668,8 @@
         # Create symbolic links
         If ($PSBoundParameters.ContainsKey('CreateSymbolicLink')) {
             $Splat = @{
-                Key         = 'SeCreateSymbolicLinkPrivilege'
-                Members     = $CreateSymbolicLink
+                Key     = 'SeCreateSymbolicLinkPrivilege'
+                Members = $CreateSymbolicLink
                 #Description = 'Create symbolic links'
             }
             Add-Right @Splat
@@ -678,8 +678,8 @@
         # Enable computer and user accounts to be trusted for delegation
         If ($PSBoundParameters.ContainsKey('EnableDelegation')) {
             $Splat = @{
-                Key         = 'SeEnableDelegationPrivilege'
-                Members     = $EnableDelegation
+                Key     = 'SeEnableDelegationPrivilege'
+                Members = $EnableDelegation
                 #Description = 'Enable computer and user accounts to be trusted for delegation'
             }
             Add-Right @Splat
@@ -688,8 +688,8 @@
         # Force shutdown from a remote system
         If ($PSBoundParameters.ContainsKey('RemoteShutdown')) {
             $Splat = @{
-                Key         = 'SeRemoteShutdownPrivilege'
-                Members     = $RemoteShutdown
+                Key     = 'SeRemoteShutdownPrivilege'
+                Members = $RemoteShutdown
                 #Description = 'Force shutdown from a remote system'
             }
             Add-Right @Splat
@@ -698,8 +698,8 @@
         # Generate security audits
         If ($PSBoundParameters.ContainsKey('Audit')) {
             $Splat = @{
-                Key         = 'SeAuditPrivilege'
-                Members     = $Audit
+                Key     = 'SeAuditPrivilege'
+                Members = $Audit
                 #Description = 'Generate security audits'
             }
             Add-Right @Splat
@@ -708,8 +708,8 @@
         # Impersonate a client after authentication
         If ($PSBoundParameters.ContainsKey('Impersonate')) {
             $Splat = @{
-                Key         = 'SeImpersonatePrivilege'
-                Members     = $Impersonate
+                Key     = 'SeImpersonatePrivilege'
+                Members = $Impersonate
                 #Description = 'Impersonate a client after authentication'
             }
             Add-Right @Splat
@@ -718,8 +718,8 @@
         # Increase a process working set
         If ($PSBoundParameters.ContainsKey('IncreaseWorkingSet')) {
             $Splat = @{
-                Key         = 'SeIncreaseWorkingSetPrivilege'
-                Members     = $IncreaseWorkingSet
+                Key     = 'SeIncreaseWorkingSetPrivilege'
+                Members = $IncreaseWorkingSet
                 #Description = 'Increase a process working set'
             }
             Add-Right @Splat
@@ -728,8 +728,8 @@
         # Increase scheduling priority
         If ($PSBoundParameters.ContainsKey('IncreaseBasePriority')) {
             $Splat = @{
-                Key         = 'SeIncreaseBasePriorityPrivilege'
-                Members     = $IncreaseBasePriority
+                Key     = 'SeIncreaseBasePriorityPrivilege'
+                Members = $IncreaseBasePriority
                 #Description = 'Increase scheduling priority'
             }
             Add-Right @Splat
@@ -738,8 +738,8 @@
         # Load and unload device drivers
         If ($PSBoundParameters.ContainsKey('LoadDriver')) {
             $Splat = @{
-                Key         = 'SeLoadDriverPrivilege'
-                Members     = $LoadDriver
+                Key     = 'SeLoadDriverPrivilege'
+                Members = $LoadDriver
                 #Description = 'Load and unload device drivers'
             }
             Add-Right @Splat
@@ -748,8 +748,8 @@
         # Manage auditing and security log
         If ($PSBoundParameters.ContainsKey('AuditSecurity')) {
             $Splat = @{
-                Key         = 'SeSecurityPrivilege'
-                Members     = $AuditSecurity
+                Key     = 'SeSecurityPrivilege'
+                Members = $AuditSecurity
                 #Description = 'Manage auditing and security log'
             }
             Add-Right @Splat
@@ -758,8 +758,8 @@
         # Modify an object label
         If ($PSBoundParameters.ContainsKey('Relabel')) {
             $Splat = @{
-                Key         = 'SeRelabelPrivilege'
-                Members     = $Relabel
+                Key     = 'SeRelabelPrivilege'
+                Members = $Relabel
                 #Description = 'Modify an object label'
             }
             Add-Right @Splat
@@ -768,8 +768,8 @@
         # Modify firmware environment values
         If ($PSBoundParameters.ContainsKey('SystemEnvironment')) {
             $Splat = @{
-                Key         = 'SeSystemEnvironmentPrivilege'
-                Members     = $SystemEnvironment
+                Key     = 'SeSystemEnvironmentPrivilege'
+                Members = $SystemEnvironment
                 #Description = 'Modify firmware environment values'
             }
             Add-Right @Splat
@@ -778,8 +778,8 @@
         # Obtain an impersonation token for another user in the same session
         If ($PSBoundParameters.ContainsKey('DelegateSessionUserImpersonate')) {
             $Splat = @{
-                Key         = 'SeDelegateSessionUserImpersonatePrivilege'
-                Members     = $DelegateSessionUserImpersonate
+                Key     = 'SeDelegateSessionUserImpersonatePrivilege'
+                Members = $DelegateSessionUserImpersonate
                 #Description = 'Obtain an impersonation token for another user in the same session'
             }
             Add-Right @Splat
@@ -788,8 +788,8 @@
         # Perform volume maintenance tasks
         If ($PSBoundParameters.ContainsKey('ManageVolume')) {
             $Splat = @{
-                Key         = 'SeManageVolumePrivilege'
-                Members     = $ManageVolume
+                Key     = 'SeManageVolumePrivilege'
+                Members = $ManageVolume
                 #Description = 'Perform volume maintenance tasks'
             }
             Add-Right @Splat
@@ -798,8 +798,8 @@
         # Profile single process
         If ($PSBoundParameters.ContainsKey('ProfileSingleProcess')) {
             $Splat = @{
-                Key         = 'SeProfileSingleProcessPrivilege'
-                Members     = $ProfileSingleProcess
+                Key     = 'SeProfileSingleProcessPrivilege'
+                Members = $ProfileSingleProcess
                 #Description = 'Profile single process'
             }
             Add-Right @Splat
@@ -808,8 +808,8 @@
         # Profile system performance
         If ($PSBoundParameters.ContainsKey('SystemProfile')) {
             $Splat = @{
-                Key         = 'SeSystemProfilePrivilege'
-                Members     = $SystemProfile
+                Key     = 'SeSystemProfilePrivilege'
+                Members = $SystemProfile
                 #Description = 'Profile system performance'
             }
             Add-Right @Splat
@@ -818,8 +818,8 @@
         # Remove computer from docking station
         If ($PSBoundParameters.ContainsKey('Undock')) {
             $Splat = @{
-                Key         = 'SeUndockPrivilege'
-                Members     = $Undock
+                Key     = 'SeUndockPrivilege'
+                Members = $Undock
                 #Description = 'Remove computer from docking station'
             }
             Add-Right @Splat
@@ -828,8 +828,8 @@
         # Replace a process level token
         If ($PSBoundParameters.ContainsKey('AssignPrimaryToken')) {
             $Splat = @{
-                Key         = 'SeAssignPrimaryTokenPrivilege'
-                Members     = $AssignPrimaryToken
+                Key     = 'SeAssignPrimaryTokenPrivilege'
+                Members = $AssignPrimaryToken
                 #Description = 'Replace a process level token'
             }
             Add-Right @Splat
@@ -838,8 +838,8 @@
         # Restore files and directories
         If ($PSBoundParameters.ContainsKey('Restore')) {
             $Splat = @{
-                Key         = 'SeRestorePrivilege'
-                Members     = $Restore
+                Key     = 'SeRestorePrivilege'
+                Members = $Restore
                 #Description = 'Restore files and directories'
             }
             Add-Right @Splat
@@ -848,8 +848,8 @@
         # Shut down the system
         If ($PSBoundParameters.ContainsKey('Shutdown')) {
             $Splat = @{
-                Key         = 'SeShutdownPrivilege'
-                Members     = $Shutdown
+                Key     = 'SeShutdownPrivilege'
+                Members = $Shutdown
                 #Description = 'Shut down the system'
             }
             Add-Right @Splat
@@ -858,8 +858,8 @@
         # Synchronize directory service data
         If ($PSBoundParameters.ContainsKey('SyncAgent')) {
             $Splat = @{
-                Key         = 'SeSyncAgentPrivilege'
-                Members     = $SyncAgent
+                Key     = 'SeSyncAgentPrivilege'
+                Members = $SyncAgent
                 #Description = 'Synchronize directory service data'
             }
             Add-Right @Splat
@@ -868,8 +868,8 @@
         # Take ownership of files or other objects
         If ($PSBoundParameters.ContainsKey('TakeOwnership')) {
             $Splat = @{
-                Key         = 'SeTakeOwnershipPrivilege'
-                Members     = $TakeOwnership
+                Key     = 'SeTakeOwnershipPrivilege'
+                Members = $TakeOwnership
                 #Description = 'Take ownership of files or other objects'
             }
             Add-Right @Splat
@@ -886,8 +886,8 @@
 
             Try {
 
-                If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], ('Delegate the permissions for "{0}"?') -f $item.Description)) {
-                    Set-IniFileSection @Splat
+                If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], ('Delegate the permissions for "{0}"?') -f $item)) {
+                    Set-IniFileSection @item
                 } #end If
                 Write-Verbose -Message ('Added members {0} to "{1}" section of the GPO' -f ($Item.Members -join '; '), $item.Description)
 

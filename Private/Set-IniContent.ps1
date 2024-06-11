@@ -1,20 +1,21 @@
 ﻿Function Set-IniContent {
-    [CmdletBinding(DefaultParameterSetName = "Object")]
+    [CmdletBinding(DefaultParameterSetName = 'Object')]
+    [OutputType([Hashtable])]
 
     Param (
         # Specifies the Hashtable to be modified.
         # Enter a variable that contains the objects or type a command or expression that gets the objects.
-        [Parameter( Mandatory = $true, ValueFromPipeline = $true, ParameterSetName = "Object")]
+        [Parameter( Mandatory = $true, ValueFromPipeline = $true, ParameterSetName = 'Object')]
         [ValidateNotNullOrEmpty()]
         [System.Collections.Hashtable]
         $InputObject,
 
-        [Parameter( Mandatory = $true, ParameterSetName = "Object")]
+        [Parameter( Mandatory = $true, ParameterSetName = 'Object')]
         [ValidateNotNullOrEmpty()]
         [String]
         $Key,
 
-        [Parameter( Mandatory = $true, ParameterSetName = "Object")]
+        [Parameter( Mandatory = $true, ParameterSetName = 'Object')]
         [ValidateNotNullOrEmpty()]
         [String]
         $Value,
@@ -22,7 +23,7 @@
         # String array of one or more sections to limit the changes to, separated by a comma.
         # Surrounding section names with square brackets is not necessary but is supported.
         # Ini keys that do not have a defined section can be modified by specifying '_' (underscore) for the section.
-        [Parameter( ParameterSetName = "Object" )]
+        [Parameter( ParameterSetName = 'Object' )]
         [ValidateNotNullOrEmpty()]
         [String[]]
         $Sections
@@ -33,13 +34,13 @@
         Function Update-IniEntry {
             param ($InputObject, $section)
 
-                if (-Not ($InputObject[$section])) {
-                    Write-Verbose ("$($MyInvocation.MyCommand.Name):: '{0}' section does not exist, creating it." -f $section)
-                    $InputObject.add($Section, @{})
-                }
+            if (-Not ($InputObject[$section])) {
+                Write-Verbose ("$($MyInvocation.MyCommand.Name):: '{0}' section does not exist, creating it." -f $section)
+                $InputObject.add($Section, @{})
+            }
 
-                Write-Verbose ("$($MyInvocation.MyCommand.Name):: Setting '{0}' key in section {1} to '{2}'." -f $key, $section, $value)
-                $InputObject[$section].add($key, $value)
+            Write-Verbose ("$($MyInvocation.MyCommand.Name):: Setting '{0}' key in section {1} to '{2}'." -f $key, $section, $value)
+            $InputObject[$section].add($key, $value)
 
         } #end Function
     } #end Begin

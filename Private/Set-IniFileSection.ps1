@@ -27,11 +27,9 @@
         [System.String]
         $Key,
 
-        [Parameter(Mandatory = $true, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
             HelpMessage = 'ArrayList of members to be configured as a value for the KEY.',
             Position = 3)]
-        [ValidateNotNull()]
-        [ValidateNotNullOrEmpty()]
         [System.String[]]
         $Members
     )
@@ -58,7 +56,7 @@
             foreach ($ExistingMember in $TempMembers) {
 
                 # Check if is a WellKnownSid
-                if ($WellKnownSIDs[$ExistingMember.TrimStart('*')]) {
+                if ($Variables.WellKnownSIDs[$ExistingMember.TrimStart('*')]) {
                     $CurrentMember = New-Object System.Security.Principal.SecurityIdentifier($ExistingMember.TrimStart('*'))
                 } else {
 
@@ -89,7 +87,7 @@
             foreach ($item in $members) {
 
                 Try {
-                    # Retrive current SID
+                    # Retrieve current SID
                     $principal = New-Object System.Security.Principal.NTAccount($Item)
                     $identity = $principal.Translate([System.Security.Principal.SecurityIdentifier]).Value
                 } Catch {
