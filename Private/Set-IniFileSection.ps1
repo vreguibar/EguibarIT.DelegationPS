@@ -1,9 +1,12 @@
 ﻿Function Set-IniFileSection {
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'medium')]
     [OutputType([System.Collections.Hashtable])]
 
     Param (
-        [Parameter(Mandatory = $true, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Hashtable containing the values from IniHashtable.inf file',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -24,7 +27,8 @@
         [System.String]
         $Key,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
             HelpMessage = 'ArrayList of members to be configured as a value for the KEY.',
             Position = 3)]
         [System.String[]]
@@ -32,6 +36,14 @@
     )
 
     Begin {
+        Write-Verbose -Message '|=> ************************************************************************ <=|'
+        Write-Verbose -Message (Get-Date).ToShortDateString()
+        Write-Verbose -Message ('  Starting: {0}' -f $MyInvocation.Mycommand)
+        Write-Verbose -Message ('Parameters used by the function... {0}' -f (Get-FunctionDisplay $PsBoundParameters -Verbose:$False))
+
+        ##############################
+        # Variables Definition
+
         $NewMembers = New-Object System.Collections.ArrayList
         $UserSIDs = New-Object System.Collections.ArrayList
 
@@ -141,12 +153,12 @@
             Set-IniContent -InputObject $IniData -Sections $Section -Key $Key -Value ($UserSIDs -join ',')
         } #end If-Else
 
-    }
+    } #end Process
 
     End {
-        Write-Verbose -Message 'Function $($MyInvocation.InvocationName) finished setting INI file section.'
+        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating Privileged Rights."
         Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
+        Write-Verbose -Message '--------------------------------------------------------------------------------'
         Write-Verbose -Message ''
 
         Write-Output $IniData
