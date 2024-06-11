@@ -6,7 +6,6 @@
         [Parameter(Mandatory = $true, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
             HelpMessage = 'Hashtable containing the values from IniHashtable.inf file',
             Position = 0)]
-        [ValidateNotNull()]
         [ValidateNotNullOrEmpty()]
         [System.Collections.Hashtable]
         $IniData,
@@ -14,7 +13,6 @@
         [Parameter(Mandatory = $true, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
             HelpMessage = 'String representing the section to configure/Change on the file',
             Position = 1)]
-        [ValidateNotNull()]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $Section,
@@ -22,7 +20,6 @@
         [Parameter(Mandatory = $true, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
             HelpMessage = 'String representing the KEY to configure/Change on the file',
             Position = 2)]
-        [ValidateNotNull()]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $Key,
