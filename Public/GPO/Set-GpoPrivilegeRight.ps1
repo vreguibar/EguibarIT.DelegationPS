@@ -71,7 +71,7 @@
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $false,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Name of the GPO which will get the Privilege Right modification.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -80,248 +80,353 @@
 
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
-            ValueFromPipelineByPropertyName =
-            $True, ValueFromRemainingArguments = $false,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to be GRANTED the right "Access this computer from the network".',
             Position = 1)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $NetworkLogon,
 
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
-            ValueFromPipelineByPropertyName =
-            $True, ValueFromRemainingArguments = $false,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Deny access this computer from the network".',
             Position = 2)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $DenyNetworkLogon,
 
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
-            ValueFromPipelineByPropertyName =
-            $True, ValueFromRemainingArguments = $false,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to be GRANTED the right "Allow Log On Locally"',
             Position = 3)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $InteractiveLogon,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to be DENIED the right "Allow Log On Locally"',
             Position = 4)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $DenyInteractiveLogon,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to be GRANTED the right "Allow Log On through Remote Desktop Services".',
             Position = 5)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $RemoteInteractiveLogon,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to be DENIED the right "Allow Log On through Remote Desktop Services".',
             Position = 6)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $DenyRemoteInteractiveLogon,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to be GRANTED the right "Log On as a Batch Job".',
             Position = 7)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $BatchLogon,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Deny Log On as a Batch Job".',
             Position = 8)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $DenyBatchLogon,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to be GRANTED the right "Log On as a Service".',
             Position = 9)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $ServiceLogon,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Deny Log On as a Service".',
             Position = 10)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $DenyServiceLogon,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Add workstations to Domain (Domain Join)".',
             Position = 11)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $MachineAccount,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Adjust memory quotas for a process".',
             Position = 12)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $IncreaseQuota,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Back up files and directories".',
             Position = 13)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $Backup,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Bypass traverse checking".',
             Position = 14)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $ChangeNotify,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Change the system time".',
             Position = 15)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $SystemTime,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Change the time zone".',
             Position = 16)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $TimeZone,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Create a pagefile".',
             Position = 17)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $CreatePagefile,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Create global objects".',
             Position = 18)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $CreateGlobal,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Create symbolic links".',
             Position = 19)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $CreateSymbolicLink,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Enable computer and user accounts to be trusted for delegation".',
             Position = 20)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $EnableDelegation,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Force shutdown from a remote system".',
             Position = 21)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $RemoteShutdown,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Generate security audits".',
             Position = 22)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $Audit,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Impersonate a client after authentication".',
             Position = 23)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $Impersonate,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Increase a process working set".',
             Position = 24)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $IncreaseWorkingSet,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Increase scheduling priority".',
             Position = 25)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $IncreaseBasePriority,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Load and unload device drivers".',
             Position = 26)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $LoadDriver,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Manage auditing and security log".',
             Position = 27)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $AuditSecurity,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Modify an object label".',
             Position = 28)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $Relabel,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Modify firmware environment values".',
             Position = 29)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $SystemEnvironment,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Obtain an impersonation token for another user in the same session".',
             Position = 30)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $DelegateSessionUserImpersonate,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Perform volume maintenance tasks".',
             Position = 31)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $ManageVolume,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Profile single process".',
             Position = 32)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $ProfileSingleProcess,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Profile system performance".',
             Position = 33)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $SystemProfile,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Remove computer from docking station".',
             Position = 34)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $Undock,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Replace a process level token".',
             Position = 35)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $AssignPrimaryToken,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Restore files and directories".',
             Position = 36)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $Restore,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Shut down the system".',
             Position = 37)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $Shutdown,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Synchronize directory service data".',
             Position = 38)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $SyncAgent,
 
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
-            ValueFromPipelineByPropertyName =
-            $True, ValueFromRemainingArguments = $false,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Take ownership of files or other objects".',
             Position = 39)]
-        [System.String[]]
+        [System.Collections.ArrayList]
         $TakeOwnership
 
     )
@@ -341,8 +446,11 @@
         # Helper function to add rights
         function Add-Right {
             param (
-                [string]$Key,
-                [string[]]$Members
+                [string]
+                $Key,
+
+                [System.Collections.ArrayList]
+                $Members
             )
 
             [Hashtable]$TmpHash = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
