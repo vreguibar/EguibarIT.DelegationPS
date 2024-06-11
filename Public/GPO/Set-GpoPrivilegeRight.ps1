@@ -533,7 +533,7 @@
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/access-credential-manager-as-a-trusted-caller
         $Splat = @{
             Key     = 'SeTrustedCredManAccessPrivilege'
-            Members = ''
+            Members = [string]::Empty
             #Description = 'Access Credential Manager as a trusted caller'
         }
         Add-Right @Splat
@@ -541,7 +541,7 @@
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/act-as-part-of-the-operating-system
         $Splat = @{
             Key     = 'SeTcbPrivilege'
-            Members = ''
+            Members = [string]::Empty
             #Description = 'Act as part of the operating system'
         }
         Add-Right @Splat
@@ -549,7 +549,7 @@
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/create-a-token-object
         $Splat = @{
             Key     = 'SeCreateTokenPrivilege'
-            Members = ''
+            Members = [string]::Empty
             #Description = 'Create a token object'
         }
         Add-Right @Splat
@@ -557,7 +557,7 @@
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/create-permanent-shared-objects
         $Splat = @{
             Key     = 'SeCreatePermanentPrivilege'
-            Members = ''
+            Members = [string]::Empty
             #Description = 'Create permanent shared objects'
         }
         Add-Right @Splat
@@ -565,7 +565,7 @@
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/debug-programs
         $Splat = @{
             Key     = 'SeDebugPrivilege'
-            Members = ''
+            Members = [string]::Empty
             #Description = 'Debug Programs'
         }
         Add-Right @Splat
@@ -573,7 +573,7 @@
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/lock-pages-in-memory
         $Splat = @{
             Key     = 'SeLockMemoryPrivilege'
-            Members = ''
+            Members = [string]::Empty
             ##Description = 'Lock pages in memory'
         }
         Add-Right @Splat
@@ -998,11 +998,11 @@
                 If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], ('Delegate the permissions for "{0}"?') -f $item)) {
                     Set-IniFileSection @item
                 } #end If
-                Write-Verbose -Message ('Added members {0} to "{1}" section of the GPO' -f ($Item.Members -join '; '), $item.Description)
+                Write-Verbose -Message ('Added members {0} to "{1}" section of the GPO' -f ($Item.Members -join '; '), $item.Key)
 
             } Catch {
 
-                Write-Error -Message ('Error while configuring "{0}" on GPO' -f $item.Description)
+                Write-Error -Message ('Error while configuring "{0}" on GPO' -f $item.Key)
                 Throw
 
             } #end Try-Catch

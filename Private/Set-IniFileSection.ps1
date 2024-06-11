@@ -72,68 +72,75 @@
             # Get all existing members (From GptTmpl.inf)
             # Check that existing values are still valid (Sid is valid)
             foreach ($ExistingMember in $TempMembers) {
-
-                # Check if is a WellKnownSid
-                if ($Variables.WellKnownSIDs[$ExistingMember.TrimStart('*')]) {
-                    $CurrentMember = New-Object System.Security.Principal.SecurityIdentifier($ExistingMember.TrimStart('*'))
-                } else {
-
-                    try {
+                try {
+                    # Check if is a WellKnownSid
+                    if ($Variables.WellKnownSIDs[$ExistingMember.TrimStart('*')]) {
+                        # SID is effectively a WellKnownSid.
+                        $CurrentMember = [System.Security.Principal.SecurityIdentifier]::New($ExistingMember.TrimStart('*'))
+                    } else {
                         # Translate the SID to a SamAccountName string. If SID is not resolved, CurrentMember will be null
-                        $ObjMember = New-Object System.Security.Principal.SecurityIdentifier($ExistingMember.TrimStart('*'))
+                        $ObjMember = [System.Security.Principal.SecurityIdentifier]::New($ExistingMember.TrimStart('*'))
                         $CurrentMember = $ObjMember.Translate([System.Security.Principal.NTAccount]).ToString()
-                    } catch {
-                        Write-Error -Message ('Error when trying to translate to SID. {0}' -f $_)
-                        $CurrentMember = $null;
-                        throw
-                    }
-                }
+                    } #end If-Else
 
-                # If SID is not resolved, CurrentMember will be null
-                # If not null, then add it to the new list
-                if ($null -ne $CurrentMember) {
-                    # Only add the CurrentMember if not present on NewMembers
-                    if (-Not $NewMembers.Contains($CurrentMember)) {
-                        $NewMembers.Add($ExistingMember);
+                    # If SID is not resolved, CurrentMember will be null
+                    # If not null, then add it to the new list
+                    if ($null -ne $CurrentMember -and -not $NewMembers.Contains($CurrentMember)) {
+                        # Only add the CurrentMember if not present on NewMembers
+                        $NewMembers.Add($CurrentMember)
                     } #end If
-                } #end If
+                } catch {
+                    Write-Error -Message ('Error when trying to translate to SID. {0}' -f $_)
+                    throw
+                } #end Try-Catch
 
                 # Set null to the variable for the next use.
                 $CurrentMember = $null;
             } #end Foreach
 
-            # Add new members from parameter
+            # Add new members from $Members parameter
             # Iterate through all members
             foreach ($item in $members) {
 
+                # Check if current item is string. If item is other, then try to get the object and its SID
+                If ($item -isnot [string]) {
+                    $CurrentItem = Get-AdObjectType -Identity $item -ErrorAction SilentlyContinue
+
+                    If ($currentItem) {
+                        $item = $CurrentItem.SID.Value
+                    }
+                }
+
                 Try {
                     # Check if is a WellKnownSid
-                    if ($Variables.WellKnownSIDs[$item.TrimStart('*')]) {
-                        $CurrentMember = New-Object System.Security.Principal.SecurityIdentifier($ExistingMember.TrimStart('*'))
+                    if ($Variables.WellKnownSIDs[$item]) {
+                        # SID is effectively a WellKnownSid.
+                        $CurrentMember = [System.Security.Principal.SecurityIdentifier]::New($item)
                     } else {
                         # Check for empty members
-                        if ( '' -eq $item ) {
-                            $identity = ''
+                        if ( [string]::Empty -eq $item ) {
+                            $identity = [string]::Empty
                         } else {
                             # Retrieve current SID
-                            $principal = New-Object System.Security.Principal.NTAccount($Item)
+                            $principal = [System.Security.Principal.NTAccount]::New($Item)
                             $identity = $principal.Translate([System.Security.Principal.SecurityIdentifier]).Value
                         }
                     } #end If-Else
-                } Catch {
-                    throw
-                }
 
-                If ( -Not (($null -eq $NewMembers) -and
-                           ($NewMembers -ne 0) -and
-                           ($NewMembers -ne $false))) {
-                    # Check if new sid is already defined on value. Add it if NOT.
-                    if (-Not $NewMembers.Contains('*{0}' -f $identity.ToString())) {
-                        $NewMembers.Add('*{0}' -f $identity.ToString());
-                    }
-                } else {
-                    $NewMembers.Add('*{0}' -f $identity.ToString());
-                } #end If
+                    If ( [string]::Empty -eq $item ) {
+                        # Add empty member
+                        $NewMembers.Add([string]::Empty)
+                    } else {
+                        # Check if new sid is already defined on value. Add it if NOT.
+                        if (-Not $NewMembers.Contains('*{0}' -f $identity.ToString())) {
+                            $NewMembers.Add('*{0}' -f $identity.ToString());
+
+                        } #end If
+                    }#end If-Else
+                } Catch {
+                    Write-Error -Message ('Error processing member {0}: {1}' -f $item, $_)
+                    throw
+                } #end Try-Catch
             } #end Foreach
 
             # Remove existing Key to avoid error Item has already been added
@@ -145,36 +152,49 @@
         } else {
             Write-Verbose -Message ('Key "{0}" not existing. Proceeding to create it.' -f $Key)
 
-            # Iterate through all members from parameter
+            # Add new members from $Members parameter
+            # Iterate through all members
             foreach ($item in $members) {
 
-                # WellKnownSid function will return null if SID is not well known.
-                if ($null -eq $identity) {
-                    if ( '' -eq $item) {
-                        $identity = ''
-                    } else {
-                        # Retrieve current SID
-                        $principal = New-Object System.Security.Principal.NTAccount($Item)
-                        $identity = $principal.Translate([System.Security.Principal.SecurityIdentifier]).Value
-                    } #end If
-                } #end If
+                # Check if current item is string. If item is other, then try to get the object and its SID
+                If ($item -isnot [string]) {
+                    $CurrentItem = Get-AdObjectType -Identity $item -ErrorAction SilentlyContinue
 
-                If ( -Not (($null -eq $UserSIDs) -and
-                           ($UserSIDs -ne 0) -and
-                           ($UserSIDs -ne $false))) {
-                    # Check the current SID is not already on list
-                    if (-Not $UserSIDs.Contains('*{0}' -f $identity.ToString())) {
-                        # Add the new member to the List, adding * prefix
-                        $UserSIDs.Add('*{0}' -f $identity.ToString())
-                    } #end If
-                } else {
-                    if ('' -eq $identity) {
-                        $UserSIDs.Add('')
-                    } else {
-                        $UserSIDs.Add('*{0}' -f $identity.ToString())
+                    If ($currentItem) {
+                        $item = $CurrentItem.SamAccountName
                     }
+                }
 
-                } #end If
+                Try {
+                    # Check if is a WellKnownSid
+                    if ($Variables.WellKnownSIDs[$item]) {
+                        # SID is effectively a WellKnownSid.
+                        $CurrentMember = [System.Security.Principal.SecurityIdentifier]::New($item)
+                    } else {
+                        # Check for empty members
+                        if ( [string]::Empty -eq $item ) {
+                            $identity = [string]::Empty
+                        } else {
+                            # Retrieve current SID
+                            $principal = [System.Security.Principal.NTAccount]::New($Item)
+                            $identity = $principal.Translate([System.Security.Principal.SecurityIdentifier]).Value
+                        }
+                    } #end If-Else
+
+                    If ( [string]::Empty -eq $item ) {
+                        # Add empty member
+                        $NewMembers.Add([string]::Empty)
+                    } else {
+                        # Check if new sid is already defined on value. Add it if NOT.
+                        if (-Not $NewMembers.Contains('*{0}' -f $identity.ToString())) {
+                            $NewMembers.Add('*{0}' -f $identity.ToString());
+
+                        } #end If
+                    }#end If-Else
+                } Catch {
+                    Write-Error -Message ('Error processing member {0}: {1}' -f $item, $_)
+                    throw
+                } #end Try-Catch
             } #end Foreach
 
             # Add content to INI hashtable
