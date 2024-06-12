@@ -128,6 +128,7 @@
     } #end Begin
 
     Process {
+        ##############################
         # Block: Ensure Section Exists
         If (-not $IniData.Contains($Section)) {
             Write-Verbose -Message ('Section "{0}" does not exist. Creating it!.' -f $Section)
@@ -136,6 +137,7 @@
 
 
 
+        ##############################
         # Block: Process Existing Members
         if ($IniData[$Section].Contains($Key)) {
             Write-Verbose -Message ('Key "{0}" found. Getting existing values.' -f $Key)
@@ -143,42 +145,70 @@
 
             # iterate all existing members (From GptTmpl.inf)
             foreach ($ExistingMember in $TempMembers) {
-                try {
-                    # Resolve current member
-                    $CurrentMember = Resolve-MemberIdentity -Member $ExistingMember.TrimStart('*')
 
-                    if ($null -ne $CurrentMember -and -not $NewMembers.Contains($CurrentMember)) {
-                        # Add member to list
-                        $NewMembers.Add('*{0}' -f $ExistingMember)
-                    }
-                } catch {
-                    Write-Error -Message ('Error when trying to translate to SID. {0}' -f $_)
-                    throw
-                } #end Try-Catch
+                if ($ExistingMember -eq [string]::Empty) {
+                    # Member is empty. Process it.
+                    $CurrentMember = [string]::Empty
+                } else {
+                    try {
+                        # Resolve current member
+                        $CurrentMember = Resolve-MemberIdentity -Member $ExistingMember.TrimStart('*')
+                    } catch {
+                        Write-Error -Message ('Error when trying to translate to SID. {0}' -f $_)
+                        throw
+                    } #end Try-Catch
+                } #end If-Else
+
+                # If SID is not resolved, CurrentMember will be null
+                # If not null, then add it to the new list
+                if ($null -ne $CurrentMember -and -not $NewMembers.Contains("*$CurrentMember")) {
+                    # Add member to list
+                    If ($CurrentMember -eq [String]::Empty) {
+                        # If empty string, add it without asterisk
+                        $NewMembers.Add($CurrentMember)
+                    } else {
+                        # Add leading asterisk
+                        $NewMembers.Add('*{0}' -f $CurrentMember)
+                    } #end If-Else
+                } #end If
             } #end Foreach
         } #end If
 
 
 
+        ##############################
         # Block: Add New Members. Iterate all $Members
         foreach ($item in $Members) {
-            try {
-                # Resolve current member
-                $identity = Resolve-MemberIdentity -Member $item
 
-                if (-not $NewMembers.Contains('*{0}' -f $identity)) {
-                    # Add member to list
-                    $NewMembers.Add('*{0}' -f $identity)
-                }
-            } catch {
-                Write-Error -Message ('Error processing member {0}: {1}' -f $item, $_)
-                throw
-            } #end Try-Catch
+            if ($item -eq [string]::Empty) {
+                # Member is empty. Process it.
+                $identity = [string]::Empty
+            } else {
+                try {
+                    # Resolve current member
+                    $identity = Resolve-MemberIdentity -Member $item
+                } catch {
+                    Write-Error -Message ('Error processing member {0}: {1}' -f $item, $_)
+                    throw
+                } #end Try-Catch
+            } #end If-Else
+
+            # If SID is not resolved, CurrentMember will be null
+            # If not null, then add it to the new list
+            if (-not $NewMembers.Contains('*{0}' -f $identity)) {
+                # Add member to list
+                $NewMembers.Add('*{0}' -f $identity)
+            }
         } #end Foreach
 
 
 
+        ##############################
         # Block: Update INI Data
+
+        # Remove existing Key to avoid error Item has already been added
+        $IniData[$Section].Remove($key)
+
         $Splat = @{
             InputObject = $IniData
             Key         = $Key
