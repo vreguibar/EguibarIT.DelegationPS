@@ -78,12 +78,13 @@
                         # SID is effectively a WellKnownSid.
                         $CurrentMember = [System.Security.Principal.SecurityIdentifier]::New($ExistingMember.TrimStart('*'))
                     } else {
-                        if ( [string]::Empty -ne $item ) {
+                        if ( [string]::Empty -eq $ExistingMember ) {
+                            $CurrentMember = [string]::Empty
+                        } else {
+
                             # Translate the SID to a SamAccountName string. If SID is not resolved, CurrentMember will be null
                             $ObjMember = [System.Security.Principal.SecurityIdentifier]::New($ExistingMember.TrimStart('*'))
                             $CurrentMember = $ObjMember.Translate([System.Security.Principal.NTAccount]).ToString()
-                        } else {
-                            $CurrentMember = [string]::Empty
                         }
                     } #end If-Else
 
