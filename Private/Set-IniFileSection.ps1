@@ -1,4 +1,37 @@
 ﻿Function Set-IniFileSection {
+    <#
+        .SYNOPSIS
+            Updates or creates a section in an INI file hashtable with specified key and members.
+
+        .DESCRIPTION
+            This function takes an INI file hashtable, a section, a key, and an array of members. It updates the
+            INI file hashtable with the provided section, key, and members.
+            If the section or key does not exist, it creates them.
+            The function supports verbose output and can be run with WhatIf and Confirm parameters for safety.
+
+        .PARAMETER IniData
+            Hashtable containing the values from the INI file.
+
+        .PARAMETER Section
+            String representing the section to configure/change in the INI file.
+
+        .PARAMETER Key
+            String representing the key to configure/change in the INI file.
+
+        .PARAMETER Members
+            ArrayList of members to be configured as a value for the key.
+
+        .EXAMPLE
+            $iniData = @{}
+            Set-IniFileSection -IniData $iniData -Section "Settings" -Key "Admins" -Members @("User1", "User2")
+
+        .INPUTS
+            System.Collections.Hashtable, System.String[], System.String
+
+        .OUTPUTS
+            System.Collections.Hashtable
+    #>
+
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'medium')]
     [OutputType([System.Collections.Hashtable])]
 
@@ -52,158 +85,146 @@
         ##############################
         # Variables Definition
 
+        [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
+
         $NewMembers = [System.Collections.Generic.List[object]]::New()
-        $UserSIDs = [System.Collections.Generic.List[object]]::New()
+        $TempMembers = [System.Collections.Generic.List[object]]::New()
+
+
+        ##############################
+        # Helper Function: Resolve-MemberIdentity
+        function Resolve-MemberIdentity {
+            Param (
+                [Parameter(Mandatory = $true)]
+                $Member
+            )
+
+            # Empty string might be valid.
+            # Check for it and return it accordingly
+            if ($Member -eq [string]::Empty) {
+                return [string]::Empty
+            } #end If
+
+            # return the value accordingly
+            if ($Variables.WellKnownSIDs[$Member]) {
+                # Check for WellKnownSids
+                return ([System.Security.Principal.SecurityIdentifier]::New($Member.TrimStart('*'))).value
+            } else {
+                # Translate to corresponding SID
+                try {
+                    if ($Member -is [Microsoft.ActiveDirectory.Management.ADAccount] -or
+                        $Member -is [Microsoft.ActiveDirectory.Management.ADGroup]
+                    ) {
+                        $principal = [System.Security.Principal.NTAccount]::New($Member.SamAccountName)
+                    } else {
+                        $principal = [System.Security.Principal.NTAccount]::New($Member.TrimStart('*'))
+                    }
+
+                    return $principal.Translate([System.Security.Principal.SecurityIdentifier]).Value
+                } catch {
+                    Write-Error -Message ('Error resolving member identity: {0}' -f $_)
+                    throw
+                } #end Try-Catch
+            } #end If-Else
+        } #end Function Resolve-MemberIdentity
 
     } #end Begin
 
     Process {
+        ##############################
+        # Block: Ensure Section Exists
         If (-not $IniData.Contains($Section)) {
             Write-Verbose -Message ('Section "{0}" does not exist. Creating it!.' -f $Section)
             $IniData.add($Section, [ordered]@{})
-        }
+        } #end If
 
-        If ($IniData[$Section].Contains($Key)) {
+
+
+        ##############################
+        # Block: Process Existing Members
+        if ($IniData[$Section].Contains($Key)) {
             Write-Verbose -Message ('Key "{0}" found. Getting existing values.' -f $Key)
+            $TempMembers = ($IniData[$Section][$Key]).Split(',')
 
-            # Get existing value and split it into a list
-            $TempMembers = ($IniData.$Section.$Key).Split(',')
-
-            # Get all existing members (From GptTmpl.inf)
-            # Check that existing values are still valid (Sid is valid)
+            # iterate all existing members (From GptTmpl.inf)
             foreach ($ExistingMember in $TempMembers) {
-                try {
-                    # Check if is a WellKnownSid
-                    if ($Variables.WellKnownSIDs[$ExistingMember.TrimStart('*')]) {
-                        # SID is effectively a WellKnownSid.
-                        $CurrentMember = [System.Security.Principal.SecurityIdentifier]::New($ExistingMember.TrimStart('*'))
-                    } else {
-                        if ( [string]::Empty -ne $item ) {
-                            # Translate the SID to a SamAccountName string. If SID is not resolved, CurrentMember will be null
-                            $ObjMember = [System.Security.Principal.SecurityIdentifier]::New($ExistingMember.TrimStart('*'))
-                            $CurrentMember = $ObjMember.Translate([System.Security.Principal.NTAccount]).ToString()
-                        } else {
-                            $CurrentMember = [string]::Empty
-                        }
-                    } #end If-Else
 
-                    # If SID is not resolved, CurrentMember will be null
-                    # If not null, then add it to the new list
-                    if ($null -ne $CurrentMember -and -not $NewMembers.Contains($CurrentMember)) {
-                        # Only add the CurrentMember if not present on NewMembers
+                if ($ExistingMember -eq [string]::Empty -or $null) {
+                    # Member is empty. Process it.
+                    $CurrentMember = [string]::Empty
+                } else {
+                    try {
+                        # Resolve current member
+                        $CurrentMember = Resolve-MemberIdentity -Member $ExistingMember.TrimStart('*')
+                    } catch {
+                        Write-Error -Message ('Error when trying to translate to SID. {0}' -f $_)
+                        throw
+                    } #end Try-Catch
+                } #end If-Else
+
+                # If SID is not resolved, CurrentMember will be null
+                # If not null, then add it to the new list
+                if ($null -ne $CurrentMember -and -not $NewMembers.Contains('*{0}' -f $CurrentMember)) {
+                    # Add member to list
+                    If ($CurrentMember -eq [String]::Empty) {
+                        # If empty string, add it without asterisk
                         $NewMembers.Add($CurrentMember)
-                    } #end If
+                    } else {
+                        # Add leading asterisk
+                        $NewMembers.Add('*{0}' -f $CurrentMember)
+                    } #end If-Else
+                } #end If
+            } #end Foreach
+        } #end If
+
+
+
+        ##############################
+        # Block: Add New Members. Iterate all $Members
+        foreach ($item in $Members) {
+
+            if ($item -eq [string]::Empty) {
+                # Member is empty. Process it.
+                $identity = [string]::Empty
+            } else {
+                try {
+                    # Resolve current member
+                    $identity = Resolve-MemberIdentity -Member $item
                 } catch {
-                    Write-Error -Message ('Error when trying to translate to SID. {0}' -f $_)
-                    throw
-                } #end Try-Catch
-
-                # Set null to the variable for the next use.
-                $CurrentMember = $null;
-            } #end Foreach
-
-            # Add new members from $Members parameter.
-            # Iterate through all members.
-            foreach ($item in $members) {
-
-                # Check if current item is string. If item is other, then try to get the object and its SID
-                If ($item -isnot [string]) {
-                    $CurrentItem = Get-AdObjectType -Identity $item -ErrorAction SilentlyContinue
-
-                    If ($currentItem) {
-                        $item = $CurrentItem.SID.Value
-                    }
-                }
-
-                Try {
-                    # Check if is a WellKnownSid
-                    if ($Variables.WellKnownSIDs[$item]) {
-                        # SID is effectively a WellKnownSid.
-                        $CurrentMember = [System.Security.Principal.SecurityIdentifier]::New($item)
-                    } else {
-                        # Check for empty members
-                        if ( [string]::Empty -eq $item ) {
-                            $identity = [string]::Empty
-                        } else {
-                            # Retrieve current SID
-                            $principal = [System.Security.Principal.NTAccount]::New($Item)
-                            $identity = $principal.Translate([System.Security.Principal.SecurityIdentifier]).Value
-                        }
-                    } #end If-Else
-
-                    If ( [string]::Empty -eq $item ) {
-                        # Add empty member
-                        $NewMembers.Add([string]::Empty)
-                    } else {
-                        # Check if new sid is already defined on value. Add it if NOT.
-                        if (-Not $NewMembers.Contains('*{0}' -f $identity.ToString())) {
-                            $NewMembers.Add('*{0}' -f $identity.ToString());
-
-                        } #end If
-                    }#end If-Else
-                } Catch {
                     Write-Error -Message ('Error processing member {0}: {1}' -f $item, $_)
                     throw
                 } #end Try-Catch
-            } #end Foreach
+            } #end If-Else
 
-            # Remove existing Key to avoid error Item has already been added
-            $IniData[$Section].Remove($key)
+            # If SID is not resolved, CurrentMember will be null
+            # If not null, then add it to the new list
+            if (-not $NewMembers.Contains('*{0}' -f $identity)) {
+                # Add member to list
+                If ($identity -eq [String]::Empty) {
+                    # If empty string, add it without asterisk
+                    $NewMembers.Add($identity)
+                } else {
+                    # Add leading asterisk
+                    $NewMembers.Add('*{0}' -f $identity)
+                } #end If-Else
+            } #end If
+        } #end Foreach
 
-            # Add content to INI hashtable
-            Set-IniContent -InputObject $IniData -Sections $Section -Key $Key -value ($NewMembers -join ',')
 
-        } else {
-            Write-Verbose -Message ('Key "{0}" not existing. Proceeding to create it.' -f $Key)
 
-            # Add new members from $Members parameter
-            # Iterate through all members
-            foreach ($item in $members) {
+        ##############################
+        # Block: Update INI Data
 
-                # Check if current item is string. If item is other, then try to get the object and its SID
-                If ($item -isnot [string]) {
-                    $CurrentItem = Get-AdObjectType -Identity $item -ErrorAction SilentlyContinue
+        # Remove existing Key to avoid error Item has already been added
+        $IniData[$Section].Remove($key)
 
-                    If ($currentItem) {
-                        $item = $CurrentItem.SamAccountName
-                    }
-                }
-
-                Try {
-                    # Check if is a WellKnownSid
-                    if ($Variables.WellKnownSIDs[$item]) {
-                        # SID is effectively a WellKnownSid.
-                        $CurrentMember = [System.Security.Principal.SecurityIdentifier]::New($item)
-                    } else {
-                        # Check for empty members
-                        if ( [string]::Empty -eq $item ) {
-                            $identity = [string]::Empty
-                        } else {
-                            # Retrieve current SID
-                            $principal = [System.Security.Principal.NTAccount]::New($Item)
-                            $identity = $principal.Translate([System.Security.Principal.SecurityIdentifier]).Value
-                        }
-                    } #end If-Else
-
-                    If ( [string]::Empty -eq $item ) {
-                        # Add empty member
-                        $NewMembers.Add([string]::Empty)
-                    } else {
-                        # Check if new sid is already defined on value. Add it if NOT.
-                        if (-Not $NewMembers.Contains('*{0}' -f $identity.ToString())) {
-                            $NewMembers.Add('*{0}' -f $identity.ToString());
-
-                        } #end If
-                    }#end If-Else
-                } Catch {
-                    Write-Error -Message ('Error processing member {0}: {1}' -f $item, $_)
-                    throw
-                } #end Try-Catch
-            } #end Foreach
-
-            # Add content to INI hashtable
-            Set-IniContent -InputObject $IniData -Sections $Section -Key $Key -Value ($UserSIDs -join ',')
-        } #end If-Else
+        $Splat = @{
+            InputObject = $IniData
+            Key         = $Key
+            Value       = ($NewMembers -join ',')
+            Sections    = $Section
+        }
+        Set-IniContent @Splat
 
     } #end Process
 
