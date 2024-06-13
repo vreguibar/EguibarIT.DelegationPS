@@ -96,7 +96,6 @@
         function Resolve-MemberIdentity {
             Param (
                 [Parameter(Mandatory = $true)]
-                [string]
                 $Member
             )
 
@@ -106,17 +105,21 @@
                 return [string]::Empty
             } #end If
 
-            # Ensure no leading asterisk
-            $Member = $Member.TrimStart('*')
-
             # return the value accordingly
             if ($Variables.WellKnownSIDs[$Member]) {
                 # Check for WellKnownSids
-                return ([System.Security.Principal.SecurityIdentifier]::New($Member)).value
+                return ([System.Security.Principal.SecurityIdentifier]::New($Member.TrimStart('*'))).value
             } else {
                 # Translate to corresponding SID
                 try {
-                    $principal = [System.Security.Principal.NTAccount]::New($Member)
+                    if ($Member -is [Microsoft.ActiveDirectory.Management.ADAccount] -or
+                        $Member -is [Microsoft.ActiveDirectory.Management.ADGroup]
+                    ) {
+                        $principal = [System.Security.Principal.NTAccount]::New($Member.SamAccountName)
+                    } else {
+                        $principal = [System.Security.Principal.NTAccount]::New($Member.TrimStart('*'))
+                    }
+
                     return $principal.Translate([System.Security.Principal.SecurityIdentifier]).Value
                 } catch {
                     Write-Error -Message ('Error resolving member identity: {0}' -f $_)
@@ -146,7 +149,7 @@
             # iterate all existing members (From GptTmpl.inf)
             foreach ($ExistingMember in $TempMembers) {
 
-                if ($ExistingMember -eq [string]::Empty) {
+                if ($ExistingMember -eq [string]::Empty -or $null) {
                     # Member is empty. Process it.
                     $CurrentMember = [string]::Empty
                 } else {
@@ -161,7 +164,7 @@
 
                 # If SID is not resolved, CurrentMember will be null
                 # If not null, then add it to the new list
-                if ($null -ne $CurrentMember -and -not $NewMembers.Contains("*$CurrentMember")) {
+                if ($null -ne $CurrentMember -and -not $NewMembers.Contains('*{0}' -f $CurrentMember)) {
                     # Add member to list
                     If ($CurrentMember -eq [String]::Empty) {
                         # If empty string, add it without asterisk
@@ -197,8 +200,14 @@
             # If not null, then add it to the new list
             if (-not $NewMembers.Contains('*{0}' -f $identity)) {
                 # Add member to list
-                $NewMembers.Add('*{0}' -f $identity)
-            }
+                If ($identity -eq [String]::Empty) {
+                    # If empty string, add it without asterisk
+                    $NewMembers.Add($identity)
+                } else {
+                    # Add leading asterisk
+                    $NewMembers.Add('*{0}' -f $identity)
+                } #end If-Else
+            } #end If
         } #end Foreach
 
 
