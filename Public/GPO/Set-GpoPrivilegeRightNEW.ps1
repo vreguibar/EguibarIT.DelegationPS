@@ -454,7 +454,7 @@
         $iniContent = Get-Content -Path $iniFilePath -Raw
 
         # Check GPT does contains default sections ([Unicode] and [Version])
-        $iniContent = Ensure-GptFixedSections -IniContent $iniContent
+        $iniContent = Confirm-GptFixedSection -IniContent $iniContent
 
     } #end Begin
 

@@ -1,7 +1,5 @@
-﻿Ensure-GptFixedSections
-
-# Helper Function: Ensure-GptFixedSections
-function Ensure-GptFixedSections {
+﻿# Helper Function: Ensure-GptFixedSections
+function Confirm-GptFixedSection {
     param (
         [string]$IniContent
     )
