@@ -1,6 +1,4 @@
-﻿Validate-GptMembers
-
-# Helper Function: Confirm-GptMember
+﻿# Helper Function: Confirm-GptMember
 function Confirm-GptMember {
     param (
         [string[]]$Members

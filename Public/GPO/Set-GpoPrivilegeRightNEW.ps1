@@ -1,4 +1,4 @@
-﻿Function Set-GpoPrivilegeRight-NEW {
+﻿Function Set-GpoPrivilegeRightNEW {
     <#
         .Synopsis
             Set the Privileged Rights into a Group Policy Objects (MUST be executed on DomainController)
