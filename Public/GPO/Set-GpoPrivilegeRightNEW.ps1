@@ -439,8 +439,39 @@
 
         ##############################
         # Variables Definition
+
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
         $ArrayList = [System.Collections.Generic.List[object]]::New()
+
+
+
+        # Helper function to add rights
+        function Add-Right {
+            param (
+                [string]
+                $Key,
+
+                [System.Collections.Generic.List[object]]
+                $Members
+            )
+
+            [Hashtable]$TmpHash = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
+
+            #if ($PSCmdlet.ShouldProcess($Key, "Assign $Description")) {
+            $TmpHash = @{
+                IniData = $GptTmpl
+                Section = 'Privilege Rights'
+                Key     = $Key
+                Members = $Members
+                #Description = $Description
+            }
+            [void]$ArrayList.Add($TmpHash)
+            #}
+        }
+
+
+
+
 
         $iniFilePath = Get-GptTemplatePath -GpoName $PSBoundParameters['GpoToModify']
         Write-Verbose -Message ('INI File Path: {0}' -f $iniFilePath)
@@ -931,9 +962,9 @@
         ################################################################################
         # Process all the Rights
 
-        Foreach ($item in $ArrayList) {
+        Foreach ($Rights in $ArrayList) {
 
-            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], ('Delegate the permissions for "{0}"?') -f $item)) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], ('Delegate the permissions for "{0}"?') -f $Rights)) {
 
 
                 foreach ($right in $Rights.GetEnumerator()) {
