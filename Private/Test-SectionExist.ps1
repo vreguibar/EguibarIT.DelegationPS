@@ -32,12 +32,44 @@ function Test-SectionExist {
                     Eguibar Information Technology S.L.
                     http://www.eguibarit.com
     #>
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Low')]
+
     param (
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
         [string]$IniContent,
+
+        [Parameter(Mandatory = $true)]
         [string]$Section
     )
-    if (-not ($IniContent -match ('[{0}]' -f $Section))) {
-        $IniContent += ('{0}[{1}]' -f $Constants.NL, $Section)
-    }
-    return $IniContent
+
+    Begin {
+        Write-Verbose -Message 'Starting the section existence check process.'
+    } #end Begin
+
+    Process {
+        Write-Verbose -Message ('Checking if the section {0} exists in the INI content.' -f $Section)
+
+        try {
+            if ($IniContent -match ('[{0}]' -f [regex]::Escape($Section))) {
+
+                Write-Verbose -Message ('Section [{0}] already exists.' -f $Section)
+
+            } else {
+                Write-Verbose -Message ('Section [{0}] does not exist. Adding section.' -f $Section)
+
+                if ($PSCmdlet.ShouldProcess('INI Content', "Add section [$Section]")) {
+                    $IniContent += ('{0}[{1}]' -f $Constants.NL, $Section)
+                } #end if
+
+            } #end if
+        } catch {
+            Write-Error -Message ('An error occurred while checking or adding the section: {0}' -f $_)
+        } #end try
+
+    } #end Process
+
+    End {
+        Write-Verbose -Message 'Section existence check process completed.'
+        return $IniContent
+    } #end End
 }
