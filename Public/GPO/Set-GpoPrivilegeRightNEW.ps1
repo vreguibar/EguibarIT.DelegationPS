@@ -972,7 +972,7 @@
                     $members = $right.Value
 
                     Write-Verbose -Message ('Processing right: {0}' -f $section)
-                    $iniContent = Test-SectionExists -IniContent $iniContent -Section $section
+                    $iniContent = Test-SectionExist -IniContent $iniContent -Section $section
 
                     $validMembers = Confirm-GptMember -Members $members
                     Write-Verbose -Message ('Valid members: {0}' -f ($validMembers -join ', '))
