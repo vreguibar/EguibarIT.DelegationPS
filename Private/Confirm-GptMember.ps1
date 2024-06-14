@@ -1,10 +1,48 @@
 ﻿# Helper Function: Confirm-GptMember
 function Confirm-GptMember {
 
-    [Parameter(Mandatory = $true)]
+    [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'low')]
+    [OutputType([System.Collections.Hashtable])]
 
     param (
-        [string[]]$Members
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
+            HelpMessage = 'Hashtable containing the values from IniHashtable.inf file',
+            Position = 0)]
+        [ValidateNotNullOrEmpty()]
+        [System.Collections.Hashtable]
+        $iniContent,
+
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
+            HelpMessage = 'String representing the section to configure/Change on the file',
+            Position = 1)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $Section,
+
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
+            HelpMessage = 'String representing the KEY to configure/Change on the file',
+            Position = 2)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $Key,
+
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $true,
+            HelpMessage = 'List of members to be configured as a value for the KEY.',
+            Position = 3)]
+        [System.Collections.Generic.List[object]]
+        $Members
     )
 
     Begin {
@@ -31,17 +69,50 @@ function Confirm-GptMember {
 
     Process {
 
+        # Get existing members (get members from $iniContent)
+        If ($iniContent[$Section].Contains($Key)) {
+            Write-Verbose -Message ('Key "{0}" found. Getting existing values.' -f $Key)
+
+            # Get existing value and split it into a list
+            $ExistingMembers = ($IniData.$Section.$Key).Split(',')
+
+        } #end If
+
+        # Check if there are ExistingMembers
+        If ($ExistingMembers) {
+            # Iterate Existing Members
+            Foreach ($Item in $ExistingMembers) {
+                # Skip empty lines
+                if ([string]::IsNullOrWhiteSpace($Item)) {
+                    continue
+                } #end If
+
+                # Check if the member is already a valid SID
+                if (Test-IsValidSID -ObjectSID $Item) {
+
+                    # Resolve the member to a SID
+                    $resolvedSid = Resolve-Sid -Name $Item
+
+                    if ($null -ne $resolvedSid) {
+                        $ValidSids.Add('*{0}' -f $resolvedSid)
+                    } else {
+                        Write-Verbose -Message ('Skipping invalid member: {0}' -f $Item)
+                    } #end If-Else
+                } #end If
+            } #end Foreach
+        } #end If
+
+        # Check for NewMembers
         foreach ($member in $Members) {
 
             # Skip empty lines
             if ([string]::IsNullOrWhiteSpace($member)) {
                 continue
-            }
+            } #end If
 
             # Check if the member is already a valid SID
             if (Test-IsValidSID -ObjectSID $member) {
-                $ValidSids.Add('*{0}' -f $member)
-            } else {
+
                 # Resolve the member to a SID
                 $resolvedSid = Resolve-Sid -Name $member
 
@@ -49,9 +120,9 @@ function Confirm-GptMember {
                     $ValidSids.Add('*{0}' -f $resolvedSid)
                 } else {
                     Write-Verbose -Message ('Skipping invalid member: {0}' -f $member)
-                }
-            }
-        }
+                } #end If-Else
+            } #end If
+        } #end Foreach
 
     } #end Process
 
