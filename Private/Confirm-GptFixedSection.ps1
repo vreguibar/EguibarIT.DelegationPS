@@ -33,6 +33,8 @@ function Confirm-GptFixedSection {
 
     param (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [AllowEmptyString()]
+        [AllowNull()]
         [string]
         $IniContent
     )
