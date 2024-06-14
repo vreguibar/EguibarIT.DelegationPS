@@ -19,7 +19,7 @@ function Confirm-GptMember {
                 [string]$Name
             )
             try {
-                $sid = (New-Object System.Security.Principal.NTAccount($Name)).Translate([System.Security.Principal.SecurityIdentifier])
+                $sid = ([System.Security.Principal.NTAccount]::New($Name)).Translate([System.Security.Principal.SecurityIdentifier])
                 return $sid.Value
             } catch {
                 Write-Verbose -Message ('Failed to resolve SID for {0}' -f $Name)
