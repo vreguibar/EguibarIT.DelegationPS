@@ -50,22 +50,30 @@
     Process {
         # try RegEx
         Try {
-            if ($SIDRegex.IsMatch($SID)) {
-
-                $isValid = $tue
+            if ($Variables.WellKnownSIDs.Contains($PSBoundParameters['ObjectSID'])) {
 
                 # Provide verbose output
                 if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
-                    Write-Verbose -Message ('The SID {0} is valid.' -f $SID)
+                    Write-Verbose -Message ('The SID {0} is a WellKnownSid.' -f $PSBoundParameters['ObjectSID'])
+                    $isValid = $tue
                 } #end If
+
+            } elseIf ($SIDRegex.IsMatch($PSBoundParameters['ObjectSID'])) {
+
+                # Provide verbose output
+                if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
+                    Write-Verbose -Message ('The SID {0} is valid.' -f $PSBoundParameters['ObjectSID'])
+                    $isValid = $tue
+                } #end If
+
             } else {
-                $isValid = $false
 
                 # Provide verbose output
                 if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
-                    Write-Verbose -Message ('[WARNING] The SID {0} is NOT valid!.' -f $SID)
+                    Write-Verbose -Message ('[WARNING] The SID {0} is NOT valid!.' -f $PSBoundParameters['ObjectSID'])
+                    $isValid = $false
                 } #end If
-            }
+            } #end If-Else
 
         } catch {
             # Handle exceptions gracefully
