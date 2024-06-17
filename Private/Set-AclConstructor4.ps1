@@ -166,14 +166,14 @@ function Set-AclConstructor4 {
                 #$groupSID = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_].Contains($Id.ToLower()) }
                 $TmpSid = ($Variables.WellKnownSIDs.GetEnumerator() | Where-Object { $_.value -eq $Id.ToLower() }).Name
 
-                $groupSID = New-Object -TypeName System.Security.Principal.SecurityIdentifier -ArgumentList $TmpSid
+                $groupSID = [System.Security.Principal.SecurityIdentifier]::New($TmpSid)
 
                 Write-Verbose -Message 'Identity is Well-Known SID. Retrieving the Well-Known SID'
             }
         } else {
 
             # If identity is NOT a WellKnownSID, the function will translate to existing Object SID.
-            $groupSID = New-Object -TypeName System.Security.Principal.SecurityIdentifier -ArgumentList $groupObject.SID
+            $groupSID = [System.Security.Principal.SecurityIdentifier]::New($groupObject.SID)
 
             Write-Verbose -Message 'Retrieving SID of Identity'
         }
@@ -233,7 +233,7 @@ function Set-AclConstructor4 {
             if ($Force -or $PSCmdlet.ShouldProcess($object.DistinguishedName, "Removing access rule for $($PSBoundParameters['Id'])")) {
 
                 #Create an Access Control Entry for new permission we wish to remove
-                [void]$acl.RemoveAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
+                [void]$acl.RemoveAccessRule(([System.DirectoryServices.ActiveDirectoryAccessRule]::New($RuleArguments)))
 
                 Write-Verbose -Message ('Removed access rule from {0}' -f $objectDN.DistinguishedName)
             } #end If
@@ -243,7 +243,7 @@ function Set-AclConstructor4 {
             if ($Force -or $PSCmdlet.ShouldProcess($object.DistinguishedName, "Adding access rule for $($PSBoundParameters['Id'])")) {
 
                 #Create an Access Control Entry for new permission we wish to add
-                [void]$acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
+                [void]$acl.AddAccessRule(([System.DirectoryServices.ActiveDirectoryAccessRule]::New($RuleArguments)))
 
                 Write-Verbose -Message ('Added access rule to {0}' -f $objectDN.DistinguishedName)
             } #end If

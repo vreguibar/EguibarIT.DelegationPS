@@ -64,6 +64,7 @@ function Confirm-GptMember {
         } #end If
 
         # Check if there are ExistingMembers
+        # Existing members are ONLY on SID form.
         If ($ExistingMembers) {
             # Iterate Existing Members
             Foreach ($Item in $ExistingMembers) {
@@ -103,10 +104,14 @@ function Confirm-GptMember {
 
             # Resolve the member to a SID
             If ($member -is [string]) {
-                # Convert String
-                If (Convert-SidToName -SID $member) {
+
+                # Check if WellKnownSid
+                If ($Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_] -eq $member }) {
+                    $resolvedSid = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_] -eq $member }
+                } elseIf (Convert-SidToName -SID $member) {
                     $resolvedSid = $member
                 } #end If
+
             } else {
                 $member = Get-AdObjectType -Identity $member
 

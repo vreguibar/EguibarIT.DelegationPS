@@ -42,30 +42,29 @@
 
     Begin {
 
-        [bool]$isValid = $false
+        # Ensure only account is used (remove anything before \ if exist)
+        $ObjectSID = ($PSBoundParameters['ObjectSID']).Split('\')[1]
 
-        # Define DN Regex
-        #$SidRegex = [RegEx]::new('^S-1-[0-59]-\d{2}-\d{8,10}-\d{8,10}-\d{8,10}-[1-9]\d{3}')
-        $SidRegex = [RegEx]::new('^S-1-(0|1|2|3|4|5|59)-\d+(-\d+)*$')
+        [bool]$isValid = $false
 
     } #end Begin
 
     Process {
         # try RegEx
         Try {
-            if ($Variables.WellKnownSIDs.Contains($PSBoundParameters['ObjectSID'])) {
+            if ($Variables.WellKnownSIDs.Contains($ObjectSID)) {
 
                 # Provide verbose output
                 if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
-                    Write-Verbose -Message ('The SID {0} is a WellKnownSid.' -f $PSBoundParameters['ObjectSID'])
+                    Write-Verbose -Message ('The SID {0} is a WellKnownSid.' -f $ObjectSID)
                 } #end If
                 $isValid = $true
                 #return
-            } elseIf ($SIDRegex.IsMatch($PSBoundParameters['ObjectSID'])) {
+            } elseIf ($Constants.SidRegEx.IsMatch($ObjectSID)) {
 
                 # Provide verbose output
                 if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
-                    Write-Verbose -Message ('The SID {0} is valid.' -f $PSBoundParameters['ObjectSID'])
+                    Write-Verbose -Message ('The SID {0} is valid.' -f $ObjectSID)
                 } #end If
                 $isValid = $true
                 #return
@@ -73,7 +72,7 @@
 
                 # Provide verbose output
                 if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
-                    Write-Verbose -Message ('[WARNING] The SID {0} is NOT valid!.' -f $PSBoundParameters['ObjectSID'])
+                    Write-Verbose -Message ('[WARNING] The SID {0} is NOT valid!.' -f $ObjectSID)
                 } #end If
                 $isValid = $false
             } #end If-Else
