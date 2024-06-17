@@ -74,7 +74,7 @@ function Confirm-GptMember {
             Write-Verbose -Message ('Key "{0}" found. Getting existing values.' -f $Key)
 
             # Get existing value and split it into a list
-            $ExistingMembers = ($IniData.$Section.$Key).Split(',')
+            $ExistingMembers = ($iniContent.$Section.$Key).Split(',')
 
         } #end If
 
@@ -88,17 +88,17 @@ function Confirm-GptMember {
                 } #end If
 
                 # Check if the member is already a valid SID
-                if (Test-IsValidSID -ObjectSID $Item) {
+                #if (Test-IsValidSID -ObjectSID $Item) {
 
-                    # Resolve the member to a SID
-                    $resolvedSid = Resolve-Sid -Name $Item
+                # Resolve the member to a SID
+                $resolvedSid = Resolve-Sid -Name $Item
 
-                    if ($null -ne $resolvedSid) {
-                        $ValidSids.Add('*{0}' -f $resolvedSid)
-                    } else {
-                        Write-Verbose -Message ('Skipping invalid member: {0}' -f $Item)
-                    } #end If-Else
-                } #end If
+                if ($null -ne $resolvedSid) {
+                    $ValidSids.Add('*{0}' -f $resolvedSid)
+                } else {
+                    Write-Verbose -Message ('Skipping invalid member: {0}' -f $Item)
+                } #end If-Else
+                #} #end If
             } #end Foreach
         } #end If
 
@@ -111,17 +111,17 @@ function Confirm-GptMember {
             } #end If
 
             # Check if the member is already a valid SID
-            if (Test-IsValidSID -ObjectSID $member) {
+            #if (Test-IsValidSID -ObjectSID $member) {
 
-                # Resolve the member to a SID
-                $resolvedSid = Resolve-Sid -Name $member
+            # Resolve the member to a SID
+            $resolvedSid = Resolve-Sid -Name $member
 
-                if ($null -ne $resolvedSid) {
-                    $ValidSids.Add('*{0}' -f $resolvedSid)
-                } else {
-                    Write-Verbose -Message ('Skipping invalid member: {0}' -f $member)
-                } #end If-Else
-            } #end If
+            if ($null -ne $resolvedSid) {
+                $ValidSids.Add('*{0}' -f $resolvedSid)
+            } else {
+                Write-Verbose -Message ('Skipping invalid member: {0}' -f $member)
+            } #end If-Else
+            #} #end If
         } #end Foreach
 
     } #end Process

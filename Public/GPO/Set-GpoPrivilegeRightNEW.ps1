@@ -1003,10 +1003,22 @@
 
                 } #end If
 
-                $validMembers = Confirm-GptMember -Members $Rights.members -iniContent $iniContent -Section $Rights.Section
+                $Splat = @{
+                    Members    = $Rights.members
+                    iniContent = $iniContent
+                    Section    = $Rights.Section
+                    key        = $Rights.Key
+                }
+                $validMembers = Confirm-GptMember @Splat
                 Write-Verbose -Message ('Valid members: {0}' -f ($validMembers -join ', '))
 
-                $iniContent = Set-IniContent -InputObject $iniContent -Key $Rights.Key -Value $validMembers -Section $Rights.Section
+                $Splat = @{
+                    Value       = $validMembers
+                    InputObject = $iniContent
+                    Section     = $Rights.Section
+                    key         = $Rights.Key
+                }
+                $iniContent = Set-IniContent @Splat
                 #} #end Foreach
 
 
@@ -1024,8 +1036,8 @@
 
         # Increment Version
         # Get path to the GPTs.ini file. Increment to make changes.
-        Write-Verbose -Message ('Updating GPO version for {0}' -f $GpoName)
-        Update-GpoVersion -GpoName $GpoName
+        Write-Verbose -Message ('Updating GPO version for {0}' -f $PSBoundParameters['GpoToModify'])
+        Update-GpoVersion -GpoName $PSBoundParameters['GpoToModify']
 
     } #end Process
 
