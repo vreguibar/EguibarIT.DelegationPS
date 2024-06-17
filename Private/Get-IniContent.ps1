@@ -21,18 +21,17 @@
 
     Param(
         # Specifies the path to the input file.
-        [Parameter(Mandatory=$true, ValueFromPipeline=$True, ValueFromPipelineByPropertyName=$True, ValueFromRemainingArguments=$false,
-            HelpMessage='Full path to the INI file.',
-            Position=0)]
-        [ValidateNotNull()]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+            HelpMessage = 'Full path to the INI file.',
+            Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.IO.FileInfo]
         $FilePath
     )
 
     Begin {
-        $sectionRegex = "^\s*\[(.+)\]\s*$"
-        $keyRegex     = "^\s*(.+?)\s*=\s*(['`"]?)(.*)\2\s*$"
+        $sectionRegex = '^\s*\[(.+)\]\s*$'
+        $keyRegex = "^\s*(.+?)\s*=\s*(['`"]?)(.*)\2\s*$"
 
         #$ini = New-Object System.Collections.Specialized.OrderedDictionary([System.StringComparer]::OrdinalIgnoreCase)
         [System.Collections.Hashtable]$ini = [ordered]@{}
@@ -40,10 +39,6 @@
 
     Process {
 
-        if (!(Test-Path $Filepath)) {
-            Write-Verbose ("Warning: `"{0}`" was not found." -f $Filepath)
-            Write-Output $ini
-        }
 
         switch -regex -file $FilePath {
             $sectionRegex {
@@ -57,7 +52,7 @@
 
             $keyRegex {
                 # Key
-                if (!(test-path "variable:local:section")) {
+                if (!(Test-Path 'variable:local:section')) {
                     $section = $script:NoSection
                     $ini.add($Section, [ordered]@{})
 

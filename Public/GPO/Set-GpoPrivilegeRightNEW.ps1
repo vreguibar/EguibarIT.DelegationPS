@@ -459,10 +459,10 @@
 
             #if ($PSCmdlet.ShouldProcess($Key, "Assign $Description")) {
             $TmpHash = @{
-                IniData = $GptTmpl
-                Section = 'Privilege Rights'
-                Key     = $Key
-                Members = $Members
+                iniContent = $iniContent
+                Section    = 'Privilege Rights'
+                Key        = $Key
+                Members    = $Members
                 #Description = $Description
             }
             [void]$ArrayList.Add($TmpHash)
@@ -482,11 +482,26 @@
         }
 
         Write-Verbose 'Loading existing INI file content'
-        $iniContent = Get-Content -Path $iniFilePath -Raw
+        #$iniContent = Get-Content -Path $iniFilePath -Raw
+        $iniContent = Get-IniContent -FilePath $iniFilePath
 
         # Check GPT does contains default sections ([Unicode] and [Version])
-        $iniContent = Confirm-GptFixedSection -IniContent $iniContent
+        If (-not ($iniContent.Contains('Version') -and
+                $iniContent.Contains('Unicode'))) {
 
+            # Add Section "Version" with first Key/Value pair
+            $iniContent.Add('Version', [ordered]@{})
+
+            # Add second Key/Value
+            $iniContent['Version'].Add('signature', '"$CHICAGO$"')
+            $iniContent['Version'].Add('Revision', '1')
+
+            # Add Unicode Section
+            $iniContent.Add('Unicode', [ordered]@{})
+
+            # Add second Key/Value
+            $iniContent['Unicode'].Add('Unicode', 'yes')
+        } #end If
     } #end Begin
 
     Process {
@@ -500,6 +515,7 @@
 
         ################################################################################
         # Keep empty due to security concerns
+        #region EmptyMemberRights
 
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/access-credential-manager-as-a-trusted-caller
         $Splat = @{
@@ -549,6 +565,7 @@
         }
         Add-Right @Splat
 
+        #endregion EmptyMemberRights
 
 
 
@@ -557,6 +574,8 @@
         ################################################################################
         # Logon restrictions (following Tier implementation)
         # PSBoundParameters for NetworkLogon, DenyNetworkLogon...
+
+        #region LogonRestrictions
 
         # NetworkLogon
         if ($PSBoundParameters.ContainsKey('NetworkLogon')) {
@@ -658,12 +677,15 @@
             Add-Right @Splat
         } #end If
 
+        #endregion LogonRestrictions
 
 
 
 
         ################################################################################
         # Remaining rights
+
+        #region RemainingRights
 
         # Add workstations to domain
         If ($PSBoundParameters.ContainsKey('MachineAccount')) {
@@ -955,6 +977,8 @@
             Add-Right @Splat
         } #end If
 
+        #endregion RemainingRights
+
 
 
 
@@ -967,28 +991,39 @@
             If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], ('Delegate the permissions for "{0}"?') -f $Rights)) {
 
 
-                foreach ($right in $Rights.GetEnumerator()) {
-                    $section = $right.Key
-                    $members = $right.Value
+                #foreach ($right in $Rights.GetEnumerator()) {
+                #$section = $right.Key
+                #$members = $right.Value
 
-                    Write-Verbose -Message ('Processing right: {0}' -f $section)
-                    $iniContent = Test-SectionExist -IniContent $iniContent -Section $section
+                # Check if [Privilege Rights] section exist. Create it if it does not exist
+                If (-not $iniContent.Contains($Rights.Section)) {
 
-                    $validMembers = Confirm-GptMember -Members $members
-                    Write-Verbose -Message ('Valid members: {0}' -f ($validMembers -join ', '))
+                    Write-Verbose -Message ('Section "{0}" does not exist. Creating it!.' -f $Rights.Section)
+                    $iniContent.add($Rights.Section, [ordered]@{})
 
-                    $iniContent = Set-IniFileSectionNEW -IniContent $iniContent -Section $section -Members $validMembers
-                } #end Foreach
+                } #end If
+
+                $validMembers = Confirm-GptMember -Members $Rights.members -iniContent $iniContent -Section $Rights.Section
+                Write-Verbose -Message ('Valid members: {0}' -f ($validMembers -join ', '))
+
+                $iniContent = Set-IniContent -InputObject $iniContent -Key $Rights.Key -Value $validMembers -Section $Rights.Section
+                #} #end Foreach
 
 
             } #end If
         } #end Foreach
 
 
+        # Save INI file
+        Try {
+            $iniContent | Out-IniFile -FilePath $iniFilePath -Encoding 'Unicode' -Force
+            Write-Verbose -Message ('Saving changes to file {0}' -f $iniFilePath)
+        } Catch {
+            Throw 'The GptTmpl.inf file could not be saved: {0}. Message is {1}', $_, $_.Message
+        }
 
-        Write-Verbose -Message ('Saving updated INI content to {0}' -f $iniFilePath)
-        Set-Content -Path $iniFilePath -Value $iniContent -Encoding Unicode
-
+        # Increment Version
+        # Get path to the GPTs.ini file. Increment to make changes.
         Write-Verbose -Message ('Updating GPO version for {0}' -f $GpoName)
         Update-GpoVersion -GpoName $GpoName
 
