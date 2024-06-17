@@ -278,7 +278,8 @@ function Set-AclConstructor6 {
             if ($Force -or $PSCmdlet.ShouldProcess($object.DistinguishedName, "Removing access rule for $($PSBoundParameters['Id'])")) {
 
                 #Create an Access Control Entry for new permission we wish to remove
-                $null = $acl.RemoveAccessRule(([System.DirectoryServices.ActiveDirectoryAccessRule]::New($RuleArguments)))
+                $null = $acl.RemoveAccessRule(([System.DirectoryServices.ActiveDirectoryAccessRule]::New($Arg1, $Arg2, $Arg3, $Arg4, $Arg5, $Arg6)))
+                #$null = $acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
 
                 Write-Verbose -Message ('Removed access rule from {0}' -f $objectDN.DistinguishedName)
             } #end If
@@ -288,7 +289,8 @@ function Set-AclConstructor6 {
             if ($Force -or $PSCmdlet.ShouldProcess($object.DistinguishedName, "Adding access rule for $($PSBoundParameters['Id'])")) {
 
                 #Create an Access Control Entry for new permission we wish to add
-                $null = $acl.AddAccessRule(([System.DirectoryServices.ActiveDirectoryAccessRule]::New($RuleArguments)))
+                $null = $acl.AddAccessRule(([System.DirectoryServices.ActiveDirectoryAccessRule]::New($Arg1, $Arg2, $Arg3, $Arg4, $Arg5, $Arg6)))
+                #$null = $acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
 
                 Write-Verbose -Message ('Added access rule to {0}' -f $objectDN.DistinguishedName)
             } #end If
