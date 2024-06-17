@@ -191,27 +191,26 @@ function Set-AclConstructor6 {
         # Collect the SID for the trustee we will be delegating to.
         # NULL will be returned if ID is a WellKnownSid
         #
-        $GroupObject = Get-AdObjectType -Identity $PSBoundParameters['Id']
+        # Check if Identity is a WellKnownSID
+        # Looking in var $Variables.WellKnownSIDs by Value (ej. 'authenticated users')
+        # must be in lowercase to work
+        If ($Variables.WellKnownSIDs.Values.Contains($Id.ToLower())) {
 
-        Write-Verbose -Message 'Identity is already a Group Object. Retrieving the Group'
+            # return SID of the WellKnownSid
+            #$groupSID = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_].Contains($Id.ToLower()) }
+            $TmpSid = ($Variables.WellKnownSIDs.GetEnumerator() | Where-Object { $_.value -eq $Id.ToLower() }).Name
+
+            $groupSID = [System.Security.Principal.SecurityIdentifier]::New($TmpSid)
+
+            Write-Verbose -Message 'Identity is Well-Known SID. Retrieving the Well-Known SID'
+        } else {
+            $GroupObject = Get-AdObjectType -Identity $PSBoundParameters['Id']
+
+            Write-Verbose -Message 'Identity is already a Group Object. Retrieving the Group'
+        }
 
         # $groupObject will be NULL if ID is a WellKnownSid
-        If ($null -eq $GroupObject) {
-
-            # Check if Identity is a WellKnownSID
-            # Looking in var $Variables.WellKnownSIDs by Value (ej. 'authenticated users')
-            # must be in lowercase to work
-            If ($Variables.WellKnownSIDs.Values.Contains($Id.ToLower())) {
-
-                # return SID of the WellKnownSid
-                #$groupSID = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_].Contains($Id.ToLower()) }
-                $TmpSid = ($Variables.WellKnownSIDs.GetEnumerator() | Where-Object { $_.value -eq $Id.ToLower() }).Name
-
-                $groupSID = [System.Security.Principal.SecurityIdentifier]::New($TmpSid)
-
-                Write-Verbose -Message 'Identity is Well-Known SID. Retrieving the Well-Known SID'
-            }
-        } else {
+        If ($null -ne $GroupObject) {
 
             # If identity is NOT a WellKnownSID, the function will translate to existing Object SID.
             $groupSID = [System.Security.Principal.SecurityIdentifier]::New($groupObject.SID)
