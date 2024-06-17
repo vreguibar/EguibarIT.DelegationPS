@@ -102,10 +102,17 @@ function Confirm-GptMember {
             #if (Test-IsValidSID -ObjectSID $member) {
 
             # Resolve the member to a SID
-            # Resolve the member to a SID
-            If (Convert-SidToName -SID $member) {
-                $resolvedSid = $member
-            }
+            If ($member -is [string]) {
+                # Convert String
+                If (Convert-SidToName -SID $member) {
+                    $resolvedSid = $member
+                } #end If
+            } else {
+                $member = Get-AdObjectType -Identity $member
+
+                $resolvedSid = $member.sid.Value
+            } #end If-Else
+
 
             if ($null -ne $resolvedSid) {
                 $ValidSids.Add('*{0}' -f $resolvedSid)
