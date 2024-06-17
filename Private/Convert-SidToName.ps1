@@ -38,7 +38,7 @@
     #>
 
     [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'Low')]
-    [OutputType([String])]
+    [OutputType([bool])]
 
     param (
         # PARAM1 STRING representing the GUID
