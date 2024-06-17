@@ -57,8 +57,8 @@
                 Get-ExtendedRightHashTable             | EguibarIT.DelegationPS
 
         .NOTES
-            Version:         1.3
-            DateModified:    31/May/2024
+            Version:         2.0
+            DateModified:    17/Jun/2024
             LasModifiedBy:   Vicente Rodriguez Eguibar
                 vicente@eguibar.com
                 Eguibar Information Technology S.L.
