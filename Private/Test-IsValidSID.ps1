@@ -41,6 +41,9 @@
     )
 
     Begin {
+
+        [bool]$isValid = $false
+
         # Define DN Regex
         #$SidRegex = [RegEx]::new('^S-1-[0-59]-\d{2}-\d{8,10}-\d{8,10}-\d{8,10}-[1-9]\d{3}')
         $SidRegex = [RegEx]::new('^S-1-(0|1|2|3|4|5|59)-\d+(-\d+)*$')
@@ -55,24 +58,24 @@
                 # Provide verbose output
                 if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
                     Write-Verbose -Message ('The SID {0} is a WellKnownSid.' -f $PSBoundParameters['ObjectSID'])
-                    $isValid = $tue
                 } #end If
-
+                $isValid = $tue
+                return
             } elseIf ($SIDRegex.IsMatch($PSBoundParameters['ObjectSID'])) {
 
                 # Provide verbose output
                 if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
                     Write-Verbose -Message ('The SID {0} is valid.' -f $PSBoundParameters['ObjectSID'])
-                    $isValid = $tue
                 } #end If
-
+                $isValid = $tue
+                return
             } else {
 
                 # Provide verbose output
                 if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
                     Write-Verbose -Message ('[WARNING] The SID {0} is NOT valid!.' -f $PSBoundParameters['ObjectSID'])
-                    $isValid = $false
                 } #end If
+                $isValid = $false
             } #end If-Else
 
         } catch {
