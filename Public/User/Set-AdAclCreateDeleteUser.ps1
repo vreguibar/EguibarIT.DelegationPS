@@ -2,7 +2,7 @@
 function Set-AdAclCreateDeleteUser {
     <#
         .Synopsis
-            The function will delegate the premission for a group to create/Delete
+            The function will delegate the permission for a group to create/Delete
             User objects in an OU
         .DESCRIPTION
             Configures the container (OU) to delegate the permissions to a group so it can create/delete user objects.
