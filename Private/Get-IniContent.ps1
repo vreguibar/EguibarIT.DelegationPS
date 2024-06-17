@@ -46,7 +46,12 @@
                 $section = $matches[1]
                 Write-Verbose "$($MyInvocation.MyCommand.Name):: Adding section : $section"
                 #$ini[$section] = New-Object System.Collections.Specialized.OrderedDictionary([System.StringComparer]::OrdinalIgnoreCase)
-                $ini.add($Section, [ordered]@{})
+                Try {
+                    $ini.add($Section, [ordered]@{})
+                } Catch {
+                    Throw
+                    Continue
+                }
                 continue
             }
 

@@ -3,14 +3,14 @@ function Update-GpoVersion {
     param (
         [string]$GpoName
     )
-    $gpo = Get-Gpo -Name $GpoName -ErrorAction Stop
+    $gpo = Get-GPO -Name $GpoName -ErrorAction Stop
     $gpoId = $gpo.Id
     $sysVolPath = '\\' + $env:USERDNSDOMAIN + '\SYSVOL\' + $env:USERDNSDOMAIN
-    $pathToGpt = '{0}\Policies\{1}\gpt.ini' -f $sysVolPath, $gpoId
+    $pathToGpt = '{0}\Policies\{1}\gpt.ini' -f $sysVolPath, ('{' + $gpoId + '}')
 
     try {
         # Get the GPO object
-        $de = New-Object System.DirectoryServices.DirectoryEntry("LDAP://CN={$gpoId},CN=Policies,CN=System,$env:USERDNSDOMAIN")
+        $de = New-Object System.DirectoryServices.DirectoryEntry("LDAP://CN={$gpoId},CN=Policies,CN=System,$($Variables.defaultNamingContext)")
 
         # Get the VersionObject of the DirectoryEntry (the GPO)
         $versionObject = [Int64]($de.Properties['VersionNumber'].Value.ToString())
