@@ -152,11 +152,11 @@ function Set-AclConstructor4 {
         # Check if Identity is a WellKnownSID
         # Looking in var $Variables.WellKnownSIDs by Value (ej. 'authenticated users')
         # must be in lowercase to work
-        If ($Variables.WellKnownSIDs.Values.Contains($Id)) {
+        If ($Variables.WellKnownSIDs.Values.Contains($Id.ToLower())) {
 
             # return SID of the WellKnownSid
             #$groupSID = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_].Contains($Id) }
-            $TmpSid = ($Variables.WellKnownSIDs.GetEnumerator() | Where-Object { $_.value -eq $Id }).Name
+            $TmpSid = ($Variables.WellKnownSIDs.GetEnumerator() | Where-Object { $_.value -eq $Id.ToLower() }).Name
 
             $groupSID = [System.Security.Principal.SecurityIdentifier]::New($TmpSid)
 
