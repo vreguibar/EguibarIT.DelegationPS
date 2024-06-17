@@ -50,21 +50,6 @@ function Confirm-GptMember {
         # Initialize an empty list to hold valid SIDs
         $ValidSids = [System.Collections.Generic.List[object]]::new()
 
-
-        # Helper function to resolve a name to a SID
-        function Resolve-Sid {
-            param (
-                [string]$Name
-            )
-            try {
-                $sid = ([System.Security.Principal.NTAccount]::New($Name.Trim('*'))).Translate([System.Security.Principal.SecurityIdentifier])
-                return $sid.Value
-            } catch {
-                Write-Verbose -Message ('Failed to resolve SID for {0}' -f $Name)
-                return $null
-            }
-        }
-
     } #end Begin
 
     Process {
@@ -91,7 +76,10 @@ function Confirm-GptMember {
                 #if (Test-IsValidSID -ObjectSID $Item) {
 
                 # Resolve the member to a SID
-                $resolvedSid = Resolve-Sid -Name $Item
+                If (Convert-SidToName -SID $item.Trim('*')) {
+                    $resolvedSid = $Item.Trim('*')
+                }
+
 
                 if ($null -ne $resolvedSid) {
                     $ValidSids.Add('*{0}' -f $resolvedSid)
@@ -114,7 +102,10 @@ function Confirm-GptMember {
             #if (Test-IsValidSID -ObjectSID $member) {
 
             # Resolve the member to a SID
-            $resolvedSid = Resolve-Sid -Name $member
+            # Resolve the member to a SID
+            If (Convert-SidToName -SID $member) {
+                $resolvedSid = $member
+            }
 
             if ($null -ne $resolvedSid) {
                 $ValidSids.Add('*{0}' -f $resolvedSid)
