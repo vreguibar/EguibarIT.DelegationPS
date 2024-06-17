@@ -184,6 +184,8 @@ function Set-AclConstructor6 {
 
         $groupObject, $groupSID, $TmpSid, $acl, $Arg1, $Arg2, $Arg3, $Arg4, $Arg5, $Arg6, $RuleArguments = $null
 
+        # Ensure ID is lower case
+        $Id = ($PSBoundParameters['Id']).ToLower()
     } #end Begin
 
     Process {
@@ -194,11 +196,11 @@ function Set-AclConstructor6 {
         # Check if Identity is a WellKnownSID
         # Looking in var $Variables.WellKnownSIDs by Value (ej. 'authenticated users')
         # must be in lowercase to work
-        If ($Variables.WellKnownSIDs.Values.Contains($Id.ToLower())) {
+        If ($Variables.WellKnownSIDs.Values.Contains($Id)) {
 
             # return SID of the WellKnownSid
             #$groupSID = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_].Contains($Id) }
-            $TmpSid = ($Variables.WellKnownSIDs.GetEnumerator() | Where-Object { $_.value -eq $Id.ToLower() }).Name
+            $TmpSid = ($Variables.WellKnownSIDs.GetEnumerator() | Where-Object { $_.value -eq $Id }).Name
 
             $groupSID = [System.Security.Principal.SecurityIdentifier]::New($TmpSid)
 
