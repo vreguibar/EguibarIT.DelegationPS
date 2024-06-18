@@ -136,7 +136,7 @@
             }
 
             Write-Verbose ('Setting {0} key in section {1} to {2}' -f $key, $section, $value)
-            If ( -Not ($InputObject[$section].Keys.Contains($key))) {
+            If ( -Not ($InputObject[$section].Keys -contains $key)) {
                 # Key does not exist. Adding Key and Value
                 $InputObject[$section].add($key, $value)
             } else {
