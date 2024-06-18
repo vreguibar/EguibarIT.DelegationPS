@@ -45,8 +45,8 @@
         Microsoft.ActiveDirectory.Management.AdGroup
 
     .NOTES
-        Version:         1.0
-            DateModified:    08/Oct/2021
+        Version:         1.2
+            DateModified:    31/May/2024
             LasModifiedBy:   Vicente Rodriguez Eguibar
                 vicente@eguibar.com
                 Eguibar Information Technology S.L.

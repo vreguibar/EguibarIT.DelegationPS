@@ -50,10 +50,6 @@
 
         $isValid = $false
 
-        # Define DN Regex
-        #[regex]$distinguishedNameRegex = '^(?:(?<cn>CN=(?<name>(?:[^,]|\,)*)),)?(?:(?<path>(?:(?:CN|OU)=(?:[^,]|\,)+,?)+),)?(?<domain>(?:DC=(?:[^,]|\,)+,?)+)$'
-        [regex]$distinguishedNameRegex = '^(?:(?<cn>CN=(?<name>(?:[^,]+|\,)+)),)?(?:(?<ou>OU=(?:[^,]+|\,)+,?)*)(?<dc>DC=(?:[^,]+|\,)+)(?:,DC=(?:[^,]+|\,)+)*$'
-
         Write-Verbose 'Begin block: Regex pattern for DN validation initialized.'
 
     } #end Begin
@@ -64,7 +60,7 @@
 
             # Perform the actual validation
             #$isValid = $ObjectDN -match $distinguishedNameRegex
-            $isValid = $distinguishedNameRegex.IsMatch($ObjectDN)
+            $isValid = $Constants.DnRegEx.IsMatch($ObjectDN)
 
             # Provide verbose output
             if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
