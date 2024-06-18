@@ -84,6 +84,7 @@
 
         <#
         # try Native SID
+
         Try {
             # Perform the actual validation
             [System.Security.Principal.SecurityIdentifier]$sid = $Sid
@@ -98,6 +99,7 @@
             # Handle exceptions gracefully
             Write-Error "An error occurred on [SecurityIdentifier] comparison: $_"
         } #end Try-Catch
+
          #>
     } #end Process
 
