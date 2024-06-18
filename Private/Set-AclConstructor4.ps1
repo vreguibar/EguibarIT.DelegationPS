@@ -142,9 +142,6 @@ function Set-AclConstructor4 {
 
         $groupObject, $groupSID, $TmpSid, $acl, $Arg1, $Arg2, $Arg3, $Arg4, $RuleArguments = $null
 
-        # Ensure ID is lower case
-        $Id = ($PSBoundParameters['Id']).ToLower()
-
     } #end Begin
 
     Process {
@@ -155,17 +152,17 @@ function Set-AclConstructor4 {
         # Check if Identity is a WellKnownSID
         # Looking in var $Variables.WellKnownSIDs by Value (ej. 'authenticated users')
         # must be in lowercase to work
-        If ($Variables.WellKnownSIDs.Values.Contains($Id)) {
+        If ($Variables.WellKnownSIDs.Values -Contains $PSBoundParameters['Id']) {
 
             # return SID of the WellKnownSid
             #$groupSID = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_].Contains($Id) }
-            $TmpSid = ($Variables.WellKnownSIDs.GetEnumerator() | Where-Object { $_.value -eq $Id }).Name
+            $TmpSid = ($Variables.WellKnownSIDs.GetEnumerator() | Where-Object { $_.value -eq $PSBoundParameters['Id'] }).Name
 
             $groupSID = [System.Security.Principal.SecurityIdentifier]::New($TmpSid)
 
             Write-Verbose -Message 'Identity is Well-Known SID. Retrieving the Well-Known SID'
         } else {
-            $GroupObject = Get-AdObjectType -Identity $Id
+            $GroupObject = Get-AdObjectType -Identity $PSBoundParameters['Id']
 
             Write-Verbose -Message 'Identity is already a Group Object. Retrieving the Group'
         }

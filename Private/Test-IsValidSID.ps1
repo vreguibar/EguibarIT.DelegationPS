@@ -52,7 +52,7 @@
     Process {
         # try RegEx
         Try {
-            if ($Variables.WellKnownSIDs.Contains($ObjectSID)) {
+            if ($Variables.WellKnownSIDs -Contains $ObjectSID) {
 
                 # Provide verbose output
                 if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
