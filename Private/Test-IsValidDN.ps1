@@ -60,7 +60,7 @@
 
             # Perform the actual validation
             #$isValid = $ObjectDN -match $distinguishedNameRegex
-            $isValid = $Constants.DnRegEx.IsMatch($ObjectDN)
+            $isValid = $ObjectDN -match $Constants.DnRegEx
 
             # Provide verbose output
             if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
