@@ -119,7 +119,15 @@
 
                 [Parameter(Mandatory = $true)]
                 [String]
-                $Section
+                $Section,
+
+                [Parameter(Mandatory = $true)]
+                [String]
+                $Key,
+
+                [Parameter(Mandatory = $true)]
+                [String]
+                $Value
             )
 
             if (-Not ($InputObject[$section])) {
@@ -152,7 +160,7 @@
                     if ($Force -or $PSCmdlet.ShouldProcess("Section: $section", "Update key '$Key' with value '$Value'")) {
 
                         Write-Verbose -Message ('Processing {0} section.' -f $section)
-                        Update-IniEntry $InputObject $section
+                        Update-IniEntry -InputObject $InputObject -Section $section -Key $Key -Value $Value
 
                     } #end If
                 } #end ForEach
@@ -164,7 +172,7 @@
                     if ($Force -or $PSCmdlet.ShouldProcess("Section: $section", "Update key '$Key' with value '$Value'")) {
 
                         Write-Verbose -Message ('Processing {0} section.' -f $section)
-                        Update-IniEntry $InputObject $section
+                        Update-IniEntry -InputObject $InputObject -Section $section -Key $Key -Value $Value
 
                     } #end If
                 } #end ForEach

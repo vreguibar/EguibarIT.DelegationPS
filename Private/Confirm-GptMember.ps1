@@ -76,9 +76,12 @@ function Confirm-GptMember {
                 # Check if the member is already a valid SID
                 #if (Test-IsValidSID -ObjectSID $Item) {
 
+                If ($Item -contains '*') {
+                    $item = $item.trim('*')
+                }
                 # Resolve the member to a SID
-                If (Convert-SidToName -SID $item.Trim('*')) {
-                    $resolvedSid = $Item.Trim('*')
+                If (Convert-SidToName -SID $item) {
+                    $resolvedSid = $Item
                 }
 
 
@@ -107,9 +110,17 @@ function Confirm-GptMember {
 
                 # Check if WellKnownSid
                 If ($Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_] -eq $member }) {
+
                     $resolvedSid = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_] -eq $member }
+
+                } elseIf (Test-NameIsWellKnownSid -Name $member) {
+
+                    $resolvedSid = (Test-NameIsWellKnownSid -Name $member).Value
+
                 } elseIf (Convert-SidToName -SID $member) {
+
                     $resolvedSid = $member
+
                 } #end If
 
             } else {

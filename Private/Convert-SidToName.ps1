@@ -71,7 +71,7 @@
         try {
 
             # Attempt to translate the SID to a name
-            $SecurityIdentifier = [Security.Principal.SecurityIdentifier]::New($Sid)
+            $SecurityIdentifier = [Security.Principal.SecurityIdentifier]::New($PSBoundParameters['SID'])
 
             # Get the account name based on SID
             $FoundName = ($SecurityIdentifier.Translate([Security.Principal.NTAccount])).Value
