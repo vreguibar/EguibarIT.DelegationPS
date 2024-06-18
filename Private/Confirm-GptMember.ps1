@@ -2,7 +2,7 @@
 function Confirm-GptMember {
 
     [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'low')]
-    [OutputType([System.Collections.Hashtable])]
+    [OutputType([string])]
 
     param (
         [Parameter(Mandatory = $true,
@@ -48,7 +48,7 @@ function Confirm-GptMember {
     Begin {
 
         # Initialize an empty list to hold valid SIDs
-        $ValidSids = [System.Collections.Generic.List[object]]::new()
+        $ValidSids = [System.Collections.Generic.List[string]]::new()
 
     } #end Begin
 
@@ -134,7 +134,7 @@ function Confirm-GptMember {
         if ($ValidSids.Count -eq 0) {
             return [string]::Empty
         } else {
-            return $ValidSids -join ','
+            return [System.String]::Join(',', $ValidSids)
         }
     } #end End
 }
