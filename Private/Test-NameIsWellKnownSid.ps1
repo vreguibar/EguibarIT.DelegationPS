@@ -9,7 +9,7 @@
 
     Begin {
 
-        $Identity = [System.Security.Principal.SecurityIdentifier]::new()
+        #$Identity = [System.Security.Principal.SecurityIdentifier]::new()
 
         $PSBoundParameters['Name'] = ($PSBoundParameters['Name']).ToLower()
 
@@ -26,7 +26,7 @@
     Process {
 
         Try {
-            if ($Variables.WellKnownSIDs -contains $PSBoundParameters['Name']) {
+            if ($Variables.WellKnownSIDs.Values -contains $PSBoundParameters['Name']) {
 
                 #return found object as System.Security.Principal.SecurityIdentifier
                 $SID = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_] -eq $PSBoundParameters['Name'] }
