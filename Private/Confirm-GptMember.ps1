@@ -110,22 +110,19 @@ function Confirm-GptMember {
 
                 # Check if string is a SID
                 If ($member -match $Constants.SidRegEx) {
-                    # Check if WellKnownSid
-                    If (Test-NameIsWellKnownSid -Name $member) {
-
-                        $resolvedSid = (Test-NameIsWellKnownSid -Name $member).Value
-
-                    } elseIf (Convert-SidToName -SID $member) {
+                    If (Convert-SidToName -SID $member) {
 
                         $resolvedSid = $member
 
-                    } #end If-ElseIf
-                } #end If
+                    } #end If
+                } elseIf (Test-NameIsWellKnownSid -Name $member) {
+                    # Check if WellKnownSid
+                    $resolvedSid = (Test-NameIsWellKnownSid -Name $member).Value
 
-                # Check if string is a DistinguishedName
-                if ($member -match $Constants.DnRegEx) {
+                } else {
                     $resolvedSid = (Get-AdObjectType -Identity $member).sid.value
-                } #end If
+                } #end-IfElse
+
 
             } else {
                 $resolvedSid = (Get-AdObjectType -Identity $member).sid.value
