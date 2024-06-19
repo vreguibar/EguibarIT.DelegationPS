@@ -462,7 +462,7 @@
                 iniContent = $iniContent
                 Section    = 'Privilege Rights'
                 Key        = $Key
-                Members    = [System.String]::Join(',',$Members)
+                Members    = $Members
                 #Description = $Description
             }
             [void]$ArrayList.Add($TmpHash)

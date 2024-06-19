@@ -108,25 +108,27 @@ function Confirm-GptMember {
             # Resolve the member to a SID
             If ($member -is [string]) {
 
-                # Check if WellKnownSid
-                If ($Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_] -eq $member }) {
+                # Check if string is a SID
+                If ($member -match $Constants.SidRegEx) {
+                    # Check if WellKnownSid
+                    If (Test-NameIsWellKnownSid -Name $member) {
 
-                    $resolvedSid = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_] -eq $member }
+                        $resolvedSid = (Test-NameIsWellKnownSid -Name $member).Value
 
-                } elseIf (Test-NameIsWellKnownSid -Name $member) {
+                    } elseIf (Convert-SidToName -SID $member) {
 
-                    $resolvedSid = (Test-NameIsWellKnownSid -Name $member).Value
+                        $resolvedSid = $member
 
-                } elseIf (Convert-SidToName -SID $member) {
+                    } #end If-ElseIf
+                } #end If
 
-                    $resolvedSid = $member
-
+                # Check if string is a DistinguishedName
+                if ($member -match $Constants.DnRegEx) {
+                    $resolvedSid = (Get-AdObjectType -Identity $member).sid.value
                 } #end If
 
             } else {
-                $member = Get-AdObjectType -Identity $member
-
-                $resolvedSid = $member.sid.Value
+                $resolvedSid = (Get-AdObjectType -Identity $member).sid.value
             } #end If-Else
 
 

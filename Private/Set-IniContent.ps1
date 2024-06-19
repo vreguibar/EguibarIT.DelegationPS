@@ -126,6 +126,7 @@
                 $Key,
 
                 [Parameter(Mandatory = $true)]
+                [AllowEmptyString()]
                 [String]
                 $Value
             )
