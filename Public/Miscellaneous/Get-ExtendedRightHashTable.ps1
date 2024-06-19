@@ -91,7 +91,7 @@
                 Write-Verbose -Message '$Variables.ExtendedRightsMap id defined. You can use it!'
             } #end If-Else
         } catch {
-            ## Get-CurrentErrorToDisplay -CurrentError $error[0]
+            Write-Error -Message 'Error when filling ExtendedRightsmap variable'
             throw
         } Finally {
             # Remove completed progress bar

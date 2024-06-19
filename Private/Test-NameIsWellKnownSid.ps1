@@ -34,7 +34,7 @@
                 $Identity = [System.Security.Principal.SecurityIdentifier]::new($SID)
             } #end If
         } catch {
-            Write-Error -Message 'Error found'
+            Write-Error -Message 'Error found when translating WellKnownSid'
         }
     } #end Process
 

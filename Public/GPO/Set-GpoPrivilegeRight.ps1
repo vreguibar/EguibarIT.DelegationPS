@@ -1031,7 +1031,9 @@
             $iniContent | Out-IniFile -FilePath $iniFilePath -Encoding 'Unicode' -Force
             Write-Verbose -Message ('Saving changes to file {0}' -f $iniFilePath)
         } Catch {
-            Throw 'The GptTmpl.inf file could not be saved: {0}. Message is {1}', $_, $_.Message
+            Write-Error -Message 'The GptTmpl.inf file could not be saved: {0}. Message is {1}', $_, $_.Message
+
+            Throw
         }
 
         # Increment Version

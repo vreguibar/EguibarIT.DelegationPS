@@ -85,7 +85,7 @@
                 }
             }
         } catch {
-            ## Get-CurrentErrorToDisplay -CurrentError $error[0]
+            Write-Error -Message 'Error when importing module'
             throw
         } #end Try-Catch
 

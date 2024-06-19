@@ -66,7 +66,7 @@
         Write-Verbose -Message ('  Starting: {0}' -f $MyInvocation.Mycommand)
         Write-Verbose -Message ('Parameters used by the function... {0}' -f (Get-FunctionDisplay $PsBoundParameters -Verbose:$False))
 
-        Import-MyModule -Name ActiveDirectory -Verbose:$false
+        Import-MyModule -name ActiveDirectory -Verbose:$false
 
         ##############################
         # Variables Definition
@@ -113,7 +113,7 @@
                     )
                     Write-Verbose -Message ('Successfully removed {0} for {1}' -f $_.AceType, $PSBoundParameters['Group'])
                 } catch {
-                    Write-Warning -Message "Failed to remove access because $($_.Exception.Message)"
+                    Write-Error -Message "Failed to remove access because $($_.Exception.Message)"
                 } #end Try-Catch
             } #end $Permission
 
@@ -134,7 +134,7 @@
                 }
                 Write-Verbose -Message 'Successfully set binary ACL in the registry' -Verbose
             } catch {
-                Write-Warning -Message "Failed to set Security in the registry because $($_.Exception.Message)"
+                Write-Error -Message "Failed to set Security in the registry because $($_.Exception.Message)"
             } #end Try-Catch
         } #end If
 

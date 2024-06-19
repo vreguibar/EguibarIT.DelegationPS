@@ -113,7 +113,7 @@
                 Set-AclConstructor6 @Splat
             }
         } Catch {
-            ## Get-CurrentErrorToDisplay -CurrentError $error[0]
+            Write-Error -Message 'Error when delegating Create/Delete site'
             throw
         } #end Try-Catch
 
@@ -152,7 +152,7 @@
                 Set-AclConstructor5 @Splat
             }
         } Catch {
-            ## Get-CurrentErrorToDisplay -CurrentError $error[0]
+            Write-Error -Message 'Error when delegating Create/Delete site'
             throw
         } #end Try-Catch
 
@@ -192,7 +192,7 @@
                 Set-AclConstructor6 @Splat
             }
         } Catch {
-            ## Get-CurrentErrorToDisplay -CurrentError $error[0]
+            Write-Error -Message 'Error when delegating Create/Delete site'
             throw
         } #end Try-Catch
 
@@ -231,7 +231,7 @@
                 Set-AclConstructor5 @Splat
             }
         } Catch {
-            ## Get-CurrentErrorToDisplay -CurrentError $error[0]
+            Write-Error -Message 'Error when delegating Create/Delete site'
             throw
         } #end Try-Catch
 
@@ -268,7 +268,7 @@
                 Set-AclConstructor4 @Splat
             }
         } Catch {
-            ## Get-CurrentErrorToDisplay -CurrentError $error[0]
+            Write-Error -Message 'Error when delegating Create/Delete site'
             throw
         } #end Try-Catch
 
@@ -307,7 +307,7 @@
                 Set-AclConstructor5 @Splat
             }
         } Catch {
-            ## Get-CurrentErrorToDisplay -CurrentError $error[0]
+            Write-Error -Message 'Error when delegating Create/Delete site'
             throw
         } #end Try-Catch
 
@@ -347,7 +347,7 @@
                 Set-AclConstructor5 @Splat
             }
         } Catch {
-            ## Get-CurrentErrorToDisplay -CurrentError $error[0]
+            Write-Error -Message 'Error when delegating Create/Delete site'
             throw
         } #end Try-Catch
 
@@ -387,7 +387,7 @@
                 Set-AclConstructor6 @Splat
             }
         } Catch {
-            ## Get-CurrentErrorToDisplay -CurrentError $error[0]
+            Write-Error -Message 'Error when delegating Create/Delete site'
             throw
         } #end Try-Catch
 
@@ -425,7 +425,7 @@
                 Set-AclConstructor6 @Splat
             }
         } Catch {
-            ## Get-CurrentErrorToDisplay -CurrentError $error[0]
+            Write-Error -Message 'Error when delegating Create/Delete site'
             throw
         } #end Try-Catch
 

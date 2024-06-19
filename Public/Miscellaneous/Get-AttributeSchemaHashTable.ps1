@@ -97,7 +97,7 @@
 
             } #end If
         } catch {
-            ## Get-CurrentErrorToDisplay -CurrentError $error[0]
+            Write-Error -Message 'Error when filling GUIDmap variable'
             throw
         } Finally {
             # Remove completed progress bar

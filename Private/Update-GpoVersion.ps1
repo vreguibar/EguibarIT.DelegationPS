@@ -61,7 +61,9 @@ function Update-GpoVersion {
         }
 
     } catch {
-        throw "The GPTs.ini file could not be modified: $_. Message is $($_.Exception.Message)"
+        Write-Error -Message "The GPTs.ini file could not be modified: $_. Message is $($_.Exception.Message)"
+
+        throw
     } finally {
         Write-Verbose -Message ('Version of GPO updated. Original Number: {0}. New Number: {1}' -f $versionObject.ToString(), $newVersionObject.ToString())
     }
