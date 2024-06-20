@@ -230,3 +230,50 @@ class IniFile {
         $this.KeyValuePair.SetValue($key, $value)
     }
 } #end Class
+
+
+<#
+
+# Sample usage:
+
+$PathToFile = 'C:\Users\RODRIGUEZEGUIBARVice\OneDrive - Vicente Rodriguez Eguibar\Desktop\GptTmpl.inf'
+
+$ini = [IniFile]::new($PathToFile)
+
+# Enumerate all sections and key/values
+foreach ($section in $ini.Sections.Sections.Values) {
+    Write-Output "Section: $($section.SectionName)"
+    foreach ($keyValue in $section.KeyValuePair.KeyValues.GetEnumerator()) {
+        Write-Output "Key: $($keyValue.Key) Value: $($keyValue.Value)"
+    }
+}
+
+# Check section exists
+if ($ini.Sections.ContainsKey('Asasa')) {
+    Write-Output "Section Name: $($ini.Sections.GetSection('Version').SectionName)"
+} else {
+    Write-Output 'Section does not exist'
+}
+
+# Get existing Section
+Write-Output $ini.Sections.GetSection('Version').SectionName
+
+# Gets the KeyValuePair with name key in the specified section
+Write-Output $ini.Sections.GetSection('Version').KeyValuePair.GetValue('signature')
+
+# Add a new section
+$ini.AddSection('Delegation Model')
+$ini.AddSection('To Be Deleted')
+
+# Add a new Key/Value pair within a given section
+$ini.AddKeyValue('Delegation Model', 'T0Admin', 'TheGood')
+
+# Change value of an existing key
+$ini.SetKeyValue('Delegation Model', 'T0Admin', 'TheUgly')
+
+# Save file
+#$ini.SaveFile($PathToFile)
+$ini.SaveFile($PathToFile, 'unicode')
+
+
+#>
