@@ -49,6 +49,7 @@
                 Try {
                     $ini.add($Section, [ordered]@{})
                 } Catch {
+                    Write-Error -Message 'Error when adding a new section'
                     Throw
                     Continue
                 }

@@ -67,6 +67,7 @@
                 } #end If-Else
             } #end If
         } catch {
+            Write-Error -Message 'Error found when translating WellKnownSid'
             Write-Error -Message ('An error occurred while retrieving the identity: {0}' -f $_)
         }
     } #end Process

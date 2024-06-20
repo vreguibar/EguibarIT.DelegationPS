@@ -48,7 +48,7 @@
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
         # Get 'Pre-Windows 2000 Compatible Access' group by SID
-        $PreWin2000 = Get-AdGroup -Filter * | Where-Object { $_.SID -like 'S-1-5-32-554' }
+        $PreWin2000 = Get-ADGroup -Filter * | Where-Object { $_.SID -like 'S-1-5-32-554' }
 
         Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case is empty a function is called to fill it up.'
         Get-AttributeSchemaHashTable
@@ -57,7 +57,7 @@
     process {
         try {
             # Remove inheritance, otherwise is not possible to remove
-            Set-AdInheritance -LDAPPath $PSBoundParameters['LDAPpath'] -RemoveInheritance $true -RemovePermissions $true
+            Set-AdInheritance -LDAPpath $PSBoundParameters['LDAPpath'] -RemoveInheritance $true -RemovePermissions $true
 
             # Remove the List Children
             $Splat = @{
@@ -118,6 +118,7 @@
                 Set-AclConstructor6 @Splat
             } #end If
         } catch {
+            Write-Error -Message 'Error when removing Pre-Windows 2000 from OU'
             throw
         }
     } #end Process

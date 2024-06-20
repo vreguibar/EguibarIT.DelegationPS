@@ -81,6 +81,7 @@
                 Set-Acl -AclObject $acl -Path ('AD:\{0}' -f $PSBoundParameters['LDAPPath'])
             } #end If
         } catch {
+            Write-Error -Message 'Error when setting OU inheritance'
             throw
         }
     } #end Process

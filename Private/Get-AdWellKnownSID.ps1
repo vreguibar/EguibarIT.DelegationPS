@@ -78,7 +78,7 @@
             Write-Verbose -Message ('Is Well-Known: {0}' -f $isWellKnownSid)
             Write-Verbose -Message ('  Description: {0}' -f $sidDescription)
         } catch {
-            ## Get-CurrentErrorToDisplay -CurrentError $error[0]
+            Write-Error -Message 'Error when checking WellKnownSid'
             throw
         } #end Try-Catch
 

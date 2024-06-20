@@ -1,7 +1,7 @@
 ﻿function Set-AdAclChangeSubnet {
     <#
         .Synopsis
-            The function will delegate the premission for a group to
+            The function will delegate the permission for a group to
             Change Subnets
         .DESCRIPTION
             Long description
@@ -68,6 +68,7 @@
     } #end Begin
 
     process {
+        # todo: TerminatingError(Set-AclConstructor5): "Cannot validate argument on parameter 'LDAPpath'. The " Test-IsValidDN -ObjectDN $_ " validation script for the argument with value "cn=subnets,cn=Sites,CN=Configuration,DC=EguibarIT,DC=local" did not return a result of True. Determine why the validation script failed, and then try the command again."
         <#
             ACENumber             : 1
             Id                    : XXX
