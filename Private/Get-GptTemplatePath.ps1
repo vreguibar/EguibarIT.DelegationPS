@@ -25,9 +25,10 @@ function Get-GptTemplatePath {
 
     param (
         [Parameter(Mandatory = $true,
-            Position = 0,
             ValueFromPipeline = $true,
-            ValueFromPipelineByPropertyName = $true)]
+            ValueFromPipelineByPropertyName = $true,
+            HelpMessage = 'The name of the Group Policy Object (GPO) for which to retrieve the GPT template path',
+            Position = 0)]
         [string]
         $GpoName
     )
