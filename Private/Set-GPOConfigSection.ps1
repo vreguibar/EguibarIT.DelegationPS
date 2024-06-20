@@ -1,4 +1,6 @@
-﻿function Set-GPOConfigSection {
+﻿# ConfigRestrictionsOnSection on file GpoPrivilegeRights.cs
+
+function Set-GPOConfigSection {
 
     <#
         .SYNOPSIS
@@ -27,17 +29,17 @@
             [string], [string], [string[]], [IniFile]
 
         .OUTPUTS
-            [bool]
+            [IniFile]
     #>
 
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
-    [OutputType([bool])]
+    [OutputType([IniFile])]
 
     param (
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            HelpMessage = '.',
+            HelpMessage = 'The section in the GPT template file to be configured (ex. [Privilege Rights] or [Registry Values]).',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [string]
@@ -86,12 +88,12 @@
 
                 Write-Verbose -Message ('Processing configuration for section [{0}] and key [{1}]...' -f $CurrentSection, $CurrentKey)
 
-                if ($GptTmpl.Sections[$CurrentSection].KeyValuePair.ContainsKey($CurrentKey)) {
+                if ($GptTmpl.Sections.GetSection($CurrentSection).KeyValuePair.ContainsKey($CurrentKey)) {
 
                     Write-Verbose -Message ('Key [{0}] exists. Updating values.' -f $CurrentKey)
 
-                    $directValue = $GptTmpl.Sections[$CurrentSection].KeyValuePair[$CurrentKey]
-                    $TempMembers = $directValue.Split(',') | ForEach-Object { $_.Trim() }
+                    $directValue = $GptTmpl.Sections.GetSection($CurrentSection).KeyValuePair.KeyValues[$CurrentKey]
+                    $TempMembers.AddRange($directValue.Split(','))
 
                     foreach ($ExistingMember in $TempMembers) {
 
@@ -140,9 +142,9 @@
                     $GptTmpl.Sections[$CurrentSection].KeyValuePair.Add($CurrentKey, $UserSIDs -join ',')
                 } #end If-Else
 
-                Write-Verbose -Message 'Writing changes to GptTmpl...'
+                #Write-Verbose -Message 'Writing changes to GptTmpl...'
 
-                $GptTmpl.WriteAllText()
+                #$GptTmpl.WriteAllText()
 
                 $status = $true
             } #end If
@@ -156,6 +158,6 @@
     } #end Process
 
     End {
-        return $status
+        return $GptTmpl
     } #end End
 }

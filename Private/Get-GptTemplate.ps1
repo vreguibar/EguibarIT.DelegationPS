@@ -1,4 +1,6 @@
-﻿function Get-GptTemplate {
+﻿# GptTemplate on file GpoPrivilegeRights.cs
+
+function Get-GptTemplate {
     <#
         .SYNOPSIS
             Retrieves the GPT template path for a specified GPO name.
@@ -44,8 +46,8 @@
     Process {
         try {
             # Retrieve the GPO object by name
-            if ($PSCmdlet.ShouldProcess("Retrieving GPO path for GPO name: $PSBoundParameters['GpoName]")) {
-                $gpo = Get-Gpo -Name $GpoName -ErrorAction Stop
+            if ($PSCmdlet.ShouldProcess("Retrieving GPO path for GPO name: $PSBoundParameters['GpoName']")) {
+                $gpo = Get-GPO -Name $PSBoundParameters['GpoName'] -ErrorAction Stop
                 Write-Verbose -Message ('GPO object retrieved successfully: {0}' -f $gpo.DisplayName)
 
                 # Construct the GPT template path
@@ -59,12 +61,12 @@
         } #end Try-Catch
 
         try {
-            if (-not (Test-Path $PathToGptTmpl)) {
+            if (-not (Test-Path $gpoPath)) {
                 Write-Verbose -Message ('GPT template path does not exist. Creating new file: {0}' -f $gpoPath)
-                New-Item -ItemType File -Path $PathToGptTmpl | Out-Null
+                New-Item -ItemType File -Path $gpoPath | Out-Null
             } #end if
 
-            $GptTemplate = [IniFile]::new($PathToFile)
+            $GptTemplate = [IniFile]::new($gpoPath)
             Write-Verbose -Message 'GPT template object created successfully.'
         } catch {
             Write-Error -Message ('An error occurred while handling the GPT template path. Error: {0}' -f $_)

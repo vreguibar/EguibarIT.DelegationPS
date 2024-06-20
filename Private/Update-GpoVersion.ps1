@@ -1,4 +1,5 @@
-﻿# Helper Function: Update-GpoVersion
+﻿# UpdateGpt on file GpoPrivilegeRights.cs
+
 function Update-GpoVersion {
 
     <#
@@ -103,7 +104,6 @@ function Update-GpoVersion {
                 # Write new version value to GPT (Including Section Name)
                 if (Test-Path -Path $pathToGpt) {
 
-<<<<<<< HEAD
                     # New instance of IniFile class
                     $Gpt = [IniFile]::new($pathToGpt)
 
@@ -136,13 +136,4 @@ function Update-GpoVersion {
         [string]$msg = ('Version of GPO updated. Original Number: {0}. New Number: {1}' -f $versionObject, $newVersionObject)
         Write-Verbose -Message $msg
     } #end End
-=======
-    } catch {
-        Write-Error -Message "The GPTs.ini file could not be modified: $_. Message is $($_.Exception.Message)"
-
-        throw
-    } finally {
-        Write-Verbose -Message ('Version of GPO updated. Original Number: {0}. New Number: {1}' -f $versionObject.ToString(), $newVersionObject.ToString())
-    }
->>>>>>> f81291f8630e407ea33664afbf57598ec6425985
 }

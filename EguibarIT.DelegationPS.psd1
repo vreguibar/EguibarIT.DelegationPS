@@ -58,9 +58,9 @@
 
     # Script files (.ps1) that are run in the caller's environment prior to importing this module.
     ScriptsToProcess      = @(
-        '.\Enums\Enum.ServiceAccessFlags.ps1',
-        '.\Enums\Enum.Encoding.ps1',
-        '.\Classes\Enum.IniFile.ps1'
+        "$PSScriptRoot\Enums\Enum.ServiceAccessFlags.ps1",
+        "$PSScriptRoot\Enums\Enum.Encoding.ps1",
+        "$PSScriptRoot\Classes\Class.IniFile.ps1"
     )
 
     # Type files (.ps1xml) to be loaded when importing this module
@@ -116,7 +116,7 @@
     'Set-AdAclUserGeneralInfo', 'Set-AdAclUserGroupMembership',
     'Set-AdAclUserLogonInfo', 'Set-AdAclUserPersonalInfo',
     'Set-AdAclUserPublicInfo', 'Set-AdAclUserWebInfo',
-    'Set-AdAclChangeVolume', 'Set-AdAclCreateDeleteVolume', 'Set-GpoPrivilegeRightNEW'
+    'Set-AdAclChangeVolume', 'Set-AdAclCreateDeleteVolume', 'Testing_Script'
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
     CmdletsToExport       = @()
