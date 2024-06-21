@@ -9,31 +9,31 @@
 @{
 
     # Script module or binary module file associated with this manifest.
-    RootModule            = 'EguibarIT.DelegationPS.psm1'
+    RootModule           = 'EguibarIT.DelegationPS.psm1'
 
     # Version number of this module.
-    ModuleVersion         = '1.116.55'
+    ModuleVersion        = '1.116.55'
 
     # Supported PSEditions
-    CompatiblePSEditions  = 'Desktop', 'Core'
+    CompatiblePSEditions = 'Desktop', 'Core'
 
     # ID used to uniquely identify this module
-    GUID                  = 'c21c1a04-f27e-44b9-967a-d8f0926c87c5'
+    GUID                 = 'c21c1a04-f27e-44b9-967a-d8f0926c87c5'
 
     # Author of this module
-    Author                = 'Vicente Rodriguez Eguibar'
+    Author               = 'Vicente Rodriguez Eguibar'
 
     # Company or vendor of this module
-    CompanyName           = 'EguibarIT'
+    CompanyName          = 'EguibarIT'
 
     # Copyright statement for this module
-    Copyright             = 'All rights reserved (c) 2024 - EguibarIT'
+    Copyright            = 'All rights reserved (c) 2024 - EguibarIT'
 
     # Description of the functionality provided by this module
-    Description           = 'Functions used to implement the Delegation Model with Tiers on the given Active Directory.'
+    Description          = 'Functions used to implement the Delegation Model with Tiers on the given Active Directory.'
 
     # Minimum version of the PowerShell engine required by this module
-    PowerShellVersion     = '7.4'
+    PowerShellVersion    = '7.2'
 
     # Name of the PowerShell host required by this module
     # PowerShellHostName = ''
@@ -73,7 +73,7 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport     = 'Set-AdAclChangeSite', 'Set-AdAclChangeSiteLink',
+    FunctionsToExport    = 'Set-AdAclChangeSite', 'Set-AdAclChangeSiteLink',
     'Set-AdAclChangeSubnet', 'Set-AdAclCreateDeleteSite',
     'Set-AdAclCreateDeleteSiteLink', 'Set-AdAclCreateDeleteSubnet',
     'Set-AdAclFMSOtransfer', 'Set-AdDirectoryReplication',
@@ -116,16 +116,16 @@
     'Set-AdAclUserGeneralInfo', 'Set-AdAclUserGroupMembership',
     'Set-AdAclUserLogonInfo', 'Set-AdAclUserPersonalInfo',
     'Set-AdAclUserPublicInfo', 'Set-AdAclUserWebInfo',
-    'Set-AdAclChangeVolume', 'Set-AdAclCreateDeleteVolume', 'Testing_Script'
+    'Set-AdAclChangeVolume', 'Set-AdAclCreateDeleteVolume'
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-    CmdletsToExport       = '*'
+    CmdletsToExport      = '*'
 
     # Variables to export from this module
     # VariablesToExport = @()
 
     # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-    AliasesToExport       = @()
+    AliasesToExport      = @()
 
     # DSC resources to export from this module
     # DscResourcesToExport = @()
@@ -137,7 +137,7 @@
     # FileList = @()
 
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
-    PrivateData           = @{
+    PrivateData          = @{
 
         PSData = @{
 
@@ -163,14 +163,14 @@
             # RequireLicenseAcceptance = $false
 
             # External dependent modules of this module
-            ExternalModuleDependencies = @('ActiveDirectory', 'GroupPolicy', 'ServerManager', 'EguibarIT.DelegationPS')
+            ExternalModuleDependencies = @('ActiveDirectory', 'GroupPolicy', 'ServerManager')
 
         } # End of PSData hashtable
 
     } # End of PrivateData hashtable
 
     # HelpInfo URI of this module
-    HelpInfoURI           = 'https://eguibarit.eu/powershell/delegation-model-powershell-scripts/eguibarit-powershell-module/'
+    HelpInfoURI          = 'https://eguibarit.eu/powershell/delegation-model-powershell-scripts/eguibarit-powershell-module/'
 
     # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
     # DefaultCommandPrefix = ''

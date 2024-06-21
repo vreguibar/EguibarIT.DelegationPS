@@ -1,4 +1,5 @@
-﻿#Import-Module EguibarIT.DelegationPS
+﻿<#
+#Import-Module EguibarIT.DelegationPS
 
 $Administrators = Get-ADGroup Administrators
 
@@ -30,3 +31,4 @@ If ($SettingsOK) {
 } else {
     Write-Warning -Message ('[WARNING] Privilege Right not granted.')
 }
+#>
