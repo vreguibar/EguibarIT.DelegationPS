@@ -1,5 +1,4 @@
-﻿
-class IniKeyValuePair {
+﻿class IniKeyValuePair {
     [hashtable] $KeyValues
 
     IniKeyValuePair() {
@@ -127,12 +126,26 @@ class IniFile {
         } #end Try-Catch
     }
 
+    [void] SaveFile() {
+        # Check if instance been initialized and has FilePath
+        If ($this.FilePath) {
+            If ($this.FilePath.Contains('GptTmpl.inf')) {
+                # Save the file as unicode
+                $this.SaveFile($This.FilePath, 'unicode')
+            } else {
+                # Save the file as UTF-8
+                $this.SaveFile($This.FilePath, 'utf8')
+            }
+        } else {
+            Write-Error -Message 'There is no path or file name. please provide one.'
+        }
+    }
+
     [void] SaveFile(
         [string]$filePath
     ) {
-        $this.SaveFile($filePath, 'UTF-8')
+        $this.SaveFile($filePath, 'utf8')
     }
-
 
     [void] SaveFile(
         [string]$filePath,
@@ -230,7 +243,6 @@ class IniFile {
         $this.KeyValuePair.SetValue($key, $value)
     }
 } #end Class
-
 
 <#
 

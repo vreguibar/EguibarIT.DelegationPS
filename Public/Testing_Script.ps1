@@ -19,9 +19,9 @@ $Splat = @{
     GptTmpl        = $GptTmpl
     Confirm        = $false
 }
-Set-GPOConfigSection @Splat
+$GptTmpl = Set-GPOConfigSection @Splat
 
-$GptTmpl.SaveFile($PathToFile, 'unicode')
+$GptTmpl.SaveFile()
 
 Update-GpoVersion -GpoName 'C-Baseline'
 

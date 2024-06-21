@@ -42,7 +42,7 @@ function Update-GpoVersion {
         Import-Module -Name GroupPolicy -Verbose:$False
 
         # Retrieve the GPO object by name
-        [GroupPolicy]$gpo = Get-GPO -Name $PsBoundParameters['GpoName'] -ErrorAction Stop
+        $gpo = Get-GPO -Name $PsBoundParameters['GpoName'] -ErrorAction Stop
         # Get the GPO ID
         $gpoId = $gpo.Id
         # Build SYSVOL path

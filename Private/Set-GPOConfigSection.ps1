@@ -60,7 +60,6 @@ function Set-GPOConfigSection {
             HelpMessage = '.',
             Position = 2)]
         [ValidateNotNullOrEmpty()]
-        [string[]]
         $Members,
 
         [Parameter(Mandatory = $true,
@@ -112,15 +111,22 @@ function Set-GPOConfigSection {
 
                         Write-Verbose -Message ('Processing new member: {0}' -f $item)
 
-                        $identity = Test-NameIsWellKnownSid -Name $item
+                        if ($item -is [Microsoft.ActiveDirectory.Management.ADGroup] -or
+                            $item -is [Microsoft.ActiveDirectory.Management.ADAccount]) {
+                            $identity = $item.SID
+                        } else {
+                            $identity = Test-NameIsWellKnownSid -Name $item
+                        } #end If-Else
 
-                        if (-not $NewMembers.Contains('*{0}' -f $identity.Value)) {
+                        if ((-not $NewMembers.Contains('*{0}' -f $identity.Value)) -and
+                            $null -ne $identity) {
 
                             $NewMembers.Add('*{0}' -f $identity.Value)
                         } #end If
                     } #end Foreach
 
-                    $GptTmpl.Sections[$CurrentSection].KeyValuePair[$CurrentKey] = $NewMembers -join ','
+                    #$GptTmpl.Sections[$CurrentSection].KeyValuePair[$CurrentKey] = $NewMembers -join ','
+                    $GptTmpl.SetKeyValue($CurrentSection, $CurrentKey, $NewMembers -join ',')
                 } else {
 
                     Write-Verbose -Message ('Key [{0}] does not exist. Creating new key...' -f $CurrentKey)
@@ -129,17 +135,25 @@ function Set-GPOConfigSection {
 
                         Write-Verbose -Message ('Processing new member: {0}' -f $item)
 
-                        $identity = Test-NameIsWellKnownSid -Name $item
+                        if ($item -is [Microsoft.ActiveDirectory.Management.ADGroup] -or
+                            $item -is [Microsoft.ActiveDirectory.Management.ADAccount]) {
+                            $identity = $item.SID
+                        } else {
+                            $identity = Test-NameIsWellKnownSid -Name $item
+                        } #end If-Else
 
                         if ($null -eq $identity) {
                             $identity = ConvertTo-SID -AccountName $item
                         } #end If
 
-                        if (-not $UserSIDs.Contains('*{0}' -f $identity.Value)) {
+                        if ((-not $UserSIDs.Contains('*{0}' -f $identity.Value)) -and
+                            $null -ne $identity) {
                             $UserSIDs.Add('*{0}' -f $identity.Value)
                         } #end If
                     } #end Foreach
-                    $GptTmpl.Sections[$CurrentSection].KeyValuePair.Add($CurrentKey, $UserSIDs -join ',')
+
+                    #$GptTmpl.Sections[$CurrentSection].KeyValuePair.Add($CurrentKey, $UserSIDs -join ',')
+                    $GptTmpl.AddKeyValue($CurrentSection, $CurrentKey, $UserSIDs -join ',')
                 } #end If-Else
 
                 #Write-Verbose -Message 'Writing changes to GptTmpl...'
