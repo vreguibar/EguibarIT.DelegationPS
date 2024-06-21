@@ -15,6 +15,54 @@
         .EXAMPLE
             Set-GpoPrivilegeRight -GpoToModify "Default Domain" -NetworkLogon "SL_InfraRight"
 
+        .EXAMPLE
+            $Splat = @{
+                GpoToModify                    = 'My posh GPO'
+                NetworkLogon                   = $NetworkLogon
+                DenyNetworkLogon               = $DenyNetworkLogon
+                InteractiveLogon               = $InteractiveLogon
+                DenyInteractiveLogon           = $DenyInteractiveLogon
+                RemoteInteractiveLogon         = $RemoteInteractiveLogon
+                DenyRemoteInteractiveLogon     = $DenyRemoteInteractiveLogon
+                BatchLogon                     = $BatchLogon
+                DenyBatchLogon                 = $DenyBatchLogon
+                ServiceLogon                   = $ServiceLogon
+                DenyServiceLogon               = $DenyServiceLogon
+                MachineAccount                 = $MachineAccount
+                IncreaseQuota                  = $IncreaseQuota
+                Backup                         = $Backup
+                ChangeNotify                   = $ChangeNotify
+                SystemTime                     = $SystemTime
+                TimeZone                       = $TimeZone
+                CreatePagefile                 = $CreatePagefile
+                CreateGlobal                   = $CreateGlobal
+                CreateSymbolicLink             = $CreateSymbolicLink
+                EnableDelegation               = $EnableDelegation
+                RemoteShutdown                 = $RemoteShutdown
+                Audit                          = $Audit
+                Impersonate                    = $Impersonate
+                IncreaseWorkingSet             = $IncreaseWorkingSet
+                IncreaseBasePriority           = $IncreaseBasePriority
+                LoadDriver                     = $LoadDriver
+                AuditSecurity                  = $AuditSecurity
+                Relabel                        = $Relabel
+                SystemEnvironment              = $SystemEnvironment
+                DelegateSessionUserImpersonate = $DelegateSessionUserImpersonate
+                ManageVolume                   = $ManageVolume
+                ProfileSingleProcess           = $ProfileSingleProcess
+                SystemProfile                  = $SystemProfile
+                Undock                         = $Undock
+                AssignPrimaryToken             = $AssignPrimaryToken
+                Restore                        = $Restore
+                Shutdown                       = $Shutdown
+                SyncAgent                      = $SyncAgent
+                TakeOwnership                  = $TakeOwnership
+            }
+            Set-GpoPrivilegeRight @Splat
+
+            This example shows how to modify all Privilege Rights from a given GPO.
+            Each parameter uses an Array with members named after the parameter.
+
         .PARAMETER GpoToModify
             [STRING] Name of the GPO which will get the Restricted Groups modification.
 
