@@ -473,34 +473,22 @@
 
 
 
-        $iniFilePath = Get-GptTemplatePath -GpoName $PSBoundParameters['GpoToModify']
-        Write-Verbose -Message ('INI File Path: {0}' -f $iniFilePath)
+        # Get the GptTmpl.inf content and store it in variable
+        $GptTmpl = Get-GptTemplate -GpoName $PSBoundParameters['GpoToModify']
 
-        if (-Not (Test-Path -Path $iniFilePath)) {
-            Write-Verbose -Message ('INI file not found. Creating new INI file at {0}' -f $iniFilePath)
-            New-Item -Path $iniFilePath -ItemType File -Force
-        }
-
-        Write-Verbose 'Loading existing INI file content'
-        #$iniContent = Get-Content -Path $iniFilePath -Raw
-        $iniContent = Get-IniContent -FilePath $iniFilePath
 
         # Check GPT does contains default sections ([Unicode] and [Version])
-        If (-not ($iniContent.Contains('Version') -and
-                $iniContent.Contains('Unicode'))) {
+        If ( -not (($GptTmpl.Sections.GetSection('Version').SectionName) -and
+        ($GptTmpl.Sections.GetSection('Unicode').SectionName))) {
 
-            # Add Section "Version" with first Key/Value pair
-            $iniContent.Add('Version', [ordered]@{})
+            # Add the missing sections
+            $GptTmpl.AddSection('Version')
+            $GptTmpl.AddSection('Unicode')
 
-            # Add second Key/Value
-            $iniContent['Version'].Add('signature', '"$CHICAGO$"')
-            $iniContent['Version'].Add('Revision', '1')
-
-            # Add Unicode Section
-            $iniContent.Add('Unicode', [ordered]@{})
-
-            # Add second Key/Value
-            $iniContent['Unicode'].Add('Unicode', 'yes')
+            # Add missing Key-Value pairs
+            $GptTmpl.SetKeyValue('Unicode', 'Unicode', 'yes')
+            $GptTmpl.SetKeyValue('Version', 'Revision', '1')
+            $GptTmpl.SetKeyValue('Version', 'signature', '$CHICAGO$')
         } #end If
     } #end Begin
 
@@ -996,40 +984,31 @@
                 #$members = $right.Value
 
                 # Check if [Privilege Rights] section exist. Create it if it does not exist
-                If (-not $iniContent.Contains($Rights.Section)) {
+                If (-not $GptTmpl.Sections.GetSection($Rights.Section).SectionName) {
 
                     Write-Verbose -Message ('Section "{0}" does not exist. Creating it!.' -f $Rights.Section)
-                    $iniContent.add($Rights.Section, [ordered]@{})
+                    $ini.AddSection($Rights.Section)
 
                 } #end If
 
+                # Add corresponding Key-Value pairs.
+                # Each pair will verify proper members are added.
                 $Splat = @{
-                    Members    = $Rights.members
-                    iniContent = $iniContent
-                    Section    = $Rights.Section
-                    key        = $Rights.Key
+                    CurrentSection = $Rights.Section
+                    CurrentKey     = $Rights.Key
+                    Members        = $Rights.members
+                    GptTmpl        = $GptTmpl
+                    Confirm        = $false
                 }
-                $validMembers = Confirm-GptMember @Splat
-                Write-Verbose -Message ('Valid members: {0}' -f ($validMembers -join ', '))
-
-                $Splat = @{
-                    Value       = $validMembers
-                    InputObject = $iniContent
-                    Section     = $Rights.Section
-                    key         = $Rights.Key
-                }
-                $iniContent = Set-IniContent @Splat
-                #} #end Foreach
-
-
+                $GptTmpl = Set-GPOConfigSection @Splat
             } #end If
         } #end Foreach
 
 
         # Save INI file
         Try {
-            $iniContent | Out-IniFile -FilePath $iniFilePath -Encoding 'Unicode' -Force
-            Write-Verbose -Message ('Saving changes to file {0}' -f $iniFilePath)
+            $GptTmpl.SaveFile()
+            Write-Verbose -Message ('Saving changes to GptTmpl.inf file og GPO {0}' -f $PSBoundParameters['GpoToModify'])
         } Catch {
             Write-Error -Message 'The GptTmpl.inf file could not be saved: {0}. Message is {1}', $_, $_.Message
 

@@ -270,8 +270,15 @@ if ($ini.Sections.ContainsKey('Asasa')) {
 # Get existing Section
 Write-Output $ini.Sections.GetSection('Version').SectionName
 
+# Check if a Key exist in a given section
+$ini.Sections.GetSection('Version').KeyValuePair.ContainsKey('Revision')
+$ini.Sections.GetSection('Version').KeyValuePair.ContainsKey('signature')
+$ini.Sections.GetSection('Unicode').KeyValuePair.ContainsKey('Unicode')
+
 # Gets the KeyValuePair with name key in the specified section
+Write-Output $ini.Sections.GetSection('Version').KeyValuePair.GetValue('Revision')
 Write-Output $ini.Sections.GetSection('Version').KeyValuePair.GetValue('signature')
+Write-Output $ini.Sections.GetSection('Unicode').KeyValuePair.GetValue('Unicode')
 
 # Add a new section
 $ini.AddSection('Delegation Model')
@@ -282,6 +289,9 @@ $ini.AddKeyValue('Delegation Model', 'T0Admin', 'TheGood')
 
 # Change value of an existing key
 $ini.SetKeyValue('Delegation Model', 'T0Admin', 'TheUgly')
+$ini.SetKeyValue('Unicode', 'Unicode', 'yes')
+$ini.SetKeyValue('Version', 'Revision', '1')
+$ini.SetKeyValue('Version', 'signature', '$CHICAGO$')
 
 # Save file
 #$ini.SaveFile($PathToFile)
