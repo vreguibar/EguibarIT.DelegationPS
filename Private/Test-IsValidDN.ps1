@@ -48,7 +48,8 @@
         Write-Verbose -Message ('  Starting: {0}' -f $MyInvocation.Mycommand)
         Write-Verbose -Message ('Parameters used by the function... {0}' -f (Get-FunctionDisplay $PsBoundParameters -Verbose:$False))
 
-        $isValid = $false
+        # Initialize a boolean variable to store validation result
+        [bool]$isValid = $false
 
         Write-Verbose 'Begin block: Regex pattern for DN validation initialized.'
 

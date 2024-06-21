@@ -31,9 +31,11 @@
     [CmdletBinding(ConfirmImpact = 'Low', SupportsShouldProcess = $false)]
     [OutputType([bool])]
 
-    param
-    (
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, ValueFromRemainingArguments = $false,
+    param (
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'String to be validated as Global Unique Identifier (GUID)',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -60,7 +62,7 @@
 
             # Perform the actual validation
             #$isValid = $ObjectDN -match $distinguishedNameRegex
-            $isValid = $Constants.GuidRegEx.IsMatch($ObjectGUID)
+            $isValid = $ObjectGUID -match $Constants.GuidRegEx
 
             # Provide verbose output
             if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
