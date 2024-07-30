@@ -14,7 +14,7 @@
     SidRegEx  = [RegEx]::new('^S-1-(0|1|2|3|4|5|16|59)-\d+(-\d+)*$')
 
     # Regular Expression (RegEx) for DistinguishedName
-    DnRegEx   = [RegEx]::new('^(?:(CN=(?<name>(?:[^,\\]|\\.)+),)*)?(OU=(?<ou>(?:[^,\\]|\\.)+),)*(DC=(?<dc>(?:[^,\\]|\\.)+))(,DC=(?<dc>(?:[^,\\]|\\.)+))+?$')
+    DnRegEx   = [RegEx]::new('^(?:(CN=(?<name>(?:[^,\\]|\\.)+),)*)?(OU=(?<ou>(?:[^,\\]|\\.)+),)*(DC=(?<dc1>(?:[^,\\]|\\.)+))(,DC=(?<dc2>(?:[^,\\]|\\.)+))+?$', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
 
     # Regular Expression (RegEx) for GUID
     <# Define GUID Regex
