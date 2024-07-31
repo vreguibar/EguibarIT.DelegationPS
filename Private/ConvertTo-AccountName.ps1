@@ -35,6 +35,8 @@
     )
 
     Begin {
+        [string]$FoundName = $null
+
         Write-Verbose -Message 'Starting function ConvertTo-AccountName'
     } #end Begin
 
@@ -51,6 +53,12 @@
 
                 # Return the account name as a string
                 $accountName.Value
+            } catch [System.Security.Principal.IdentityNotMappedException] {
+
+                if($variables.WellKnownSIDs.Contains($SID)) {
+                    Write-Verbose -Message ('SID: {0} is a Well-Known SID' -f $SID)
+                    $FoundName = $Variables.WellKnownSIDs[$SID]
+                }
             } catch {
                 Write-Error -Message ('Failed to convert SID: {0} to account name. {1}' -f $PSBoundParameters['SID'], $_)
                 return $null

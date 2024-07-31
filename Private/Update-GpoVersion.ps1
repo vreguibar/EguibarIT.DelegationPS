@@ -22,7 +22,7 @@ function Update-GpoVersion {
             None.
     #>
 
-    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     [OutputType([void])]
 
     param (
@@ -46,7 +46,7 @@ function Update-GpoVersion {
         # Get the GPO ID
         $gpoId = $gpo.Id
         # Build SYSVOL path
-        $sysVolPath = '\\' + $env:USERDNSDOMAIN + '\SYSVOL\' + $env:USERDNSDOMAIN
+        $sysVolPath = '\\{0}\SYSVOL\{0}' -f $env:USERDNSDOMAIN
         $pathToGpt = '{0}\Policies\{1}\gpt.ini' -f $sysVolPath, ('{' + $gpoId + '}')
 
     } #end Begin
@@ -109,7 +109,7 @@ function Update-GpoVersion {
 
                     # Check section exists
                     if ($Gpt.Sections.ContainsKey('General')) {
-                        Write-Output "Section Name: $($ini.Sections.GetSection('General').SectionName)"
+                        Write-Verbose -Message ('Section Name: {0}' -f $gpt.Sections.GetSection('General').SectionName)
 
                         # Change value of an existing key
                         $Gpt.SetKeyValue('General', 'Version', $newVersionObject.ToString())

@@ -32,7 +32,7 @@ function Set-GPOConfigSection {
             [IniFile]
     #>
 
-    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     [OutputType([IniFile])]
 
     param (
@@ -48,7 +48,7 @@ function Set-GPOConfigSection {
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            HelpMessage = '.',
+            HelpMessage = 'TheKEY within given section (ex. SeAuditPrivilege or SeBatchLogonRight).',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
         [string]
@@ -57,9 +57,10 @@ function Set-GPOConfigSection {
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            HelpMessage = '.',
+            HelpMessage = 'Member of given KEY. This value can be Empty or Null',
             Position = 2)]
-        [ValidateNotNullOrEmpty()]
+        [AllowNull()]
+        [AllowEmptyString()]
         $Members,
 
         [Parameter(Mandatory = $true,
@@ -96,34 +97,45 @@ function Set-GPOConfigSection {
 
                     foreach ($ExistingMember in $TempMembers) {
 
-                        Write-Verbose -Message ('Processing existing member: {0}' -f $ExistingMember)
+                        if (-Not [string]::IsNullOrEmpty($ExistingMember)) {
+                            Write-Verbose -Message ('Processing existing member: {0}' -f $ExistingMember)
 
-                        $CurrentMember = ConvertTo-AccountName -SID $ExistingMember.TrimStart('*')
+                            $CurrentMember = ConvertTo-AccountName -SID $ExistingMember.TrimStart('*')
 
-                        if (($null -ne $CurrentMember) -and -not
-                            $NewMembers.Contains($ExistingMember)) {
-                            $NewMembers.Add($ExistingMember)
-                        } #end If
-                        $CurrentMember = $null
-                    } #end Foreach
-
-                    foreach ($item in $Members) {
-
-                        Write-Verbose -Message ('Processing new member: {0}' -f $item)
-
-                        if ($item -is [Microsoft.ActiveDirectory.Management.ADGroup] -or
-                            $item -is [Microsoft.ActiveDirectory.Management.ADAccount]) {
-                            $identity = $item.SID
-                        } else {
-                            $identity = Test-NameIsWellKnownSid -Name $item
-                        } #end If-Else
-
-                        if ((-not $NewMembers.Contains('*{0}' -f $identity.Value)) -and
-                            $null -ne $identity) {
-
-                            $NewMembers.Add('*{0}' -f $identity.Value)
+                            if (($null -ne $CurrentMember) -and -not
+                                $NewMembers.Contains($ExistingMember)) {
+                                $NewMembers.Add($ExistingMember)
+                            } #end If
+                            $CurrentMember = $null
                         } #end If
                     } #end Foreach
+
+                    # Ensure members has values. If ONLY one and this is NULL or EMPTY,
+                    # then just skip foreach and add EMPTY
+                    If (-Not (($Members.Count -eq 1) -and ([string]::IsNullOrEmpty($Members[0])))) {
+
+                        #iterate all members
+                        foreach ($item in $Members) {
+
+                            Write-Verbose -Message ('Processing new member: {0}' -f $item)
+
+                            if ($item -is [Microsoft.ActiveDirectory.Management.ADGroup] -or
+                                $item -is [Microsoft.ActiveDirectory.Management.ADAccount]) {
+                                $identity = $item.SID
+                            } else {
+                                $identity = Test-NameIsWellKnownSid -Name $item
+                            } #end If-Else
+
+                            if ((-not $NewMembers.Contains('*{0}' -f $identity.Value)) -and
+                                $null -ne $identity) {
+
+                                $NewMembers.Add('*{0}' -f $identity.Value)
+                            } #end If
+                        } #end Foreach
+
+                        # Add empty to array
+                        $NewMembers.Add([string]::Empty)
+                    } #end If
 
                     #$GptTmpl.Sections[$CurrentSection].KeyValuePair[$CurrentKey] = $NewMembers -join ','
                     $GptTmpl.SetKeyValue($CurrentSection, $CurrentKey, $NewMembers -join ',')
@@ -131,41 +143,45 @@ function Set-GPOConfigSection {
 
                     Write-Verbose -Message ('Key [{0}] does not exist. Creating new key...' -f $CurrentKey)
 
-                    foreach ($item in $Members) {
+                    # Ensure members has values. If ONLY one and this is NULL or EMPTY,
+                    # then just skip foreach and add EMPTY
+                    If (-Not (($Members.Count -eq 1) -and ([string]::IsNullOrEmpty($Members[0])))) {
 
-                        Write-Verbose -Message ('Processing new member: {0}' -f $item)
+                        #iterate all members
+                        foreach ($item in $Members) {
 
-                        if ($item -is [Microsoft.ActiveDirectory.Management.ADGroup] -or
-                            $item -is [Microsoft.ActiveDirectory.Management.ADAccount]) {
-                            $identity = $item.SID
-                        } else {
-                            $identity = Test-NameIsWellKnownSid -Name $item
-                        } #end If-Else
+                            Write-Verbose -Message ('Processing new member: {0}' -f $item)
 
-                        if ($null -eq $identity) {
-                            $identity = ConvertTo-SID -AccountName $item
-                        } #end If
+                            if ($item -is [Microsoft.ActiveDirectory.Management.ADGroup] -or
+                                $item -is [Microsoft.ActiveDirectory.Management.ADAccount]) {
+                                $identity = $item.SID
+                            } else {
+                                $identity = Test-NameIsWellKnownSid -Name $item
+                            } #end If-Else
 
-                        if ((-not $UserSIDs.Contains('*{0}' -f $identity.Value)) -and
-                            $null -ne $identity) {
-                            $UserSIDs.Add('*{0}' -f $identity.Value)
-                        } #end If
-                    } #end Foreach
+                            if ($null -eq $identity) {
+                                $identity = ConvertTo-SID -AccountName $item
+                            } #end If
+
+                            if ((-not $UserSIDs.Contains('*{0}' -f $identity.Value)) -and
+                                $null -ne $identity) {
+                                $UserSIDs.Add('*{0}' -f $identity.Value)
+                            } #end If
+                        } #end Foreach
+
+                        # Add empty to array
+                        $UserSIDs.Add([string]::Empty)
+                    } #end If
 
                     #$GptTmpl.Sections[$CurrentSection].KeyValuePair.Add($CurrentKey, $UserSIDs -join ',')
                     $GptTmpl.AddKeyValue($CurrentSection, $CurrentKey, $UserSIDs -join ',')
                 } #end If-Else
-
-                #Write-Verbose -Message 'Writing changes to GptTmpl...'
-
-                #$GptTmpl.WriteAllText()
 
                 $status = $true
             } #end If
         } catch {
             Write-Error -Message "An error occurred: $_.Exception.Message"
             $status = $false
-            throw [System.ApplicationException]::new("Either you are trying to add a group that does not exist, or the identity provided does not correspond to a Group object class: '$_'. Message is $_.Message")
         } finally {
             $status = $true
         } #end Try-Catch-Finally

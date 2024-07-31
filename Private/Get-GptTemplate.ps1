@@ -63,7 +63,7 @@ function Get-GptTemplate {
         try {
             if (-not (Test-Path $gpoPath)) {
                 Write-Verbose -Message ('GPT template path does not exist. Creating new file: {0}' -f $gpoPath)
-                New-Item -ItemType File -Path $gpoPath | Out-Null
+                New-Item -ItemType File -Path $gpoPath -Force
             } #end if
 
             $GptTemplate = [IniFile]::new($gpoPath)

@@ -615,10 +615,10 @@
 
         # NetworkLogon
         if ($PSBoundParameters.ContainsKey('NetworkLogon')) {
+            Write-Verbose -Message 'GRANTING "Access this computer from the network" right...'
             $Splat = @{
                 Key     = 'SeNetworkLogonRight'
                 Members = $NetworkLogon
-                #Description = 'Access this computer from the network'
             }
             Add-Right @Splat
         } #end If
@@ -1035,7 +1035,7 @@
                 If (-not $GptTmpl.Sections.GetSection($Rights.Section).SectionName) {
 
                     Write-Verbose -Message ('Section "{0}" does not exist. Creating it!.' -f $Rights.Section)
-                    $ini.AddSection($Rights.Section)
+                    $GptTmpl.AddSection($Rights.Section)
 
                 } #end If
 
