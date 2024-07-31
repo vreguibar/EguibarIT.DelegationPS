@@ -121,7 +121,7 @@ function Update-GpoVersion {
                     } #end If-Else
 
                     # Save file using default encoding UTF-8
-                    $Gpt.SaveFile($PathToFile)
+                    $Gpt.SaveFile($pathToGpt)
 
                     Write-Verbose -Message ('Saving new Version of GPO to file {0}' -f $pathToGpt)
                 } #end If
