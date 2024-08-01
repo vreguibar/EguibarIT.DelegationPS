@@ -37,6 +37,8 @@ function Update-GpoVersion {
 
     Begin {
 
+        [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
+
         [Int64]$versionObject = $null
 
         Import-Module -Name GroupPolicy -Verbose:$False
@@ -124,6 +126,17 @@ function Update-GpoVersion {
                     $Gpt.SaveFile($pathToGpt)
 
                     Write-Verbose -Message ('Saving new Version of GPO to file {0}' -f $pathToGpt)
+
+                    # Last, write the GPCMachineExtensionName attribute with the Client-Side Extension GUID
+                    # If not the settings won't display in the GPO Management tool and the target
+                    # server won't be able to read the GPO.
+                    $Splat = @{
+                        Identity = 'CN={0},CN=Policies,CN=System,{1}' -f ('{' + $gpoId + '}'), $Variables.defaultNamingContext
+                        Replace  = @{
+                            gPCMachineExtensionNames = '[{827D319E-6EAC-11D2-A4EA-00C04F79F83A}{803E14A0-B4FB-11D0-A0D0-00A0C90F574B}]'
+                        }
+                    }
+                    Set-ADObject @Splat
                 } #end If
             } #end If
         } catch {

@@ -1,10 +1,13 @@
-﻿class IniKeyValuePair {
+﻿# Class to manage key-value pairs for INI files
+class IniKeyValuePair {
     [hashtable] $KeyValues
 
+    # Constructor
     IniKeyValuePair() {
         $this.KeyValues = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
     }
 
+    # Adds a key-value pair to the hashtable
     [void] Add([string]$key, [string]$value) {
         if (-not [string]::IsNullOrWhiteSpace($key)) {
             $this.KeyValues[$key] = $value
@@ -13,10 +16,12 @@
         } #end If-Else
     }
 
+    # Checks if the key exists in the hashtable
     [bool] ContainsKey([string]$key) {
         return $this.KeyValues.ContainsKey($key)
     }
 
+    # Retrieves the value for the given key
     [string] GetValue([string]$key) {
         if ($this.ContainsKey($key)) {
             return $this.KeyValues[$key]
@@ -25,6 +30,7 @@
         } #end If-Else
     }
 
+    # Sets the value for the given key
     [void] SetValue([string]$key, [string]$value) {
         if (-not [string]::IsNullOrWhiteSpace($key)) {
             $this.KeyValues[$key] = $value
@@ -55,6 +61,7 @@ class IniSections {
         $this.Sections = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
     }
 
+    # Adds a section to the hashtable
     [void] Add([IniSection]$section) {
         if (-not [string]::IsNullOrWhiteSpace($section.SectionName)) {
             $this.Sections[$section.SectionName] = $section
@@ -63,10 +70,12 @@ class IniSections {
         } #end If-Else
     }
 
+    # Checks if the section exists
     [bool] ContainsKey([string]$key) {
         return $this.Sections.ContainsKey($key)
     }
 
+    # Retrieves the section by name
     [IniSection] GetSection([string]$key) {
         if ($this.ContainsKey($key)) {
             return $this.Sections[$key]
@@ -83,18 +92,21 @@ class IniFile {
     [IniSections] $Sections
     [IniKeyValuePair] $KeyValuePair
 
+    # Default constructor
     IniFile() {
         $this.Sections = [IniSections]::new()
         $this.KeyValuePair = [IniKeyValuePair]::new()
         $this.FilePath = ''
     }
 
+    # Constructor with file path
     IniFile([string]$filePath) {
         $this.Sections = [IniSections]::new()
         $this.KeyValuePair = [IniKeyValuePair]::new()
         $this.ReadFile($filePath)
     }
 
+    # Reads an INI file and populates sections and key-value pairs
     [void] ReadFile([string]$filePath) {
         Try {
             $this.FilePath = $filePath
@@ -126,6 +138,7 @@ class IniFile {
         } #end Try-Catch
     }
 
+    # Saves the file with the appropriate encoding based on the file path
     [void] SaveFile() {
         # Check if instance been initialized and has FilePath
         If ($this.FilePath) {
@@ -141,6 +154,7 @@ class IniFile {
         }
     }
 
+    # Saves the file with specified encoding
     [void] SaveFile(
         [string]$filePath
     ) {
@@ -190,6 +204,7 @@ class IniFile {
         }
     }
 
+    # Retrieves the value for a key in a section
     [string] GetKeyValue([string]$sectionName, [string]$key) {
         if ($this.Sections.ContainsKey($sectionName)) {
             return $this.Sections.GetSection($sectionName).KeyValuePair.GetValue($key)
@@ -198,6 +213,7 @@ class IniFile {
         }
     }
 
+    # Adds a new section
     [void] AddSection([string]$sectionName) {
         if (-not [string]::IsNullOrWhiteSpace($sectionName)) {
             $section = [IniSection]::new($sectionName)
@@ -207,6 +223,7 @@ class IniFile {
         } #end If-Else
     }
 
+    # Adds a new key-value pair to a section
     [void] AddKeyValue([string]$sectionName, [string]$key, [string]$value) {
         if ($this.Sections.ContainsKey($sectionName)) {
             $this.Sections.GetSection($sectionName).KeyValuePair.Add($key, $value)
@@ -215,6 +232,7 @@ class IniFile {
         } #end If-Else
     }
 
+    # Sets the value for a key in a section
     [void] SetKeyValue([string]$sectionName, [string]$key, [string]$value) {
         if ($this.Sections.ContainsKey($sectionName)) {
             $this.Sections.GetSection($sectionName).KeyValuePair.SetValue($key, $value)
@@ -223,6 +241,7 @@ class IniFile {
         } #end If-Else
     }
 
+    # Gets the value of a key from a section or global settings
     [string] GetItem([string]$sectionName, [string]$key) {
         if ($this.Sections.ContainsKey($sectionName)) {
             return $this.Sections.GetSection($sectionName).KeyValuePair.GetValue($key)
@@ -231,14 +250,17 @@ class IniFile {
         }
     }
 
+    # Sets a key-value pair in a section
     [void] SetItem([string]$sectionName, [string]$key, [string]$value) {
         $this.SetKeyValue($sectionName, $key, $value)
     }
 
+    # Gets a global key-value pair
     [string] GetGlobalItem([string]$key) {
         return $this.KeyValuePair.GetValue($key)
     }
 
+    # Sets a global key-value pair
     [void] SetGlobalItem([string]$key, [string]$value) {
         $this.KeyValuePair.SetValue($key, $value)
     }
