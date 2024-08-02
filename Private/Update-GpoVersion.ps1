@@ -120,6 +120,7 @@ function Update-GpoVersion {
 
                         # Change value of an existing key
                         $Gpt.SetKeyValue('General', 'Version', $newVersionObject.ToString())
+                        $Gpt.SetKeyValue('General', 'displayName', $Gpo.DisplayName)
 
                     } else {
                         Write-Verbose -Message 'Section [General] does not exist. Creating it with Key=Value.'
@@ -127,7 +128,8 @@ function Update-GpoVersion {
                         $Gpt.AddSection('General')
 
                         # Add a new Key/Value pair within a given section
-                        $Gpt.AddKeyValue('General', 'Version', $newVersionObject.ToString())
+                        $Gpt.SetKeyValue('General', 'Version', $newVersionObject.ToString())
+                        $Gpt.SetKeyValue('General', 'displayName', $Gpo.DisplayName)
                     } #end If-Else
 
                     # Save file using default encoding UTF-8
