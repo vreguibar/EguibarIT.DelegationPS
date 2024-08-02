@@ -112,17 +112,20 @@ function Update-GpoVersion {
                 if (Test-Path -Path $pathToGpt) {
 
                     # New instance of IniFile class
-                    $Gpt = [IniFile]::new($pathToGpt)
+                    $Gpt = [IniFileHandler.IniFile]::new($pathToGpt)
 
                     # Check section exists
-                    if ($Gpt.Sections.ContainsKey('General')) {
-                        Write-Verbose -Message ('Section Name: {0}' -f $gpt.Sections.GetSection('General').SectionName)
+                    if ($Gpt.SectionExists('General')) {
+                        Write-Verbose -Message ('Section Name: General')
 
                         # Change value of an existing key
                         $Gpt.SetKeyValue('General', 'Version', $newVersionObject.ToString())
 
                     } else {
                         Write-Verbose -Message 'Section [General] does not exist. Creating it with Key=Value.'
+
+                        $Gpt.AddSection('General')
+
                         # Add a new Key/Value pair within a given section
                         $Gpt.AddKeyValue('General', 'Version', $newVersionObject.ToString())
                     } #end If-Else

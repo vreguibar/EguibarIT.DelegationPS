@@ -26,14 +26,14 @@ function Set-GPOConfigSection {
             Set-GPOConfigSection -CurrentSection "User Rights Assignment" -CurrentKey "SeDenyNetworkLogonRight" -Members @("User1", "Group1") -GptTmpl $GptTmpl
 
         .INPUTS
-            [string], [string], [string[]], [IniFile]
+            [string], [string], [string[]], [IniFileHandler.IniFile]
 
         .OUTPUTS
-            [IniFile]
+            [IniFileHandler.IniFile]
     #>
 
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
-    [OutputType([IniFile])]
+    [OutputType([IniFileHandler.IniFile])]
 
     param (
         [Parameter(Mandatory = $true,
@@ -69,7 +69,7 @@ function Set-GPOConfigSection {
             HelpMessage = '.',
             Position = 3)]
         [ValidateNotNullOrEmpty()]
-        [IniFile]
+        [IniFileHandler.IniFile]
         $GptTmpl
     )
 
@@ -80,6 +80,7 @@ function Set-GPOConfigSection {
         $TempMembers = [System.Collections.Generic.List[string]]::new()
         $NewMembers = [System.Collections.Generic.List[string]]::new()
         $CurrentMember = $null
+        $section = $null
     } #end Begin
 
     Process {
@@ -88,11 +89,12 @@ function Set-GPOConfigSection {
 
                 Write-Verbose -Message ('Processing configuration for section [{0}] and key [{1}]...' -f $CurrentSection, $CurrentKey)
 
-                if ($GptTmpl.Sections.GetSection($CurrentSection).KeyValuePair.ContainsKey($CurrentKey)) {
+                #if ($GptTmpl.Sections.GetSection($CurrentSection).KeyValuePair.ContainsKey($CurrentKey)) {
+                if ($GptTmpl.Sections.TryGetValue($CurrentSection, [ref]$section) -and $section.KeyValuePair.KeyValues.ContainsKey($CurrentKey)) {
 
                     Write-Verbose -Message ('Key [{0}] exists. Updating values.' -f $CurrentKey)
 
-                    $directValue = $GptTmpl.Sections.GetSection($CurrentSection).KeyValuePair.KeyValues[$CurrentKey]
+                    $directValue = ($GptTmpl.GetKeyValue($CurrentSection, $CurrentKey)).TrimEnd(',')
                     $TempMembers.AddRange($directValue.Split(','))
 
                     foreach ($ExistingMember in $TempMembers) {
@@ -138,7 +140,7 @@ function Set-GPOConfigSection {
                     } #end If
 
                     #$GptTmpl.Sections[$CurrentSection].KeyValuePair[$CurrentKey] = $NewMembers -join ','
-                    $GptTmpl.SetKeyValue($CurrentSection, $CurrentKey, $NewMembers -join ',')
+                    $GptTmpl.SetKeyValue($CurrentSection, $CurrentKey, ($NewMembers -join ',').TrimEnd(','))
                 } else {
 
                     Write-Verbose -Message ('Key [{0}] does not exist. Creating new key...' -f $CurrentKey)
@@ -174,7 +176,7 @@ function Set-GPOConfigSection {
                     } #end If
 
                     #$GptTmpl.Sections[$CurrentSection].KeyValuePair.Add($CurrentKey, $UserSIDs -join ',')
-                    $GptTmpl.AddKeyValue($CurrentSection, $CurrentKey, $UserSIDs -join ',')
+                    $GptTmpl.SetKeyValue($CurrentSection, $CurrentKey, ($UserSIDs -join ',').TrimEnd(','))
                 } #end If-Else
 
                 $status = $true

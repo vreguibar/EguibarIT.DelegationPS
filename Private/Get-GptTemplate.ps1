@@ -20,11 +20,11 @@ function Get-GptTemplate {
             [string] The name of the Group Policy Object (GPO).
 
         .OUTPUTS
-            [IniFile] Returns an object representing the GPT template if successful.
+            [IniFileHandler.IniFile] Returns an object representing the GPT template if successful.
     #>
 
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'low')]
-    [OutputType([IniFile])]
+    [OutputType([IniFileHandler.IniFile])]
 
     param (
         [Parameter(Mandatory = $true,
@@ -66,7 +66,7 @@ function Get-GptTemplate {
                 New-Item -ItemType File -Path $gpoPath -Force
             } #end if
 
-            $GptTemplate = [IniFile]::new($gpoPath)
+            $GptTemplate = [IniFileHandler.IniFile]::new($gpoPath)
             Write-Verbose -Message 'GPT template object created successfully.'
         } catch {
             Write-Error -Message ('An error occurred while handling the GPT template path. Error: {0}' -f $_)

@@ -485,6 +485,17 @@
         Write-Verbose -Message ('  Starting: {0}' -f $MyInvocation.Mycommand)
         Write-Verbose -Message ('Parameters used by the function... {0}' -f (Get-FunctionDisplay $PsBoundParameters -Verbose:$False))
 
+        $CurrentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+
+        #Create a principal object for current user
+        $UserPrincipal = [System.Security.Principal.WindowsPrincipal]::New($CurrentUser)
+
+        #Check if Administrator
+        If (-Not ($UserPrincipal.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator))) {
+            Write-Error -Message 'This function MUST be executed as Administrator, including elevation. Otherwise will throw errors'
+            $PSCmdlet.ThrowTerminatingError()
+        }
+
         ##############################
         # Variables Definition
 
@@ -526,8 +537,8 @@
 
 
         # Check GPT does contains default sections ([Unicode] and [Version])
-        If ( -not (($GptTmpl.Sections.GetSection('Version').SectionName) -and
-        ($GptTmpl.Sections.GetSection('Unicode').SectionName))) {
+        If ( -not (($GptTmpl.SectionExist('Version')) -and
+        ($GptTmpl.SectionExist('Unicode')))) {
 
             # Add the missing sections
             $GptTmpl.AddSection('Version')
@@ -1032,7 +1043,7 @@
                 #$members = $right.Value
 
                 # Check if [Privilege Rights] section exist. Create it if it does not exist
-                If (-not $GptTmpl.Sections.GetSection($Rights.Section).SectionName) {
+                If (-not $GptTmpl.SectionExists($Rights.Section)) {
 
                     Write-Verbose -Message ('Section "{0}" does not exist. Creating it!.' -f $Rights.Section)
                     $GptTmpl.AddSection($Rights.Section)
