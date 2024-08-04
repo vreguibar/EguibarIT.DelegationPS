@@ -1,5 +1,4 @@
-﻿# Load the assembly containing the IniFile class
-Add-Type -Language CSharp -TypeDefinition @'
+﻿Add-Type -Language CSharp -TypeDefinition @'
 
 using System;
 using System.Collections.Generic;
@@ -74,6 +73,7 @@ namespace IniFileHandler
     //      SectionName: The name of the section.
     //      KeyValuePair: The key-value pairs within the section.
 
+
     /// <summary>
     /// Represents a section in an INI file.
     /// </summary>
@@ -131,21 +131,38 @@ namespace IniFileHandler
         /// Adds a new section to the collection.
         /// </summary>
         /// <param name="section">The section to add.</param>
-        public void Add(IniSection section) { if (!string.IsNullOrWhiteSpace(section.SectionName)) _sections[section.SectionName] = section; }
+        public void Add(IniSection section)
+        {
+            if (!string.IsNullOrWhiteSpace(section.SectionName))
+                _sections[section.SectionName] = section;
+        }
 
         /// <summary>
         /// Checks if a section exists in the collection.
         /// </summary>
         /// <param name="sectionName">The name of the section to check.</param>
         /// <returns>True if the section exists, otherwise false.</returns>
-        public bool ContainsKey(string sectionName) { return _sections.ContainsKey(sectionName); }
+        public bool ContainsKey(string sectionName) {
+            return _sections.ContainsKey(sectionName);
+        }
 
         /// <summary>
         /// Gets a section from the collection by name.
         /// </summary>
         /// <param name="sectionName">The name of the section to retrieve.</param>
         /// <returns>The <see cref="IniSection"/> object, or null if the section does not exist.</returns>
-        public IniSection GetSection(string sectionName) { _sections.TryGetValue(sectionName, out var section); return section; }
+        public IniSection GetSection(string sectionName) {
+            _sections.TryGetValue(sectionName, out var section); return section;
+        }
+
+        /// <summary>
+        /// Try to get existing section name.
+        /// </summary>
+        /// <param name="sectionName">The name of the section to retrieve.</param>
+        public bool TryGetValue(string sectionName, out IniSection section)
+        {
+            return _sections.TryGetValue(sectionName, out section);
+        }
 
         /// <summary>
         /// Gets an enumerable collection of all sections.
@@ -298,7 +315,7 @@ namespace IniFileHandler
                 }
 
                 // Sections
-                foreach (var section in Sections.Sections.Values)
+                foreach (var section in Sections.Values)
                 {
                     lines.Add($"[{section.SectionName}]");
                     foreach (var kvp in section.KeyValuePair.KeyValues)
@@ -399,7 +416,6 @@ namespace IniFileHandler
         }
     } //end Class
 } //end Namespace
-
 
 '@
 
