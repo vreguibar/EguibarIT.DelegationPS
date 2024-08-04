@@ -537,8 +537,8 @@
 
 
         # Check GPT does contains default sections ([Unicode] and [Version])
-        If ( -not (($GptTmpl.SectionExist('Version')) -and
-        ($GptTmpl.SectionExist('Unicode')))) {
+        If ( -not (($GptTmpl.SectionExists('Version')) -and
+        ($GptTmpl.SectionExists('Unicode')))) {
 
             # Add the missing sections
             $GptTmpl.AddSection('Version')
