@@ -1,5 +1,4 @@
-﻿# GptTemplate on file GpoPrivilegeRights.cs
-
+﻿# GptTmpl on file GpoPrivilegeRights.cs
 function Get-GptTemplate {
     <#
         .SYNOPSIS
@@ -52,30 +51,38 @@ function Get-GptTemplate {
 
                 # Construct the GPT template path
                 $DomainPath = '\\{0}\SYSVOL\{0}' -f $env:USERDNSDOMAIN
-                $gpoPath = "$DomainPath\Policies\{$($gpo.Id)}\Machine\Microsoft\Windows NT\SecEdit\GptTmpl.inf"
+                $gpoPath = '{0}\Policies\{1}\Machine\Microsoft\Windows NT\SecEdit\' -f $DomainPath, ('{' + $($gpo.Id) + '}')
+                $gpoPathFile = '{0}GptTmpl.inf' -f $gpoPath
 
                 Write-Verbose -Message ('Constructed GPT template path: {0}' -f $gpoPath)
             } #end if
-        } catch {
-            Write-Error -Message ('Failed to retrieve GPT template path for GPO {0}. Error: {1}' -f $GpoName, $_)
-        } #end Try-Catch
 
-        try {
             if (-not (Test-Path $gpoPath)) {
                 Write-Verbose -Message ('GPT template path does not exist. Creating new file: {0}' -f $gpoPath)
-                New-Item -ItemType File -Path $gpoPath -Force
+
+                # Create the directory
+                New-Item -ItemType Directory -Path $gpoPath -Force | Out-Null
+
+                # Create the file with encoding
+                [System.IO.File]::WriteAllText($gpoPathFile, '', [System.Text.Encoding]::Unicode)
             } #end if
 
-            $GptTemplate = [IniFileHandler.IniFile]::new($gpoPath)
+            $GptTmpl = [IniFileHandler.IniFile]::new($gpoPathFile)
+
             Write-Verbose -Message 'GPT template object created successfully.'
+
+            return $GptTmpl
+
         } catch {
             Write-Error -Message ('An error occurred while handling the GPT template path. Error: {0}' -f $_)
-            throw
+            return $null
         } #end Try-Catch
 
     } #end Process
 
     End {
-        return $GptTemplate
+
+        Write-Verbose -Message 'Returning GptTmpl object.'
+
     } #end End
 }

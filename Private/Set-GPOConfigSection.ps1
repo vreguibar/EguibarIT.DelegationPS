@@ -89,7 +89,6 @@ function Set-GPOConfigSection {
 
                 Write-Verbose -Message ('Processing configuration for section [{0}] and key [{1}]...' -f $CurrentSection, $CurrentKey)
 
-                #if ($GptTmpl.Sections.GetSection($CurrentSection).KeyValuePair.ContainsKey($CurrentKey)) {
                 if ($GptTmpl.Sections.TryGetValue($CurrentSection, [ref]$section) -and $section.KeyValuePair.KeyValues.ContainsKey($CurrentKey)) {
 
                     Write-Verbose -Message ('Key [{0}] exists. Updating values.' -f $CurrentKey)
@@ -139,7 +138,6 @@ function Set-GPOConfigSection {
                         $NewMembers.Add([string]::Empty)
                     } #end If
 
-                    #$GptTmpl.Sections[$CurrentSection].KeyValuePair[$CurrentKey] = $NewMembers -join ','
                     $GptTmpl.SetKeyValue($CurrentSection, $CurrentKey, ($NewMembers -join ',').TrimEnd(','))
                 } else {
 
@@ -175,7 +173,6 @@ function Set-GPOConfigSection {
                         $UserSIDs.Add([string]::Empty)
                     } #end If
 
-                    #$GptTmpl.Sections[$CurrentSection].KeyValuePair.Add($CurrentKey, $UserSIDs -join ',')
                     $GptTmpl.SetKeyValue($CurrentSection, $CurrentKey, ($UserSIDs -join ',').TrimEnd(','))
                 } #end If-Else
 

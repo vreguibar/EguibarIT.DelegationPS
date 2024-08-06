@@ -1,5 +1,4 @@
 ﻿# UpdateGpt on file GpoPrivilegeRights.cs
-
 function Update-GpoVersion {
 
     <#
@@ -36,8 +35,6 @@ function Update-GpoVersion {
     )
 
     Begin {
-
-        [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
         [Int64]$versionObject = $null
 
@@ -113,6 +110,7 @@ function Update-GpoVersion {
 
                     # New instance of IniFile class
                     $Gpt = [IniFileHandler.IniFile]::new($pathToGpt)
+                    #$Gpt.ReadFile($pathToGpt)
 
                     # Check section exists
                     if ($Gpt.SectionExists('General')) {

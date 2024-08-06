@@ -7,23 +7,26 @@ using System.Text;
 
 namespace IniFileHandler
 {
-    //################################################################################
-    // Represents a collection of key-value pairs in an INI section.
-    // Properties:
-    //      KeyValues: Stores key-value pairs in a case-insensitive dictionary.
-    // Methods:
-    //      Add(string key, string value): Adds or updates a key-value pair.
-    //      ContainsKey(string key): Checks if a key exists.
-    //      GetValue(string key): Retrieves the value for a key.
-    //      SetValue(string key, string value): Sets the value for a key.
+
+/*################################################################################
+       Represents a collection of key-value pairs in an INI section.
+       Properties:
+            KeyValues: Stores key-value pairs in a case-insensitive dictionary.
+       Methods:
+            Add(string key, string value): Adds or updates a key-value pair.
+            ContainsKey(string key): Checks if a key exists.
+            GetValue(string key): Retrieves the value for a key.
+            SetValue(string key, string value): Sets the value for a key.
+    */
 
     /// <summary>
-    /// Represents a collection of key-value pairs within an INI file section.
+    /// Represents a collection of key-value pairs in an INI file.
     /// </summary>
     public class IniKeyValuePair
     {
+
         /// <summary>
-        /// Gets the dictionary of key-value pairs.
+        /// Gets the dictionary containing the key-value pairs.
         /// </summary>
         public Dictionary<string, string> KeyValues { get; private set; }
 
@@ -36,61 +39,79 @@ namespace IniFileHandler
         }
 
         /// <summary>
-        /// Adds or updates a key-value pair in the dictionary.
+        /// Adds a new key-value pair or updates the value if the key exists.
         /// </summary>
         /// <param name="key">The key to add or update.</param>
         /// <param name="value">The value associated with the key.</param>
-        public void Add(string key, string value) { if (!string.IsNullOrWhiteSpace(key)) KeyValues[key] = value; }
+        public void Add(string key, string value)
+        {
+            if (!string.IsNullOrWhiteSpace(key))
+                KeyValues[key] = value;
+        }
 
         /// <summary>
-        /// Checks if the dictionary contains a specific key.
+        /// Checks if the specified key exists in the collection.
         /// </summary>
-        /// <param name="key">The key to check for existence.</param>
-        /// <returns>True if the key exists, otherwise false.</returns>
-        public bool ContainsKey(string key) { return KeyValues.ContainsKey(key); }
+        /// <param name="key">The key to check for.</param>
+        /// <returns><c>true</c> if the key exists; otherwise, <c>false</c>.</returns>
+        public bool ContainsKey(string key)
+        {
+            return KeyValues.ContainsKey(key);
+        }
 
         /// <summary>
-        /// Gets the value associated with a specific key.
+        /// Gets the value associated with the specified key.
         /// </summary>
         /// <param name="key">The key to retrieve the value for.</param>
-        /// <returns>The value associated with the key, or null if the key does not exist.</returns>
-        public string GetValue(string key) { KeyValues.TryGetValue(key, out var value); return value; }
+        /// <returns>The value associated with the specified key, or <c>null</c> if the key does not exist.</returns>
+        public string GetValue(string key)
+        {
+            KeyValues.TryGetValue(key, out var value);
+            return value;
+        }
 
         /// <summary>
-        /// Sets the value for a specific key.
+        /// Sets the value for a specified key.
         /// </summary>
         /// <param name="key">The key to set the value for.</param>
         /// <param name="value">The value to set.</param>
-        public void SetValue(string key, string value) { if (!string.IsNullOrWhiteSpace(key)) KeyValues[key] = value; }
+        public void SetValue(string key, string value)
+        {
+            if (!string.IsNullOrWhiteSpace(key))
+                KeyValues[key] = value;
+        }
+    } //end class IniKeyValuePair
 
-    } //end Class
 
 
 
-    //################################################################################
-    // Represents a section in an INI file containing a name and key-value pairs.
-    // Properties:
-    //      SectionName: The name of the section.
-    //      KeyValuePair: The key-value pairs within the section.
 
+
+    /*################################################################################
+       Represents a section in an INI file containing a name and key-value pairs.
+       Properties:
+            SectionName: The name of the section.
+            KeyValuePair: The key-value pairs within the section.
+    */
 
     /// <summary>
     /// Represents a section in an INI file.
     /// </summary>
     public class IniSection
     {
+
         /// <summary>
         /// Gets the name of the section.
         /// </summary>
         public string SectionName { get; }
 
         /// <summary>
-        /// Gets the collection of key-value pairs in the section.
+        /// Gets the key-value pairs associated with this section.
         /// </summary>
         public IniKeyValuePair KeyValuePair { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="IniSection"/> class.
+        /// Initializes a new instance of the <see cref="IniSection"/> class with a specified section name.
         /// </summary>
         /// <param name="sectionName">The name of the section.</param>
         public IniSection(string sectionName)
@@ -98,22 +119,26 @@ namespace IniFileHandler
             SectionName = sectionName;
             KeyValuePair = new IniKeyValuePair();
         }
-    } //end Class
+    } //end class IniSection
 
 
 
-    //################################################################################
-    // Represents a collection of INI sections. Manages multiple INI sections.
-    // Properties:
-    //      _sections: The internal dictionary holding section names and their corresponding IniSection objects.
-    // Methods:
-    //      Add(IniSection section): Adds a section to the collection.
-    //      ContainsKey(string sectionName): Checks if a section exists.
-    //      GetSection(string sectionName): Retrieves a section.
-    //      Values: Returns all sections.
+
+
+
+    /*################################################################################
+       Represents a collection of INI sections. Manages multiple INI sections.
+       Properties:
+            _sections: The internal dictionary holding section names and their corresponding IniSection objects.
+       Methods:
+            Add(IniSection section): Adds a section to the collection.
+            ContainsKey(string sectionName): Checks if a section exists.
+            GetSection(string sectionName): Retrieves a section.
+            Values: Returns all sections.
+    */
 
     /// <summary>
-    /// Manages a collection of <see cref="IniSection"/> objects.
+    /// Represents a collection of INI sections.
     /// </summary>
     public class IniSections
     {
@@ -127,90 +152,99 @@ namespace IniFileHandler
             _sections = new Dictionary<string, IniSection>(StringComparer.OrdinalIgnoreCase);
         }
 
-         /// <summary>
-        /// Adds a new section to the collection.
+        /// <summary>
+        /// Adds a new section to the collection or updates an existing section.
         /// </summary>
-        /// <param name="section">The section to add.</param>
+        /// <param name="section">The section to add or update.</param>
         public void Add(IniSection section)
         {
             if (!string.IsNullOrWhiteSpace(section.SectionName))
                 _sections[section.SectionName] = section;
         }
 
-        /// <summary>
-        /// Checks if a section exists in the collection.
+         /// <summary>
+        /// Checks if a section with the specified name exists in the collection.
         /// </summary>
-        /// <param name="sectionName">The name of the section to check.</param>
-        /// <returns>True if the section exists, otherwise false.</returns>
-        public bool ContainsKey(string sectionName) {
+        /// <param name="sectionName">The name of the section.</param>
+        /// <returns><c>true</c> if the section exists; otherwise, <c>false</c>.</returns>
+        public bool ContainsKey(string sectionName)
+        {
             return _sections.ContainsKey(sectionName);
         }
 
         /// <summary>
-        /// Gets a section from the collection by name.
+        /// Gets the section with the specified name.
         /// </summary>
-        /// <param name="sectionName">The name of the section to retrieve.</param>
-        /// <returns>The <see cref="IniSection"/> object, or null if the section does not exist.</returns>
-        public IniSection GetSection(string sectionName) {
-            _sections.TryGetValue(sectionName, out var section); return section;
+        /// <param name="sectionName">The name of the section.</param>
+        /// <returns>The <see cref="IniSection"/> with the specified name, or <c>null</c> if the section does not exist.</returns>
+        public IniSection GetSection(string sectionName)
+        {
+            _sections.TryGetValue(sectionName, out var section);
+            return section;
         }
 
         /// <summary>
-        /// Try to get existing section name.
+        /// Tries to get the section with the specified name.
         /// </summary>
-        /// <param name="sectionName">The name of the section to retrieve.</param>
+        /// <param name="sectionName">The name of the section.</param>
+        /// <param name="section">When this method returns, contains the <see cref="IniSection"/> with the specified name, if found; otherwise, <c>null</c>.</param>
+        /// <returns><c>true</c> if the section exists; otherwise, <c>false</c>.</returns>
         public bool TryGetValue(string sectionName, out IniSection section)
         {
             return _sections.TryGetValue(sectionName, out section);
         }
 
         /// <summary>
-        /// Gets an enumerable collection of all sections.
+        /// Gets the collection of all sections.
         /// </summary>
         public IEnumerable<IniSection> Values => _sections.Values;
-    } //end Class
+    } //end class IniSections
 
 
 
-    //################################################################################
-    // Represents an INI file with sections and key-value pairs.
-    // Properties:
-    //      FilePath: The path to the INI file.
-    //      Sections: Collection of sections in the file.
-    //      KeyValuePair: Global key-value pairs not associated with any section.
-    // Methods:
-    //      ReadFile(string filePath): Reads and parses the INI file.
-    //      SaveFile(): Saves the INI file with the default encoding.
-    //      SaveFile(string filePath): Saves the INI file with the specified encoding.
-    //      SaveFile(string filePath, Encoding encoding): Saves the INI file with a specific encoding.
-    //      DetermineEncoding(string filePath): Determines the encoding based on the file name.
-    //      AddSection(string sectionName): Adds a section.
-    //      SectionExists(string sectionName): Checks if a section exists.
-    //      SetKeyValue(string sectionName, string key, string value): Adds or updates a key-value pair.
-    //      GetKeyValue(string sectionName, string key): Retrieves the value of a key.
+
+
+
+    /*################################################################################
+       Represents an INI file with sections and key-value pairs.
+       Properties:
+            FilePath: The path to the INI file.
+            Sections: Collection of sections in the file.
+            KeyValuePair: Global key-value pairs not associated with any section.
+       Methods:
+            ReadFile(string filePath): Reads and parses the INI file.
+            SaveFile(): Saves the INI file with the default encoding.
+            SaveFile(string filePath): Saves the INI file with the specified encoding.
+            SaveFile(string filePath, Encoding encoding): Saves the INI file with a specific encoding.
+            DetermineEncoding(string filePath): Determines the encoding based on the file name.
+            AddSection(string sectionName): Adds a section.
+            SectionExists(string sectionName): Checks if a section exists.
+            SetKeyValue(string sectionName, string key, string value): Adds or updates a key-value pair.
+            GetKeyValue(string sectionName, string key): Retrieves the value of a key.
+    */
 
     /// <summary>
-    /// Provides functionality to read, write, and manage INI files.
+    /// Represents an INI file.
     /// </summary>
     public class IniFile
     {
 
         /// <summary>
-        /// Gets the file path of the INI file.
+        /// Gets or sets the file path of the INI file.
         /// </summary>
-        public string FilePath { get; private set; }
+        public string FilePath { get; set; }
 
         /// <summary>
-        /// Gets the collection of sections in the INI file.
+        /// Gets the sections in the INI file.
         /// </summary>
-        public IniSections Sections { get; private set; }
+        public IniSections Sections { get; }
 
-         /// <summary>
-        /// Gets the global key-value pairs (not associated with any section).
+        /// <summary>
+        /// Gets the key-value pairs outside of any section.
         /// </summary>
-        public IniKeyValuePair KeyValuePair { get; private set; }
+        public IniKeyValuePair KeyValuePair { get; }
 
-         /// <summary>
+        /// <summary>
         /// Initializes a new instance of the <see cref="IniFile"/> class.
         /// </summary>
         public IniFile()
@@ -221,147 +255,125 @@ namespace IniFileHandler
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="IniFile"/> class and loads the specified file.
+        /// Initializes a new instance of the <see cref="IniFile"/> class with the specified file path.
         /// </summary>
-        /// <param name="filePath">The path of the INI file to load.</param>
+        /// <param name="filePath">The path to the INI file.</param>
+        /// <exception cref="ArgumentException">Thrown when the file path is null or empty.</exception>
         public IniFile(string filePath) : this()
         {
+            if (string.IsNullOrWhiteSpace(filePath))
+                throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));
+
             ReadFile(filePath);
         }
 
         /// <summary>
-        /// Reads the INI file from the specified path.
+        /// Reads the INI file at the specified file path.
         /// </summary>
-        /// <param name="filePath">The path of the INI file to read.</param>
+        /// <param name="filePath">The path to the INI file.</param>
+        /// <exception cref="ArgumentException">Thrown when the file path is null or empty.</exception>
+        /// <exception cref="FileNotFoundException">Thrown when the specified INI file is not found.</exception>
         public void ReadFile(string filePath)
         {
-            try
-            {
-                FilePath = filePath;
-                var iniLines = File.ReadAllLines(filePath);
-                IniKeyValuePair currentSection = KeyValuePair;
+            if (string.IsNullOrWhiteSpace(filePath))
+                throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));
 
-                foreach (var line in iniLines)
-                {
-                    if (!string.IsNullOrWhiteSpace(line))
-                    {
-                        if (line.StartsWith("[") && line.EndsWith("]"))
-                        {
-                            var sectionName = line.Trim('[', ']');
-                            var section = new IniSection(sectionName);
-                            currentSection = section.KeyValuePair;
-                            Sections.Add(section);
-                        }
-                        else if (!line.StartsWith(";") && !line.StartsWith("#"))
-                        {
-                            var keyPair = line.Split('=', 2);
-                            var key = keyPair[0].Trim();
-                            var value = keyPair.Length > 1 ? keyPair[1].Trim() : null;
-                            currentSection.Add(key, value);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException("The specified INI file was not found.", filePath);
+
+            FilePath = filePath;
+            var encoding = DetermineEncoding(filePath);
+            string[] iniLines = File.ReadAllLines(filePath, encoding);
+            IniKeyValuePair currentSection = KeyValuePair;
+
+            foreach (string line in iniLines)
             {
-                Console.Error.WriteLine($"Failed to read the INI file: {ex.Message}");
+                if (string.IsNullOrWhiteSpace(line)) continue;
+
+                if (line.StartsWith("[") && line.EndsWith("]"))
+                {
+                    string sectionName = line.Trim('[', ']');
+                    IniSection section = new IniSection(sectionName);
+                    currentSection = section.KeyValuePair;
+                    Sections.Add(section);
+                }
+                else if (!line.StartsWith(";") && !line.StartsWith("#"))
+                {
+                    string[] keyPair = line.Split(new char[] { '=' }, 2);
+                    string key = keyPair[0].Trim();
+                    string value = keyPair.Length > 1 ? keyPair[1].Trim() : null;
+
+                    currentSection.Add(key, value);
+                }
             }
         }
 
-         /// <summary>
-        /// Saves the INI file to the default file path using the appropriate encoding.
+        /// <summary>
+        /// Saves the current state of the INI file to the associated file path.
         /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown when there is no associated file path.</exception>
         public void SaveFile()
         {
             if (string.IsNullOrEmpty(FilePath))
             {
-                throw new InvalidOperationException("FilePath is not specified.");
+                throw new InvalidOperationException("This INI record has no associated file.");
             }
 
             SaveFile(FilePath, DetermineEncoding(FilePath));
         }
 
-         /// <summary>
-        /// Saves the INI file to the specified file path using the appropriate encoding.
-        /// </summary>
-        /// <param name="filePath">The file path to save the INI file to.</param>
         public void SaveFile(string filePath)
         {
             SaveFile(filePath, DetermineEncoding(filePath));
         }
 
         /// <summary>
-        /// Saves the INI file to the specified file path using the specified encoding.
+        /// Saves the current state of the INI file to the specified file path.
         /// </summary>
         /// <param name="filePath">The file path to save the INI file to.</param>
         /// <param name="encoding">The encoding to use when saving the file.</param>
+        /// <exception cref="ArgumentException">Thrown when the file path is null or empty.</exception>
         public void SaveFile(string filePath, Encoding encoding)
         {
-            try
+            if (string.IsNullOrWhiteSpace(filePath))
+                throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));
+
+            var lines = new List<string>();
+
+            foreach (var kvp in KeyValuePair.KeyValues)
             {
-                var lines = new List<string>();
-
-                // Global key-value pairs (no section)
-                foreach (var kvp in KeyValuePair.KeyValues)
-                {
-                    if (kvp.Value == null)
-                    {
-                        lines.Add(kvp.Key);
-                    }
-                    else
-                    {
-                        lines.Add($"{kvp.Key}={kvp.Value}");
-                    }
-                }
-
-                // Sections
-                foreach (var section in Sections.Values)
-                {
-                    lines.Add($"[{section.SectionName}]");
-                    foreach (var kvp in section.KeyValuePair.KeyValues)
-                    {
-                        if (kvp.Value == null)
-                        {
-                            lines.Add(kvp.Key);
-                        }
-                        else
-                        {
-                            lines.Add($"{kvp.Key}={kvp.Value}");
-                        }
-                    }
-                    lines.Add(string.Empty);
-                }
-
-                File.WriteAllLines(filePath, lines, encoding);
+                lines.Add(kvp.Value == null ? kvp.Key : $"{kvp.Key}={kvp.Value}");
             }
-            catch (Exception ex)
+
+            foreach (var section in Sections.Values)
             {
-                Console.Error.WriteLine($"Failed to save the INI file: {ex.Message}");
+                lines.Add($"[{section.SectionName}]");
+                foreach (var kvp in section.KeyValuePair.KeyValues)
+                {
+                    lines.Add(kvp.Value == null ? kvp.Key : $"{kvp.Key}={kvp.Value}");
+                }
+                lines.Add(string.Empty); // Add an empty line after each section
             }
+
+            File.WriteAllLines(filePath, lines, encoding);
         }
 
         /// <summary>
-        /// Determines the encoding to be used based on the file name.
+        /// Determines the encoding of the specified INI file based on its name.
         /// </summary>
-        /// <param name="filePath">The path of the file.</param>
-        /// <returns>The encoding to use for the file.</returns>
+        /// <param name="filePath">The path to the INI file.</param>
+        /// <returns>The encoding of the file.</returns>
         private Encoding DetermineEncoding(string filePath)
         {
-            // If the file is named 'GptTmpl.inf', use Unicode (UTF-16 LE); otherwise, use UTF-8.
-            if (Path.GetFileName(filePath).Equals("GptTmpl.inf", StringComparison.OrdinalIgnoreCase))
-            {
-                return Encoding.Unicode; // UTF-16 LE
-            }
-            else
-            {
-                return Encoding.UTF8;
-            }
+            return Path.GetFileName(filePath).Equals("GptTmpl.inf", StringComparison.OrdinalIgnoreCase)
+                ? Encoding.Unicode  // UTF-16 LE
+                : Encoding.UTF8;
         }
 
         /// <summary>
-        /// Adds a new section to the INI file. If the section already exists, it will not be added.
+        /// Adds a new section to the INI file.
         /// </summary>
-        /// <param name="sectionName">The name of the section to be added.</param>
+        /// <param name="sectionName">The name of the section to add.</param>
         public void AddSection(string sectionName)
         {
             if (!Sections.ContainsKey(sectionName))
@@ -374,25 +386,25 @@ namespace IniFileHandler
         /// <summary>
         /// Checks if a section with the specified name exists in the INI file.
         /// </summary>
-        /// <param name="sectionName">The name of the section to be checked.</param>
-        /// <returns>True if the section exists; otherwise, false.</returns>
+        /// <param name="sectionName">The name of the section to check for.</param>
+        /// <returns><c>true</c> if the section exists; otherwise, <c>false</c>.</returns>
         public bool SectionExists(string sectionName)
         {
             return Sections.ContainsKey(sectionName);
         }
 
         /// <summary>
-        /// Adds or updates a key-value pair in the specified section.
+        /// Sets the value for a specified key in a specified section.
         /// </summary>
-        /// <param name="sectionName">The name of the section where the key-value pair is to be added or updated.</param>
-        /// <param name="key">The key to be added or updated.</param>
-        /// <param name="value">The value to be associated with the key.</param>
-        /// <exception cref="KeyNotFoundException">Thrown if the section does not exist.</exception>
+        /// <param name="sectionName">The name of the section.</param>
+        /// <param name="key">The key to set the value for.</param>
+        /// <param name="value">The value to set.</param>
+        /// <exception cref="KeyNotFoundException">Thrown when the section does not exist.</exception>
         public void SetKeyValue(string sectionName, string key, string value)
         {
             if (Sections.ContainsKey(sectionName))
             {
-                Sections.GetSection(sectionName).KeyValuePair.Add(key, value);
+                Sections.GetSection(sectionName).KeyValuePair.SetValue(key, value);
             }
             else
             {
@@ -401,11 +413,11 @@ namespace IniFileHandler
         }
 
         /// <summary>
-        /// Retrieves the value associated with the specified key in the given section.
+        /// Gets the value associated with the specified key in the specified section.
         /// </summary>
-        /// <param name="sectionName">The name of the section from which the key-value pair is to be retrieved.</param>
-        /// <param name="key">The key whose value is to be retrieved.</param>
-        /// <returns>The value associated with the key, or null if the key does not exist.</returns>
+        /// <param name="sectionName">The name of the section.</param>
+        /// <param name="key">The key to retrieve the value for.</param>
+        /// <returns>The value associated with the specified key, or <c>null</c> if the key does not exist.</returns>
         public string GetKeyValue(string sectionName, string key)
         {
             if (Sections.TryGetValue(sectionName, out IniSection section))
@@ -414,7 +426,8 @@ namespace IniFileHandler
             }
             return null;
         }
-    } //end Class
+    } //end class IniFile
+
 } //end Namespace
 
 '@
@@ -432,6 +445,11 @@ $iniFile.AddSection("NewSectionName")
 # Check if a Key Exists in a Section
 $section = $null
 $keyExists = $iniFile.Sections.TryGetValue("SectionName", [ref]$section) -and $section.KeyValuePair.KeyValues.ContainsKey("KeyName")
+
+# Checking if a Key Exists in a Section
+IniSection section;
+bool sectionExists = iniFile.Sections.TryGetValue("SectionName", out section);
+bool keyExists = section?.KeyValuePair.ContainsKey("KeyName") ?? false;
 
 # Add or Update a Key-Value Pair in a Section
 $iniFile.SetKeyValuePair("SectionName", "KeyName", "Value")

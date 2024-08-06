@@ -504,6 +504,8 @@
 
 
 
+
+
         # Helper function to add rights
         function Add-Right {
             param (
@@ -526,7 +528,7 @@
             }
             [void]$ArrayList.Add($TmpHash)
             #}
-        }
+        } #end Function Add-Right
 
 
 
@@ -538,7 +540,7 @@
 
         # Check GPT does contains default sections ([Unicode] and [Version])
         If ( -not (($GptTmpl.SectionExists('Version')) -and
-        ($GptTmpl.SectionExists('Unicode')))) {
+            ($GptTmpl.SectionExists('Unicode')))) {
 
             # Add the missing sections
             $GptTmpl.AddSection('Version')
@@ -552,7 +554,6 @@
     } #end Begin
 
     Process {
-
         # https://jigsolving.com/gpo-deep-dive-part-1/
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/user-rights-assignment
 
@@ -1037,11 +1038,6 @@
 
             If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], ('Delegate the permissions for "{0}"?') -f $Rights)) {
 
-
-                #foreach ($right in $Rights.GetEnumerator()) {
-                #$section = $right.Key
-                #$members = $right.Value
-
                 # Check if [Privilege Rights] section exist. Create it if it does not exist
                 If (-not $GptTmpl.SectionExists($Rights.Section)) {
 
@@ -1049,6 +1045,8 @@
                     $GptTmpl.AddSection($Rights.Section)
 
                 } #end If
+
+
 
                 # Add corresponding Key-Value pairs.
                 # Each pair will verify proper members are added.
@@ -1060,6 +1058,7 @@
                     Confirm        = $false
                 }
                 $GptTmpl = Set-GPOConfigSection @Splat
+
             } #end If
         } #end Foreach
 
@@ -1068,8 +1067,9 @@
         Try {
             $GptTmpl.SaveFile()
             Write-Verbose -Message ('Saving changes to GptTmpl.inf file og GPO {0}' -f $PSBoundParameters['GpoToModify'])
+
         } Catch {
-            Write-Error -Message 'The GptTmpl.inf file could not be saved: {0}. Message is {1}', $_, $_.Message
+            Write-Error -Message ('The GptTmpl.inf file could not be saved: {0}. Message is {1}' -f $_, $_.Message)
 
             Throw
         }
