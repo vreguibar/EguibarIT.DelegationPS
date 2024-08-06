@@ -72,7 +72,7 @@
         ##############################
         # Variables Definition
 
-        Import-MyModule -Name ActiveDirectory -Verbose:$false
+        Import-MyModule -Name ActiveDirectory -Verbose:$false | Out-Null
 
         Set-Location -Path AD:\
 

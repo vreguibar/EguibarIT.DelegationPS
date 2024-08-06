@@ -38,7 +38,7 @@ function Get-GptTemplate {
     Begin {
         Write-Verbose -Message 'Starting function Get-GptTemplatePath'
 
-        Import-Module -Name GroupPolicy -Verbose:$false
+        Import-Module -Name GroupPolicy -Verbose:$false | Out-Null
 
     } #end Begin
 

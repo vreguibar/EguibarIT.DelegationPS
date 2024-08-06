@@ -66,7 +66,7 @@
         Write-Verbose -Message ('  Starting: {0}' -f $MyInvocation.Mycommand)
         Write-Verbose -Message ('Parameters used by the function... {0}' -f (Get-FunctionDisplay $PsBoundParameters -Verbose:$False))
 
-        Import-MyModule -name ActiveDirectory -Verbose:$false
+        Import-MyModule -name ActiveDirectory -Verbose:$false | Out-Null
 
         ##############################
         # Variables Definition

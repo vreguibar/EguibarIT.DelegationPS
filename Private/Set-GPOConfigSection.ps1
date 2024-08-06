@@ -74,7 +74,15 @@ function Set-GPOConfigSection {
     )
 
     Begin {
-        # Initialize variables
+
+        Write-Verbose -Message '|=> ************************************************************************ <=|'
+        Write-Verbose -Message (Get-Date).ToShortDateString()
+        Write-Verbose -Message ('  Starting: {0}' -f $MyInvocation.Mycommand)
+        Write-Verbose -Message ('Parameters used by the function... {0}' -f (Get-FunctionDisplay $PsBoundParameters -Verbose:$False))
+
+        ##############################
+        # Variables Definition
+
         [bool]$status = $false
         $UserSIDs = [System.Collections.Generic.List[string]]::new()
         $TempMembers = [System.Collections.Generic.List[string]]::new()

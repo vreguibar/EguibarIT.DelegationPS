@@ -78,7 +78,7 @@
                         $Splat.Add('Force', $true)
                     }
 
-                    Import-Module @Splat
+                    Import-Module @Splat | Out-Null
                     Write-Verbose -Message ('Successfully imported module {0}' -f $PSBoundParameters['name'])
                 } else {
                     Write-Verbose -Message ('Module {0} is already imported.' -f $PSBoundParameters['name'])
