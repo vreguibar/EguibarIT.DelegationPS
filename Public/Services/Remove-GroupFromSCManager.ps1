@@ -59,12 +59,11 @@
 
     Begin {
 
-        $error.clear()
+        $txt = ($constants.Header -f (Get-Date).ToShortDateString(), $MyInvocation.Mycommand, (Get-FunctionDisplay $PsBoundParameters -Verbose:$False))
+        Write-Verbose -Message $txt
 
-        Write-Verbose -Message '|=> ************************************************************************ <=|'
-        Write-Verbose -Message (Get-Date).ToShortDateString()
-        Write-Verbose -Message ('  Starting: {0}' -f $MyInvocation.Mycommand)
-        Write-Verbose -Message ('Parameters used by the function... {0}' -f (Get-FunctionDisplay $PsBoundParameters -Verbose:$False))
+        ##############################
+        # Module imports
 
         Import-MyModule -name ActiveDirectory -Verbose:$false | Out-Null
 
@@ -141,9 +140,7 @@
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished removing Service Control Manager (SCM) access."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($constants.Footer -f $MyInvocation.InvocationName, 'removing Service Control Manager (SCM) access.')
+        Write-Verbose -Message $txt
     } #end END
 }

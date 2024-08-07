@@ -36,6 +36,14 @@
     )
 
     Begin {
+        $txt = ($constants.Header -f (Get-Date).ToShortDateString(), $MyInvocation.Mycommand, (Get-FunctionDisplay $PsBoundParameters -Verbose:$False))
+        Write-Verbose -Message $txt
+
+        ##############################
+        # Module imports
+
+        ##############################
+        # Variables Definition
 
         $Identity = $null
 

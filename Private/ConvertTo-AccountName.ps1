@@ -35,9 +35,16 @@
     )
 
     Begin {
+        $txt = ($constants.Header -f (Get-Date).ToShortDateString(), $MyInvocation.Mycommand, (Get-FunctionDisplay $PsBoundParameters -Verbose:$False))
+        Write-Verbose -Message $txt
+
+        ##############################
+        # Module imports
+
+        ##############################
+        # Variables Definition
         [string]$FoundName = $null
 
-        Write-Verbose -Message 'Starting function ConvertTo-AccountName'
     } #end Begin
 
     Process {
@@ -55,7 +62,7 @@
                 $accountName.Value
             } catch [System.Security.Principal.IdentityNotMappedException] {
 
-                if($variables.WellKnownSIDs.Contains($SID)) {
+                if ($variables.WellKnownSIDs.Contains($SID)) {
                     Write-Verbose -Message ('SID: {0} is a Well-Known SID' -f $SID)
                     $FoundName = $Variables.WellKnownSIDs[$SID]
                 }

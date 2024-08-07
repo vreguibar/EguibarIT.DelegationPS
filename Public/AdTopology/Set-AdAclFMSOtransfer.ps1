@@ -60,10 +60,12 @@
 
     Begin {
 
-        Write-Verbose -Message '|=> ************************************************************************ <=|'
-        Write-Verbose -Message (Get-Date).ToShortDateString()
-        Write-Verbose -Message ('  Starting: {0}' -f $MyInvocation.Mycommand)
-        Write-Verbose -Message ('Parameters used by the function... {0}' -f (Get-FunctionDisplay $PsBoundParameters -Verbose:$False))
+
+        $txt = ($constants.Header -f (Get-Date).ToShortDateString(), $MyInvocation.Mycommand, (Get-FunctionDisplay $PsBoundParameters -Verbose:$False))
+        Write-Verbose -Message $txt
+
+        ##############################
+        # Module imports
 
         ##############################
         # Variables Definition
@@ -93,7 +95,7 @@
                         ACENumber              : 1
                         DistinguishedName      : CN=Schema,CN=Configuration,DC=EguibarIT,DC=local
                         IdentityReference      : EguibarIT\XXXX
-                        ActiveDirectoryRightst : ExtendedRight
+                        ActiveDirectoryRights : ExtendedRight
                         AccessControlType      : Allow
                         ObjectType             : Change Schema Master [Extended Rights]
                         InheritanceType        : None
@@ -103,7 +105,7 @@
                         ACENumber              : 2
                         DistinguishedName      : CN=Schema,CN=Configuration,DC=EguibarIT,DC=local
                         IdentityReference      : EguibarIT\XXXX
-                        ActiveDirectoryRightst : WriteProperty
+                        ActiveDirectoryRights : WriteProperty
                         AccessControlType      : Allow
                         ObjectType             : fSMORoleOwner [AttributeSchema]
                         InheritanceType        : None
