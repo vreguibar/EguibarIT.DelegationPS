@@ -35,7 +35,7 @@
 
         ##############################
         # Module imports
-        Import-Module ActiveDirectory -Verbose:$false | Out-Null
+        Import-Module ActiveDirectory -SkipEditionCheck -Verbose:$false | Out-Null
 
         ##############################
         # Variables Definition

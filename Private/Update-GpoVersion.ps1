@@ -35,12 +35,16 @@ function Update-GpoVersion {
     )
 
     Begin {
-        $txt = ($constants.Header -f (Get-Date).ToShortDateString(), $MyInvocation.Mycommand, (Get-FunctionDisplay $PsBoundParameters -Verbose:$False))
+        $txt = ($constants.Header -f
+            (Get-Date).ToShortDateString(),
+            $MyInvocation.Mycommand,
+            (Get-FunctionDisplay $PsBoundParameters -Verbose:$False)
+        )
         Write-Verbose -Message $txt
 
         ##############################
         # Module imports
-        Import-Module -Name GroupPolicy -Verbose:$False | Out-Null
+        Import-Module -Name GroupPolicy -SkipEditionCheck -Verbose:$False | Out-Null
 
         ##############################
         # Variables Definition

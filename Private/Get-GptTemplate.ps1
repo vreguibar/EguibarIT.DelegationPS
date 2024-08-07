@@ -36,13 +36,17 @@ function Get-GptTemplate {
     )
 
     Begin {
-        $txt = ($constants.Header -f (Get-Date).ToShortDateString(), $MyInvocation.Mycommand, (Get-FunctionDisplay $PsBoundParameters -Verbose:$False))
+        $txt = ($constants.Header -f
+            (Get-Date).ToShortDateString(),
+            $MyInvocation.Mycommand,
+            (Get-FunctionDisplay $PsBoundParameters -Verbose:$False)
+        )
         Write-Verbose -Message $txt
 
         ##############################
         # Module imports
 
-        Import-Module -Name GroupPolicy -Verbose:$false | Out-Null
+        Import-Module -Name GroupPolicy -SkipEditionCheck -Verbose:$false | Out-Null
 
         ##############################
         # Variables Definition
@@ -88,7 +92,6 @@ function Get-GptTemplate {
     } #end Process
 
     End {
-
         Write-Verbose -Message 'Returning GptTmpl object.'
 
     } #end End

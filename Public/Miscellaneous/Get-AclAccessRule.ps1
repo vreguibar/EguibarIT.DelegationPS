@@ -65,12 +65,16 @@
         $error.clear()
 
 
-        $txt = ($constants.Header -f (Get-Date).ToShortDateString(), $MyInvocation.Mycommand, (Get-FunctionDisplay $PsBoundParameters -Verbose:$False))
+        $txt = ($constants.Header -f
+            (Get-Date).ToShortDateString(),
+            $MyInvocation.Mycommand,
+            (Get-FunctionDisplay $PsBoundParameters -Verbose:$False)
+        )
         Write-Verbose -Message $txt
 
         ##############################
         # Module imports
-        Import-MyModule -Name ActiveDirectory -Verbose:$false | Out-Null
+        Import-Module -Name ActiveDirectory -SkipEditionCheck -Verbose:$false | Out-Null
 
         ##############################
         # Variables Definition
