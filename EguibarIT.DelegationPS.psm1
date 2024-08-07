@@ -54,7 +54,7 @@ foreach ($Item in $Public) {
     }
 }
 
-Export-ModuleMember -Function '*' -Alias '*'
+Export-ModuleMember -Function '*' -Alias '*' -Verbose:$false | Out-Null
 
 # Call function Initialize-ModuleVariable to fill-up $Variables
 Initialize-ModuleVariable

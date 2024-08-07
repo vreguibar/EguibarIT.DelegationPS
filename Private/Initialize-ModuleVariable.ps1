@@ -30,7 +30,7 @@
     Param ()
 
     Begin {
-        $txt = ($constants.Header -f (Get-Date).ToShortDateString(), $MyInvocation.Mycommand, (Get-FunctionDisplay $PsBoundParameters -Verbose:$False))
+        $txt = ($constants.Header -f (Get-Date).ToShortDateString(), $MyInvocation.Mycommand, $null)
         Write-Verbose -Message $txt
 
         ##############################

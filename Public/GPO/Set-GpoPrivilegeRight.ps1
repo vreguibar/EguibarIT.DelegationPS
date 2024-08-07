@@ -96,6 +96,93 @@
         .PARAMETER DenyServiceLogon
             Identity (SamAccountName) to configure the right "Deny Log On as a Service"
 
+        .PARAMETER MachineAccount
+            Identity (SamAccountName) to configure the right "Add workstations to Domain (Domain Join)".
+
+        .PARAMETER IncreaseQuota
+            Identity (SamAccountName) to configure the right "Adjust memory quotas for a process".
+
+        .PARAMETER Backup
+            Identity (SamAccountName) to configure the right "Back up files and directories".
+
+        .PARAMETER ChangeNotify
+            Identity (SamAccountName) to configure the right "Bypass traverse checking".
+
+        .PARAMETER SystemTime
+            Identity (SamAccountName) to configure the right "Change the system time".
+
+        .PARAMETER TimeZone
+            Identity (SamAccountName) to configure the right "Change the time zone".
+
+        .PARAMETER CreatePagefile
+            Identity (SamAccountName) to configure the right "Create a pagefile".
+
+        .PARAMETER CreateGlobal
+            Identity (SamAccountName) to configure the right "Create global objects".
+
+        .PARAMETER CreateSymbolicLink
+            Identity (SamAccountName) to configure the right "Create symbolic links".
+
+        .PARAMETER EnableDelegation
+            Identity (SamAccountName) to configure the right "Enable computer and user accounts to be trusted for delegation".
+
+        .PARAMETER RemoteShutdown
+            Identity (SamAccountName) to configure the right "Force shutdown from a remote system".
+
+        .PARAMETER Audit
+            Identity (SamAccountName) to configure the right "Generate security audits".
+
+        .PARAMETER Impersonate
+            Identity (SamAccountName) to configure the right "Impersonate a client after authentication".
+
+        .PARAMETER IncreaseWorkingSet
+            Identity (SamAccountName) to configure the right "Increase a process working set".
+
+        .PARAMETER IncreaseBasePriority
+            Identity (SamAccountName) to configure the right "Increase scheduling priority".
+
+        .PARAMETER LoadDriver
+            Identity (SamAccountName) to configure the right "Load and unload device drivers".
+
+        .PARAMETER AuditSecurity
+            Identity (SamAccountName) to configure the right "Manage auditing and security log".
+
+        .PARAMETER Relabel
+            Identity (SamAccountName) to configure the right "Modify an object label".
+
+        .PARAMETER SystemEnvironment
+            Identity (SamAccountName) to configure the right "Modify firmware environment values".
+
+        .PARAMETER DelegateSessionUserImpersonate
+            Identity (SamAccountName) to configure the right "Obtain an impersonation token for another user in the same session".
+
+        .PARAMETER ManageVolume
+            Identity (SamAccountName) to configure the right "Perform volume maintenance tasks".
+
+        .PARAMETER ProfileSingleProcess
+            Identity (SamAccountName) to configure the right "Profile single process".
+
+        .PARAMETER SystemProfile
+            Identity (SamAccountName) to configure the right "Profile system performance".
+
+        .PARAMETER Undock
+            Identity (SamAccountName) to configure the right "Remove computer from docking station".
+
+        .PARAMETER AssignPrimaryToken
+            Identity (SamAccountName) to configure the right "Replace a process level token".
+
+        .PARAMETER Restore
+            Identity (SamAccountName) to configure the right "Restore files and directories".
+
+        .PARAMETER Shutdown
+            Identity (SamAccountName) to configure the right "Shut down the system".
+
+        .PARAMETER SyncAgent
+            Identity (SamAccountName) to configure the right "Synchronize directory service data".
+
+        .PARAMETER TakeOwnership
+            Identity (SamAccountName) to configure the right "Take ownership of files or other objects".
+
         .NOTES
             Used Functions:
                 Name                                   | Module
@@ -486,6 +573,13 @@
 
         ##############################
         # Module imports
+
+        ##############################
+        # Variables Definition
+
+        [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
+        $ArrayList = [System.Collections.Generic.List[object]]::New()
+
         $CurrentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent()
 
         #Create a principal object for current user
@@ -496,12 +590,6 @@
             Write-Error -Message 'This function MUST be executed as Administrator, including elevation. Otherwise will throw errors'
             $PSCmdlet.ThrowTerminatingError()
         }
-
-        ##############################
-        # Variables Definition
-
-        [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
-        $ArrayList = [System.Collections.Generic.List[object]]::New()
 
 
 
@@ -552,6 +640,7 @@
             $GptTmpl.SetKeyValue('Version', 'Revision', '1')
             $GptTmpl.SetKeyValue('Version', 'signature', '$CHICAGO$')
         } #end If
+
     } #end Begin
 
     Process {

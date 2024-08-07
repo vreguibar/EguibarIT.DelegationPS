@@ -27,7 +27,6 @@
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Hashtable variable from calling function containing PsBoundParameters to format accordingly',
             Position = 0)]
-        [ValidateNotNullOrEmpty()]
         [Hashtable]
         $HashTable,
 
