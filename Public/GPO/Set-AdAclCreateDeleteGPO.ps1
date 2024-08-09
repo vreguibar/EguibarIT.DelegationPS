@@ -1,10 +1,10 @@
 ﻿function Set-AdAclCreateDeleteGPO {
     <#
         .Synopsis
-            The function will delegate the premission for a group to create/Delete
+            The function will delegate the permission for a group to create/Delete
             Group Policy Objects objects within the Group Policy Container
         .DESCRIPTION
-            The function will delegate the premission for a group to create/Delete
+            The function will delegate the permission for a group to create/Delete
             Group Policy Objects objects within the Group Policy Container
         .EXAMPLE
             Set-AdAclCreateDeleteGPO -Group "SG_SiteAdmins_XXXX"
@@ -33,7 +33,9 @@
 
     param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Group Name which will get the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -41,7 +43,9 @@
         $Group,
 
         # PARAM2 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -75,7 +79,7 @@
             ACE number: 1
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : CreateChild
+             ActiveDirectoryRights : CreateChild
                   AccessControlType : Allow
                          ObjectType : GuidNULL
                     InheritanceType : None
@@ -99,7 +103,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Create/Delete GPO?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for Create/Delete GPO?')) {
             Set-AclConstructor5 @Splat
         } #end If
     } #end Process
@@ -112,9 +116,9 @@
             Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating Create/Delete GPO."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating Create/Delete GPO.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

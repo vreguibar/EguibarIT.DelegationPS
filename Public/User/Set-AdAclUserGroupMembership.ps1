@@ -2,10 +2,10 @@
 function Set-AdAclUserGroupMembership {
     <#
         .Synopsis
-            The function will delegate the premission for a group to Modify
+            The function will delegate the permission for a group to Modify
             Group Membership Set of user in an OU
         .DESCRIPTION
-            The function will delegate the premission for a group to Modify Group Membership Set of user object
+            The function will delegate the permission for a group to Modify Group Membership Set of user object
         .EXAMPLE
             Set-AdAclUserGroupMembership -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
         .EXAMPLE
@@ -36,7 +36,9 @@ function Set-AdAclUserGroupMembership {
 
     param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -44,7 +46,9 @@ function Set-AdAclUserGroupMembership {
         $Group,
 
         #PARAM2 Distinguished Name of the OU were the groups can be changed
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the object (or container) where the permissions are going to be configured.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -54,7 +58,9 @@ function Set-AdAclUserGroupMembership {
         $LDAPpath,
 
         # PARAM3 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -94,7 +100,7 @@ function Set-AdAclUserGroupMembership {
             ACE number: 1
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : ReadProperty, WriteProperty
+             ActiveDirectoryRights : ReadProperty, WriteProperty
                   AccessControlType : Allow
                          ObjectType : Group Membership [ExtendedRight]
                     InheritanceType : Descendents
@@ -119,7 +125,7 @@ function Set-AdAclUserGroupMembership {
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Group Membership?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for Group Membership?')) {
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -127,7 +133,7 @@ function Set-AdAclUserGroupMembership {
                          ACE number: 2
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : ReadProperty, WriteProperty
+             ActiveDirectoryRights : ReadProperty, WriteProperty
                   AccessControlType : Allow
                          ObjectType : memberOf
                     InheritanceType : All
@@ -152,7 +158,7 @@ function Set-AdAclUserGroupMembership {
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for memberOf?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for memberOf?')) {
             Set-AclConstructor6 @Splat
         } #end If
     } #end Process
@@ -165,9 +171,9 @@ function Set-AdAclUserGroupMembership {
             Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegation of user group membership."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating of user group membership.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

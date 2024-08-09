@@ -1,7 +1,7 @@
 ﻿function Set-AdAclChangeSiteLink {
     <#
         .Synopsis
-            The function will delegate the premission for a group to
+            The function will delegate the permission for a group to
             Change Sites
         .DESCRIPTION
             Long description
@@ -31,7 +31,9 @@
 
     param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Group Name which will get the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -39,7 +41,9 @@
         $Group,
 
         # PARAM2 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -100,7 +104,7 @@
             } #end If
         }
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Change AD Site Link?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to Change AD Site Link?')) {
             Set-AclConstructor5 @Splat
         } #end If
     }
@@ -113,9 +117,9 @@
             Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating Change Site-Link."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating Change Site-Link.'
+        )
+        Write-Verbose -Message $txt
     } #end End
 }

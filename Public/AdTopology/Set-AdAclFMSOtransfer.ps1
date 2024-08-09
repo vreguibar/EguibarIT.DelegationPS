@@ -34,14 +34,18 @@
 
     Param (
 
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         $Group,
 
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Flexible Single Master Operations (FSMO) Roles to delegate.',
             Position = 1)]
         [ValidateSet('Schema', 'Infrastructure', 'DomainNaming', 'RID', 'PDC')]
@@ -50,7 +54,9 @@
         $FSMOroles,
 
         # PARAM3 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 2)]
         [Switch]
@@ -134,7 +140,7 @@
                         } #end If
                     }
 
-                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Schema Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to transfer Schema Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
 
@@ -155,7 +161,7 @@
                         } #end If
                     } #end If
 
-                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Schema Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to transfer Schema Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
                 }
@@ -166,7 +172,7 @@
                         ACENumber              : 1
                         DistinguishedName      : CN=Partitions,CN=Configuration,DC=EguibarIT,DC=local
                         IdentityReference      : EguibarIT\XXXX
-                        ActiveDirectoryRightst : WriteProperty
+                        ActiveDirectoryRights : WriteProperty
                         AccessControlType      : Allow
                         ObjectType             : fSMORoleOwner [AttributeSchema]
                         InheritanceType        : None
@@ -176,7 +182,7 @@
                         ACENumber              : 2
                         DistinguishedName      : CN=Partitions,CN=Configuration,DC=EguibarIT,DC=local
                         IdentityReference      : EguibarIT\XXXX
-                        ActiveDirectoryRightst : ExtendedRight
+                        ActiveDirectoryRights : ExtendedRight
                         AccessControlType      : Allow
                         ObjectType             : Change Domain Master [Extended Rights]
                         InheritanceType        : None
@@ -201,7 +207,7 @@
                         } #end If
                     } #end If
 
-                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Domain Naming Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to transfer Domain Naming Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
 
@@ -222,7 +228,7 @@
                         } #end If
                     }
 
-                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Domain Naming Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to transfer Domain Naming Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
                 }
@@ -234,7 +240,7 @@
                         ACENumber              : 1
                         DistinguishedName      : CN=Infrastructure,DC=EguibarIT,DC=local
                         IdentityReference      : EguibarIT\XXXX
-                        ActiveDirectoryRightst : WriteProperty
+                        ActiveDirectoryRights : WriteProperty
                         AccessControlType      : Allow
                         ObjectType             : fSMORoleOwner [AttributeSchema]
                         InheritanceType        : None
@@ -244,7 +250,7 @@
                         ACENumber              : 2
                         DistinguishedName      : CN=Infrastructure,DC=EguibarIT,DC=local
                         IdentityReference      : EguibarIT\XXXX
-                        ActiveDirectoryRightst : ExtendedRight
+                        ActiveDirectoryRights : ExtendedRight
                         AccessControlType      : Allow
                         ObjectType             : Change Infrastructure Master [Extended Rights]
                         InheritanceType        : None
@@ -269,7 +275,7 @@
                         } #end If
                     } #end If
 
-                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Infrastructure Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to transfer Infrastructure Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
 
@@ -290,7 +296,7 @@
                         } #end If
                     } #end If
 
-                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer Infrastructure Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to transfer Infrastructure Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
                 }
@@ -301,7 +307,7 @@
                         ACENumber              : 1
                         DistinguishedName      : CN=RID Manager$,CN=System,DC=EguibarIT,DC=local
                         IdentityReference      : EguibarIT\XXXX
-                        ActiveDirectoryRightst : WriteProperty
+                        ActiveDirectoryRights : WriteProperty
                         AccessControlType      : Allow
                         ObjectType             : fSMORoleOwner [AttributeSchema]
                         InheritanceType        : None
@@ -311,7 +317,7 @@
                         ACENumber              : 2
                         DistinguishedName      : CN=RID Manager$,CN=System,DC=EguibarIT,DC=local
                         IdentityReference      : EguibarIT\XXXX
-                        ActiveDirectoryRightst : ExtendedRight
+                        ActiveDirectoryRights : ExtendedRight
                         AccessControlType      : Allow
                         ObjectType             : Change Rid Master [Extended Rights]
                         InheritanceType        : None
@@ -336,7 +342,7 @@
                         } #end If
                     } #end If
 
-                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer RID Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to transfer RID Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
 
@@ -357,7 +363,7 @@
                         } #end If
                     } #end If
 
-                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer RID Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to transfer RID Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
                 }
@@ -368,7 +374,7 @@
                         ACENumber              : 1
                         DistinguishedName      : DC=EguibarIT,DC=local
                         IdentityReference      : EguibarIT\XXXX
-                        ActiveDirectoryRightst : WriteProperty
+                        ActiveDirectoryRights : WriteProperty
                         AccessControlType      : Allow
                         ObjectType             : fSMORoleOwner [AttributeSchema]
                         InheritanceType        : None
@@ -378,7 +384,7 @@
                         ACENumber              : 2
                         DistinguishedName      : DC=EguibarIT,DC=local
                         IdentityReference      : EguibarIT\XXXX
-                        ActiveDirectoryRightst : ExtendedRight
+                        ActiveDirectoryRights : ExtendedRight
                         AccessControlType      : Allow
                         ObjectType             : Change PDC [Extended Rights]
                         InheritanceType        : None
@@ -403,7 +409,7 @@
                         } #end If
                     } #end If
 
-                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer PDCemulator Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to transfer PDCemulator Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
 
@@ -424,7 +430,7 @@
                         } #end If
                     } #end If
 
-                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to transfer PDCemulator Master?')) {
+                    If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to transfer PDCemulator Master?')) {
                         Set-AclConstructor4 @Splat
                     } #end If
                 }
@@ -439,9 +445,9 @@
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating FSMO role transfer."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating FSMO role transfer.'
+        )
+        Write-Verbose -Message $txt
     } #end End
 } # End Set-AdAclFMSOtransfer function

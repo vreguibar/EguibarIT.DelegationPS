@@ -1,9 +1,9 @@
 ﻿Function Set-AdAclMngPrivilegedAccount {
     <#
         .Synopsis
-            The function will delegate the premission for a group to Managed Privileged Accounts
+            The function will delegate the permission for a group to Managed Privileged Accounts
         .DESCRIPTION
-            The function will delegate the premission for a group to
+            The function will delegate the permission for a group to
             Managed Privileged Accounts by modifying the AdminSdHolder
         .EXAMPLE
             Set-AdAclMngPrivilegedAccount -Group "SL_PUM"
@@ -33,7 +33,9 @@
 
     Param (
         # PARAM1 Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -41,7 +43,9 @@
         $Group,
 
         # PARAM3 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -92,7 +96,7 @@
             ACE number: 1
             --------------------------------------------------------
                  IdentityReference : XXX
-             ActiveDirectoryRightst : ReadProperty, WriteProperty
+             ActiveDirectoryRights : ReadProperty, WriteProperty
                   AccessControlType : Allow
                          ObjectType : member [AttributeSchema]
                     InheritanceType : None
@@ -124,7 +128,7 @@
             ACE number: 2
             --------------------------------------------------------
                  IdentityReference : XXX
-             ActiveDirectoryRightst : ReadProperty, WriteProperty
+             ActiveDirectoryRights : ReadProperty, WriteProperty
                   AccessControlType : Allow
                          ObjectType : lockoutTime [AttributeSchema]
                     InheritanceType : None
@@ -148,7 +152,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for lockoutTime?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for lockoutTime?')) {
             Set-AclConstructor5 @Splat
         } #end If
 
@@ -156,7 +160,7 @@
             ACE number: 3
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : ReadProperty, WriteProperty
+             ActiveDirectoryRights : ReadProperty, WriteProperty
                   AccessControlType : Allow
                          ObjectType : userAccountControl [AttributeSchema]
                     InheritanceType : None
@@ -180,7 +184,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for userAccountControl?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for userAccountControl?')) {
             Set-AclConstructor5 @Splat
         } #end If
 
@@ -188,7 +192,7 @@
             ACE number: 4
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : ReadProperty, WriteProperty
+             ActiveDirectoryRights : ReadProperty, WriteProperty
                   AccessControlType : Allow
                          ObjectType : pwdLastSet [AttributeSchema]
                     InheritanceType : None
@@ -212,7 +216,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for pwdLastSet?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for pwdLastSet?')) {
             Set-AclConstructor5 @Splat
         } #end If
 
@@ -220,7 +224,7 @@
             ACE number: 5
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : ExtendedRight
+             ActiveDirectoryRights : ExtendedRight
                   AccessControlType : Allow
                          ObjectType : Reset Password [ExtendedRight]
                     InheritanceType : None
@@ -244,7 +248,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Reset Password?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for Reset Password?')) {
             Set-AclConstructor5 @Splat
         } #end If
 
@@ -252,7 +256,7 @@
             ACE number: 6
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : ExtendedRight
+             ActiveDirectoryRights : ExtendedRight
                   AccessControlType : Allow
                          ObjectType : Change Password [ExtendedRight]
                     InheritanceType : None
@@ -276,7 +280,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Change Password?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for Change Password?')) {
             Set-AclConstructor5 @Splat
         } #end If
     } #end Process
@@ -289,9 +293,9 @@
             Write-Verbose ('Permissions delegation process completed for group: {0} ' -f $PSBoundParameters['Group'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating management of Privileged Accounts (AdminSDHolder)."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating management of Privileged Accounts (AdminSDHolder).'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

@@ -33,7 +33,10 @@
 
     param
     (
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'String to ve validated as DistinguishedName',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -81,11 +84,10 @@
     } #end Process
 
     end {
-
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished checking DistinguishedName."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'Testing DistinguishedName (DN) (Private Function).'
+        )
+        Write-Verbose -Message $txt
 
         return $isValid
     } #end End

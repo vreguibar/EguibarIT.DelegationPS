@@ -42,7 +42,9 @@
 
     Param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -50,7 +52,9 @@
         $Group,
 
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Remote computer to execute the commands.',
             Position = 1)]
         [Alias('Host', 'PC', 'Server', 'HostName', 'ComputerName')]
@@ -61,7 +65,6 @@
     Begin {
 
         $error.clear()
-
 
         $txt = ($constants.Header -f
             (Get-Date).ToShortDateString(),
@@ -148,9 +151,9 @@
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished adding Service Control Manager (SCM) access."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'adding Service Control Manager (SCM) access.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 } # End Function

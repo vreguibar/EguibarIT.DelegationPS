@@ -21,12 +21,12 @@
     Param()
 
     Begin {
-        $error.clear()
-
-        Write-Verbose -Message '|=> ************************************************************************ <=|'
-        Write-Verbose -Message (Get-Date).ToShortDateString()
-        Write-Verbose -Message ('  Starting: {0}' -f $MyInvocation.Mycommand)
-        Write-Verbose -Message ('This function does not uses any Parameter' )
+        $txt = ($constants.Header -f
+            (Get-Date).ToShortDateString(),
+            $MyInvocation.Mycommand,
+            'This function does not uses any Parameter.'
+        )
+        Write-Verbose -Message $txt
 
         ##############################
         # Variables Definition
@@ -108,9 +108,9 @@
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) fill up ExtendedRightsMap variable."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'filling up ExtendedRightsMap variable.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

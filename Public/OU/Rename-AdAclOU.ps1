@@ -33,7 +33,9 @@
 
     param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Group Name which will get the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -41,7 +43,9 @@
         $Group,
 
         #PARAM2 Distinguished Name of the OU were the groups can be changed
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the OU that can be Changed',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -51,7 +55,9 @@
         $LDAPpath,
 
         # PARAM3 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -88,7 +94,7 @@
             ACE number: 1
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : ReadProperty, WriteProperty
+             ActiveDirectoryRights : ReadProperty, WriteProperty
                   AccessControlType : Allow
                          ObjectType : distinguishedName
                     InheritanceType : All
@@ -113,7 +119,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for distinguishedName?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for distinguishedName?')) {
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -121,7 +127,7 @@
             ACE number: 2
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : ReadProperty, WriteProperty
+             ActiveDirectoryRights : ReadProperty, WriteProperty
                   AccessControlType : Allow
                          ObjectType : cn
                     InheritanceType : All
@@ -146,7 +152,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for cn?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for cn?')) {
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -154,7 +160,7 @@
             ACE number: 3
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : ReadProperty, WriteProperty
+             ActiveDirectoryRights : ReadProperty, WriteProperty
                   AccessControlType : Allow
                          ObjectType : name
                     InheritanceType : All
@@ -179,7 +185,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for name?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for name?')) {
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -193,9 +199,9 @@
             Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating OU renaming."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating OU renaming.'
+        )
+        Write-Verbose -Message $txt
     }
 }

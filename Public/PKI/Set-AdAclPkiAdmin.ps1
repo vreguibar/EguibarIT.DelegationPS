@@ -1,7 +1,7 @@
 ﻿function Set-AdAclPkiAdmin {
     <#
         .Synopsis
-            The function will delegate full control premission for a group
+            The function will delegate full control permission for a group
             over Certificate Authority
         .DESCRIPTION
             Configures the configuration container to delegate the permissions to a group
@@ -34,7 +34,9 @@
 
     param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Group Name which will get the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -42,7 +44,9 @@
         $Group,
 
         #PARAM2 Distinguished Name of the OU were the groups can be changed
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the OU having the Rights groups, where the "Cert Publishers" built-in group resides (Usually OU=Rights,OU=Admin,DC=EguibarIT,DC=local).',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -52,7 +56,9 @@
         $ItRightsOuDN,
 
         # PARAM3 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -110,7 +116,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for PKI?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for PKI?')) {
             Set-AclConstructor5 @Splat
         } #end If
 
@@ -142,7 +148,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for PKI?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for PKI?')) {
             Set-AclConstructor5 @Splat
         } #end If
 
@@ -174,7 +180,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for PKI?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for PKI?')) {
             Set-AclConstructor5 @Splat
         } #end If
 
@@ -188,9 +194,9 @@
             Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating management of PKI."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating management of PKI.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

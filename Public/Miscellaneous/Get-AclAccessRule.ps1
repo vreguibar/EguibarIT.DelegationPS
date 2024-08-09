@@ -3,7 +3,7 @@
         .Synopsis
             Helper function to show Access Rules of given object
         .DESCRIPTION
-            This function will retrive and display the Access Rules of the given object.
+            This function will retrieve and display the Access Rules of the given object.
         .EXAMPLE
             Get-AclAccessRule "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
         .EXAMPLE
@@ -37,13 +37,15 @@
                 Eguibar Information Technology S.L.
                 http://www.eguibarit.com
     #>
-    [CmdletBinding(ConfirmImpact = 'Low')]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
     [OutputType([System.Collections.ArrayList])]
 
     param
     (
         # PARAM1 LDAP path to the object to get the ACL
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the object',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -53,7 +55,9 @@
         $LDAPpath,
 
         # PARAM1 Search by Identity Reference
-        [Parameter(Mandatory = $False, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $False,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'The identity to filter ACE',
             Position = 1)]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
@@ -63,7 +67,6 @@
     Begin {
 
         $error.clear()
-
 
         $txt = ($constants.Header -f
             (Get-Date).ToShortDateString(),
@@ -84,6 +87,7 @@
         $result = [System.Collections.ArrayList]::New()
 
     } #end Begin
+
     Process {
         If ($PSBoundParameters['searchBy']) {
             $AclAccess = Get-Acl -Path $PSBoundParameters['LDAPpath'] |
@@ -124,10 +128,10 @@
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished getting ACL."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'getting ACL.'
+        )
+        Write-Verbose -Message $txt
 
         Set-Location -Path $env:HOMEDRIVE\
 

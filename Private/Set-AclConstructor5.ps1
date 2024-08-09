@@ -89,7 +89,9 @@ function Set-AclConstructor5 {
     param (
         # PARAM1 STRING for the Delegated Identity
         # An IdentityReference object that identifies the trustee of the access rule.
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the Delegated Group',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -98,7 +100,9 @@ function Set-AclConstructor5 {
 
         # PARAM2 STRING for the object's LDAP path
         # The LDAP path to the object where the ACL will be changed
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the object',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -108,7 +112,9 @@ function Set-AclConstructor5 {
         $LDAPpath,
 
         # PARAM3 STRING representing AdRight
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Active Directory Right',
             Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -118,7 +124,9 @@ function Set-AclConstructor5 {
         $AdRight,
 
         # PARAM4 STRING representing Access Control Type
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Allow or Deny access to the given object',
             Position = 3)]
         #[ValidateSet('Allow', 'Deny')]
@@ -127,7 +135,9 @@ function Set-AclConstructor5 {
         $AccessControlType,
 
         # PARAM5 STRING representing Object GUID
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'GUID of the object',
             Position = 4)]
         [AllowNull()]
@@ -135,7 +145,9 @@ function Set-AclConstructor5 {
         $ObjectType,
 
         # PARAM6 STRING representing ActiveDirectory Security Inheritance
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Security inheritance of the new right (All, Children, Descendents, None, SelfAndChildren)',
             Position = 5)]
         #[ValidateSet('All', 'Children', 'Descendents', 'None', 'SelfAndChildren')]
@@ -145,7 +157,9 @@ function Set-AclConstructor5 {
         $AdSecurityInheritance,
 
         # PARAM7 SWITCH if $false (default) will add the rule. If $true, it will remove the rule
-        [Parameter(Mandatory = $False, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $False,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 6)]
         [Switch]
@@ -295,9 +309,9 @@ function Set-AclConstructor5 {
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished adding access rule with 5 arguments."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'adding access rule with 5 arguments (Private Function).'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

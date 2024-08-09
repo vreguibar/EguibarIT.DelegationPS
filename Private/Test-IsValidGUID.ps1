@@ -86,11 +86,10 @@
     } #end Process
 
     end {
-
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished checking Global Unique Identifier (GUID)."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'testing Global Unique Identifier (GUID) (Private Function).'
+        )
+        Write-Verbose -Message $txt
 
         return $isValid
     } #end End

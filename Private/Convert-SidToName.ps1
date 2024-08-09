@@ -95,10 +95,10 @@
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) Finished translating SID."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'translating SID to Name (Private Function).'
+        )
+        Write-Verbose -Message $txt
 
         return $FoundName
     } #end End

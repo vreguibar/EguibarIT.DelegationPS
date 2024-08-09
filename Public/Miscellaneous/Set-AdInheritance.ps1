@@ -27,7 +27,9 @@
 
     param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'The Delegated Group Name',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -37,14 +39,18 @@
         $LDAPpath,
 
         # PARAM2 Bool for the IsProtected parameter
-        [Parameter(Mandatory = $False, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $False,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present inheritance of object will be removed.',
             Position = 1)]
         [bool]
         $RemoveInheritance,
 
         # PARAM3 Bool for the preserveInheritance parameter
-        [Parameter(Mandatory = $False, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $False,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present the permissions from the parent object are copied to the object.',
             Position = 2)]
         [bool]
@@ -95,9 +101,9 @@
     End {
         Set-Location -Path $env:HOMEDRIVE\
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) setting Inheritance and permissions."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'setting Inheritance and permissions.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

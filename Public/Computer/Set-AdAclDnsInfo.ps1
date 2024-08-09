@@ -35,7 +35,9 @@
 
     Param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -43,7 +45,9 @@
         $Group,
 
         # PARAM2 Distinguished Name of the OU where the computer will get password reset
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the OU where the computer will get password reset',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -53,7 +57,9 @@
         $LDAPpath,
 
         # PARAM3 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -93,7 +99,7 @@
             ACE number: 1
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : ReadProperty, WriteProperty
+             ActiveDirectoryRights : ReadProperty, WriteProperty
                   AccessControlType : Allow
                          ObjectType : DNS Host Name Attributes [ExtendedRight]
                     InheritanceType : Descendents
@@ -118,7 +124,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for DNS Host Name Attributes?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for DNS Host Name Attributes?')) {
             Set-AclConstructor6 @Splat
         } #end If
     } #end Process
@@ -131,9 +137,9 @@
             Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) delegated DNS permissions."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating DNS permissions.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

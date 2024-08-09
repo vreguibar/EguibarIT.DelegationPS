@@ -25,7 +25,8 @@
                 Eguibar Information Technology S.L.
                 http://www.eguibarit.com
     #>
-    [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'Medium')]
+    [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'Low')]
+    [OutputType([void])]
 
     Param (
 
@@ -99,9 +100,9 @@
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished importing module."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'importing module.'
+        )
+        Write-Verbose -Message $txt
     } #end End
 }

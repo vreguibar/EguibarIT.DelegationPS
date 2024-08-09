@@ -5,7 +5,7 @@
         .DESCRIPTION
             Remove Un-Resolvable SID from a given object. If a SID is displayed within the ACE, is
             because a name could not be resolved. Most likely the object was deleted, and its friendly
-            name could not be retrived. This function will identify this unresolved SID and remove it from the ACE
+            name could not be retrieved. This function will identify this unresolved SID and remove it from the ACE
         .EXAMPLE
             Remove-UnknownSID -LDAPpath "OU=Users,OU=Good,OU=Sites,DC=EguibarIT,DC=local"
         .EXAMPLE
@@ -31,7 +31,9 @@
 
     Param (
         # PARAM1 STRING for the Object Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the object (or container) where the Unknown SID is located.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -40,7 +42,9 @@
         [String]
         $LDAPpath,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Switch indicator to remove the unknown SID.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -134,9 +138,9 @@
     } # end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished detecting and removing unresolved SIDs."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'detecting and removing unresolved SIDs.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

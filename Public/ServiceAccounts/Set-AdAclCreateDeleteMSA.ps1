@@ -34,7 +34,9 @@
 
     Param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -42,7 +44,9 @@
         $Group,
 
         # PARAM2 Distinguished Name of the object (or container) where the permissions are going to be configured.
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the object (or container) where the permissions are going to be configured.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -52,7 +56,9 @@
         $LDAPpath,
 
         # PARAM3 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -122,7 +128,7 @@
             ACE number: 2
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : CreateChild, DeleteChild
+             ActiveDirectoryRights : CreateChild, DeleteChild
                   AccessControlType : Allow
                          ObjectType : GuidNULL
                     InheritanceType : Descendents
@@ -147,7 +153,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for msDS-ManagedServiceAccount?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for msDS-ManagedServiceAccount?')) {
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -213,7 +219,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for applicationVersion?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for applicationVersion?')) {
             Set-AclConstructor6 @Splat
         } #end If
     } #end Process
@@ -226,9 +232,9 @@
             Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating Create/Delete MSA."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating Create Delete MSA.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

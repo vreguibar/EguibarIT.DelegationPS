@@ -27,7 +27,9 @@ Function Remove-AccountOperator {
 
     param (
         # PARAM1 STRING for the Object Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the object (or container) where the permissions are going to be removed.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -75,9 +77,9 @@ Function Remove-AccountOperator {
     } #end Process
 
     end {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) removed Account Operators."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'removing Account Operators.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

@@ -28,7 +28,10 @@
 
     Param (
 
-        [Parameter(Mandatory = $true, ValueFromPipeline = $True, ValueFromPipelineByPropertyName = $True, ValueFromRemainingArguments = $false,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $True,
+            ValueFromPipelineByPropertyName = $True,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (Security IDentifier or SID) to check if it IS a WellKnownSID.',
             Position = 0)]
         [ValidateScript({ Test-IsValidSID -ObjectSID $_ })]
@@ -87,11 +90,12 @@
     } # end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished checking for Well-Known SIDs."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'checking for Well-Known SIDs (Private Function).'
+        )
+        Write-Verbose -Message $txt
 
         return $IsWellKnownSid
     } #end End
+
 } # End Function

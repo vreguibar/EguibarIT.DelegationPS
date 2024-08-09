@@ -32,7 +32,9 @@ function Set-AdmPwdComputerSelfPermission {
 
     Param     (
         # PARAM1 Distinguished Name of the OU where the computer can self update password attributes
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the OU where the computer can self update password attributes.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -42,7 +44,9 @@ function Set-AdmPwdComputerSelfPermission {
         $LDAPpath,
 
         # PARAM3 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -75,7 +79,7 @@ function Set-AdmPwdComputerSelfPermission {
             ACE number: 1
             --------------------------------------------------------
                   IdentityReference : SELF
-             ActiveDirectoryRightst : ReadProperty, WriteProperty
+             ActiveDirectoryRights : ReadProperty, WriteProperty
                   AccessControlType : Allow
                          ObjectType : ms-Mcs-AdmPwdExpirationTime [AttributeSchema]
                     InheritanceType : Descendents
@@ -101,7 +105,7 @@ function Set-AdmPwdComputerSelfPermission {
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for ms-Mcs-AdmPwdExpirationTime?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for ms-Mcs-AdmPwdExpirationTime?')) {
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -109,7 +113,7 @@ function Set-AdmPwdComputerSelfPermission {
             ACE number: 2
             --------------------------------------------------------
                   IdentityReference : SELF
-             ActiveDirectoryRightst : WriteProperty
+             ActiveDirectoryRights : WriteProperty
                   AccessControlType : Allow
                          ObjectType : ms-Mcs-AdmPwd [AttributeSchema]
                     InheritanceType : Descendents
@@ -134,7 +138,7 @@ function Set-AdmPwdComputerSelfPermission {
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for ms-Mcs-AdmPwd?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for ms-Mcs-AdmPwd?')) {
             Set-AclConstructor6 @Splat
         } #end If
     }
@@ -147,9 +151,9 @@ function Set-AdmPwdComputerSelfPermission {
             Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating change Computer Self Service Permission."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating change Computer Self Service Permission.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

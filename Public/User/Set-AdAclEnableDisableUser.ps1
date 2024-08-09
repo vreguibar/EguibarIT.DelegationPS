@@ -2,9 +2,9 @@
 function Set-AdAclEnableDisableUser {
     <#
         .Synopsis
-            The function will delegate the premission for a group to enable or disable a user in an OU
+            The function will delegate the permission for a group to enable or disable a user in an OU
         .DESCRIPTION
-            The function will delegate the premission for a group to enable or disable a user
+            The function will delegate the permission for a group to enable or disable a user
         .EXAMPLE
             Set-AdAclEnableDisableUser -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
         .PARAMETER Group
@@ -32,7 +32,9 @@ function Set-AdAclEnableDisableUser {
 
     param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -40,7 +42,9 @@ function Set-AdAclEnableDisableUser {
         $Group,
 
         #PARAM2 Distinguished Name of the OU were the groups can be changed
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the object (or container) where the permissions are going to be configured.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -50,7 +54,9 @@ function Set-AdAclEnableDisableUser {
         $LDAPpath,
 
         # PARAM3 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -87,7 +93,7 @@ function Set-AdAclEnableDisableUser {
             ACE number: 11
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : ReadProperty, WriteProperty
+             ActiveDirectoryRights : ReadProperty, WriteProperty
                   AccessControlType : Allow
                          ObjectType : userAccountControl [AttributeSchema]
                     InheritanceType : Descendents
@@ -112,7 +118,7 @@ function Set-AdAclEnableDisableUser {
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for userAccountControl?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for userAccountControl?')) {
             Set-AclConstructor6 @Splat
         } #end If
     } #end Process
@@ -125,9 +131,9 @@ function Set-AdAclEnableDisableUser {
             Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finish delegation enable/disable user."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating enable/disable user.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

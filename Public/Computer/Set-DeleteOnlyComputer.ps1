@@ -35,7 +35,9 @@ function Set-DeleteOnlyComputer {
 
     Param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -43,7 +45,9 @@ function Set-DeleteOnlyComputer {
         $Group,
 
         # PARAM2 Distinguished Name of the OU where the computer will get password reset
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the OU where the computer will get password reset',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -53,7 +57,9 @@ function Set-DeleteOnlyComputer {
         $LDAPpath,
 
         # PARAM3 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -90,7 +96,7 @@ function Set-DeleteOnlyComputer {
             ACE number: 1
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : WriteProperty
+             ActiveDirectoryRights : WriteProperty
                   AccessControlType : Allow
                          ObjectType : GuidNULL
                     InheritanceType : All
@@ -114,7 +120,7 @@ function Set-DeleteOnlyComputer {
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Delete Only Computer?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for Delete Only Computer?')) {
             Set-AclConstructor5 @Splat
         } #end If
 
@@ -122,7 +128,7 @@ function Set-DeleteOnlyComputer {
             ACE number: 2
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : DeleteChild
+             ActiveDirectoryRights : DeleteChild
                   AccessControlType : Allow
                          ObjectType : computer [ClassSchema]
                     InheritanceType : All
@@ -146,7 +152,7 @@ function Set-DeleteOnlyComputer {
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Delete Only Computer?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for Delete Only Computer?')) {
             Set-AclConstructor5 @Splat
         } #end If
     } #end Process
@@ -159,9 +165,9 @@ function Set-DeleteOnlyComputer {
             Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating Delete only."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating Delete only.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

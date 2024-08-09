@@ -1,7 +1,7 @@
 ﻿function Set-AdAclPkiTemplateAdmin {
     <#
         .Synopsis
-            The function will delegate template management premission for a group
+            The function will delegate template management permission for a group
             over Certificate Authority
         .DESCRIPTION
             Configures the configuration container to delegate the permissions to a group so it can fully manage CA Templates.
@@ -101,7 +101,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for PKI template?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for PKI template?')) {
             Set-AclConstructor5 @Splat
         } #end If
 
@@ -134,7 +134,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for PKI template?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for PKI template?')) {
             Set-AclConstructor5 @Splat
         } #end If
 
@@ -148,9 +148,9 @@
             Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating management of PKI template."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating management of PKI template.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

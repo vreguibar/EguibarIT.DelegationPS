@@ -66,7 +66,9 @@
 
     param (
         # PARAM1 STRING representing the GUID
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'STRING representing the GUID',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -162,11 +164,11 @@
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished converting GUID."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'converting GUID to name (Private Function).'
+        )
+        Write-Verbose -Message $txt
 
         Return $Output
     } #end End
-}
+} #end Function

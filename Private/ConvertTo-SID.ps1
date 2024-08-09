@@ -45,6 +45,7 @@
 
         ##############################
         # Module imports
+
     } #end Begin
 
     Process {
@@ -60,15 +61,19 @@
 
             } else {
                 Write-Verbose 'Operation was cancelled by user or not approved by ShouldProcess.'
-            }
+            } #end If-Else
         } catch {
             Write-Error -Message ('Failed to convert {0} to SID. Error: {1}' -f $PSBoundParameters['AccountName'], $_.Exception.Message)
             return $null
-        }
+        } #end Try-Catch
     } #end Process
 
     End {
-        Write-Verbose -Message 'Ending ConvertTo-SID function.'
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'converting account name to SID (Private Function).'
+        )
+        Write-Verbose -Message $txt
+
         return $sid
     } #end End
 }

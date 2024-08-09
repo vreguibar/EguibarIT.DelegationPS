@@ -53,6 +53,7 @@
                 http://www.eguibarit.com
     #>
     [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'low')]
+    # return type will be different on each case.
 
     Param (
         # Param1
@@ -77,8 +78,8 @@
 
         ##############################
         # Module imports
-        Import-Module -Name 'ActiveDirectory' -SkipEditionCheck -Verbose:$false | Out-Null
 
+        Import-Module -Name 'ActiveDirectory' -SkipEditionCheck -Verbose:$false | Out-Null
 
         ##############################
         # Variables Definition
@@ -173,10 +174,10 @@
     } # End Process Section
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished getting AD object type."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'getting AD object type (Private Function).'
+        )
+        Write-Verbose -Message $txt
 
         if ($null -ne $ReturnValue) {
             Write-Output $ReturnValue

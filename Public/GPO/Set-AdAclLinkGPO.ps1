@@ -3,7 +3,7 @@
         .Synopsis
             Set delegation to Link Group Policy Objects
         .DESCRIPTION
-            The function will delegate the premission for a group to Link Group Policy Objects objects to Domain or OU
+            The function will delegate the permission for a group to Link Group Policy Objects objects to Domain or OU
         .EXAMPLE
             Set-AdAclLinkGPO -Group "SG_SiteAdmins_XXXX"
         .EXAMPLE
@@ -31,7 +31,9 @@
 
     param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Group Name which will get the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -39,7 +41,9 @@
         $Group,
 
         # PARAM2 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -101,7 +105,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Link GPO?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for Link GPO?')) {
             Set-AclConstructor5 @Splat
         } #end If
     }
@@ -114,9 +118,9 @@
             Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating link GPO."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating link GPO.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

@@ -4,7 +4,9 @@
 
     param(
 
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Name of the service. For example BITS',
             ParameterSetName = 'ByName',
             Position = 0)]
@@ -13,7 +15,9 @@
         [string[]]
         $Name,
 
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Display Name of the service. For example "Background Intelligent Transfer Service"',
             ParameterSetName = 'ByDisplayName',
             Position = 0)]
@@ -22,7 +26,9 @@
         [string[]]
         $DisplayName,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Remote computer to execute the commands.',
             Position = 1)]
         [Alias('Host', 'PC', 'Server', 'HostName', 'ComputerName')]
@@ -32,7 +38,6 @@
 
     Begin {
         $error.clear()
-
 
         $txt = ($constants.Header -f
             (Get-Date).ToShortDateString(),
@@ -59,7 +64,7 @@
             'ByDisplayName' {
                 Write-Verbose -Message 'Query the service(s) using DisplayName'
                 $Name = Get-Service -DisplayName $DisplayName -ComputerName $Computer -ErrorAction Stop |
-                Select-Object -ExpandProperty Name
+                    Select-Object -ExpandProperty Name
             }
         } #end Switch
 
@@ -144,10 +149,10 @@
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished getting Service ACL."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'getting Service ACL.'
+        )
+        Write-Verbose -Message $txt
 
         return $CustomObject
     } #end End

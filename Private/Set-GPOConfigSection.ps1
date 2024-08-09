@@ -1,7 +1,6 @@
 ﻿# ConfigRestrictionsOnSection on file GpoPrivilegeRights.cs
 
 function Set-GPOConfigSection {
-
     <#
         .SYNOPSIS
             Configures a specific section and key in a GPT template (GptTmpl.inf) file with specified members.
@@ -200,6 +199,11 @@ function Set-GPOConfigSection {
     } #end Process
 
     End {
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'setting GPO section (Private Function).'
+        )
+        Write-Verbose -Message $txt
+
         return $GptTmpl
     } #end End
 }

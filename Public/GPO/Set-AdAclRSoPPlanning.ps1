@@ -3,7 +3,7 @@
         .Synopsis
             Set delegation to Resultant Set of Policy (Planning)
         .DESCRIPTION
-            The function will delegate the premission for a group to Resultant Set of Policy (Planning)
+            The function will delegate the permission for a group to Resultant Set of Policy (Planning)
         .EXAMPLE
             Set-AdAclRSoPPlanning -Group "SL_GpoRight"
         .EXAMPLE
@@ -31,7 +31,9 @@
 
     param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Group Name which will get the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -39,7 +41,9 @@
         $Group,
 
         # PARAM2 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -79,7 +83,7 @@
             ACE number: 1
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : ExtendedRight
+             ActiveDirectoryRights : ExtendedRight
                   AccessControlType : Allow
                          ObjectType : Generate Resultant Set of Policy (Planning) [ExtendedRight]
                     InheritanceType : All
@@ -104,7 +108,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Generate Resultant Set of Policy (Planning)?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for Generate Resultant Set of Policy (Planning)?')) {
             Set-AclConstructor5 @Splat
         } #end If
     } # end Process
@@ -117,9 +121,9 @@
             Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating RSoP Planning."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating RSoP Planning.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

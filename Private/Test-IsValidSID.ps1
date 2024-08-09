@@ -113,6 +113,11 @@
     } #end Process
 
     end {
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'testing SID (Private Function).'
+        )
+        Write-Verbose -Message $txt
+
         return $isValid
     } #end End
 

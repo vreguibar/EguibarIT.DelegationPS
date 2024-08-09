@@ -41,7 +41,9 @@
 
     Param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -49,7 +51,9 @@
         $Group,
 
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Remote computer to execute the commands..',
             Position = 1)]
         [Alias('Host', 'PC', 'Server', 'HostName')]
@@ -144,7 +148,9 @@
     } #end Process
 
     End {
-        $txt = ($constants.Footer -f $MyInvocation.InvocationName, 'removing Service Control Manager (SCM) access.')
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'removing Service Control Manager (SCM) access.'
+        )
         Write-Verbose -Message $txt
     } #end END
 }

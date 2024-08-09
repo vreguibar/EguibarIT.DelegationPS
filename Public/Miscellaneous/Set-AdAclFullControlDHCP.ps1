@@ -32,7 +32,9 @@
 
     Param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -40,7 +42,9 @@
         $Group,
 
         # PARAM3 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -76,7 +80,7 @@
         <#
             ACENumber              : 1
             IdentityReference      : EguibarIT\xxx
-            ActiveDirectoryRightst : GenericAll
+            ActiveDirectoryRights : GenericAll
             AccessControlType      : Allow
             ObjectType             : GuidNULL
             InheritanceType        : Descendents
@@ -101,14 +105,14 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for dHCPClass?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for dHCPClass?')) {
             Set-AclConstructor6 @Splat
         } #end If
 
         <#
             ACENumber              : 2
             IdentityReference      : EguibarIT\xxx
-            ActiveDirectoryRightst : CreateChild, DeleteChild
+            ActiveDirectoryRights : CreateChild, DeleteChild
             AccessControlType      : Allow
             ObjectType             : dHCPClass [ClassSchema]
             InheritanceType        : None
@@ -132,7 +136,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for dHCPClass?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for dHCPClass?')) {
             Set-AclConstructor5 @Splat
         } #end If
     } #end Process
@@ -145,9 +149,9 @@
             Write-Verbose ('Permissions delegation process completed for group: {0} ' -f $PSBoundParameters['Group'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finish delegating DHCP."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating DHCP.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

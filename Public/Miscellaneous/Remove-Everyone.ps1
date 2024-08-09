@@ -27,7 +27,9 @@ Function Remove-Everyone {
 
     param (
         # PARAM1 STRING for the Object Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the object (or container) where the permissions are going to be removed.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -59,7 +61,7 @@ Function Remove-Everyone {
         <#
             ACENumber              : 2
             IdentityReference      : Everyone
-            ActiveDirectoryRightst : ReadProperty, WriteProperty, GenericExecute
+            ActiveDirectoryRights : ReadProperty, WriteProperty, GenericExecute
             AccessControlType      : Allow
             ObjectType             : GuidNULL
             InheritanceType        : All
@@ -81,9 +83,9 @@ Function Remove-Everyone {
     } #end Process
 
     end {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) removed Everyone."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'removing EVERYONE.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

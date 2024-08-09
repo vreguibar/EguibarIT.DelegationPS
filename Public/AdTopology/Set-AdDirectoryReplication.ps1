@@ -1,7 +1,7 @@
 ﻿function Set-AdDirectoryReplication {
     <#
         .Synopsis
-            The function will delegate the premission for a group to replicate the directory
+            The function will delegate the permission for a group to replicate the directory
         .DESCRIPTION
             TConfigures the configuration container to delegate the permissions to a group so it can replicate the directory
         .EXAMPLE
@@ -31,7 +31,9 @@
     [OutputType([void])]
 
     param (
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -39,7 +41,9 @@
         $Group,
 
         # PARAM2 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 1)]
         [Switch]
@@ -85,7 +89,7 @@
                 ACENumber              :
                 DistinguishedName      : Current Naming Context
                 IdentityReference      : EguibarIT\XXX
-                ActiveDirectoryRightst : ExtendedRight
+                ActiveDirectoryRights : ExtendedRight
                 AccessControlType      : Allow
                 ObjectType             : Monitor Active Directory Replication [Extended Rights]
                 InheritanceType        : None
@@ -108,7 +112,7 @@
                 } #end If
             } #end If
 
-            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Monitor Active Directory Replication?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to Monitor Active Directory Replication?')) {
                 Set-AclConstructor4 @Splat
             } #end If
 
@@ -118,7 +122,7 @@
                 ACENumber              :
                 DistinguishedName      : Current Naming Context
                 IdentityReference      : EguibarIT\XXX
-                ActiveDirectoryRightst : ExtendedRight
+                ActiveDirectoryRights : ExtendedRight
                 AccessControlType      : Allow
                 ObjectType             : Replicating Directory Changes [Extended Rights]
                 InheritanceType        : None
@@ -141,7 +145,7 @@
                 } #end If
             } #end If
 
-            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Replicating Directory Changes?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to Replicating Directory Changes?')) {
                 Set-AclConstructor4 @Splat
             } #end If
 
@@ -151,7 +155,7 @@
                 ACENumber              :
                 DistinguishedName      : Current Naming Context
                 IdentityReference      : EguibarIT\XXX
-                ActiveDirectoryRightst : ExtendedRight
+                ActiveDirectoryRights : ExtendedRight
                 AccessControlType      : Allow
                 ObjectType             : Replicating Directory Changes All [Extended Rights]
                 InheritanceType        : None
@@ -174,7 +178,7 @@
                 } #end If
             } #end If
 
-            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Replicating Directory Changes All?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to Replicating Directory Changes All?')) {
                 Set-AclConstructor4 @Splat
             } #end If
 
@@ -184,7 +188,7 @@
                 ACENumber              :
                 DistinguishedName      : Current Naming Context
                 IdentityReference      : EguibarIT\XXX
-                ActiveDirectoryRightst : ExtendedRight
+                ActiveDirectoryRights : ExtendedRight
                 AccessControlType      : Allow
                 ObjectType             : Replicating Directory Changes In Filtered Set [Extended Rights]
                 InheritanceType        : None
@@ -207,7 +211,7 @@
                 } #end If
             } #end If
 
-            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Replicating Directory Changes In Filtered Set?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to Replicating Directory Changes In Filtered Set?')) {
                 Set-AclConstructor4 @Splat
             } #end If
 
@@ -217,7 +221,7 @@
                 ACENumber              :
                 DistinguishedName      : Current Naming Context
                 IdentityReference      : EguibarIT\XXX
-                ActiveDirectoryRightst : ExtendedRight
+                ActiveDirectoryRights : ExtendedRight
                 AccessControlType      : Allow
                 ObjectType             : Manage Replication Topology [Extended Rights]
                 InheritanceType        : None
@@ -240,7 +244,7 @@
                 } #end If
             } #end If
 
-            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Manage Replication Topology?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to Manage Replication Topology?')) {
                 Set-AclConstructor4 @Splat
             } #end If
 
@@ -250,7 +254,7 @@
                 ACENumber              :
                 DistinguishedName      : Current Naming Context
                 IdentityReference      : EguibarIT\XXX
-                ActiveDirectoryRightst : ExtendedRight
+                ActiveDirectoryRights : ExtendedRight
                 AccessControlType      : Allow
                 ObjectType             : Replication Synchronization [Extended Rights]
                 InheritanceType        : All
@@ -273,7 +277,7 @@
                 } #end If
             } #end If
 
-            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to Replication Synchronization?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to Replication Synchronization?')) {
                 Set-AclConstructor4 @Splat
             } #end If
 
@@ -310,7 +314,7 @@
                     } #end If
                 } #end If
 
-                If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to msDS-NC-Replica-Locations?')) {
+                If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msDS-NC-Replica-Locations?')) {
                     Set-AclConstructor4 @Splat
                 } #end If
 
@@ -330,7 +334,7 @@
                     } #end If
                 } #end If
 
-                If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions to msDS-NC-Replica-Locations?')) {
+                If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msDS-NC-Replica-Locations?')) {
                     Set-AclConstructor4 @Splat
                 } #end If
 
@@ -347,9 +351,9 @@
             Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating replication."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating replication.'
+        )
+        Write-Verbose -Message $txt
     } #end End
 }

@@ -27,7 +27,9 @@
 
     param (
         # PARAM1 STRING for the Object Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Object Distinguished Name',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -130,9 +132,9 @@
     } #end Process
 
     end {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) removed Pre-Windows 2000 Compatible Access from OU."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'removing Pre-Windows 2000 Compatible Access from OU.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

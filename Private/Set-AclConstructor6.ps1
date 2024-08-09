@@ -133,7 +133,9 @@ function Set-AclConstructor6 {
         $AdRight,
 
         # PARAM4 STRING representing Access Control Type
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Allow or Deny access to the given object',
             Position = 3)]
         [ValidateSet([AccessControlType])]
@@ -141,7 +143,9 @@ function Set-AclConstructor6 {
         $AccessControlType,
 
         # PARAM5 STRING representing the object GUID
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'GUID of the object',
             Position = 4)]
         [AllowNull()]
@@ -149,7 +153,9 @@ function Set-AclConstructor6 {
         $ObjectType,
 
         # PARAM6 STRING representing ActiveDirectory Security Inheritance
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Security inheritance of the new right (All, Children, Descendent, None, SelfAndChildren)',
             Position = 5)]
         [ValidateSet([ActiveDirectorySecurityInheritance])]
@@ -158,7 +164,9 @@ function Set-AclConstructor6 {
         $AdSecurityInheritance,
 
         # PARAM7 Object GUID (or Extended Right)
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'GUID of the Inherited object or Extended Right',
             Position = 6)]
         [AllowNull()]
@@ -166,7 +174,9 @@ function Set-AclConstructor6 {
         $InheritedObjectType,
 
         # PARAM8 SWITCH if $false (default) will add the rule. If $true, it will remove the rule
-        [Parameter(Mandatory = $False, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $False,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 7)]
         [Switch]
@@ -318,9 +328,9 @@ function Set-AclConstructor6 {
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished adding access rule with 6 arguments."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'adding access rule with 6 arguments (Private Function).'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

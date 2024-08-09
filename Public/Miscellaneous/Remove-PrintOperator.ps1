@@ -27,7 +27,9 @@
 
     param (
         # PARAM1 STRING for the Object Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the object (or container) where the permissions are going to be removed.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -68,7 +70,7 @@
         <#
             ACENumber              : 1
             IdentityReference      : BUILTIN\Print Operators
-            ActiveDirectoryRightst : CreateChild, DeleteChild
+            ActiveDirectoryRights : CreateChild, DeleteChild
             AccessControlType      : Allow
             ObjectType             : printQueue [ClassSchema]
             InheritanceType        : None
@@ -90,9 +92,9 @@
     } #end Process
 
     end {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) removed Print Operators."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'removing Print Operators.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

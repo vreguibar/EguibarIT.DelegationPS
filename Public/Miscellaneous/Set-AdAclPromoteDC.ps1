@@ -1,9 +1,9 @@
 ﻿function Set-AdAclPromoteDomain {
     <#
         .Synopsis
-            The function will delegate the premission for a group to Promote and Demote Domain Controllers
+            The function will delegate the permission for a group to Promote and Demote Domain Controllers
         .DESCRIPTION
-            The function will delegate the premission for a group to Promote and Demote Domain Controllers
+            The function will delegate the permission for a group to Promote and Demote Domain Controllers
         .EXAMPLE
             Set-AdAclPromoteDomain -Group "SG_SiteAdmins_XXXX" -StagingOU "OU=InfraStaging,OU=Infra,OU=Admin,DC=EguibarIT,DC=local"
         .EXAMPLE
@@ -34,14 +34,18 @@
     [OutputType([void])]
 
     param (
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         $Group,
 
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'DistinguishedName of the Staging OU. OU must exist and Server must be present here before starting the Promotion process.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -49,7 +53,9 @@
         $StagingOU,
 
         # PARAM2 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 2)]
         [Switch]
@@ -112,7 +118,7 @@
                 } #end If
             } #end If
 
-            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Add/Remove Replica In Domain?')) {
+            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for Add/Remove Replica In Domain?')) {
                 Set-AclConstructor4 @Splat
             } #end If
 
@@ -161,7 +167,7 @@
             ACENumber              : 1
             DistinguishedName      : CN=Sites,CN=Configuration,DC=EguibarIT,DC=local
             IdentityReference      : EguibarIT\XXXX
-            ActiveDirectoryRightst : CreateChild
+            ActiveDirectoryRights : CreateChild
             AccessControlType      : Allow
             ObjectType             : nTDSDSA [ClassSchema]
             InheritanceType        : Descendents
@@ -171,7 +177,7 @@
             ACENumber              : 2
             DistinguishedName      : CN=Sites,CN=Configuration,DC=EguibarIT,DC=local
             IdentityReference      : EguibarIT\XXXX
-            ActiveDirectoryRightst : WriteDacl
+            ActiveDirectoryRights : WriteDacl
             AccessControlType      : Allow
             ObjectType             : GuidNULL
             InheritanceType        : Descendents
@@ -181,7 +187,7 @@
             ACENumber              : 3
             DistinguishedName      : CN=Sites,CN=Configuration,DC=EguibarIT,DC=local
             IdentityReference      : EguibarIT\XXXX
-            ActiveDirectoryRightst : CreateChild
+            ActiveDirectoryRights : CreateChild
             AccessControlType      : Allow
             ObjectType             : server [ClassSchema]
             InheritanceType        : Descendents
@@ -191,7 +197,7 @@
             ACENumber              : 4
             DistinguishedName      : CN=Sites,CN=Configuration,DC=EguibarIT,DC=local
             IdentityReference      : EguibarIT\XXXX
-            ActiveDirectoryRightst : CreateChild
+            ActiveDirectoryRights : CreateChild
             AccessControlType      : Allow
             ObjectType             : nTDSConnection [ClassSchema]
             InheritanceType        : Descendents
@@ -338,9 +344,9 @@
             Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating DCPromote."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating DCPromote.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 } #end Function Set-AdAclPromoteDomain

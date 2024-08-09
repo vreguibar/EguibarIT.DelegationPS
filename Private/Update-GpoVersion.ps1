@@ -153,7 +153,9 @@ function Update-GpoVersion {
     } #end Process
 
     End {
-        [string]$msg = ('Version of GPO updated. Original Number: {0}. New Number: {1}' -f $versionObject, $newVersionObject)
-        Write-Verbose -Message $msg
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'Version of GPO updated (Private Function).'
+        )
+        Write-Verbose -Message $txt
     } #end End
 }

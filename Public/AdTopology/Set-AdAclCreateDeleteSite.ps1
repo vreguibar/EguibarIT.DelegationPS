@@ -1,7 +1,7 @@
 ﻿function Set-AdAclCreateDeleteSite {
     <#
         .Synopsis
-            The function will delegate the premission for a group to
+            The function will delegate the permission for a group to
             Create and Delete Sites
 
         .DESCRIPTION
@@ -43,7 +43,9 @@
 
     param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Group Name which will get the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -51,7 +53,9 @@
         $Group,
 
         # PARAM2 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -90,7 +94,7 @@
             ACE number: 1
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : CreateChild, DeleteChild
+             ActiveDirectoryRights  : CreateChild, DeleteChild
                   AccessControlType : Allow
                          ObjectType : GuidNULL
                     InheritanceType : Descendents
@@ -129,7 +133,7 @@
             ACE number: 2
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : CreateChild, DeleteChild
+             ActiveDirectoryRights  : CreateChild, DeleteChild
                   AccessControlType : Allow
                          ObjectType : site [ClassSchema]
                     InheritanceType : All
@@ -168,7 +172,7 @@
             ACE number: 3
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : CreateChild, DeleteChild
+             ActiveDirectoryRights  : CreateChild, DeleteChild
                   AccessControlType : Allow
                          ObjectType : nTDSSiteSettings [ClassSchema]
                     InheritanceType : Descendents
@@ -208,7 +212,7 @@
             ACE number: 4
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : CreateChild, DeleteChild
+             ActiveDirectoryRights : CreateChild, DeleteChild
                   AccessControlType : Allow
                          ObjectType : nTDSDSA [ClassSchema]
                     InheritanceType : Descendents
@@ -246,7 +250,7 @@
             ACE number: 5
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : WriteDacl
+             ActiveDirectoryRights : WriteDacl
                   AccessControlType : Allow
                          ObjectType : nTDSDSA [ClassSchema]
                     InheritanceType : Descendents
@@ -284,7 +288,7 @@
             ACE number: 6
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : CreateChild, DeleteChild
+             ActiveDirectoryRights : CreateChild, DeleteChild
                   AccessControlType : Allow
                          ObjectType : server [ClassSchema]
                     InheritanceType : Descendents
@@ -324,7 +328,7 @@
             ACE number: 7
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : CreateChild, DeleteChild
+             ActiveDirectoryRights : CreateChild, DeleteChild
                   AccessControlType : Allow
                          ObjectType : nTDSConnection [ClassSchema]
                     InheritanceType : Descendents
@@ -363,7 +367,7 @@
             ACE number: 8
             --------------------------------------------------------
                  IdentityReference : XXX
-            ActiveDirectoryRightst : GenericAll
+            ActiveDirectoryRights : GenericAll
             AccessControlType      : Allow
             ObjectType             : GuidNULL
             InheritanceType        : Descendents
@@ -401,7 +405,7 @@
             ACE number: 9
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : GenericAll
+             ActiveDirectoryRights : GenericAll
              AccessControlType      : Allow
              ObjectType             : GuidNULL
              InheritanceType        : Descendents
@@ -446,9 +450,9 @@
             Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating Change/Delete Site."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating Change/Delete Site.'
+        )
+        Write-Verbose -Message $txt
     } #end End
 }

@@ -80,7 +80,11 @@
     } #end Process
 
     End {
-        Write-Verbose -Message 'Function ConvertTo-AccountName completed.'
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'translating SID to account name (Private Function).'
+        )
+        Write-Verbose -Message $txt
+
         return $accountName.Value
     } #end End
 }

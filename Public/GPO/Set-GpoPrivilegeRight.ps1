@@ -1176,9 +1176,9 @@
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating Privileged Rights."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating Privileged Rights on GPO.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 } #end Function

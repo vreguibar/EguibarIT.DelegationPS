@@ -1,9 +1,9 @@
 ﻿Function Set-AdAclMngPrivilegedGroup {
     <#
         .Synopsis
-            The function will delegate the premission for a group to Managed Privileged Groups
+            The function will delegate the permission for a group to Managed Privileged Groups
         .DESCRIPTION
-            The function will delegate the premission for a group to Managed Privileged Groups
+            The function will delegate the permission for a group to Managed Privileged Groups
         .EXAMPLE
             Set-AdAclMngPrivilegedGroup -Group "SL_PGM"
         .EXAMPLE
@@ -31,7 +31,9 @@
 
     Param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -39,7 +41,9 @@
         $Group,
 
         # PARAM3 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -78,7 +82,7 @@
             ACE number: 1
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : ReadProperty, WriteProperty
+             ActiveDirectoryRights : ReadProperty, WriteProperty
                   AccessControlType : Allow
                          ObjectType : member [AttributeSchema]
                     InheritanceType : None
@@ -100,7 +104,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Change Password?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for Change Password?')) {
             Set-AclConstructor5 @Splat
         } #end If
     } # end Process
@@ -113,9 +117,9 @@
             Write-Verbose ('Permissions delegation process completed for group: {0} ' -f $PSBoundParameters['Group'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating management of Privileged Groups (AdminSdHolder)."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating management of Privileged Groups (AdminSDHolder).'
+        )
+        Write-Verbose -Message $txt
     }
 }

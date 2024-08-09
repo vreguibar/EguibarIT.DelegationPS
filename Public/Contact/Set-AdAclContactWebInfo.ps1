@@ -2,10 +2,10 @@
 function Set-AdAclContactWebInfo {
     <#
         .Synopsis
-            The function will delegate the premission for a group to Modify
+            The function will delegate the permission for a group to Modify
             Personal Information Set of Contact in an OU
         .DESCRIPTION
-            The function will delegate the premission for a group to Modify
+            The function will delegate the permission for a group to Modify
             Personal Information Set of Contact in an OU
         .EXAMPLE
             Set-AdAclContactWebInfo -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
@@ -37,7 +37,9 @@ function Set-AdAclContactWebInfo {
 
     Param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -45,7 +47,9 @@ function Set-AdAclContactWebInfo {
         $Group,
 
         # PARAM2 Distinguished Name of the OU where the computer will get password reset
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the OU where the computer will get password reset',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -55,7 +59,9 @@ function Set-AdAclContactWebInfo {
         $LDAPpath,
 
         # PARAM3 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -95,7 +101,7 @@ function Set-AdAclContactWebInfo {
             ACE number: 1
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : ReadProperty, WriteProperty
+             ActiveDirectoryRights : ReadProperty, WriteProperty
                   AccessControlType : Allow
                          ObjectType : Web Information [ExtendedRight]
                     InheritanceType : Descendents
@@ -121,7 +127,7 @@ function Set-AdAclContactWebInfo {
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Web Information?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for Web Information?')) {
             Set-AclConstructor6 @Splat
         } #end If
     } #end Process
@@ -134,9 +140,9 @@ function Set-AdAclContactWebInfo {
             Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating change Contact web info."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating change Contact web info.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

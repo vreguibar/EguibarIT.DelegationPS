@@ -1,9 +1,9 @@
 ﻿Function Set-DomainJoinComputer {
     <#
         .Synopsis
-            The function will delegate premission for a group to Domain-Join Computer objects from given container
+            The function will delegate permission for a group to Domain-Join Computer objects from given container
         .DESCRIPTION
-            The function will delegate premission for a group to Domain-Join Computer objects from given container
+            The function will delegate permission for a group to Domain-Join Computer objects from given container
         .EXAMPLE
             Set-DomainJoinComputer -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
         .EXAMPLE
@@ -35,7 +35,9 @@
 
     Param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -43,7 +45,9 @@
         $Group,
 
         # PARAM2 Distinguished Name of the OU where the computer will get password reset
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the OU where the computer will get password reset',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -53,7 +57,9 @@
         $LDAPpath,
 
         # PARAM3 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -93,7 +99,7 @@
             ACE number: 1
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : CreateChild, DeleteChild
+             ActiveDirectoryRights : CreateChild, DeleteChild
                   AccessControlType : Allow
                          ObjectType : computer [ClassSchema]
                     InheritanceType : All
@@ -117,7 +123,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Domain Join Computer?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for Domain Join Computer?')) {
             Set-AclConstructor5 @Splat
         } #end If
 
@@ -125,7 +131,7 @@
              ACE number: 2
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : ExtendedRight
+             ActiveDirectoryRights : ExtendedRight
                   AccessControlType : Allow
                          ObjectType : Reset Password [ExtendedRight]
                     InheritanceType : Descendents
@@ -150,7 +156,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Reset Password?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for Reset Password?')) {
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -158,7 +164,7 @@
              ACE number: 3
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : ReadProperty, WriteProperty
+             ActiveDirectoryRights : ReadProperty, WriteProperty
                   AccessControlType : Allow
                          ObjectType : Account Restrictions [ExtendedRight]
                     InheritanceType : Descendents
@@ -183,7 +189,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for Account Restrictions?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for Account Restrictions?')) {
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -191,7 +197,7 @@
              ACE number: 4
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : Self
+             ActiveDirectoryRights : Self
                   AccessControlType : Allow
                          ObjectType : dNSHostName [AttributeSchema]
                     InheritanceType : Descendents
@@ -216,7 +222,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for dNSHostName?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for dNSHostName?')) {
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -224,7 +230,7 @@
              ACE number: 5
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : Self
+             ActiveDirectoryRights : Self
                   AccessControlType : Allow
                          ObjectType : servicePrincipalName [AttributeSchema]
                     InheritanceType : Descendents
@@ -249,7 +255,7 @@
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for servicePrincipalName?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for servicePrincipalName?')) {
             Set-AclConstructor6 @Splat
         } #end If
     } #end Process
@@ -262,9 +268,9 @@
             Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating domain Join."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating domain Join.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

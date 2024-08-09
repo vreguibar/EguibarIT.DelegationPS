@@ -45,7 +45,9 @@
 
     Param (
 
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Specifies the service to be configured.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -53,14 +55,18 @@
         [String]
         $Service,
 
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         $Group,
 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Remote computer to execute the commands..',
             Position = 2)]
         [Alias('Host', 'PC', 'Server', 'HostName')]
@@ -72,7 +78,6 @@
     Begin {
 
         $error.clear()
-
 
         $txt = ($constants.Header -f
             (Get-Date).ToShortDateString(),
@@ -162,9 +167,9 @@
     } #end Process
 
     End {
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished adding Service access."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '-------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'adding Service access.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 } # End Function

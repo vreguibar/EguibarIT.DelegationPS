@@ -92,7 +92,9 @@ function Get-GptTemplate {
     } #end Process
 
     End {
-        Write-Verbose -Message 'Returning GptTmpl object.'
-
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'Returning GptTmpl object (Private Function).'
+        )
+        Write-Verbose -Message $txt
     } #end End
 }

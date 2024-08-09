@@ -4,7 +4,7 @@ function Set-AdmPwdResetPasswordPermission {
         .Synopsis
             The function will delegate the right to a group for resetting the computer password.
         .DESCRIPTION
-            LAPS implementation. The function will delegate the premission for a group to reset Admin password of Computer object
+            LAPS implementation. The function will delegate the permission for a group to reset Admin password of Computer object
         .EXAMPLE
             Set-AdmPwdResetPasswordPermission -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
         .EXAMPLE
@@ -34,7 +34,9 @@ function Set-AdmPwdResetPasswordPermission {
 
     Param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -42,7 +44,9 @@ function Set-AdmPwdResetPasswordPermission {
         $Group,
 
         # PARAM2 Distinguished Name of the OU where the computer will get password reset
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the OU where the computer will get password reset',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -52,7 +56,9 @@ function Set-AdmPwdResetPasswordPermission {
         $LDAPpath,
 
         # PARAM3 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -89,7 +95,7 @@ function Set-AdmPwdResetPasswordPermission {
             ACE number: 1
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : ReadProperty, WriteProperty
+             ActiveDirectoryRights : ReadProperty, WriteProperty
                   AccessControlType : Allow
                          ObjectType : ms-Mcs-AdmPwdExpirationTime [AttributeSchema]
                     InheritanceType : Descendents
@@ -114,7 +120,7 @@ function Set-AdmPwdResetPasswordPermission {
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for ms-Mcs-AdmPwdExpirationTime?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for ms-Mcs-AdmPwdExpirationTime?')) {
             Set-AclConstructor6 @Splat
         } #end If
     } #end Process
@@ -127,9 +133,9 @@ function Set-AdmPwdResetPasswordPermission {
             Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegating reset Password."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating reset Password.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }

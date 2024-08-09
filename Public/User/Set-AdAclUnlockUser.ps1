@@ -2,9 +2,9 @@
 function Set-AdAclUnlockUser {
     <#
         .Synopsis
-            The function will delegate the premission for a group to Unlock a user in an OU
+            The function will delegate the permission for a group to Unlock a user in an OU
         .DESCRIPTION
-            The function will delegate the premission for a group to Unlock a user
+            The function will delegate the permission for a group to Unlock a user
         .EXAMPLE
             Set-AdAclUnlockUser -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
         .EXAMPLE
@@ -34,7 +34,9 @@ function Set-AdAclUnlockUser {
 
     param (
         # PARAM1 STRING for the Delegated Group Name
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Group Name which will get the delegation',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -42,7 +44,9 @@ function Set-AdAclUnlockUser {
         $Group,
 
         #PARAM2 Distinguished Name of the OU were the groups can be changed
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Distinguished Name of the object (or container) where the permissions are going to be configured.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
@@ -52,7 +56,9 @@ function Set-AdAclUnlockUser {
         $LDAPpath,
 
         # PARAM3 SWITCH If present, the access rule will be removed.
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true,
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -89,7 +95,7 @@ function Set-AdAclUnlockUser {
             ACE number: 1
             --------------------------------------------------------
                   IdentityReference : XXX
-             ActiveDirectoryRightst : ReadProperty, WriteProperty
+             ActiveDirectoryRights : ReadProperty, WriteProperty
                   AccessControlType : Allow
                          ObjectType : lockoutTime [AttributeSchema]
                     InheritanceType : Descendents
@@ -115,7 +121,7 @@ function Set-AdAclUnlockUser {
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permisssions for lockoutTime?')) {
+        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for lockoutTime?')) {
             Set-AclConstructor6 @Splat
         } #end If
     } #end Process
@@ -128,9 +134,9 @@ function Set-AdAclUnlockUser {
             Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
         } #end If-Else
 
-        Write-Verbose -Message "Function $($MyInvocation.InvocationName) finished delegation to unlock user."
-        Write-Verbose -Message ''
-        Write-Verbose -Message '--------------------------------------------------------------------------------'
-        Write-Verbose -Message ''
+        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+            'delegating to unlock user.'
+        )
+        Write-Verbose -Message $txt
     } #end END
 }
