@@ -146,7 +146,7 @@ function Set-AclConstructor4 {
     )
 
     Begin {
-        $txt = ($constants.Header -f
+        $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
             (Get-FunctionDisplay $PsBoundParameters -Verbose:$False)
@@ -284,7 +284,7 @@ function Set-AclConstructor4 {
     } #end Process
 
     End {
-        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
             'adding access rule with 4 arguments (Private Function).'
         )
         Write-Verbose -Message $txt

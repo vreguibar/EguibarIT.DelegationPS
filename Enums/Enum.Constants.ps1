@@ -30,28 +30,6 @@
     #>
     GuidRegEx = [RegEx]::new('^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$')
 
-    # Standard header used on each function on the Begin section
-    Header    = @'
-
-         ═══════════════════════════════════════════════════════════════════════════
-                              EguibarIT.DelegationPS module
-         ═══════════════════════════════════════════════════════════════════════════
-            Date:     {0}
-            Starting: {1}
-
-          Parameters used by the function... {2}
-
-'@
-
-    # Standard footer used on each function on the Begin section
-    Footer    = @'
-
-          Function {0} finished {1}"
-
-         ───────────────────────────────────────────────────────────────────────────
-
-'@
-
 }
 
 $Splat = @{

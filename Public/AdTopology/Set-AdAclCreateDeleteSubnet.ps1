@@ -54,7 +54,7 @@
 
     begin {
 
-        $txt = ($constants.Header -f
+        $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
             (Get-FunctionDisplay $PsBoundParameters -Verbose:$False)
@@ -150,7 +150,7 @@
             Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
         } #end If-Else
 
-        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
             'delegating Change Subnet.'
         )
         Write-Verbose -Message $txt

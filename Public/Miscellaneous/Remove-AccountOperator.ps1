@@ -41,7 +41,7 @@ Function Remove-AccountOperator {
 
     begin {
 
-        $txt = ($constants.Header -f
+        $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
             (Get-FunctionDisplay $PsBoundParameters -Verbose:$False)
@@ -77,7 +77,7 @@ Function Remove-AccountOperator {
     } #end Process
 
     end {
-        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
             'removing Account Operators.'
         )
         Write-Verbose -Message $txt

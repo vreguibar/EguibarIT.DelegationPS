@@ -59,7 +59,7 @@
 
     Begin {
 
-        $txt = ($constants.Header -f
+        $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
             (Get-FunctionDisplay $PsBoundParameters -Verbose:$False)
@@ -101,7 +101,7 @@
     End {
         Set-Location -Path $env:HOMEDRIVE\
 
-        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
             'setting Inheritance and permissions.'
         )
         Write-Verbose -Message $txt

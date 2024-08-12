@@ -74,7 +74,7 @@ function Set-GPOConfigSection {
 
     Begin {
 
-        $txt = ($constants.Header -f
+        $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
             (Get-FunctionDisplay $PsBoundParameters -Verbose:$False)
@@ -199,7 +199,7 @@ function Set-GPOConfigSection {
     } #end Process
 
     End {
-        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
             'setting GPO section (Private Function).'
         )
         Write-Verbose -Message $txt

@@ -32,6 +32,29 @@
 
     # Well-Known SIDs
     WellKnownSIDs              = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
+
+    # Standard header used on each function on the Begin section
+    HeaderDelegation           = @'
+
+         ═══════════════════════════════════════════════════════════════════════════
+                              EguibarIT.DelegationPS module
+         ═══════════════════════════════════════════════════════════════════════════
+            Date:     {0}
+            Starting: {1}
+
+          Parameters used by the function... {2}
+
+'@
+
+    # Standard footer used on each function on the Begin section
+    FooterDelegation           = @'
+
+          Function {0} finished {1}"
+
+         ───────────────────────────────────────────────────────────────────────────
+
+'@
+
 }
 
 $Splat = @{

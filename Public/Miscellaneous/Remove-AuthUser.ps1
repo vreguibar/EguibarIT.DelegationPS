@@ -41,7 +41,7 @@ Function Remove-AuthUser {
 
     Begin {
 
-        $txt = ($constants.Header -f
+        $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
             (Get-FunctionDisplay $PsBoundParameters -Verbose:$False)
@@ -76,7 +76,7 @@ Function Remove-AuthUser {
     } #end Process
 
     End {
-        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
             'removing AUTHENTICATED USERS.'
         )
         Write-Verbose -Message $txt

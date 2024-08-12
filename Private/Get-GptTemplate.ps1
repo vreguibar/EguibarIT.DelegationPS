@@ -36,7 +36,7 @@ function Get-GptTemplate {
     )
 
     Begin {
-        $txt = ($constants.Header -f
+        $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
             (Get-FunctionDisplay $PsBoundParameters -Verbose:$False)
@@ -92,7 +92,7 @@ function Get-GptTemplate {
     } #end Process
 
     End {
-        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
             'Returning GptTmpl object (Private Function).'
         )
         Write-Verbose -Message $txt

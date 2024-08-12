@@ -36,7 +36,7 @@ Function Get-SCManagerPermission {
     Begin {
         $error.clear()
 
-        $txt = ($constants.Header -f
+        $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
             (Get-FunctionDisplay $PsBoundParameters -Verbose:$False)
@@ -80,7 +80,7 @@ Function Get-SCManagerPermission {
     } #end Process
 
     End {
-        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
             'showing Service Control Manager (SCM) access.'
         )
         Write-Verbose -Message $txt

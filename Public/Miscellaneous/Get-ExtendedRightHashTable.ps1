@@ -21,7 +21,7 @@
     Param()
 
     Begin {
-        $txt = ($constants.Header -f
+        $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
             'This function does not uses any Parameter.'
@@ -108,7 +108,7 @@
     } #end Process
 
     End {
-        $txt = ($Constants.Footer -f $MyInvocation.InvocationName,
+        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
             'filling up ExtendedRightsMap variable.'
         )
         Write-Verbose -Message $txt

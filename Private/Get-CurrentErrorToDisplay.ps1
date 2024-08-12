@@ -31,14 +31,14 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true, ValueFromRemainingArguments = $false,
-            HelpMessage = 'Current error (usually from $Error variable) which is going to be proccessed. If no error is provided then $error[0] will be used instead.',
+            HelpMessage = 'Current error (usually from $Error variable) which is going to be processed. If no error is provided then $error[0] will be used instead.',
             Position = 0)]
         $CurrentError
     )
 
     Begin {
 
-        $txt = ($constants.Header -f
+        $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
             (Get-FunctionDisplay $PsBoundParameters -Verbose:$False)
