@@ -30,7 +30,6 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Hashtable variable from calling function containing PsBoundParameters to format accordingly',
             Position = 0)]
-        [ValidateNotNullOrEmpty()]
         [Hashtable]
         $HashTable,
 
@@ -65,7 +64,6 @@
         } else {
             $display = 'No PsBoundParameters to display.'
         } #end If
-        $display += $Constants.NL
         $display += $Constants.NL
 
     } # end Process

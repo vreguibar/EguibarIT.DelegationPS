@@ -72,7 +72,7 @@ function Set-AdAclComputerGroupMembership {
         $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
-            (Get-FunctionDisplay $PsBoundParameters -Verbose:$False)
+            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
         )
         Write-Verbose -Message $txt
 

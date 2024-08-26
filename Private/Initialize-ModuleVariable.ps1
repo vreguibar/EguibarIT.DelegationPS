@@ -30,12 +30,6 @@
     Param ()
 
     Begin {
-        $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToShortDateString(),
-            $MyInvocation.Mycommand,
-            (Get-FunctionDisplay $PsBoundParameters -Verbose:$False)
-        )
-        Write-Verbose -Message $txt
 
         ##############################
         # Module imports
@@ -151,9 +145,5 @@
     } #end Process
 
     End {
-        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
-            'initializing Variables (Private Function).'
-        )
-        Write-Verbose -Message $txt
     } #end End
 }
