@@ -79,7 +79,7 @@
         ##############################
         # Module imports
 
-        Import-Module -Name 'ActiveDirectory' -SkipEditionCheck -Verbose:$false | Out-Null
+        Import-MyModule -Name 'ActiveDirectory' -Verbose:$false
 
         ##############################
         # Variables Definition

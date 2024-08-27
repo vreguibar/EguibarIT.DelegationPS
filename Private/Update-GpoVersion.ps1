@@ -44,7 +44,7 @@ function Update-GpoVersion {
 
         ##############################
         # Module imports
-        Import-Module -Name GroupPolicy -SkipEditionCheck -Verbose:$False | Out-Null
+        Import-MyModule -Name 'GroupPolicy' -Verbose:$false
 
         ##############################
         # Variables Definition
