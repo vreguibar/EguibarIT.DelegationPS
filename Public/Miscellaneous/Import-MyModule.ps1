@@ -39,8 +39,15 @@
         .PARAMETER NoClobber
             Prevents importing commands that would hide or overwrite existing commands.
 
-        .PARAMETER RemainingArguments
-            Accepts any additional arguments that might be passed to the function.
+        .PARAMETER Scope
+            Defines the scope of the import, either 'Global' or 'Local'.
+
+        .PARAMETER SkipEditionCheck
+            Skips the edition check if importing modules designed for Windows PowerShell in PowerShell Core.
+
+        .PARAMETER UseWindowsPowerShell
+            Forces the module to be imported using Windows PowerShell instead of PowerShell Core.
+
 
         .EXAMPLE
             Import-MyModule -Name ActiveDirectory
@@ -124,10 +131,10 @@
     )
 
     Begin {
-        $txt = ($Variables.Header -f
+        $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
-            '(Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)'
+            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
         )
         Write-Verbose -Message $txt
 
@@ -141,7 +148,7 @@
 
         # Get Hashtable with corresponding parameters to import module
         $importParams = @{
-            Name        = $Name
+            Name        = $name
             ErrorAction = 'Stop'
         }
 
@@ -195,7 +202,7 @@
         # Handle Verbose parameter correctly
         if ($PSBoundParameters['Verbose'] -eq $true) {
             $importParams['Verbose'] = $true
-        } elseIf ($PSBoundParameters['Verbose'] -eq $false) {
+        } elseIf (($PSBoundParameters['Verbose'] -eq $false) -or (-Not $PSBoundParameters.ContainsKey('Verbose'))) {
             $importParams['Verbose'] = $false
         }
 
@@ -205,27 +212,42 @@
 
         try {
 
-            # Check if the module is available
-            $availableModule = Get-Module -Name $Name -ListAvailable -ErrorAction SilentlyContinue -Verbose:$PSBoundParameters['Verbose']
+            If ($Name -eq 'GroupPolicy') {
+                $x = 'C:\Windows\system32\WindowsPowerShell\v1.0\Modules\GroupPolicy\GroupPolicy.psd1'
+                Import-Module $x -Verbose:$PSBoundParameters['Verbose']
+            }
 
-            if ($null -eq $availableModule) {
+            If ($Name -eq 'ServerManager') {
+                $x = 'C:\Windows\system32\WindowsPowerShell\v1.0\Modules\ServerManager\ServerManager.psd1'
+                Import-Module $x -Verbose:$PSBoundParameters['Verbose']
+            }
+
+            # Change this part to correctly check for module availability
+            $availableModule = Get-Module -Name $Name -ErrorAction SilentlyContinue -Verbose:$PSBoundParameters['Verbose']
+
+            if (-not $availableModule) {
                 throw ('Module "{0}" is not installed. Please install the module before importing.' -f $Name)
             } #end If
+
 
             # Check if the module is already imported
             $importedModule = Get-Module -Name $Name -ErrorAction SilentlyContinue -Verbose:$PSBoundParameters['Verbose']
 
-            if ($null -ne $importedModule -and -not $Force) {
+            if ($null -ne $module -and -not $Force) {
                 Write-Verbose -Message ('[{0}] Module {1} is already imported.' -f $functionName, $Name)
+
                 if ($PassThru) {
-                    return $importedModule
+                    return $Module
                 } #end If
                 return
+
             } #end If
 
             # Perform the import
             if ($PSCmdlet.ShouldProcess($Name, 'Import Module')) {
+
                 $importedModule = Import-Module @importParams -Verbose:$PSBoundParameters['Verbose']
+
                 Write-Verbose -Message ('[{0}] Successfully imported module {1}' -f $functionName, $Name)
 
 
@@ -233,7 +255,10 @@
                     return $importedModule
                 } #end If
 
-            } #end If
+                Write-Verbose -Message ('Module {0} has been successfully imported.' -f $ModuleName)
+            } #end else
+
+
 
         } catch {
             Write-Error -Message ('[{0}] Error importing module {1}: {2}' -f $functionName, $Name, $_)
@@ -243,7 +268,7 @@
     } #end Process
 
     End {
-        $txt = ($Variables.Footer -f $MyInvocation.InvocationName,
+        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
             'importing module.'
         )
         Write-Verbose -Message $txt
