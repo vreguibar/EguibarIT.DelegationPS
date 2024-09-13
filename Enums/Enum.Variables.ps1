@@ -33,6 +33,15 @@
     # Well-Known SIDs
     WellKnownSIDs              = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
+    # Module Logging Config
+    LogConfig                  = @{
+        LogName          = 'EguibarIT-Events'
+        Source           = 'DelegationPS-PowerShellModule'
+        MaximumKilobytes = 16384  # 16 MB default
+        RetentionDays    = 30
+    }
+    EventLogInitialized        = $false
+
     # Standard header used on each function on the Begin section
     HeaderDelegation           = @'
 
