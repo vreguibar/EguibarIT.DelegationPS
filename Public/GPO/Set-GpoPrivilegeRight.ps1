@@ -203,6 +203,7 @@
     [OutputType([void])]
 
     Param (
+
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
@@ -630,6 +631,9 @@
         # Get the GptTmpl.inf content and store it in variable
         $GptTmpl = Get-GptTemplate -GpoName $PSBoundParameters['GpoToModify']
 
+        if (($null -eq $GptTmpl) -or ($GptTmpl -isnot [IniFileHandler.IniFile])) {
+            throw 'Failed to get a valid IniFileHandler.IniFile object from Get-GptTemplate'
+        } #end If
 
         # Check GPT does contains default sections ([Unicode] and [Version])
         If ( -not (($GptTmpl.SectionExists('Version')) -and
@@ -1144,14 +1148,35 @@
 
                 # Add corresponding Key-Value pairs.
                 # Each pair will verify proper members are added.
-                $Splat = @{
-                    CurrentSection = $Rights.Section
-                    CurrentKey     = $Rights.Key
-                    Members        = $Rights.members
-                    GptTmpl        = $GptTmpl
-                    Confirm        = $false
-                }
-                $GptTmpl = Set-GPOConfigSection @Splat
+                Try {
+
+                    $Splat = @{
+                        CurrentSection = $Rights.Section
+                        CurrentKey     = $Rights.Key
+                        Members        = $Rights.members
+                        GptTmpl        = $GptTmpl
+                        Confirm        = $false
+                    }
+                    $GptTmpl = Set-GPOConfigSection @Splat
+
+                } Catch {
+
+                    $FormatError = [System.Text.StringBuilder]::new()
+                    $FormatError.AppendLine('Something went wrong.')
+                    $FormatError.AppendLine('Message: {0}' -f $_.Message)
+                    $FormatError.AppendLine('CategoryInfo: {0}' -f $_.CategoryInfo)
+                    $FormatError.AppendLine('ErrorDetails: {0}' -f $_.ErrorDetails)
+                    $FormatError.AppendLine('Exception: {0}' -f $_.Exception)
+                    $FormatError.AppendLine('FullyQualifiedErrorId: {0}' -f $_.FullyQualifiedErrorId)
+                    $FormatError.AppendLine('InvocationInfo: {0}' -f $_.InvocationInfo)
+                    $FormatError.AppendLine('PipelineIterationInfo: {0}' -f $_.PipelineIterationInfo)
+                    $FormatError.AppendLine('ScriptStackTrace: {0}' -f $_.ScriptStackTrace)
+                    $FormatError.AppendLine('TargetObject: {0}' -f $_.TargetObject)
+                    $FormatError.AppendLine('PSMessageDetails: {0}' -f $_.PSMessageDetails)
+
+                    Write-Error -Message $FormatError
+
+                } #end Try-Catch
 
             } #end If
         } #end Foreach
@@ -1163,8 +1188,24 @@
             Write-Verbose -Message ('Saving changes to GptTmpl.inf file og GPO {0}' -f $PSBoundParameters['GpoToModify'])
 
         } Catch {
-            Write-Error -Message ('The GptTmpl.inf file could not be saved: {0}. Message is {1}' -f $_, $_.Message)
+            Write-Error -Message ('
+                Something went wrong...
 
+                    Message: {0}
+                    CategoryInfo: {1}
+                    ErrorDetails: {2}
+                    Exception: {3}
+                    FullyQualifiedErrorId: {4}
+                    InvocationInfo: {5}
+                    PipelineIterationInfo: {6}
+                    ScriptStackTrace: {7}
+                    TargetObject: {8}
+                    PSMessageDetails: {9}
+
+                    {10}' -f
+                $_.Message, $_.CategoryInfo, $_.ErrorDetails, $_.Exception, $_.FullyQualifiedErrorId,
+                $_.InvocationInfo, $_.PipelineIterationInfo, $_.ScriptStackTrace, $_.TargetObject, $_.PSMessageDetails, $_
+            )
             Throw
         }
 

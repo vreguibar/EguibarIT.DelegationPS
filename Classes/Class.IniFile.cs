@@ -1,6 +1,4 @@
-﻿Add-Type -Language CSharp -TypeDefinition @'
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -45,8 +43,9 @@ namespace IniFileHandler
         /// <param name="value">The value associated with the key.</param>
         public void Add(string key, string value)
         {
-            if (!string.IsNullOrWhiteSpace(key))
-                KeyValues[key] = value;
+             if (string.IsNullOrWhiteSpace(key))
+                throw new ArgumentException("Key cannot be null or empty.", nameof(key));
+            KeyValues[key] = value;
         }
 
         /// <summary>
@@ -66,8 +65,7 @@ namespace IniFileHandler
         /// <returns>The value associated with the specified key, or <c>null</c> if the key does not exist.</returns>
         public string GetValue(string key)
         {
-            KeyValues.TryGetValue(key, out var value);
-            return value;
+            return KeyValues.TryGetValue(key, out string value) ? value : null;
         }
 
         /// <summary>
@@ -77,8 +75,9 @@ namespace IniFileHandler
         /// <param name="value">The value to set.</param>
         public void SetValue(string key, string value)
         {
-            if (!string.IsNullOrWhiteSpace(key))
-                KeyValues[key] = value;
+            if (string.IsNullOrWhiteSpace(key))
+                throw new ArgumentException("Key cannot be null or empty.", nameof(key));
+            KeyValues[key] = value;
         }
     } //end class IniKeyValuePair
 
@@ -103,12 +102,12 @@ namespace IniFileHandler
         /// <summary>
         /// Gets the name of the section.
         /// </summary>
-        public string SectionName { get; }
+        public string SectionName { get; set; }
 
         /// <summary>
         /// Gets the key-value pairs associated with this section.
         /// </summary>
-        public IniKeyValuePair KeyValuePair { get; }
+        public IniKeyValuePair KeyValuePair { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IniSection"/> class with a specified section name.
@@ -116,6 +115,8 @@ namespace IniFileHandler
         /// <param name="sectionName">The name of the section.</param>
         public IniSection(string sectionName)
         {
+            if (string.IsNullOrWhiteSpace(sectionName))
+                throw new ArgumentException("Section name cannot be null or empty.", nameof(sectionName));
             SectionName = sectionName;
             KeyValuePair = new IniKeyValuePair();
         }
@@ -142,14 +143,17 @@ namespace IniFileHandler
     /// </summary>
     public class IniSections
     {
-        private Dictionary<string, IniSection> _sections;
+        /// <summary>
+        /// Gets the dictionary of sections.
+        /// </summary>
+        public Dictionary<string, IniSection> Sections { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IniSections"/> class.
         /// </summary>
         public IniSections()
         {
-            _sections = new Dictionary<string, IniSection>(StringComparer.OrdinalIgnoreCase);
+            Sections = new Dictionary<string, IniSection>(StringComparer.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -158,18 +162,19 @@ namespace IniFileHandler
         /// <param name="section">The section to add or update.</param>
         public void Add(IniSection section)
         {
-            if (!string.IsNullOrWhiteSpace(section.SectionName))
-                _sections[section.SectionName] = section;
+            if (section == null || string.IsNullOrWhiteSpace(section.SectionName))
+                throw new ArgumentException("Section name cannot be null or empty.", nameof(section.SectionName));
+            Sections[section.SectionName] = section;
         }
 
-         /// <summary>
+        /// <summary>
         /// Checks if a section with the specified name exists in the collection.
         /// </summary>
         /// <param name="sectionName">The name of the section.</param>
         /// <returns><c>true</c> if the section exists; otherwise, <c>false</c>.</returns>
         public bool ContainsKey(string sectionName)
         {
-            return _sections.ContainsKey(sectionName);
+            return Sections.ContainsKey(sectionName);
         }
 
         /// <summary>
@@ -179,9 +184,10 @@ namespace IniFileHandler
         /// <returns>The <see cref="IniSection"/> with the specified name, or <c>null</c> if the section does not exist.</returns>
         public IniSection GetSection(string sectionName)
         {
-            _sections.TryGetValue(sectionName, out var section);
-            return section;
+            //return Sections.TryGetValue(key, out IniSection section) ? section : null;
+            return Sections.TryGetValue(sectionName, out IniSection section) ? section : null;
         }
+
 
         /// <summary>
         /// Tries to get the section with the specified name.
@@ -191,13 +197,15 @@ namespace IniFileHandler
         /// <returns><c>true</c> if the section exists; otherwise, <c>false</c>.</returns>
         public bool TryGetValue(string sectionName, out IniSection section)
         {
-            return _sections.TryGetValue(sectionName, out section);
+            return Sections.TryGetValue(sectionName, out section);
         }
+
 
         /// <summary>
         /// Gets the collection of all sections.
         /// </summary>
-        public IEnumerable<IniSection> Values => _sections.Values;
+        public IEnumerable<IniSection> Values => Sections.Values;
+
     } //end class IniSections
 
 
@@ -226,23 +234,26 @@ namespace IniFileHandler
     /// <summary>
     /// Represents an INI file.
     /// </summary>
-    public class IniFile
+    public class IniFile : IDisposable
     {
 
         /// <summary>
         /// Gets or sets the file path of the INI file.
         /// </summary>
-        public string FilePath { get; set; }
+        public string FilePath { get; private set; }
 
         /// <summary>
         /// Gets the sections in the INI file.
         /// </summary>
-        public IniSections Sections { get; }
+        public IniSections Sections { get; private set; }
 
         /// <summary>
         /// Gets the key-value pairs outside of any section.
         /// </summary>
-        public IniKeyValuePair KeyValuePair { get; }
+        public IniKeyValuePair KeyValuePair { get; private set; }
+
+        private bool _disposed = false;
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IniFile"/> class.
@@ -283,27 +294,36 @@ namespace IniFileHandler
 
             FilePath = filePath;
             var encoding = DetermineEncoding(filePath);
-            string[] iniLines = File.ReadAllLines(filePath, encoding);
-            IniKeyValuePair currentSection = KeyValuePair;
 
-            foreach (string line in iniLines)
+            using (var reader = new StreamReader(filePath, encoding))
             {
-                if (string.IsNullOrWhiteSpace(line)) continue;
-
-                if (line.StartsWith("[") && line.EndsWith("]"))
+                IniKeyValuePair currentSection = KeyValuePair;
+                string line;
+                while ((line = reader.ReadLine()) != null)
                 {
-                    string sectionName = line.Trim('[', ']');
-                    IniSection section = new IniSection(sectionName);
-                    currentSection = section.KeyValuePair;
-                    Sections.Add(section);
-                }
-                else if (!line.StartsWith(";") && !line.StartsWith("#"))
-                {
-                    string[] keyPair = line.Split(new char[] { '=' }, 2);
-                    string key = keyPair[0].Trim();
-                    string value = keyPair.Length > 1 ? keyPair[1].Trim() : null;
+                    if (string.IsNullOrWhiteSpace(line)) continue;
 
-                    currentSection.Add(key, value);
+                    if (line.StartsWith("[") && line.EndsWith("]"))
+                    {
+                        string sectionName = line.Trim('[', ']');
+                        IniSection section = new IniSection(sectionName);
+                        currentSection = section.KeyValuePair;
+                        Sections.Add(section);
+                    }
+                    else if (!line.StartsWith(";") && !line.StartsWith("#"))
+                    {
+                        int separatorIndex = line.IndexOf('=');
+                        if (separatorIndex != -1)
+                        {
+                            string key = line.Substring(0, separatorIndex).Trim();
+                            string value = separatorIndex < line.Length - 1 ? line.Substring(separatorIndex + 1).Trim() : null;
+                            currentSection.Add(key, value);
+                        }
+                        else
+                        {
+                            currentSection.Add(line.Trim(), null);
+                        }
+                    }
                 }
             }
         }
@@ -338,24 +358,23 @@ namespace IniFileHandler
             if (string.IsNullOrWhiteSpace(filePath))
                 throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));
 
-            var lines = new List<string>();
-
-            foreach (var kvp in KeyValuePair.KeyValues)
+            using (var writer = new StreamWriter(filePath, false, encoding))
             {
-                lines.Add(kvp.Value == null ? kvp.Key : $"{kvp.Key}={kvp.Value}");
-            }
-
-            foreach (var section in Sections.Values)
-            {
-                lines.Add($"[{section.SectionName}]");
-                foreach (var kvp in section.KeyValuePair.KeyValues)
+                foreach (var kvp in KeyValuePair.KeyValues)
                 {
-                    lines.Add(kvp.Value == null ? kvp.Key : $"{kvp.Key}={kvp.Value}");
+                    writer.WriteLine(kvp.Value == null ? kvp.Key : $"{kvp.Key}={kvp.Value}");
                 }
-                lines.Add(string.Empty); // Add an empty line after each section
-            }
 
-            File.WriteAllLines(filePath, lines, encoding);
+                foreach (var section in Sections.Values)
+                {
+                    writer.WriteLine();
+                    writer.WriteLine($"[{section.SectionName}]");
+                    foreach (var kvp in section.KeyValuePair.KeyValues)
+                    {
+                        writer.WriteLine(kvp.Value == null ? kvp.Key : $"{kvp.Key}={kvp.Value}");
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -402,9 +421,9 @@ namespace IniFileHandler
         /// <exception cref="KeyNotFoundException">Thrown when the section does not exist.</exception>
         public void SetKeyValue(string sectionName, string key, string value)
         {
-            if (Sections.ContainsKey(sectionName))
+            if (Sections.TryGetValue(sectionName, out var section))
             {
-                Sections.GetSection(sectionName).KeyValuePair.SetValue(key, value);
+                section.KeyValuePair.SetValue(key, value);
             }
             else
             {
@@ -426,49 +445,29 @@ namespace IniFileHandler
             }
             return null;
         }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    // Dispose managed resources if any
+                }
+
+                // Free unmanaged resources if any
+
+                _disposed = true;
+            }
+        }
+
     } //end class IniFile
 
 } //end Namespace
 
-'@
-
-
-<#
-# Examples of usage
-
-# Check if a Section Exists
-$sectionExists = $iniFile.SectionExists("SectionName")
-
-# Add a New Section
-$iniFile.AddSection("NewSectionName")
-
-# Check if a Key Exists in a Section
-$section = $null
-$keyExists = $iniFile.Sections.TryGetValue("SectionName", [ref]$section) -and $section.KeyValuePair.KeyValues.ContainsKey("KeyName")
-
-# Checking if a Key Exists in a Section
-IniSection section;
-bool sectionExists = iniFile.Sections.TryGetValue("SectionName", out section);
-bool keyExists = section?.KeyValuePair.ContainsKey("KeyName") ?? false;
-
-# Add or Update a Key-Value Pair in a Section
-$iniFile.SetKeyValuePair("SectionName", "KeyName", "Value")
-
-# Get the Value of a Key
-$value = $iniFile.GetKeyValue("SectionName", "KeyName")
-
-# Save the INI File
-$iniFile.SaveFile("Path\To\File.ini")
-
-# Load an INI File
-$iniFile = [IniFile]::new("Path\To\File.ini")
-
-# Get All Sections
-$allSections = $iniFile.Sections.Values
-
-# Get All Keys in a Section
-$section = $null
-$iniFile.Sections.TryGetValue("SectionName", [ref]$section)
-$allKeys = $section.KeyValuePair.KeyValues.Keys
-
-#>

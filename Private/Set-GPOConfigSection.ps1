@@ -101,7 +101,8 @@ function Set-GPOConfigSection {
 
                 Write-Verbose -Message ('Processing configuration for section [{0}] and key [{1}]...' -f $CurrentSection, $CurrentKey)
 
-                if ($GptTmpl.Sections.TryGetValue($CurrentSection, [ref]$section) -and $section.KeyValuePair.KeyValues.ContainsKey($CurrentKey)) {
+                if ($GptTmpl.Sections.TryGetValue($CurrentSection, [ref]$section) -and
+                    $section.KeyValuePair.KeyValues.ContainsKey($CurrentKey)) {
 
                     Write-Verbose -Message ('Key [{0}] exists. Updating values.' -f $CurrentKey)
 
@@ -132,8 +133,10 @@ function Set-GPOConfigSection {
 
                             Write-Verbose -Message ('Processing new member: {0}' -f $item)
 
-                            if ($item -is [Microsoft.ActiveDirectory.Management.ADGroup] -or
-                                $item -is [Microsoft.ActiveDirectory.Management.ADAccount]) {
+                            if ($item -is [Microsoft.ActiveDirectory.Management.ADPrincipal] -or
+                                $item -is [Microsoft.ActiveDirectory.Management.ADAccount] -or
+                                $item -is [Microsoft.ActiveDirectory.Management.ADGroup] -or
+                                $item -is [Microsoft.ActiveDirectory.Management.ADUser]) {
                                 $identity = $item.SID
                             } else {
                                 $identity = Test-NameIsWellKnownSid -Name $item
@@ -164,8 +167,10 @@ function Set-GPOConfigSection {
 
                             Write-Verbose -Message ('Processing new member: {0}' -f $item)
 
-                            if ($item -is [Microsoft.ActiveDirectory.Management.ADGroup] -or
-                                $item -is [Microsoft.ActiveDirectory.Management.ADAccount]) {
+                            if ($item -is [Microsoft.ActiveDirectory.Management.ADPrincipal] -or
+                                $item -is [Microsoft.ActiveDirectory.Management.ADAccount] -or
+                                $item -is [Microsoft.ActiveDirectory.Management.ADGroup] -or
+                                $item -is [Microsoft.ActiveDirectory.Management.ADUser]) {
                                 $identity = $item.SID
                             } else {
                                 $identity = Test-NameIsWellKnownSid -Name $item
@@ -191,7 +196,20 @@ function Set-GPOConfigSection {
                 $status = $true
             } #end If
         } catch {
-            Write-Error -Message "An error occurred: $_.Exception.Message"
+            $FormatError = [System.Text.StringBuilder]::new()
+            $FormatError.AppendLine('Something went wrong.')
+            $FormatError.AppendLine('Message: {0}' -f $_.Message)
+            $FormatError.AppendLine('CategoryInfo: {0}' -f $_.CategoryInfo)
+            $FormatError.AppendLine('ErrorDetails: {0}' -f $_.ErrorDetails)
+            $FormatError.AppendLine('Exception: {0}' -f $_.Exception)
+            $FormatError.AppendLine('FullyQualifiedErrorId: {0}' -f $_.FullyQualifiedErrorId)
+            $FormatError.AppendLine('InvocationInfo: {0}' -f $_.InvocationInfo)
+            $FormatError.AppendLine('PipelineIterationInfo: {0}' -f $_.PipelineIterationInfo)
+            $FormatError.AppendLine('ScriptStackTrace: {0}' -f $_.ScriptStackTrace)
+            $FormatError.AppendLine('TargetObject: {0}' -f $_.TargetObject)
+            $FormatError.AppendLine('PSMessageDetails: {0}' -f $_.PSMessageDetails)
+
+            Write-Error -Message $FormatError
             $status = $false
         } finally {
             $status = $true

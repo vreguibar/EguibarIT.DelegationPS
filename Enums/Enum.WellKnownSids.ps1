@@ -1,4 +1,6 @@
-﻿$Variables.WellKnownSIDs = [ordered] @{
+﻿[Hashtable]$Variables.WellKnownSIDs = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
+
+$Variables.WellKnownSIDs = [ordered] @{
     'S-1-0'                                      = 'null authority'
     'S-1-0-0'                                    = 'nobody'
     'S-1-1'                                      = 'world authority'

@@ -53,35 +53,62 @@
 
         $cleanedName = ($PSBoundParameters['Name']).ToLower()
 
-        $cleanedName = $cleanedName -replace 'built-in\\', ''
-        $cleanedName = $cleanedName -replace 'builtin\\', ''
-        $cleanedName = $cleanedName -replace 'built in\\', ''
-        $cleanedName = $cleanedName -replace 'nt authority\\', ''
-        $cleanedName = $cleanedName -replace 'ntauthority\\', ''
-        $cleanedName = $cleanedName -replace 'ntservice\\', ''
-        $cleanedName = $cleanedName -replace 'nt service\\', ''
+        $cleanedName = $Name -replace '^(built-in\\|builtin\\|built in\\|nt authority\\|ntauthority\\|ntservice\\|nt service\\)', ''
 
     } #end Begin
 
     Process {
 
         Try {
-            if ($Variables.WellKnownSIDs.Values -contains $cleanedName) {
+            #return found object as System.Security.Principal.SecurityIdentifier
 
-                #return found object as System.Security.Principal.SecurityIdentifier
-                $SID = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_] -eq $cleanedName }
+            $SID = $Variables.WellKnownSIDs.Keys.Where{ $Variables.WellKnownSIDs[$_] -eq $cleanedName }
 
-                if ($SID) {
+            if ($SID) {
+
+                try {
                     # Create the SecurityIdentifier object
                     $Identity = [System.Security.Principal.SecurityIdentifier]::new($SID)
-                } else {
-                    Write-Verbose -Message ('The name {0} does not correspond to a well-known SID.' -f $cleanedName)
-                } #end If-Else
-            } #end If
+                    Write-Verbose -Message ('Matched SID: {0}' -f $matchingSid)
+                } catch {
+
+                    $FormatError = [System.Text.StringBuilder]::new()
+                    $FormatError.AppendLine('Error creating SecurityIdentifier object.')
+                    $FormatError.AppendLine('Message: {0}' -f $_.Message)
+                    $FormatError.AppendLine('CategoryInfo: {0}' -f $_.CategoryInfo)
+                    $FormatError.AppendLine('ErrorDetails: {0}' -f $_.ErrorDetails)
+                    $FormatError.AppendLine('Exception: {0}' -f $_.Exception)
+                    $FormatError.AppendLine('FullyQualifiedErrorId: {0}' -f $_.FullyQualifiedErrorId)
+                    $FormatError.AppendLine('InvocationInfo: {0}' -f $_.InvocationInfo)
+                    $FormatError.AppendLine('PipelineIterationInfo: {0}' -f $_.PipelineIterationInfo)
+                    $FormatError.AppendLine('ScriptStackTrace: {0}' -f $_.ScriptStackTrace)
+                    $FormatError.AppendLine('TargetObject: {0}' -f $_.TargetObject)
+                    $FormatError.AppendLine('PSMessageDetails: {0}' -f $_.PSMessageDetails)
+
+                    Write-Error -Message $FormatError
+                }
+            } else {
+                Write-Verbose -Message ('The name {0} does not correspond to a well-known SID.' -f $cleanedName)
+            } #end If-Else
+
         } catch {
-            Write-Error -Message 'Error found when translating WellKnownSid'
-            Write-Error -Message ('An error occurred while retrieving the identity: {0}' -f $_)
-        }
+
+            $FormatError = [System.Text.StringBuilder]::new()
+            $FormatError.AppendLine('Error found when translating WellKnownSid.')
+            $FormatError.AppendLine('Message: {0}' -f $_.Message)
+            $FormatError.AppendLine('CategoryInfo: {0}' -f $_.CategoryInfo)
+            $FormatError.AppendLine('ErrorDetails: {0}' -f $_.ErrorDetails)
+            $FormatError.AppendLine('Exception: {0}' -f $_.Exception)
+            $FormatError.AppendLine('FullyQualifiedErrorId: {0}' -f $_.FullyQualifiedErrorId)
+            $FormatError.AppendLine('InvocationInfo: {0}' -f $_.InvocationInfo)
+            $FormatError.AppendLine('PipelineIterationInfo: {0}' -f $_.PipelineIterationInfo)
+            $FormatError.AppendLine('ScriptStackTrace: {0}' -f $_.ScriptStackTrace)
+            $FormatError.AppendLine('TargetObject: {0}' -f $_.TargetObject)
+            $FormatError.AppendLine('PSMessageDetails: {0}' -f $_.PSMessageDetails)
+
+            Write-Error -Message $FormatError
+        } #end Try-Catch
+
     } #end Process
 
     End {

@@ -31,6 +31,7 @@ function Get-GptTemplate {
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Specify the name of the GPO.',
             Position = 0)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $GpoName
     )
@@ -78,11 +79,19 @@ function Get-GptTemplate {
                 [System.IO.File]::WriteAllText($gpoPathFile, '', [System.Text.Encoding]::Unicode)
             } #end if
 
-            $GptTmpl = [IniFileHandler.IniFile]::new($gpoPathFile)
+            # $GptTmpl = [IniFileHandler.IniFile]::new($gpoPathFile)
+
+            $GptTmpl = [IniFileHandler.IniFile]::new()
+            $GptTmpl.ReadFile($gpoPath)
 
             Write-Verbose -Message 'GPT template object created successfully.'
 
-            return $GptTmpl
+            # Ensure we're returning an IniFileHandler.IniFile object
+            if ($GptTmpl -is [IniFileHandler.IniFile]) {
+                return $GptTmpl
+            } else {
+                throw 'Failed to create an IniFileHandler.IniFile object'
+            } #end If-Else
 
         } catch {
             Write-Error -Message ('An error occurred while handling the GPT template path. Error: {0}' -f $_)
