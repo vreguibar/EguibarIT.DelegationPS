@@ -18,10 +18,10 @@
             [string] - The SID that you want to convert to an account name.
 
         .OUTPUTS
-            [string] - The NT account name corresponding to the given SID.
+            [System.Security.Principal.NTAccount] - The NT account name corresponding to the given SID.
     #>
 
-    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'low')]
+    [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'low')]
     [OutputType([System.Security.Principal.NTAccount])]
 
     param (
@@ -31,7 +31,12 @@
             HelpMessage = 'Enter the Security Identifier (SID) to be converted to an account name.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [string]$SID
+        [ValidateScript(
+            { Test-IsValidSID -ObjectSID $_ },
+            ErrorMessage = 'The SID provided is not valid. Please check the provided value.'
+        )]
+        [string]
+        $SID
     )
 
     Begin {
@@ -47,36 +52,46 @@
 
         ##############################
         # Variables Definition
-        [string]$FoundName = $null
 
     } #end Begin
 
     Process {
-        if ($PSCmdlet.ShouldProcess("SID: $SID", 'Convert to account name')) {
-            try {
-                Write-Verbose -Message ('Attempting to convert SID: {0} to account name' -f $PSBoundParameters['SID'])
+
+
+        try {
+            Write-Verbose -Message ('Attempting to convert SID: {0} to account name' -f $PSBoundParameters['SID'])
+
+            # Check if the SID exists in the Well-Known SIDs hashtable
+            if ($Variables.WellKnownSIDs.Keys.Contains($PSBoundParameters['SID'])) {
+
+                Write-Verbose -Message ('
+                    SID {0} found on the Well-Known SIDs table.
+                    Returning cached account name.' -f
+                    $PSBoundParameters['SID']
+                )
+                return [System.Security.Principal.NTAccount]::new($Variables.WellKnownSIDs[$PSBoundParameters['SID']])
+
+            } else {
 
                 # Create a SecurityIdentifier object from the SID string
                 $tmpSid = [System.Security.Principal.SecurityIdentifier]::New($PSBoundParameters['SID'])
 
-                # Translate the SID to an NTAccount object
-                $accountName = $tmpSid.Translate([System.Security.Principal.NTAccount])
+                # Return Translated SID to an NTAccount object
+                return $tmpSid.Translate([System.Security.Principal.NTAccount])
 
-                # Return the account name as a string
-                $accountName.Value
-            } catch [System.Security.Principal.IdentityNotMappedException] {
+            } #end If-Else
 
-                if ($variables.WellKnownSIDs.Contains($SID)) {
-                    Write-Verbose -Message ('SID: {0} is a Well-Known SID' -f $SID)
-                    $FoundName = $Variables.WellKnownSIDs[$SID]
-                }
-            } catch {
-                Write-Error -Message ('Failed to convert SID: {0} to account name. {1}' -f $PSBoundParameters['SID'], $_)
-                return $null
-            }
-        } else {
-            Write-Verbose -Message ('Conversion of SID: {0} to account name was skipped due to ShouldProcess.' -f $PSBoundParameters['SID'])
-        }
+        } catch {
+            Write-Warning -Message ('
+                Failed to convert SID: {0}
+                to account name.
+                {1}
+                This account should not be processed further.' -f
+                $PSBoundParameters['SID'], $_
+            )
+            return $null
+        } #end Try-Catch
+
     } #end Process
 
     End {
@@ -84,7 +99,5 @@
             'translating SID to account name (Private Function).'
         )
         Write-Verbose -Message $txt
-
-        return $accountName.Value
     } #end End
 }

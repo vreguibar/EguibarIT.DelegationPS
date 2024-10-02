@@ -54,7 +54,12 @@
         ##############################
         # Variables Definition
         # Ensure only account is used (remove anything before \ if exist)
-        $ObjectSID = ($PSBoundParameters['ObjectSID']).Split('\')[1]
+        If ($PSBoundParameters['ObjectSID'] -contains '\') {
+            $ObjectSID = ($PSBoundParameters['ObjectSID']).Split('\')[1]
+        } else {
+            # Account does not contains \
+            $ObjectSID = $PSBoundParameters['ObjectSID']
+        } #end If-Else
 
         [bool]$isValid = $false
 
@@ -63,7 +68,8 @@
     Process {
         # try RegEx
         Try {
-            if ($Variables.WellKnownSIDs -Contains $ObjectSID) {
+            #if ($Variables.WellKnownSIDs -Contains $ObjectSID) {
+            If ($Variables.WellKnownSIDs.Keys.Contains($ObjectSID)) {
 
                 # Provide verbose output
                 if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {

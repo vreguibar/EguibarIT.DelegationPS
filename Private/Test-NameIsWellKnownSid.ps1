@@ -117,6 +117,6 @@
         )
         Write-Verbose -Message $txt
 
-        return $Identity
+        return $Identity.Value
     } #end End
 }

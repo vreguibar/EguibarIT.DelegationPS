@@ -96,8 +96,26 @@ $Variables.WellKnownSIDs = [ordered] @{
     'S-1-5-83-0'                                 = 'virtual machines'
 }
 New-Variable -Name WellKnownSIDs -Value $Variables.WellKnownSIDs -Scope Script -Force
-# Search by Key to get Value
-# $WellKnownSIDs['S-1-5-11']
 #
-# Search by Value to get Key
+# Check if KEY exist
+# $Variables.WellKnownSIDs.Keys.Contains('S-1-5-11')
+# -> Return True or False
+#
+# Search by KEY to get VALUE
+# $Variables.WellKnownSIDs['S-1-5-11']
+# -> Return 'authenticated users'
+#
+#
+#
+# Check if VALUE exist
+# $Variables.WellKnownSIDs.Values.Contains('authenticated users')
+# -> Return True or False
+#
+# Search by VALUE to get KEY
 # $Variables.WellKnownSIDs.keys.where{$Variables.WellKnownSIDs[$_] -eq 'authenticated users'}
+#-> Return 'S-1-5-11'
+#
+
+
+
+

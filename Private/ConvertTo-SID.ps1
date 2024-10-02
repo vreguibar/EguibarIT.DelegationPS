@@ -21,7 +21,7 @@
             [System.Security.Principal.SecurityIdentifier] - The SID corresponding to the account name.
     #>
 
-    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'low')]
+    [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'low')]
     [OutputType([System.Security.Principal.SecurityIdentifier])]
 
     param (
@@ -31,7 +31,6 @@
             HelpMessage = 'Enter the account name in the format domain\username or username.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [string]
         $AccountName
     )
 
@@ -46,24 +45,24 @@
         ##############################
         # Module imports
 
+        ##############################
+        # Variables Definition
+
+        $AccountName = Get-AdObjectType -Identity $PSBoundParameters['AccountName']
+
     } #end Begin
 
     Process {
         try {
-            if ($PSCmdlet.ShouldProcess("Account Name: $AccountName", 'Convert to SID')) {
-                Write-Verbose -Message ('Converting {0} to SID.' -f $PSBoundParameters['AccountName'])
 
-                $tmpAccount = [System.Security.Principal.NTAccount]::new($PSBoundParameters['AccountName'])
+            Write-Verbose -Message ('Converting {0} to SID.' -f $AccountName)
 
-                $sid = $tmpAccount.Translate([System.Security.Principal.SecurityIdentifier])
+            return [System.Security.Principal.SecurityIdentifier]::new($AccountName.SID.Value)
 
-                Write-Verbose -Message ('Successfully converted {0} to SID: {1}.' -f $PSBoundParameters['AccountName'], $sid)
+            Write-Verbose -Message ('Successfully converted {0} to SID: {1}.' -f $AccountName, $sid)
 
-            } else {
-                Write-Verbose 'Operation was cancelled by user or not approved by ShouldProcess.'
-            } #end If-Else
         } catch {
-            Write-Error -Message ('Failed to convert {0} to SID. Error: {1}' -f $PSBoundParameters['AccountName'], $_.Exception.Message)
+            Write-Error -Message ('Failed to convert {0} to SID. Error: {1}' -f $AccountName, $_.Exception.Message)
             return $null
         } #end Try-Catch
     } #end Process
@@ -73,7 +72,5 @@
             'converting account name to SID (Private Function).'
         )
         Write-Verbose -Message $txt
-
-        return $sid
     } #end End
 }
