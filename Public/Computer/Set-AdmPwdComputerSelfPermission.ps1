@@ -38,7 +38,7 @@ function Set-AdmPwdComputerSelfPermission {
             HelpMessage = 'Distinguished Name of the OU where the computer can self update password attributes.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [ValidateScript({ Test-IsValidDN -ObjectDN $_ })]
+        [ValidateScript({ Test-IsValidDN -ObjectDN $_ }, ErrorMessage = 'DistinguishedName provided is not valid! Please Check.')]
         [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath,

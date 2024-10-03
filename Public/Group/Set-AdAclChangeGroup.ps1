@@ -50,7 +50,7 @@
             HelpMessage = 'Distinguished Name of the OU were the groups can be changed',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
-        [ValidateScript({ Test-IsValidDN -ObjectDN $_ })]
+        [ValidateScript({ Test-IsValidDN -ObjectDN $_ }, ErrorMessage = 'DistinguishedName provided is not valid! Please Check.')]
         [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath,

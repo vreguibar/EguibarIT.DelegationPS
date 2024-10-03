@@ -97,7 +97,7 @@ function Set-AclConstructor4 {
             HelpMessage = 'Distinguished (DN) Name of the object. The LDAP path to the object where the ACL will be changed.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
-        [ValidateScript({ Test-IsValidDN -ObjectDN $_ })]
+        [ValidateScript({ Test-IsValidDN -ObjectDN $_ }, ErrorMessage = 'DistinguishedName provided is not valid! Please Check.')]
         [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath,

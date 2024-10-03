@@ -48,7 +48,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'SID of the object to be translated',
             Position = 0)]
-        [ValidateScript({ Test-IsValidSID -ObjectSID $_ })]
+        [ValidateScript({ Test-IsValidSID -ObjectSID $_ }, ErrorMessage = 'Provided SID is not valid! Please check.')]
         [ValidateNotNullOrEmpty()]
         $SID
     )

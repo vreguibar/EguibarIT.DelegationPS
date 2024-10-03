@@ -50,7 +50,7 @@ function Set-AdAclBitLockerTPM {
             HelpMessage = 'Distinguished Name of the OU where the BitLocker and TPM computer information will be accessed.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
-        [ValidateScript({ Test-IsValidDN -ObjectDN $_ })]
+        [ValidateScript({ Test-IsValidDN -ObjectDN $_ }, ErrorMessage = 'DistinguishedName provided is not valid! Please Check.')]
         [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath,

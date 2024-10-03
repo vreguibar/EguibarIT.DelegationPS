@@ -26,13 +26,16 @@
     [OutputType([System.Security.Principal.SecurityIdentifier])]
 
     Param (
+
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Specify the SID name.',
             Position = 0)]
+        [ValidateNotNullOrEmpty()]
         [string]
         $Name
+
     )
 
     Begin {

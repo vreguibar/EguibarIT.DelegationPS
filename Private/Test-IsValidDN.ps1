@@ -46,19 +46,13 @@
     )
 
     Begin {
-        $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToShortDateString(),
-            $MyInvocation.Mycommand,
-            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
-        )
-        Write-Verbose -Message $txt
 
         ##############################
         # Module imports
         # Initialize a boolean variable to store validation result
         [bool]$isValid = $false
 
-        Write-Verbose 'Begin block: Regex pattern for DN validation initialized.'
+        Write-Verbose -Message 'Begin block: Regex pattern for DN validation initialized.'
 
     } #end Begin
 
@@ -78,17 +72,11 @@
         } catch {
             # Handle exceptions gracefully
             Write-Error -Message 'Error when validating DistinguishedName'
-            throw
         } #end Try-Catch
 
     } #end Process
 
     end {
-        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
-            'Testing DistinguishedName (DN) (Private Function).'
-        )
-        Write-Verbose -Message $txt
-
         return $isValid
     } #end End
 } #end Function

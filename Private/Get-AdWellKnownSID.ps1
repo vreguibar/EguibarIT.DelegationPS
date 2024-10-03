@@ -34,7 +34,7 @@
             ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (Security IDentifier or SID) to check if it IS a WellKnownSID.',
             Position = 0)]
-        [ValidateScript({ Test-IsValidSID -ObjectSID $_ })]
+        [ValidateScript({ Test-IsValidSID -ObjectSID $_ }, ErrorMessage = 'Provided SID is not valid! Please check.')]
         [ValidateNotNullOrEmpty()]
         $SID
     )

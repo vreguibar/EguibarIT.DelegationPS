@@ -50,7 +50,7 @@
             HelpMessage = 'Distinguished Name of the OU having the Rights groups, where the "Cert Publishers" built-in group resides (Usually OU=Rights,OU=Admin,DC=EguibarIT,DC=local).',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
-        [ValidateScript({ Test-IsValidDN -ObjectDN $_ })]
+        [ValidateScript({ Test-IsValidDN -ObjectDN $_ }, ErrorMessage = 'DistinguishedName provided is not valid! Please Check.')]
         [Alias('DN', 'DistinguishedName')]
         [String]
         $ItRightsOuDN,

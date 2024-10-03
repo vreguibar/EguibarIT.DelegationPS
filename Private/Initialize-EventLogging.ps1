@@ -143,7 +143,7 @@
 
     End {
         $txt = ($Variables.Footer -f $MyInvocation.InvocationName,
-            'initializing Event Logging.'
+            'initializing Event Logging. (Private Function)'
         )
         Write-Verbose -Message $txt
     } #end End

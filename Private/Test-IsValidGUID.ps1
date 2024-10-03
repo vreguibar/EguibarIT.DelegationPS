@@ -45,12 +45,6 @@
     )
 
     Begin {
-        $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToShortDateString(),
-            $MyInvocation.Mycommand,
-            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
-        )
-        Write-Verbose -Message $txt
 
         ##############################
         # Module imports
@@ -80,17 +74,11 @@
         } catch {
             # Handle exceptions gracefully
             Write-Error -Message 'Error when validating GUID'
-            throw
         } #end Try-Catch
 
     } #end Process
 
     end {
-        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
-            'testing Global Unique Identifier (GUID) (Private Function).'
-        )
-        Write-Verbose -Message $txt
-
         return $isValid
     } #end End
 } #end Function
