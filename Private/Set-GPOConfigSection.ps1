@@ -161,25 +161,26 @@
                         #remove * prefix from member
                         $sid = $member.TrimStart('*')
 
-                        # Call function to resolve SID
-                        $resolvedAccount = ConvertTo-AccountName -SID $sid
-
-                        if ($resolvedAccount) {
-                            [void]$resolvedMembers.Add("*$sid")
-                            Write-Verbose ('
-                                Resolved existing member: {0}
-                                                     SID: {1}' -f
-                                $resolvedAccount[0], $sid
-                            )
-                        } else {
-
+                        try {
+                            # Call function to resolve SID
+                            $resolvedAccount = ConvertTo-AccountName -SID $sid
+                        } catch {
                             Write-Error -Message ('
                                 Failed to resolve existing member with SID: {0}
                                 This item will not be added to the Rights Assignment section.' -f
                                 $sid
                             )
+                            Get-ErrorDetail -ErrorRecord $_
+                        } #end Try-Catch
 
-                        } #end If-Else
+                        if ($resolvedAccount) {
+                            [void]$resolvedMembers.Add('*{0}' -f $sid)
+                            Write-Verbose ('
+                                Resolved existing member: {0}
+                                                     SID: {1}' -f
+                                $resolvedAccount[0], $sid
+                            )
+                        } #end If
                     } #end Foreach
                 } #end If-Else
             } #end If-Else
@@ -213,7 +214,7 @@
 
                         if ($sid) {
 
-                            [void]$resolvedMembers.Add("*$sid")
+                            [void]$resolvedMembers.Add('*{0}' -f $sid)
                             Write-Verbose ('
                                 Resolved new member: {0}
                                                 SID: {1}' -f
@@ -267,21 +268,12 @@
             }
 
         } catch {
-            $FormatError = [System.Text.StringBuilder]::new()
-            $FormatError.AppendLine('Failed to update key {0} in section {1}.' -f $CurrentKey, $CurrentSection)
-            $FormatError.AppendLine('Message: {0}' -f $_.Message)
-            $FormatError.AppendLine('CategoryInfo: {0}' -f $_.CategoryInfo)
-            $FormatError.AppendLine('ErrorDetails: {0}' -f $_.ErrorDetails)
-            $FormatError.AppendLine('Exception: {0}' -f $_.Exception)
-            $FormatError.AppendLine('FullyQualifiedErrorId: {0}' -f $_.FullyQualifiedErrorId)
-            $FormatError.AppendLine('InvocationInfo: {0}' -f $_.InvocationInfo)
-            $FormatError.AppendLine('PipelineIterationInfo: {0}' -f $_.PipelineIterationInfo)
-            $FormatError.AppendLine('ScriptStackTrace: {0}' -f $_.ScriptStackTrace)
-            $FormatError.AppendLine('TargetObject: {0}' -f $_.TargetObject)
-            $FormatError.AppendLine('PSMessageDetails: {0}' -f $_.PSMessageDetails)
-
-            Write-Error -Message $FormatError
-            throw
+            Write-Error -Message ('
+                Failed to update key {0} in section {1}.
+                {2}' -f
+                $CurrentKey, $CurrentSection, $_
+            )
+            Get-ErrorDetail -ErrorRecord $_
         } #end Try-Catch
     } #end Process
 

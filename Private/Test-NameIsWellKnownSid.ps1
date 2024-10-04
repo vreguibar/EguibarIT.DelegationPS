@@ -30,7 +30,7 @@
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Specify the SID name.',
+            HelpMessage = 'Specify the name to check against Well-Known SIDs.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [string]
@@ -54,7 +54,7 @@
 
         $Identity = $null
 
-        $cleanedName = ($PSBoundParameters['Name']).ToLower()
+        $Name = ($PSBoundParameters['Name']).ToLower()
 
         $cleanedName = $Name -replace '^(built-in\\|builtin\\|built in\\|nt authority\\|ntauthority\\|ntservice\\|nt service\\)', ''
 
@@ -63,53 +63,44 @@
     Process {
 
         Try {
-            #return found object as System.Security.Principal.SecurityIdentifier
+            # Check if the cleaned name is in the Well-Known SID dictionary
+            if ($Variables.WellKnownSIDs.Values -contains $cleanName) {
+                # Find the corresponding SID
+                $sid = $Variables.WellKnownSIDs.Keys | Where-Object { $Variables.WellKnownSIDs[$_] -eq $cleanName }
 
-            $SID = $Variables.WellKnownSIDs.Keys.Where{ $Variables.WellKnownSIDs[$_] -eq $cleanedName }
+                if ($sid) {
 
-            if ($SID) {
-
-                try {
                     # Create the SecurityIdentifier object
-                    $Identity = [System.Security.Principal.SecurityIdentifier]::new($SID)
-                    Write-Verbose -Message ('Matched SID: {0}' -f $matchingSid)
-                } catch {
+                    $Identity = [System.Security.Principal.SecurityIdentifier]::new($sid)
+                    Write-Verbose -Message ('
+                        Matched SID: {0}
+                                For: {1}' -f
+                        $sid, $cleanName
+                    )
 
-                    $FormatError = [System.Text.StringBuilder]::new()
-                    $FormatError.AppendLine('Error creating SecurityIdentifier object.')
-                    $FormatError.AppendLine('Message: {0}' -f $_.Message)
-                    $FormatError.AppendLine('CategoryInfo: {0}' -f $_.CategoryInfo)
-                    $FormatError.AppendLine('ErrorDetails: {0}' -f $_.ErrorDetails)
-                    $FormatError.AppendLine('Exception: {0}' -f $_.Exception)
-                    $FormatError.AppendLine('FullyQualifiedErrorId: {0}' -f $_.FullyQualifiedErrorId)
-                    $FormatError.AppendLine('InvocationInfo: {0}' -f $_.InvocationInfo)
-                    $FormatError.AppendLine('PipelineIterationInfo: {0}' -f $_.PipelineIterationInfo)
-                    $FormatError.AppendLine('ScriptStackTrace: {0}' -f $_.ScriptStackTrace)
-                    $FormatError.AppendLine('TargetObject: {0}' -f $_.TargetObject)
-                    $FormatError.AppendLine('PSMessageDetails: {0}' -f $_.PSMessageDetails)
+                    # Convert to SecurityIdentifier object
+                    [System.Security.Principal.SecurityIdentifier]$Identity = [System.Security.Principal.SecurityIdentifier]::New($sid)
+                } else {
 
-                    Write-Error -Message $FormatError
+                    Write-Error -Message ('
+                        Error creating SecurityIdentifier object for {0}.' -f
+                        $cleanName
+                    )
+                    Get-ErrorDetail -ErrorRecord $_
+                    $Identity = $null
                 }
             } else {
-                Write-Verbose -Message ('The name {0} does not correspond to a well-known SID.' -f $cleanedName)
+                Write-Verbose -Message ('
+                    The name {0} does not correspond to a well-known SID or is not recognized.' -f
+                    $cleanedName
+                )
+                $Identity = $null
             } #end If-Else
 
         } catch {
-
-            $FormatError = [System.Text.StringBuilder]::new()
-            $FormatError.AppendLine('Error found when translating WellKnownSid.')
-            $FormatError.AppendLine('Message: {0}' -f $_.Message)
-            $FormatError.AppendLine('CategoryInfo: {0}' -f $_.CategoryInfo)
-            $FormatError.AppendLine('ErrorDetails: {0}' -f $_.ErrorDetails)
-            $FormatError.AppendLine('Exception: {0}' -f $_.Exception)
-            $FormatError.AppendLine('FullyQualifiedErrorId: {0}' -f $_.FullyQualifiedErrorId)
-            $FormatError.AppendLine('InvocationInfo: {0}' -f $_.InvocationInfo)
-            $FormatError.AppendLine('PipelineIterationInfo: {0}' -f $_.PipelineIterationInfo)
-            $FormatError.AppendLine('ScriptStackTrace: {0}' -f $_.ScriptStackTrace)
-            $FormatError.AppendLine('TargetObject: {0}' -f $_.TargetObject)
-            $FormatError.AppendLine('PSMessageDetails: {0}' -f $_.PSMessageDetails)
-
-            Write-Error -Message $FormatError
+            Write-Error -Message ('Error found when translating WellKnownSid for {0}.' -f $cleanedName)
+            $Identity = $null
+            Get-ErrorDetail -ErrorRecord $_
         } #end Try-Catch
 
     } #end Process

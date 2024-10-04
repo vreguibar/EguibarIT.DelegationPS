@@ -1160,22 +1160,8 @@
                     $GptTmpl = Set-GPOConfigSection @Splat
 
                 } Catch {
-
-                    $FormatError = [System.Text.StringBuilder]::new()
-                    $FormatError.AppendLine('Something went wrong.')
-                    $FormatError.AppendLine('Message: {0}' -f $_.Message)
-                    $FormatError.AppendLine('CategoryInfo: {0}' -f $_.CategoryInfo)
-                    $FormatError.AppendLine('ErrorDetails: {0}' -f $_.ErrorDetails)
-                    $FormatError.AppendLine('Exception: {0}' -f $_.Exception)
-                    $FormatError.AppendLine('FullyQualifiedErrorId: {0}' -f $_.FullyQualifiedErrorId)
-                    $FormatError.AppendLine('InvocationInfo: {0}' -f $_.InvocationInfo)
-                    $FormatError.AppendLine('PipelineIterationInfo: {0}' -f $_.PipelineIterationInfo)
-                    $FormatError.AppendLine('ScriptStackTrace: {0}' -f $_.ScriptStackTrace)
-                    $FormatError.AppendLine('TargetObject: {0}' -f $_.TargetObject)
-                    $FormatError.AppendLine('PSMessageDetails: {0}' -f $_.PSMessageDetails)
-
-                    Write-Error -Message $FormatError
-
+                    Write-Error -Message ('Something went wrong. {0}' -f $_)
+                    Get-ErrorDetail -ErrorRecord $_
                 } #end Try-Catch
 
             } #end If
@@ -1188,24 +1174,10 @@
             Write-Verbose -Message ('Saving changes to GptTmpl.inf file og GPO {0}' -f $PSBoundParameters['GpoToModify'])
 
         } Catch {
-            Write-Error -Message ('
-                Something went wrong...
-
-                    Message: {0}
-                    CategoryInfo: {1}
-                    ErrorDetails: {2}
-                    Exception: {3}
-                    FullyQualifiedErrorId: {4}
-                    InvocationInfo: {5}
-                    PipelineIterationInfo: {6}
-                    ScriptStackTrace: {7}
-                    TargetObject: {8}
-                    PSMessageDetails: {9}
-
-                    {10}' -f
-                $_.Message, $_.CategoryInfo, $_.ErrorDetails, $_.Exception, $_.FullyQualifiedErrorId,
-                $_.InvocationInfo, $_.PipelineIterationInfo, $_.ScriptStackTrace, $_.TargetObject, $_.PSMessageDetails, $_
+            Write-Error -Message ('Something went wrong while trying to save the GptTmpl.inf file...
+                    {0}' -f $_
             )
+            Get-ErrorDetail -ErrorRecord $_
             Throw
         }
 

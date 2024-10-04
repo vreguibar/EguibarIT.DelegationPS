@@ -33,7 +33,7 @@
         [ValidateNotNullOrEmpty()]
         [ValidateScript(
             { Test-IsValidSID -ObjectSID $_ },
-            ErrorMessage = 'The SID provided is not valid. Please check the provided value.'
+            ErrorMessage = 'The SID provided {0} is not valid. Please check the provided value.'
         )]
         [string]
         $SID
