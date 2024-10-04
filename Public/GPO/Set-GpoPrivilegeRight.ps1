@@ -602,10 +602,34 @@
 
         # Helper function to add rights
         function Add-Right {
+            <#
+                .SYNOPSIS
+                    Adds members to a specific privilege right in the configuration.
+
+                .DESCRIPTION
+                    This function allows adding a list of members to a specified privilege right by storing
+                    the information in a temporary hashtable and then appending it to an ArrayList.
+                    It supports ShouldProcess for WhatIf functionality and includes detailed verbose messaging.
+
+                .PARAMETER Key
+                    The privilege right key to which the members will be assigned.
+
+                .PARAMETER Members
+                    A list of members (objects) that will be associated with the given privilege right.
+
+                .EXAMPLE
+                    Add-Right -Key 'SeBackupPrivilege' -Members @('Domain\Admins', 'Local\Backup Operators')
+            #>
+
+            [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'low')]
+
             param (
+
+                [Parameter(Mandatory = $true)]
                 [string]
                 $Key,
 
+                [Parameter(Mandatory = $true)]
                 [System.Collections.Generic.List[object]]
                 $Members
             )
@@ -887,7 +911,7 @@
         If ($PSBoundParameters.ContainsKey('TimeZone')) {
             $Splat = @{
                 Key     = 'SeTimeZonePrivilege'
-                Members = $SeTimeZonePrivilege
+                Members = $TimeZone
                 #Description = 'Change the time zone'
             }
             Add-Right @Splat
@@ -1161,7 +1185,7 @@
 
                 } Catch {
                     Write-Error -Message ('Something went wrong. {0}' -f $_)
-                    Get-ErrorDetail -ErrorRecord $_
+                    #Get-ErrorDetail -ErrorRecord $_
                 } #end Try-Catch
 
             } #end If
@@ -1174,10 +1198,8 @@
             Write-Verbose -Message ('Saving changes to GptTmpl.inf file og GPO {0}' -f $PSBoundParameters['GpoToModify'])
 
         } Catch {
-            Write-Error -Message ('Something went wrong while trying to save the GptTmpl.inf file...
-                    {0}' -f $_
-            )
-            Get-ErrorDetail -ErrorRecord $_
+            Write-Error -Message ('Something went wrong while trying to save the GptTmpl.inf file...')
+            #Get-ErrorDetail -ErrorRecord $_
             Throw
         }
 

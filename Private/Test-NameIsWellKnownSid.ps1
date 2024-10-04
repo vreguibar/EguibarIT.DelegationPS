@@ -64,9 +64,9 @@
 
         Try {
             # Check if the cleaned name is in the Well-Known SID dictionary
-            if ($Variables.WellKnownSIDs.Values -contains $cleanName) {
+            if ($Variables.WellKnownSIDs.Values.Contains($cleanedName)) {
                 # Find the corresponding SID
-                $sid = $Variables.WellKnownSIDs.Keys | Where-Object { $Variables.WellKnownSIDs[$_] -eq $cleanName }
+                $sid = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_] -eq $cleanedName }
 
                 if ($sid) {
 
@@ -75,7 +75,7 @@
                     Write-Verbose -Message ('
                         Matched SID: {0}
                                 For: {1}' -f
-                        $sid, $cleanName
+                        $Identity.Value, $cleanName
                     )
 
                     # Convert to SecurityIdentifier object
@@ -86,7 +86,7 @@
                         Error creating SecurityIdentifier object for {0}.' -f
                         $cleanName
                     )
-                    Get-ErrorDetail -ErrorRecord $_
+                    #Get-ErrorDetail -ErrorRecord $_
                     $Identity = $null
                 }
             } else {
@@ -100,7 +100,7 @@
         } catch {
             Write-Error -Message ('Error found when translating WellKnownSid for {0}.' -f $cleanedName)
             $Identity = $null
-            Get-ErrorDetail -ErrorRecord $_
+            #Get-ErrorDetail -ErrorRecord $_
         } #end Try-Catch
 
     } #end Process

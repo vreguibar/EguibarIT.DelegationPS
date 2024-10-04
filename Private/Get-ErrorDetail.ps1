@@ -33,7 +33,7 @@
     #>
 
     [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'low')]
-    [OutputType([System.String])]
+    [OutputType([void])]
 
     param (
 
@@ -62,7 +62,7 @@
 
     process {
         if ($null -eq $ErrorRecord) {
-            return 'No error record provided or found.'
+            Write-Warning -Message 'No error record provided or found.'
         }
 
         $errorProperties = @(
@@ -120,6 +120,6 @@
     } #end Process
 
     end {
-        return $output.ToString()
+        Write-Verbose -Message $output.ToString()
     } #end End
 }

@@ -69,7 +69,11 @@
                     Returning cached account name.' -f
                     $PSBoundParameters['SID']
                 )
-                return [System.Security.Principal.NTAccount]::new($Variables.WellKnownSIDs[$PSBoundParameters['SID']])
+                # Create a SecurityIdentifier object from the Well-Known SID string
+                $tmpSid = [System.Security.Principal.SecurityIdentifier]::New($Variables.WellKnownSIDs[$PSBoundParameters['SID']])
+
+                # Return Translated SID to an NTAccount object
+                return $tmpSid.Translate([System.Security.Principal.NTAccount])
 
             } else {
 
@@ -83,11 +87,9 @@
 
         } catch {
             Write-Warning -Message ('
-                Failed to convert SID: {0}
-                to account name.
-                {1}
+                Failed to convert SID: {0} to account name.
                 This account should not be processed further.' -f
-                $PSBoundParameters['SID'], $_
+                $PSBoundParameters['SID']
             )
             Get-ErrorDetail -ErrorRecord $_
             return $null

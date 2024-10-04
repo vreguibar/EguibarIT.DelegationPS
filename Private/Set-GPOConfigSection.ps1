@@ -170,7 +170,7 @@
                                 This item will not be added to the Rights Assignment section.' -f
                                 $sid
                             )
-                            Get-ErrorDetail -ErrorRecord $_
+                            #Get-ErrorDetail -ErrorRecord $_
                         } #end Try-Catch
 
                         if ($resolvedAccount) {
@@ -207,7 +207,11 @@
                         $ReturnedMember = Get-AdObjectType -Identity $member
 
                         If ($ReturnedMember) {
-                            $Sid = $ReturnedMember.SID.Value
+                            if ($ReturnedMember.PSobject.Properties.name -match 'SID') {
+                                $Sid = $ReturnedMember.SID.Value
+                            } else {
+                                $Sid = $ReturnedMember
+                            }
                         } else {
                             $Sid = Test-NameIsWellKnownSid -Name $member
                         } #end If-Else
@@ -222,12 +226,12 @@
                             )
 
                         } else {
-                            Write-Error -Message ('
+                            Write-Warning -Message ('
                                 Failed to resolve new member: {0}
-                                Item will not be added to the corresponding section.' -f
+                                Item might not be added to the corresponding section.' -f
                                 $member
                             )
-                            Get-ErrorDetail -ErrorRecord $_
+                            #Get-ErrorDetail -ErrorRecord $_
                         } #end If-Else
 
                     } #end If
@@ -256,14 +260,17 @@
             $updatedValue = $updatedValue.TrimEnd(',. ')
 
             if ($PSCmdlet.ShouldProcess("$CurrentKey in section $CurrentSection", 'Updating key value')) {
+
                 # Update the GPT template
                 $GptTmpl.SetKeyValue($CurrentSection, $CurrentKey, $updatedValue)
+
                 Write-Verbose -Message ('
-                Updated key {0}
-                in section {1}
-                with value: {2}' -f
+                    Updated key {0}
+                    in section {1}
+                    with value: {2}' -f
                     $CurrentKey, $CurrentSection, $updatedValue
                 )
+
             } else {
                 Write-Verbose -Message 'Skipping update due to WhatIf condition'
             }
@@ -274,7 +281,7 @@
                 {2}' -f
                 $CurrentKey, $CurrentSection, $_
             )
-            Get-ErrorDetail -ErrorRecord $_
+            #Get-ErrorDetail -ErrorRecord $_
         } #end Try-Catch
     } #end Process
 

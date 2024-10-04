@@ -53,22 +53,26 @@ function Update-GpoVersion {
         # Retrieve the GPO object by name
         $gpo = Get-GPO -Name $PsBoundParameters['GpoName'] -ErrorAction Stop
         # Get the GPO ID
-        $gpoId = $gpo.Id
+        $gpoId = ('{' + $gpo.Id + '}')
         # Build SYSVOL path
         $sysVolPath = '\\{0}\SYSVOL\{0}' -f $env:USERDNSDOMAIN
-        $pathToGpt = '{0}\Policies\{1}\gpt.ini' -f $sysVolPath, ('{' + $gpoId + '}')
+        $pathToGpt = '{0}\Policies\{1}\gpt.ini' -f $sysVolPath, $gpoId
 
     } #end Begin
 
     Process {
 
         Try {
+
             # Get the GPO object
-            $url = 'LDAP://CN={0},CN=Policies,CN=System,{1}' -f ('{' + $gpoId + '}'), $Variables.defaultNamingContext
+            $url = 'LDAP://CN={0},CN=Policies,CN=System,{1}' -f $gpoId, $Variables.defaultNamingContext
             $de = [System.DirectoryServices.DirectoryEntry]::New($url)
+
         } catch {
+
             Write-Error -Message ('Error accessing GPO through DirectoryEntry' -f $Gpo.Name)
             Get-ErrorDetail -ErrorRecord $_
+
         } #end Try-Catch
 
         # Get the VersionObject of the DirectoryEntry (the GPO)
