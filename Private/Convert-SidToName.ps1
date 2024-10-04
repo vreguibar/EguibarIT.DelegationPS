@@ -88,6 +88,7 @@
 
         } catch {
             Write-Error -Message ('An unexpected error occurred: {0}' -f $_)
+            Get-ErrorDetail -ErrorRecord $_
             $FoundName = $null
             throw
         }#end Try-Catch

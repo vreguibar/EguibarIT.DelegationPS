@@ -227,6 +227,7 @@
                                 Item will not be added to the corresponding section.' -f
                                 $member
                             )
+                            Get-ErrorDetail -ErrorRecord $_
                         } #end If-Else
 
                     } #end If

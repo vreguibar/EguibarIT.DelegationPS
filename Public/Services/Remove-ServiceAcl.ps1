@@ -155,7 +155,8 @@
                 }
                 Write-Verbose -Message ('Successfully removed ACL in Service {0}' -f $PSBoundParameters['Service'])
             } catch {
-                Write-Error -Message "Failed to remove Security because $($_.Exception.Message)"
+                Write-Error -Message ('Failed to remove Security because {0}' -f $_.Exception.Message)
+                Get-ErrorDetail -ErrorRecord $_
             } #end Try-Catch
         } #end If
 

@@ -63,6 +63,7 @@
 
         } catch {
             Write-Error -Message ('Failed to convert {0} to SID. Error: {1}' -f $AccountName, $_.Exception.Message)
+            Get-ErrorDetail -ErrorRecord $_
             return $null
         } #end Try-Catch
     } #end Process

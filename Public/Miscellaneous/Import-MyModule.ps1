@@ -265,6 +265,7 @@
 
         } catch {
             Write-Error -Message ('[{0}] Error importing module {1}: {2}' -f $functionName, $Name, $_)
+            Get-ErrorDetail -ErrorRecord $_
             #throw
         } #end Try-Catch
 

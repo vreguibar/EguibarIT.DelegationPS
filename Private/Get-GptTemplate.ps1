@@ -79,6 +79,7 @@ function Get-GptTemplate {
                         Error while trying to create the folder for {0}' -f
                         $gpo.DisplayName
                     )
+                    Get-ErrorDetail -ErrorRecord $_
                 } #end Try-Catch
 
             } #end if
@@ -94,6 +95,7 @@ function Get-GptTemplate {
                         Error while trying to create GptTmpl.inf file within folder for {0}' -f
                         $gpo.DisplayName
                     )
+                    Get-ErrorDetail -ErrorRecord $_
                 } #end Try-Catch
 
             } #end if
@@ -113,21 +115,8 @@ function Get-GptTemplate {
             } #end If-Else
 
         } catch {
-            $FormatError = [System.Text.StringBuilder]::new()
-            $FormatError.AppendLine('An error occurred while handling the GPT template path.')
-            $FormatError.AppendLine('Message: {0}' -f $_.Message)
-            $FormatError.AppendLine('CategoryInfo: {0}' -f $_.CategoryInfo)
-            $FormatError.AppendLine('ErrorDetails: {0}' -f $_.ErrorDetails)
-            $FormatError.AppendLine('Exception: {0}' -f $_.Exception)
-            $FormatError.AppendLine('FullyQualifiedErrorId: {0}' -f $_.FullyQualifiedErrorId)
-            $FormatError.AppendLine('InvocationInfo: {0}' -f $_.InvocationInfo)
-            $FormatError.AppendLine('PipelineIterationInfo: {0}' -f $_.PipelineIterationInfo)
-            $FormatError.AppendLine('ScriptStackTrace: {0}' -f $_.ScriptStackTrace)
-            $FormatError.AppendLine('TargetObject: {0}' -f $_.TargetObject)
-            $FormatError.AppendLine('PSMessageDetails: {0}' -f $_.PSMessageDetails)
-
-            Write-Error -Message $FormatError
-
+            Write-Error -Message ('An error occurred while handling the GPT template path.')
+            Get-ErrorDetail -ErrorRecord $_
             return $null
         } #end Try-Catch
 

@@ -94,6 +94,7 @@
             } #end If
         } catch {
             Write-Error -Message 'Error when setting OU inheritance'
+            Get-ErrorDetail -ErrorRecord $_
             throw
         }
     } #end Process

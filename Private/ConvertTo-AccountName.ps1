@@ -89,6 +89,7 @@
                 This account should not be processed further.' -f
                 $PSBoundParameters['SID'], $_
             )
+            Get-ErrorDetail -ErrorRecord $_
             return $null
         } #end Try-Catch
 

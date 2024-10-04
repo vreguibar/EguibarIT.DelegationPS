@@ -68,6 +68,7 @@ function Update-GpoVersion {
             $de = [System.DirectoryServices.DirectoryEntry]::New($url)
         } catch {
             Write-Error -Message ('Error accessing GPO through DirectoryEntry' -f $Gpo.Name)
+            Get-ErrorDetail -ErrorRecord $_
         } #end Try-Catch
 
         # Get the VersionObject of the DirectoryEntry (the GPO)
