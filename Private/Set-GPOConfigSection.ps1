@@ -165,11 +165,12 @@
                             # Call function to resolve SID
                             $resolvedAccount = ConvertTo-AccountName -SID $sid
                         } catch {
-                            Write-Error -Message ('
-                                Failed to resolve existing member with SID: {0}
-                                This item will not be added to the Rights Assignment section.' -f
-                                $sid
-                            )
+                            $txt = [System.Text.StringBuilder]::new()
+                            [void]$txt.AppendLine($Constants.NL)
+                            [void]$txt.AppendLine('Failed to resolve new member with SID: {0}' -f $sid)
+                            [void]$txt.AppendLine('Item might not be added to the corresponding section. Please verify it!')
+                            [void]$txt.AppendLine($Constants.NL)
+                            Write-Warning -Message $txt
                             #Get-ErrorDetail -ErrorRecord $_
                         } #end Try-Catch
 
@@ -226,11 +227,12 @@
                             )
 
                         } else {
-                            Write-Warning -Message ('
-                                Failed to resolve new member: {0}
-                                Item might not be added to the corresponding section.' -f
-                                $member
-                            )
+                            $txt = [System.Text.StringBuilder]::new()
+                            [void]$txt.AppendLine($Constants.NL)
+                            [void]$txt.AppendLine('Failed to resolve new member: {0}' -f $member)
+                            [void]$txt.AppendLine('Item might not be added to the corresponding section. Please verify it!')
+                            [void]$txt.AppendLine($Constants.NL)
+                            Write-Warning -Message $txt
                             #Get-ErrorDetail -ErrorRecord $_
                         } #end If-Else
 
