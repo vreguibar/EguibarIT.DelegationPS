@@ -86,12 +86,14 @@
             } #end If-Else
 
         } catch {
-            Write-Warning -Message ('
-                Failed to convert SID: {0} to account name.
-                This account should not be processed further.' -f
-                $PSBoundParameters['SID']
-            )
-            Get-ErrorDetail -ErrorRecord $_
+            $txt = [System.Text.StringBuilder]::new()
+            [void]$txt.AppendLine($Constants.NL)
+            [void]$txt.AppendLine('Failed to convert SID: { 0 } to account name.' -f $PSBoundParameters['SID'])
+            [void]$txt.AppendLine('This account might not be processed further.')
+            [void]$txt.AppendLine($Constants.NL)
+
+            Write-Warning -Message $txt
+            ##Get-ErrorDetail -ErrorRecord $_
             return $null
         } #end Try-Catch
 

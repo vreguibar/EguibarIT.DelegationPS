@@ -630,6 +630,9 @@
                 $Key,
 
                 [Parameter(Mandatory = $true)]
+                [AllowNull()]
+                [AllowEmptyString()]
+                [AllowEmptyCollection()]
                 [System.Collections.Generic.List[object]]
                 $Members
             )
@@ -1185,7 +1188,7 @@
 
                 } Catch {
                     Write-Error -Message ('Something went wrong. {0}' -f $_)
-                    #Get-ErrorDetail -ErrorRecord $_
+                    ##Get-ErrorDetail -ErrorRecord $_
                 } #end Try-Catch
 
             } #end If
@@ -1199,7 +1202,7 @@
 
         } Catch {
             Write-Error -Message ('Something went wrong while trying to save the GptTmpl.inf file...')
-            #Get-ErrorDetail -ErrorRecord $_
+            ##Get-ErrorDetail -ErrorRecord $_
             Throw
         }
 

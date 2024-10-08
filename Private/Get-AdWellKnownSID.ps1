@@ -84,7 +84,7 @@
             Write-Verbose -Message ('  Description: {0}' -f $sidDescription)
         } catch {
             Write-Error -Message 'Error when checking WellKnownSid'
-            Get-ErrorDetail -ErrorRecord $_
+            #Get-ErrorDetail -ErrorRecord $_
             throw
         } #end Try-Catch
 

@@ -86,7 +86,7 @@
                         Error creating SecurityIdentifier object for {0}.' -f
                         $cleanName
                     )
-                    #Get-ErrorDetail -ErrorRecord $_
+                    ##Get-ErrorDetail -ErrorRecord $_
                     $Identity = $null
                 }
             } else {
@@ -100,7 +100,7 @@
         } catch {
             Write-Error -Message ('Error found when translating WellKnownSid for {0}.' -f $cleanedName)
             $Identity = $null
-            #Get-ErrorDetail -ErrorRecord $_
+            ##Get-ErrorDetail -ErrorRecord $_
         } #end Try-Catch
 
     } #end Process

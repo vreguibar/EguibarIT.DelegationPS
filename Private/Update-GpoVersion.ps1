@@ -71,7 +71,7 @@ function Update-GpoVersion {
         } catch {
 
             Write-Error -Message ('Error accessing GPO through DirectoryEntry' -f $Gpo.Name)
-            Get-ErrorDetail -ErrorRecord $_
+            #Get-ErrorDetail -ErrorRecord $_
 
         } #end Try-Catch
 
@@ -152,7 +152,7 @@ function Update-GpoVersion {
                 } #end If
             } #end If
         } catch {
-            Get-ErrorDetail -ErrorRecord $_
+            #Get-ErrorDetail -ErrorRecord $_
             throw "The GPTs.ini file could not be modified: $_. Message is $($_.Exception.Message)"
         } #end Try-Catch
 

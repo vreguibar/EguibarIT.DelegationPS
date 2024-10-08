@@ -79,7 +79,7 @@ function Get-GptTemplate {
                         Error while trying to create the folder for {0}' -f
                         $gpo.DisplayName
                     )
-                    Get-ErrorDetail -ErrorRecord $_
+                    #Get-ErrorDetail -ErrorRecord $_
                 } #end Try-Catch
 
             } #end if
@@ -95,7 +95,7 @@ function Get-GptTemplate {
                         Error while trying to create GptTmpl.inf file within folder for {0}' -f
                         $gpo.DisplayName
                     )
-                    Get-ErrorDetail -ErrorRecord $_
+                    #Get-ErrorDetail -ErrorRecord $_
                 } #end Try-Catch
 
             } #end if
@@ -116,7 +116,7 @@ function Get-GptTemplate {
 
         } catch {
             Write-Error -Message ('An error occurred while handling the GPT template path.')
-            Get-ErrorDetail -ErrorRecord $_
+            #Get-ErrorDetail -ErrorRecord $_
             return $null
         } #end Try-Catch
 

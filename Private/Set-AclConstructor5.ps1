@@ -226,7 +226,7 @@ function Set-AclConstructor5 {
 
         } Catch {
             Write-Error -Message ('Error while trying to access LDAP object {0}' -f $PSBoundParameters['LDAPPath'])
-            Get-ErrorDetail -ErrorRecord $_
+            #Get-ErrorDetail -ErrorRecord $_
             throw
         } #end Try-Catch
 
@@ -239,7 +239,7 @@ function Set-AclConstructor5 {
 
         } Catch {
             Write-Error -Message ('Error while trying to Get a copy of the current DACL {0}' -f $object.DistinguishedName)
-            Get-ErrorDetail -ErrorRecord $_
+            #Get-ErrorDetail -ErrorRecord $_
             throw
         } #end Try-Catch
 
@@ -302,7 +302,7 @@ function Set-AclConstructor5 {
 
         } Catch {
             Write-Error -Message ('Error when trying to re-apply the modified DACL to the {0}' -f $objectDN.DistinguishedName)
-            Get-ErrorDetail -ErrorRecord $_
+            #Get-ErrorDetail -ErrorRecord $_
             throw
         } #end Try-Catch
 

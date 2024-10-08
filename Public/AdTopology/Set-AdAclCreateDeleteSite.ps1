@@ -124,7 +124,7 @@
             }
         } Catch {
             Write-Error -Message 'Error when delegating Create/Delete site'
-            Get-ErrorDetail -ErrorRecord $_
+            #Get-ErrorDetail -ErrorRecord $_
             throw
         } #end Try-Catch
 
@@ -164,7 +164,7 @@
             }
         } Catch {
             Write-Error -Message 'Error when delegating Create/Delete site'
-            Get-ErrorDetail -ErrorRecord $_
+            #Get-ErrorDetail -ErrorRecord $_
             throw
         } #end Try-Catch
 
@@ -205,7 +205,7 @@
             }
         } Catch {
             Write-Error -Message 'Error when delegating Create/Delete site'
-            Get-ErrorDetail -ErrorRecord $_
+            #Get-ErrorDetail -ErrorRecord $_
             throw
         } #end Try-Catch
 
@@ -245,7 +245,7 @@
             }
         } Catch {
             Write-Error -Message 'Error when delegating Create/Delete site'
-            Get-ErrorDetail -ErrorRecord $_
+            #Get-ErrorDetail -ErrorRecord $_
             throw
         } #end Try-Catch
 
@@ -283,7 +283,7 @@
             }
         } Catch {
             Write-Error -Message 'Error when delegating Create/Delete site'
-            Get-ErrorDetail -ErrorRecord $_
+            #Get-ErrorDetail -ErrorRecord $_
             throw
         } #end Try-Catch
 
@@ -323,7 +323,7 @@
             }
         } Catch {
             Write-Error -Message 'Error when delegating Create/Delete site'
-            Get-ErrorDetail -ErrorRecord $_
+            #Get-ErrorDetail -ErrorRecord $_
             throw
         } #end Try-Catch
 
@@ -364,7 +364,7 @@
             }
         } Catch {
             Write-Error -Message 'Error when delegating Create/Delete site'
-            Get-ErrorDetail -ErrorRecord $_
+            #Get-ErrorDetail -ErrorRecord $_
             throw
         } #end Try-Catch
 
@@ -405,7 +405,7 @@
             }
         } Catch {
             Write-Error -Message 'Error when delegating Create/Delete site'
-            Get-ErrorDetail -ErrorRecord $_
+            #Get-ErrorDetail -ErrorRecord $_
             throw
         } #end Try-Catch
 
@@ -444,7 +444,7 @@
             }
         } Catch {
             Write-Error -Message 'Error when delegating Create/Delete site'
-            Get-ErrorDetail -ErrorRecord $_
+            #Get-ErrorDetail -ErrorRecord $_
             throw
         } #end Try-Catch
 

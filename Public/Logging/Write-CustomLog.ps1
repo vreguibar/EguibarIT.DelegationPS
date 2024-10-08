@@ -309,7 +309,7 @@
                     Full details: {1}' -f
                     $_.Exception.Message, $_
                 )
-                Get-ErrorDetail -ErrorRecord $_
+                #Get-ErrorDetail -ErrorRecord $_
                 throw
             } #end Try-Catch
         } #end If

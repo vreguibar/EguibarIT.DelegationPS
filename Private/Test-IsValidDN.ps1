@@ -72,7 +72,7 @@
         } catch {
             # Handle exceptions gracefully
             Write-Error -Message 'Error when validating DistinguishedName'
-            Get-ErrorDetail -ErrorRecord $_
+            #Get-ErrorDetail -ErrorRecord $_
         } #end Try-Catch
 
     } #end Process

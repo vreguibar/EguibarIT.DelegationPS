@@ -62,32 +62,28 @@
     Process {
         # try RegEx
         Try {
-            # Provide verbose output
-            if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
 
-                #if ($Variables.WellKnownSIDs -Contains $ObjectSID) {
-                If ($Variables.WellKnownSIDs.Keys.Contains($ObjectSID)) {
+            #if ($Variables.WellKnownSIDs -Contains $ObjectSID) {
+            If ($Variables.WellKnownSIDs.Keys.Contains($ObjectSID)) {
 
-                    Write-Verbose -Message ('The SID {0} is a WellKnownSid.' -f $ObjectSID)
-                    $isValid = $true
+                Write-Verbose -Message ('The SID {0} is a WellKnownSid.' -f $ObjectSID)
+                $isValid = $true
 
-                } elseIf ($ObjectSID -match $Constants.SidRegEx) {
+            } elseIf ($ObjectSID -match $Constants.SidRegEx) {
 
-                    Write-Verbose -Message ('The SID {0} is valid.' -f $ObjectSID)
-                    $isValid = $true
+                Write-Verbose -Message ('The SID {0} is valid.' -f $ObjectSID)
+                $isValid = $true
 
-                } else {
+            } else {
 
-                    Write-Verbose -Message ('[WARNING] The SID {0} is NOT valid!.' -f $ObjectSID)
-                    $isValid = $false
+                Write-Verbose -Message ('[WARNING] The SID {0} is NOT valid!.' -f $ObjectSID)
+                $isValid = $false
 
-                } #end If-Else
-
-            } #end If VERBOSE
+            } #end If-Else
         } catch {
             # Handle exceptions gracefully
             Write-Error -Message ('An error occurred when validating the SID: {0}' -f $_)
-            Get-ErrorDetail -ErrorRecord $_
+            ##Get-ErrorDetail -ErrorRecord $_
         } #end Try-Catch
 
         <#

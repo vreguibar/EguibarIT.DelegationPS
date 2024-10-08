@@ -108,7 +108,7 @@
                             Write-Verbose -Message 'Un-resolved SID removed'
 
                         } catch {
-                            Get-ErrorDetail -ErrorRecord $_
+                            #Get-ErrorDetail -ErrorRecord $_
                             throw [System.ApplicationException]::new("An error occurred while removing access rule: '$($_.Exception)'. Message is $($_.Exception.Message)")
 
                         } finally {

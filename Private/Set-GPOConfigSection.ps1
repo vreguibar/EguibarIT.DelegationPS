@@ -171,7 +171,7 @@
                             [void]$txt.AppendLine('Item might not be added to the corresponding section. Please verify it!')
                             [void]$txt.AppendLine($Constants.NL)
                             Write-Warning -Message $txt
-                            #Get-ErrorDetail -ErrorRecord $_
+                            ##Get-ErrorDetail -ErrorRecord $_
                         } #end Try-Catch
 
                         if ($resolvedAccount) {
@@ -233,7 +233,7 @@
                             [void]$txt.AppendLine('Item might not be added to the corresponding section. Please verify it!')
                             [void]$txt.AppendLine($Constants.NL)
                             Write-Warning -Message $txt
-                            #Get-ErrorDetail -ErrorRecord $_
+                            ##Get-ErrorDetail -ErrorRecord $_
                         } #end If-Else
 
                     } #end If
@@ -283,7 +283,7 @@
                 {2}' -f
                 $CurrentKey, $CurrentSection, $_
             )
-            #Get-ErrorDetail -ErrorRecord $_
+            ##Get-ErrorDetail -ErrorRecord $_
         } #end Try-Catch
     } #end Process
 
