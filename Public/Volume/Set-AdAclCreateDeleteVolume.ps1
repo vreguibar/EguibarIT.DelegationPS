@@ -152,7 +152,7 @@
         } #end If
 
         If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for Volume?')) {
-            Set-AclConstructor6 @Splat
+            Set-AclConstructor5 @Splat
         } #end If
     } #end Process
 
