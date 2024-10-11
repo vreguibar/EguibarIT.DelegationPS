@@ -47,7 +47,7 @@ function Get-GptTemplate {
         ##############################
         # Module imports
 
-        Import-MyModule -Name 'GroupPolicy' -Verbose:$false
+        Import-MyModule -Name 'GroupPolicy' -SkipEditionCheck -Verbose:$false
 
         ##############################
         # Variables Definition
