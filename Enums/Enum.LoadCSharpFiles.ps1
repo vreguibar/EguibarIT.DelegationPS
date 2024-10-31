@@ -18,6 +18,5 @@ function Test-ClassExist {
 
 
 
-#$IniFileCS = Get-Content -Path "$PSScriptRoot\Class.IniFile.cs" -Raw
 $SCMFlagsCS = [System.IO.File]::ReadAllText("$PSScriptRoot\Enum.SCMFlags.cs")
 Add-Type -Language CSharp -TypeDefinition $SCMFlagsCS
