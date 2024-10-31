@@ -148,6 +148,10 @@
                         Write-Verbose -Message 'Looking for SamAccountName'
                         $newObject = Get-ADObject -Filter { (Name -like $identity) -or (SamAccountName -like $identity) }
 
+                        # If identity is a DC will return 2 objects computer & msDSFR-Member
+                        if ($newObject.Count -gt 1) {
+                            $newObject = $newObject[0]
+                        }
                     } #end If-ElseIf-Else
 
                 } #end If WellKnownSid

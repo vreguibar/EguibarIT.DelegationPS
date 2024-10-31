@@ -33,13 +33,14 @@
             This function relies on SC.exe located at $env:SystemRoot\System32\
 
         .NOTES
-            Version:         1.0
-            DateModified:    20/Mar/2024
+            Version:         1.2
+            DateModified:    30/Oct/2024
             LasModifiedBy:   Vicente Rodriguez Eguibar
                 vicente@eguibar.com
                 Eguibar IT
                 http://www.eguibarit.com
     #>
+
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     [OutputType([void])]
 
@@ -100,6 +101,9 @@
         # Get group SID
         $GroupSID = $CurrentGroup.SID.Value
 
+        # Make sure computer has 'sc.exe'. sc.exe supports remoting by giving \\computername
+        $ServiceControlCmd = Get-Command "$env:SystemRoot\system32\sc.exe"
+
     } #end Begin
 
     Process {
@@ -107,17 +111,25 @@
         # get current Service acl in SDDL format
         Write-Verbose -Message 'Get current Service acl in SDDL format'
 
-        $Splat = @{
-            ScriptBlock = { ((& (Get-Command "$($env:SystemRoot)\System32\sc.exe") @('sdshow', $PSBoundParameters['Service']))[1]) }
-        }
-        If ($Computer) {
-            $Splat.Add('ComputerName', $Computer)
-        } #end If
-        $MySDDL = Invoke-Command @Splat
+        $MySDDL = if ($Computer) {
+            (& $ServiceControlCmd.Definition @("\\$Computer", 'sdshow', $PSBoundParameters['Service']))[1]
+        } else {
+           ( & $ServiceControlCmd.Definition @(, 'sdshow', $PSBoundParameters['Service']))[1]
+        } #end If-Else
 
-        # Build the Common Security Descriptor from SDDL
-        Write-Verbose -Message 'Build the Common Security Descriptor from SDDL'
-        $Permission = [System.Security.AccessControl.CommonSecurityDescriptor]::New($true, $False, $MySDDL)
+        Write-Verbose -Message ('Retrieved SDDL: {0}' -f $MySDDL)
+
+        try {
+
+            # Build the Common Security Descriptor from SDDL
+            Write-Verbose -Message 'Building the Common Security Descriptor from SDDL'
+            $Permission = [System.Security.AccessControl.CommonSecurityDescriptor]::New($true, $false, $MySDDL)
+
+        } catch {
+            Write-Error -Message ('Failed to retrieve or validate SDDL for service "{0}": {1}' -f $PSBoundParameters['Service'], $_.Exception.Message)
+            return  # Exit the function if SDDL retrieval or validation fails
+        }
+
 
         # Add new DACL
         Write-Verbose -Message 'Add new DACL'
@@ -137,7 +149,6 @@
                     [System.Security.AccessControl.PropagationFlags]::None
                 )
 
-
                 Write-Verbose -Message ('Successfully Added {0} for {1}' -f $_.AceType, $PSBoundParameters['Group'])
             } catch {
                 Write-Warning -Message "Failed to add access because $($_.Exception.Message)"
@@ -149,9 +160,6 @@
                 # Get SDDL
                 Write-Verbose -Message 'Get SDDL from Common Security Descriptor.'
                 $sddl = $Permission.GetSddlForm([System.Security.AccessControl.AccessControlSections]::All)
-
-                # Make sure computer has 'sc.exe':
-                $ServiceControlCmd = Get-Command "$env:SystemRoot\system32\sc.exe"
 
                 If ($Computer) {
                     & $ServiceControlCmd.Definition @("\\$Computer", 'sdset', $PSBoundParameters['Service'], "$sddl")

@@ -5,6 +5,7 @@
 
         .DESCRIPTION
             This function adds a specified group to the Service Control Manager (SCM) ACL with specified permissions.
+            It modifies the SCM security descriptor to include the group with specific access rights.
 
         .EXAMPLE
             Add-GroupToSCManager -Group "SG_AdAdmins"
@@ -28,6 +29,14 @@
 
         .NOTES
             This function relies on SC.exe located at $env:SystemRoot\System32\
+
+        .NOTES
+            Used Functions:
+                Name                                   | Module
+                ---------------------------------------|--------------------------
+                Get-AdObjectType                       | EguibarIT.DelegationPS & EguibarIT.HousekeepingPS
+                Write-Verbose                          | Microsoft.PowerShell.Utility
+                Write-Error                            | Microsoft.PowerShell.Utility
 
         .NOTES
             Version:         1.0
@@ -58,7 +67,6 @@
             HelpMessage = 'Remote computer to execute the commands.',
             Position = 1)]
         [Alias('Host', 'PC', 'Server', 'HostName', 'ComputerName')]
-        [String]
         $Computer
     )
 
@@ -112,7 +120,7 @@
 
             try {
                 # https://learn.microsoft.com/en-us/windows/win32/services/service-security-and-access-rights
-                $combinedFlags = [ServiceAccessFlags] 'QueryConfig, ChangeConfig, QueryStatus, EnumerateDependents, Start, Stop, Delete, ReadControl, WriteDac, WriteOwner' -as [int]
+                $combinedFlags = [ServiceAccessFlags] 'QueryConfig, ChangeConfig, QueryStatus, EnumerateDependents, Start, Stop, Delete, ReadControl, WriteDac, WriteOwner, AllAccess' -as [int]
 
                 $Permission.DiscretionaryAcl.AddAccess(
                     [System.Security.AccessControl.AccessControlType]::Allow,
@@ -124,7 +132,7 @@
 
                 Write-Verbose -Message ('Successfully Added {0} for {1}' -f $_.AceType, $PSBoundParameters['Group'])
             } catch {
-                Write-Warning -Message "Failed to add access because $($_.Exception.Message)"
+                Write-Error -Message ('Failed to add access because {0}' -f $_.Exception.Message)
             }
 
             # Commit changes
@@ -144,7 +152,7 @@
                 }
                 Write-Verbose -Message 'Successfully set ACL in Service Control Manager'
             } catch {
-                Write-Warning -Message "Failed to set Security in the registry because $($_.Exception.Message)"
+                Write-Error -Message ('Failed to set Security in the registry because {0}' -f $_.Exception.Message)
             } #end Try-Catch
         } #end If
 
