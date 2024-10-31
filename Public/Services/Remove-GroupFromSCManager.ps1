@@ -86,6 +86,9 @@
         # Get group SID
         $GroupSID = $CurrentGroup.SID.Value
 
+        # Make sure computer has 'sc.exe'. sc.exe supports remoting by giving \\computername
+        $ServiceControlCmd = Get-Command "$env:SystemRoot\system32\sc.exe"
+
     } #end Begin
 
     Process {
@@ -93,13 +96,13 @@
         # get current 'Service Control Manager (SCM)' acl in SDDL format
         Write-Verbose -Message 'Get current "Service Control Manager (SCM)" acl in SDDL format'
 
-        $Splat = @{
-            ScriptBlock = { ((& (Get-Command "$($env:SystemRoot)\System32\sc.exe") @('sdshow', 'scmanager'))[1]) }
-        }
-        If ($Computer) {
-            $Splat.Add('ComputerName', $Computer)
-        } #end If
-        $MySDDL = Invoke-Command @Splat
+        $MySDDL = if ($Computer) {
+            (& $ServiceControlCmd.Definition @("\\$Computer", 'sdshow', 'scmanager'))[1]
+        } else {
+           ( & $ServiceControlCmd.Definition @('sdshow', 'scmanager'))[1]
+        } #end If-Else
+
+        Write-Verbose -Message ('Retrieved SDDL: {0}' -f $MySDDL)
 
         # Build the Common Security Descriptor from SDDL
         Write-Verbose -Message 'Build the Common Security Descriptor from SDDL'
@@ -131,9 +134,6 @@
                 # Get SDDL
                 Write-Verbose -Message 'Get SDDL from Common Security Descriptor.'
                 $sddl = $Permission.GetSddlForm([System.Security.AccessControl.AccessControlSections]::All)
-
-                # Make sure computer has 'sc.exe':
-                $ServiceControlCmd = Get-Command "$env:SystemRoot\system32\sc.exe"
 
                 If ($Computer) {
                     & $ServiceControlCmd.Definition @("\\$Computer", 'sdset', 'scmanager', "$sddl")

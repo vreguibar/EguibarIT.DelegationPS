@@ -95,6 +95,36 @@
         # Get group SID
         $GroupSID = $CurrentGroup.SID.Value
 
+        # Make sure computer has 'sc.exe'. sc.exe supports remoting by giving \\computername
+        $ServiceControlCmd = Get-Command "$env:SystemRoot\system32\sc.exe"
+
+        # Map permissions to access rights using enum values
+        # https://learn.microsoft.com/en-us/windows/win32/services/service-security-and-access-rights
+        $permissionMap = @{
+            'FullControl'    = (
+                [ServiceControlManagerFlags]::SC_MANAGER_ALL_ACCESS -bor
+                [ServiceControlManagerFlags]::READ_CONTROL -bor
+                [ServiceControlManagerFlags]::WRITE_DAC -bor
+                [ServiceControlManagerFlags]::WRITE_OWNER -bor
+                [ServiceControlManagerFlags]::DELETE
+            )
+            'ReadAndExecute' = (
+                [ServiceControlManagerFlags]::SC_MANAGER_CONNECT -bor
+                [ServiceControlManagerFlags]::SC_MANAGER_ENUMERATE_SERVICE -bor
+                [ServiceControlManagerFlags]::SC_MANAGER_LOCK -bor
+                [ServiceControlManagerFlags]::SC_MANAGER_QUERY_LOCK_STATUS -bor
+                [ServiceControlManagerFlags]::READ_CONTROL -bor
+                [ServiceControlManagerFlags]::Generic_Execute
+            )
+            'Read'           = (
+                [ServiceControlManagerFlags]::SC_MANAGER_CONNECT -bor
+                [ServiceControlManagerFlags]::SC_MANAGER_ENUMERATE_SERVICE -bor
+                [ServiceControlManagerFlags]::READ_CONTROL
+            )
+            'Write'          = [ServiceControlManagerFlags]::SC_MANAGER_CREATE_SERVICE
+            'Start'          = [ServiceControlManagerFlags]::SC_MANAGER_CONNECT
+            'Stop'           = [ServiceControlManagerFlags]::SC_MANAGER_CONNECT
+        }
     } #end Begin
 
     Process {
@@ -102,13 +132,13 @@
         # get current 'Service Control Manager (SCM)' acl in SDDL format
         Write-Verbose -Message 'Get current "Service Control Manager (SCM)" acl in SDDL format'
 
-        $Splat = @{
-            ScriptBlock = { ((& (Get-Command "$($env:SystemRoot)\System32\sc.exe") @('sdshow', 'scmanager'))[1]) }
-        }
-        If ($Computer) {
-            $Splat.Add('ComputerName', $Computer)
-        } #end If
-        $MySDDL = Invoke-Command @Splat
+        $MySDDL = if ($Computer) {
+            (& $ServiceControlCmd.Definition @("\\$Computer", 'sdshow', 'scmanager'))[1]
+        } else {
+           ( & $ServiceControlCmd.Definition @('sdshow', 'scmanager'))[1]
+        } #end If-Else
+
+        Write-Verbose -Message ('Retrieved SDDL: {0}' -f $MySDDL)
 
         # Build the Common Security Descriptor from SDDL
         Write-Verbose -Message 'Build the Common Security Descriptor from SDDL'
@@ -119,13 +149,10 @@
         If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Add group from SCM?')) {
 
             try {
-                # https://learn.microsoft.com/en-us/windows/win32/services/service-security-and-access-rights
-                $combinedFlags = [ServiceAccessFlags] 'QueryConfig, ChangeConfig, QueryStatus, EnumerateDependents, Start, Stop, Delete, ReadControl, WriteDac, WriteOwner, AllAccess' -as [int]
-
                 $Permission.DiscretionaryAcl.AddAccess(
                     [System.Security.AccessControl.AccessControlType]::Allow,
                     [System.Security.Principal.SecurityIdentifier]"$($GroupSID)",
-                    $combinedFlags, # int accessMask
+                    $permissionMap['FullControl'], # int accessMask
                     [System.Security.AccessControl.InheritanceFlags]::None,
                     [System.Security.AccessControl.PropagationFlags]::None
                 )
@@ -141,9 +168,6 @@
                 # Get SDDL
                 Write-Verbose -Message 'Get SDDL from Common Security Descriptor.'
                 $sddl = $Permission.GetSddlForm([System.Security.AccessControl.AccessControlSections]::All)
-
-                # Make sure computer has 'sc.exe':
-                $ServiceControlCmd = Get-Command "$env:SystemRoot\system32\sc.exe"
 
                 If ($Computer) {
                     & $ServiceControlCmd.Definition @("\\$Computer", 'sdset', 'scmanager', "$sddl")

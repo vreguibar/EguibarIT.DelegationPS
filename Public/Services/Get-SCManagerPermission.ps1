@@ -60,13 +60,13 @@ Function Get-SCManagerPermission {
         # get current 'Service Control Manager (SCM)' acl in SDDL format
         Write-Verbose -Message 'Get current "Service Control Manager (SCM)" acl in SDDL format'
 
-        $Splat = @{
-            ScriptBlock = { ((& (Get-Command "$($env:SystemRoot)\System32\sc.exe") @('sdshow', 'scmanager'))[1]) }
-        }
-        If ($Computer) {
-            $Splat.Add('ComputerName', $Computer)
-        } #end If
-        $MySDDL = Invoke-Command @Splat
+        $MySDDL = if ($Computer) {
+            (& $ServiceControlCmd.Definition @("\\$Computer", 'sdshow', 'scmanager'))[1]
+        } else {
+           ( & $ServiceControlCmd.Definition @('sdshow', 'scmanager'))[1]
+        } #end If-Else
+
+        Write-Verbose -Message ('Retrieved SDDL: {0}' -f $MySDDL)
 
         # Build the Common Security Descriptor from SDDL
         $Permission = [System.Security.AccessControl.CommonSecurityDescriptor]::New($true, $False, $MySDDL)

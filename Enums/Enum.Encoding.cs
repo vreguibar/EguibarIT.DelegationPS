@@ -1,5 +1,5 @@
-﻿# https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/set-content?view=powershell-7.4
-Add-Type @'
+﻿// https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/set-content?view=powershell-7.4
+
 public enum Encoding {
     ascii,
     ansi,
@@ -13,4 +13,3 @@ public enum Encoding {
     utf8NoBOM,
     utf32
 }
-'@

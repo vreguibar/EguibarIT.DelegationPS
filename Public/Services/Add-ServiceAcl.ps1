@@ -104,6 +104,39 @@
         # Make sure computer has 'sc.exe'. sc.exe supports remoting by giving \\computername
         $ServiceControlCmd = Get-Command "$env:SystemRoot\system32\sc.exe"
 
+        # Map permissions to access rights using enum values
+        # https://learn.microsoft.com/en-us/windows/win32/services/service-security-and-access-rights
+        $permissionMap = @{
+            'FullControl'    = (
+                [ServiceControlManagerFlags]::SC_MANAGER_ALL_ACCESS -bor
+                [ServiceControlManagerFlags]::READ_CONTROL -bor
+                [ServiceControlManagerFlags]::WRITE_DAC -bor
+                [ServiceControlManagerFlags]::WRITE_OWNER -bor
+                [ServiceControlManagerFlags]::DELETE -bor
+                [ServiceControlManagerFlags]::GenericRead -bor
+                [ServiceControlManagerFlags]::GenericWrite -bor
+                [ServiceControlManagerFlags]::GenericExecute
+            )
+            'ReadAndExecute' = (
+                [ServiceControlManagerFlags]::SC_MANAGER_CONNECT -bor
+                [ServiceControlManagerFlags]::SC_MANAGER_ENUMERATE_SERVICE -bor
+                [ServiceControlManagerFlags]::SC_MANAGER_LOCK -bor
+                [ServiceControlManagerFlags]::SC_MANAGER_QUERY_LOCK_STATUS -bor
+                [ServiceControlManagerFlags]::GenericRead -bor
+                [ServiceControlManagerFlags]::GenericExecute
+            )
+            'Read'           = (
+                [ServiceControlManagerFlags]::SC_MANAGER_CONNECT -bor
+                [ServiceControlManagerFlags]::SC_MANAGER_ENUMERATE_SERVICE -bor
+                [ServiceControlManagerFlags]::GenericRead -bor
+                [ServiceControlManagerFlags]::READ_CONTROL
+            )
+            'Write'          = [ServiceControlManagerFlags]::GenericWrite
+            'Start'          = [ServiceControlManagerFlags]::SERVICE_START
+            'Stop'           = [ServiceControlManagerFlags]::SERVICE_STOP
+            'Pause'          = [ServiceControlManagerFlags]::SERVICE_PAUSE_CONTINUE
+        }
+
     } #end Begin
 
     Process {
@@ -114,7 +147,7 @@
         $MySDDL = if ($Computer) {
             (& $ServiceControlCmd.Definition @("\\$Computer", 'sdshow', $PSBoundParameters['Service']))[1]
         } else {
-           ( & $ServiceControlCmd.Definition @(, 'sdshow', $PSBoundParameters['Service']))[1]
+           ( & $ServiceControlCmd.Definition @('sdshow', $PSBoundParameters['Service']))[1]
         } #end If-Else
 
         Write-Verbose -Message ('Retrieved SDDL: {0}' -f $MySDDL)
@@ -126,9 +159,12 @@
             $Permission = [System.Security.AccessControl.CommonSecurityDescriptor]::New($true, $false, $MySDDL)
 
         } catch {
-            Write-Error -Message ('Failed to retrieve or validate SDDL for service "{0}": {1}' -f $PSBoundParameters['Service'], $_.Exception.Message)
+            Write-Error -Message ('
+                Failed to retrieve or validate SDDL for service "{0}": {1}' -f
+                $PSBoundParameters['Service'], $_.Exception.Message
+            )
             return  # Exit the function if SDDL retrieval or validation fails
-        }
+        } #end Try-Catch
 
 
         # Add new DACL
@@ -136,15 +172,10 @@
         If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Add group Service ACL?')) {
 
             try {
-                # https://learn.microsoft.com/en-us/windows/win32/services/service-security-and-access-rights
-                # Combine the desired flags instead of 983551
-                $combinedFlags = [ServiceAccessFlags] 'Delete, ReadControl, WriteDac, WriteOwner, AllAccess' -as [int]
-
-
                 $Permission.DiscretionaryAcl.AddAccess(
                     [System.Security.AccessControl.AccessControlType]::Allow,
                     [System.Security.Principal.SecurityIdentifier]"$($GroupSID)",
-                    $combinedFlags,
+                    $permissionMap['FullControl'],
                     [System.Security.AccessControl.InheritanceFlags]::None,
                     [System.Security.AccessControl.PropagationFlags]::None
                 )

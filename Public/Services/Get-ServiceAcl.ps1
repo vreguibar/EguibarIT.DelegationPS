@@ -108,9 +108,12 @@
             } #end Try-Catch
 
             # Create the custom object with the note properties
-            $CustomObject = New-Object -TypeName PSObject -Property ([ordered] @{ Name = $_.Name
-                    Dacl                                                               = $Dacl
-                })
+            $CustomObject = New-Object -TypeName PSObject -Property (
+                [ordered] @{
+                    Name = $_.Name
+                    Dacl = $Dacl
+                }
+            )
 
             # Add the 'Access' property:
             $CustomObject | Add-Member -MemberType ScriptProperty -Name Access -Value {
