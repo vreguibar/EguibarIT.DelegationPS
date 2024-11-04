@@ -37,39 +37,85 @@ Add-Type -Language CSharp -TypeDefinition $IniFileCS
 
 <## Examples of usage
 
-# Check if a Section Exists
-$sectionExists = $iniFile.SectionExists("SectionName")
-
-# Add a New Section
-$iniFile.AddSection("NewSectionName")
-
-# Check if a Key Exists in a Section
-$section = $null
-$keyExists = $iniFile.Sections.TryGetValue("SectionName", [ref]$section) -and $section.KeyValuePair.KeyValues.ContainsKey("KeyName")
-
-# Checking if a Key Exists in a Section
-IniSection section;
-bool sectionExists = iniFile.Sections.TryGetValue("SectionName", out section);
-bool keyExists = section?.KeyValuePair.ContainsKey("KeyName") ?? false;
-
-# Add or Update a Key-Value Pair in a Section
-$iniFile.SetKeyValuePair("SectionName", "KeyName", "Value")
-
-# Get the Value of a Key
-$value = $iniFile.GetKeyValue("SectionName", "KeyName")
-
-# Save the INI File
-$iniFile.SaveFile("Path\To\File.ini")
+################################################################################
+# Create New File
+$GptTmpl = [IniFileHandler.IniFile]::New()
 
 # Load an INI File
-$iniFile = [IniFile]::new("Path\To\File.ini")
+$GptTmpl = [IniFileHandler.IniFile]::New("Path\To\File.ini")
+
+# Don't forget to dispose when done
+$GptTmpl.Dispose()
+
+# Better: Using PowerShell automatic disposal
+try {
+    $GptTmpl = [IniFileHandler.IniFile]::New()
+    # Work with $GptTmpl here
+}
+finally {
+    if ($GptTmpl -is [System.IDisposable]) {
+        $GptTmpl.Dispose()
+    }
+}
+
+
+
+################################################################################
+# Add a New Section
+$GptTmpl.AddSection("NewSectionName")
+
+# Check if a Section Exists
+$sectionExists = $GptTmpl.SectionExists("SectionName")
+
+ # Get specific section
+$section = $GptTmpl.Sections.GetSection("General")
+
+# Add or Update a Key-Value Pair in a Section
+$GptTmpl.SetKeyValuePair("SectionName", "KeyName", "Value")
+
+# Get the Value of a Key
+$value = $GptTmpl.GetKeyValue("SectionName", "KeyName")
 
 # Get All Sections
 $allSections = $iniFile.Sections.Values
 
+
+
+################################################################################
+# Check if a Key Exists in a Section
+$section = $null
+$keyExists = $GptTmpl.Sections.TryGetValue("SectionName", [ref]$section) -and $section.KeyValuePair.KeyValues.ContainsKey("KeyName")
+
+# Checking if a Key Exists in a Section
+IniSection section;
+bool sectionExists = $GptTmpl.Sections.TryGetValue("SectionName", out section);
+bool keyExists = section?.KeyValuePair.ContainsKey("KeyName") ?? false;
+
 # Get All Keys in a Section
 $section = $null
-$iniFile.Sections.TryGetValue("SectionName", [ref]$section)
+$GptTmpl.Sections.TryGetValue("SectionName", [ref]$section)
 $allKeys = $section.KeyValuePair.KeyValues.Keys
+
+
+
+################################################################################
+# Add security section
+$GptTmpl.AddSection("File Security")
+
+# Add security descriptors
+$GptTmpl.AddSimpleString("File Security", "C:\Windows\System32\* D:PAI(A;;FA;;;BA)")
+$GptTmpl.AddSimpleString("File Security", "C:\Program Files\* D:PAI(A;;FA;;;BA)")
+
+# Read all entries
+$securityEntries = $GptTmpl.GetSimpleStrings("File Security")
+$securityEntries | ForEach-Object {
+    Write-Host "Security Entry: $_"
+}
+
+
+
+################################################################################
+# Save the INI File
+$GptTmpl.SaveFile("Path\To\File.ini")
 
 #>
