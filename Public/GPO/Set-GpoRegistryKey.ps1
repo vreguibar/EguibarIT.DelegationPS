@@ -1,37 +1,34 @@
-﻿Function Set-GpoFileSecurity {
+﻿Function Set-GpoRegistryKey {
 
     <#
         .SYNOPSIS
-            Modifies file security settings for specified paths in a GPO.
+            Modifies registry key security settings for specified paths within a GPO.
 
         .DESCRIPTION
-            This function adjusts the file security settings within a specified Group Policy Object (GPO).
-            It modifies the permissions based on predefined paths and uses a Security Descriptor Definition Language (SDDL)
-            format to define access control entries. The function also ensures that required GptTmpl sections exist,
-            and updates the GPO version to reflect changes.
+            This function allows the modification of registry permissions within a specified Group Policy Object (GPO).
+            It applies permissions for a given group or security identifier (SID) to multiple registry paths, setting custom security descriptors.
+            The function will attempt to create or modify the "Registry Keys" section in the GptTmpl.inf file associated with the GPO,
+            and save these settings back to the GPO for enforcement.
 
         .PARAMETER GpoToModify
-            The name of the Group Policy Object (GPO) to be modified.
+            The name of the GPO to be modified. This parameter is required.
 
         .PARAMETER Group
-            The group name or security identifier (SID) that will be delegated specific permissions.
+            The group name or SID that will receive the specified permissions within the GPO. This parameter is required.
+
+        .PARAMETER Force
+            A switch to bypass confirmation and enforce changes directly. When not specified, the function will prompt for confirmation.
 
         .EXAMPLE
-            Set-GpoFileSecurity -GpoToModify "Default Domain Policy" -Group "Domain Admins" -Verbose
+            Set-GpoRegistryKey -GpoToModify "SampleGPO" -Group "Domain Users" -Force
 
-            This command modifies the file security for paths defined in the Default Domain Policy GPO,
-            granting permissions to the Domain Admins group and outputs detailed processing information.
-
-        .INPUTS
-            None. Parameters are provided by the caller.
-
-        .OUTPUTS
-            None.
+            This command modifies the registry permissions for the "Domain Users" group within the "SampleGPO" GPO,
+            setting specific registry paths and permissions as defined within the function.
 
         .NOTES
             Version:         1.1
             DateModified:    12/Nov/2024
-            LasModifiedBy:   Vicente Rodriguez Eguibar
+            LastModifiedBy:  Vicente Rodriguez Eguibar
                 vicente@eguibar.com
                 Eguibar Information Technology S.L.
                 http://www.eguibarit.com
@@ -39,13 +36,13 @@
         .NOTES
             Used Functions:
             Name                         | Module
-                -------------------------|--------------------------
-                Get-FunctionDisplay      | EguibarIT & EguibarIT.DelegationPS
-                Get-AdObjectType         | EguibarIT & EguibarIT.DelegationPS
-                Get-GptTemplate          | EguibarIT & EguibarIT.DelegationPS
-                Update-GpoVersion        | EguibarIT & EguibarIT.DelegationPS
-                Write-Error              | Microsoft.PowerShell.Utility
-                Write-Verbose            | Microsoft.PowerShell.Utility
+            -----------------------------|--------------------------
+            Get-FunctionDisplay          | EguibarIT & EguibarIT.DelegationPS
+            Get-AdObjectType             | EguibarIT & EguibarIT.DelegationPS
+            Get-GptTemplate              | EguibarIT & EguibarIT.DelegationPS
+            Update-GpoVersion            | EguibarIT & EguibarIT.DelegationPS
+            Write-Error                  | Microsoft.PowerShell.Utility
+            Write-Verbose                | Microsoft.PowerShell.Utility
     #>
 
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'medium')]
@@ -130,48 +127,48 @@
 
         If (
             $Force -or
-            $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], ('Delegate file permissions for "{0}"?') -f $Rights)
+            $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], ('Delegate registry permissions for "{0}"?') -f $Rights)
         ) {
 
             # Check if [[File Security]] section exist. Create it if it does not exist
-            If (-not $GptTmpl.SectionExists('File Security')) {
+            If (-not $GptTmpl.SectionExists('Registry Keys')) {
 
-                Write-Verbose -Message ('Section "[File Security]" does not exist. Creating it!.')
-                $GptTmpl.AddSection('File Security')
+                Write-Verbose -Message ('Section "[Registry Keys]" does not exist. Creating it!.')
+                $GptTmpl.AddSection('Registry Keys')
 
             } #end If
 
             # Define Path
             $AllPaths = @(
-                '%AllUsersProfile%',
-                '%ProgramFiles%',
-                '%ProgramFiles% (x86)',
-                '%SystemDrive%\',
-                '%SystemDrive%\$Recycle.Bin',
-                '%SystemDrive%\Users',
-                '%SystemRoot%',
-                '%SystemRoot%\Fonts',
-                '%SystemRoot%\Globalization',
-                '%SystemRoot%\INF',
-                '%SystemRoot%\Installer',
-                '%SystemRoot%\security',
-                '%SystemRoot%\System',
-                '%SystemRoot%\System32',
-                '%SystemRoot%\SystemResources',
-                '%SystemRoot%\SysWOW64',
-                '%SystemRoot%\WinSxS'
+                'CLASSES_ROOT',
+                'MACHINE',
+                'MACHINE\BCD00000000',
+                'MACHINE\HARDWARE',
+                'MACHINE\SAM',
+                'MACHINE\SECURITY',
+                'MACHINE\SOFTWARE',
+                'MACHINE\SOFTWARE\Classes',
+                'MACHINE\SOFTWARE\Classes\TypeLib',
+                'MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion',
+                'MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer',
+                'MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UserData',
+                'MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion',
+                'MACHINE\SYSTEM',
+                'MACHINE\SYSTEM\ControlSet001',
+                'MACHINE\SYSTEM\CurrentControlSet',
+                'USERS',
+                'USERS\.DEFAULT'
             )
-            # Dynamically add Drive letters
-            $AllPaths += (Get-PSDrive -PSProvider FileSystem).Root
+
 
             # Define SDDL permissions
             [string]$SDDL = 'D:PAR'
-            [string]$SDDL += '(A;OICI;0x1200a9;;;S-1-15-2-1)'
-            [string]$SDDL += '(A;OICIIO; FA;;;CO)'
-            [string]$SDDL += '(A;OICI; FA;;;SY)'
-            [string]$SDDL += '(A;OICI; FA;;;BA)'
-            [string]$SDDL += '(A;OICI; 0x1200a9;;;BU)'
-            [string]$SDDL += ('(A;OICI; FA;;;{0})' -f $CurrentGroup.SID.Value)
+            [string]$SDDL += '(A;CI;KR;;;S-1-15-2-1)'
+            [string]$SDDL += '(A;CIIO;KA;;;CO)'
+            [string]$SDDL += '(A;CI;KA;;;SY)'
+            [string]$SDDL += '(A;CI;KA;;;BA)'
+            [string]$SDDL += '(A;CI;KR;;;BU)'
+            [string]$SDDL += ('(A;CI;KA;;;{0})' -f $CurrentGroup.SID.Value)
 
 
             # Add corresponding values.
@@ -183,7 +180,7 @@
                     [string]$TmpString = '"{0}",0,"{1}"' -f $Currentpath, $SDDL
 
                     # Add string to section in template
-                    $GptTmpl.AddSimpleString('File Security', $TmpString)
+                    $GptTmpl.AddSimpleString('Registry Keys', $TmpString)
                 } #end Foreach
 
             } Catch {
