@@ -203,7 +203,9 @@
             Write-Error -Message ('Something went wrong while trying to save the GptTmpl.inf file...')
             ##Get-ErrorDetail -ErrorRecord $_
             Throw
-        }
+        } Finally {
+            $GptTmpl.Dispose()
+        } #end Try-Catch-Finally
 
         # Increment Version
         # Get path to the GPTs.ini file. Increment to make changes.

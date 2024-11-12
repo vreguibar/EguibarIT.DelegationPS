@@ -31,9 +31,13 @@ if ((-not (Test-ClassExist 'EventIdInfo')) -or
 
 
 
-#$IniFileCS = Get-Content -Path "$PSScriptRoot\Class.IniFile.cs" -Raw
-$IniFileCS = [System.IO.File]::ReadAllText("$PSScriptRoot\Class.IniFile.cs")
-Add-Type -Language CSharp -TypeDefinition $IniFileCS
+# Define the class only if it doesn't already exist
+if ((-not (Test-ClassExist 'IniFile')) -or
+    (-not (Test-ClassExist 'IniSections'))
+) {
+    $IniFileCS = [System.IO.File]::ReadAllText("$PSScriptRoot\Class.IniFile.cs")
+    Add-Type -Language CSharp -TypeDefinition $IniFileCS
+} #end If
 
 <## Examples of usage
 
