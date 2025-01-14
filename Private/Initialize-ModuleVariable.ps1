@@ -103,7 +103,12 @@
             #Get-AttributeSchemaHashTable
 
         } catch {
-            Write-Error -Message 'Something went wrong while trying to fill $Variables.GuidMap!'
+            Write-Error -Message '
+            Something went wrong while trying to fill $Variables.GuidMap!
+                Ensure that:
+                 * Machine is Domain Joined
+                 * Active Directory is available and working
+                 * Communication exist between this machine and AD'
             Throw
         }
 
@@ -137,7 +142,12 @@
 
             #Get-ExtendedRightHashTable
         } Catch {
-            Write-Error -Message 'Something went wrong while trying to fill $Variables.ExtendedRightsMap!'
+            Write-Error -Message '
+            Something went wrong while trying to fill $Variables.ExtendedRightsMap!
+                Ensure that:
+                 * Machine is Domain Joined
+                 * Active Directory is available and working
+                 * Communication exist between this machine and AD'
             Throw
         }
 
