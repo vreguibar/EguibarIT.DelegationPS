@@ -655,6 +655,16 @@
 
 
 
+
+        # Verify that given GPO exists.
+        $Gpo = Get-GPO -Name $PSBoundParameters['GpoToModify'] -ErrorAction SilentlyContinue
+        if (-not $Gpo) {
+            throw "GPO '$GpoToModify' does not exist."
+        }
+
+
+
+
         # Get the GptTmpl.inf content and store it in variable
         $GptTmpl = Get-GptTemplate -GpoName $PSBoundParameters['GpoToModify']
 

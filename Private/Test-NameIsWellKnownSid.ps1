@@ -13,7 +13,7 @@
             The name to check against the well-known SIDs.
 
         .EXAMPLE
-            PS> Test-NameIsWellKnownSid -Name 'NT AUTHORITY\SYSTEM'
+            Test-NameIsWellKnownSid -Name 'NT AUTHORITY\SYSTEM'
 
         .INPUTS
             [String] Name
@@ -75,16 +75,16 @@
                     Write-Verbose -Message ('
                         Matched SID: {0}
                                 For: {1}' -f
-                        $Identity.Value, $cleanName
+                        $Identity.Value, $cleanedName
                     )
 
                     # Convert to SecurityIdentifier object
-                    [System.Security.Principal.SecurityIdentifier]$Identity = [System.Security.Principal.SecurityIdentifier]::New($sid)
+                    #[System.Security.Principal.SecurityIdentifier]$Identity = [System.Security.Principal.SecurityIdentifier]::New($sid)
                 } else {
 
                     Write-Error -Message ('
                         Error creating SecurityIdentifier object for {0}.' -f
-                        $cleanName
+                        $cleanedName
                     )
                     ##Get-ErrorDetail -ErrorRecord $_
                     $Identity = $null
