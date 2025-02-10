@@ -125,7 +125,7 @@
             } elseif ($Members -isnot [System.Collections.IEnumerable]) {
                 $Members = @($Members)
             }
-            
+
             # Check if the key exists
             $currentValue = $GptTmpl.GetKeyValue($CurrentSection, $CurrentKey)
 
@@ -203,51 +203,53 @@
                 $resolvedMembers.Clear()
                 [void]$resolvedMembers.Add( [string]::Empty )
 
-            } else {
+            }
+            #iterate all new members
+            foreach ($member in $Members) {
 
-                #iterate all new members
-                foreach ($member in $Members) {
+                if (-not [string]::IsNullOrWhiteSpace($member)) {
 
-                    if (-not [string]::IsNullOrWhiteSpace($member)) {
+                    # Handle Distinguished Names (DNs)
+                    if ($member -match '^cn=') {
+                        $groupName = ($member -split ',')[0] -replace '^cn=', ''
+                        $adObject = Get-ADGroup -Identity $groupName -ErrorAction Stop
+                        $sid = $adObject.SID.Value
+                    } else {
 
                         # Resolve SID to AD Identity
                         #$sid = Resolve-MemberIdentity -Member $member
                         $ReturnedMember = Get-AdObjectType -Identity $member
 
-                        If ($ReturnedMember) {
-                            if ($ReturnedMember.PSobject.Properties.name -match 'SID') {
-                                $Sid = $ReturnedMember.SID.Value
-                            } else {
-                                $Sid = $ReturnedMember
-                            }
+                        if ($adObject) {
+                            $sid = $adObject.SID.Value
                         } else {
-                            $Sid = Test-NameIsWellKnownSid -Name $member
+                            $sid = Test-NameIsWellKnownSid -Name $member
                         } #end If-Else
 
-                        if ($sid) {
+                    } #end If-Else
 
-                            [void]$resolvedMembers.Add('*{0}' -f $sid)
-                            Write-Verbose ('
+                    if ($sid) {
+
+                        [void]$resolvedMembers.Add('*{0}' -f $sid)
+                        Write-Verbose ('
                                 Resolved new member: {0}
                                                 SID: {1}' -f
-                                $member, $sid
-                            )
+                            $member, $sid
+                        )
 
-                        } else {
-                            $txt = [System.Text.StringBuilder]::new()
-                            [void]$txt.AppendLine($Constants.NL)
-                            [void]$txt.AppendLine('Failed to resolve new member: {0}' -f $member)
-                            [void]$txt.AppendLine('Item might not be added to the corresponding section. Please verify it!')
-                            [void]$txt.AppendLine($Constants.NL)
-                            Write-Warning -Message $txt
-                            ##Get-ErrorDetail -ErrorRecord $_
-                        } #end If-Else
+                    } else {
+                        $txt = [System.Text.StringBuilder]::new()
+                        [void]$txt.AppendLine($Constants.NL)
+                        [void]$txt.AppendLine('Failed to resolve new member: {0}' -f $member)
+                        [void]$txt.AppendLine('Item might not be added to the corresponding section. Please verify it!')
+                        [void]$txt.AppendLine($Constants.NL)
+                        Write-Warning -Message $txt
+                        ##Get-ErrorDetail -ErrorRecord $_
+                    } #end If-Else
 
-                    } #end If
+                } #end If
 
-                } #end Foreach
-
-            } #end If-Else
+            } #end Foreach
 
             # Convert resolved members to string
             $updatedValue = if (
