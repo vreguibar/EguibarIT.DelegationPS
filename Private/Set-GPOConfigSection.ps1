@@ -119,6 +119,13 @@
     Process {
         try {
 
+            # Ensure Members is always an array
+            if ($null -eq $Members -or ($Members.Count -eq 1 -and [string]::IsNullOrEmpty($Members[0]))) {
+                $Members = @([string]::Empty)
+            } elseif ($Members -isnot [System.Collections.IEnumerable]) {
+                $Members = @($Members)
+            }
+            
             # Check if the key exists
             $currentValue = $GptTmpl.GetKeyValue($CurrentSection, $CurrentKey)
 
