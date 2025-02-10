@@ -70,7 +70,7 @@
                     $PSBoundParameters['SID']
                 )
                 # Create a SecurityIdentifier object from the Well-Known SID string
-                $tmpSid = [System.Security.Principal.SecurityIdentifier]::New($Variables.WellKnownSIDs[$PSBoundParameters['SID']])
+                $tmpSid = [System.Security.Principal.SecurityIdentifier]::New($PSBoundParameters['SID'])
 
                 # Return Translated SID to an NTAccount object
                 return $tmpSid.Translate([System.Security.Principal.NTAccount])
