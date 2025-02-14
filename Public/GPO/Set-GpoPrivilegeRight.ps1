@@ -187,6 +187,7 @@
             Used Functions:
                 Name                                   | Module
                 ---------------------------------------|--------------------------
+                Get-GPO                                | Microsoft.GroupPolicy
                 Set-AclConstructor6                    | EguibarIT.DelegationPS
                 Get-AttributeSchemaHashTable           | EguibarIT.DelegationPS
                 Get-ExtendedRightHashTable             | EguibarIT.DelegationPS

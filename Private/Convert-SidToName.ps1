@@ -13,7 +13,7 @@
             The SID must be a valid string representation of a SID.
 
         .EXAMPLE
-            PS> Convert-SidToName -SID 'S-1-5-21-3623811015-3361044348-30300820-1013'
+            Convert-SidToName -SID 'S-1-5-21-3623811015-3361044348-30300820-1013'
             EguibarIT\davade
 
         .INPUTS
@@ -48,7 +48,10 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'SID of the object to be translated',
             Position = 0)]
-        [ValidateScript({ Test-IsValidSID -ObjectSID $_ }, ErrorMessage = 'Provided SID is not valid! Please check.')]
+        [ValidateScript(
+            { Test-IsValidSID -ObjectSID $_ },
+            ErrorMessage = '[PARAMETER] Provided SID is not valid! Function will not continue. Please check.'
+        )]
         [ValidateNotNullOrEmpty()]
         $SID
     )
@@ -73,6 +76,19 @@
 
     Process {
 
+        # Check Well-Known SIDs first
+        if ($Variables.WellKnownSIDs.Keys.ContainsKey($PSBoundParameters['SID'])) {
+
+            Write-Verbose -Message ('
+                Resolved SID {0}
+                from Well-Known SIDs: {1}' -f
+                $Sid, $Variables.WellKnownSIDs[$PSBoundParameters['SID']]
+            )
+            return $Variables.WellKnownSIDs[$Sid]
+
+        } #end If
+
+        # Fallback to dynamic resolution
         try {
 
             # Attempt to translate the SID to a name
@@ -81,16 +97,26 @@
             # Get the account name based on SID
             $FoundName = ($SecurityIdentifier.Translate([Security.Principal.NTAccount])).Value
 
+            Write-Verbose -Message ('
+                Converted SID {0}
+                to account name: {1}' -f
+                $Sid, $objUser.Value
+            )
+
         } catch [System.Security.Principal.IdentityNotMappedException] {
 
-            Write-Warning 'Identity Not Mapped Exception'
+            Write-Warning 'Identity Not Mapped Exception. The SID could not be translated to an account name.'
             $FoundName = $null
 
         } catch {
-            Write-Error -Message ('An unexpected error occurred: {0}' -f $_)
-            #Get-ErrorDetail -ErrorRecord $_
+            Write-Error -Message ('
+                An unexpected error occurred while converting SID
+                SID: {0}
+                {1}' -f
+                $PSBoundParameters['SID'], $_
+            )
+
             $FoundName = $null
-            throw
         }#end Try-Catch
 
     } #end Process
