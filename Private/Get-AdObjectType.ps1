@@ -51,8 +51,8 @@
         Microsoft.ActiveDirectory.Management.ADServiceAccount
 
     .NOTES
-        Version:         1.3
-            DateModified:    2/Oct/2024
+        Version:         1.4
+            DateModified:    14/Feb/2025
             LasModifiedBy:   Vicente Rodriguez Eguibar
                 vicente@eguibar.com
                 Eguibar Information Technology S.L.
