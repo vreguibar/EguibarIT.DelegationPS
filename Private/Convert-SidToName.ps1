@@ -1,7 +1,7 @@
 ﻿Function Convert-SidToName {
     <#
         .SYNOPSIS
-            Converts a Security Identifier (SID) to its corresponding NT Account Name.
+            Converts a Security Identifier (SID) to its corresponding Account Name.
 
         .DESCRIPTION
             This function translates a given Security Identifier (SID) to the corresponding
@@ -9,7 +9,7 @@
             human-readable form.
 
         .PARAMETER SID
-            The Security Identifier (SID) to be translated to an NT Account Name.
+            The Security Identifier (SID) to be translated to an Account Name.
             The SID must be a valid string representation of a SID.
 
         .EXAMPLE
@@ -38,7 +38,7 @@
     #>
 
     [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'Low')]
-    [OutputType([bool])]
+    [OutputType([System.Security.Principal.NTAccount])]
 
     param (
         # PARAM1 STRING representing the GUID
@@ -76,48 +76,52 @@
 
     Process {
 
+        Write-Verbose -Message ('Attempting to convert SID: {0} to account name' -f $PSBoundParameters['SID'])
+
         # Check Well-Known SIDs first
         if ($Variables.WellKnownSIDs.Keys.ContainsKey($PSBoundParameters['SID'])) {
 
             Write-Verbose -Message ('
-                Resolved SID {0}
+                        Resolved SID: {0}
                 from Well-Known SIDs: {1}' -f
                 $Sid, $Variables.WellKnownSIDs[$PSBoundParameters['SID']]
             )
-            return $Variables.WellKnownSIDs[$Sid]
+            $FoundName = $Variables.WellKnownSIDs[$Sid]
 
-        } #end If
+        } else {
 
-        # Fallback to dynamic resolution
-        try {
+            # Fallback to dynamic resolution
+            try {
 
-            # Attempt to translate the SID to a name
-            $SecurityIdentifier = [Security.Principal.SecurityIdentifier]::New($PSBoundParameters['SID'])
+                # Attempt to translate the SID to a name
+                $SecurityIdentifier = [Security.Principal.SecurityIdentifier]::New($PSBoundParameters['SID'])
 
-            # Get the account name based on SID
-            $FoundName = ($SecurityIdentifier.Translate([Security.Principal.NTAccount])).Value
+                # Get the account name based on SID
+                $FoundName = ($SecurityIdentifier.Translate([Security.Principal.NTAccount])).Value
 
-            Write-Verbose -Message ('
-                Converted SID {0}
-                to account name: {1}' -f
-                $Sid, $objUser.Value
-            )
+                Write-Verbose -Message ('
+                    Successfully converted SID {0}
+                    to account name: {1}' -f
+                    $Sid, $objUser.Value
+                )
 
-        } catch [System.Security.Principal.IdentityNotMappedException] {
+            } catch [System.Security.Principal.IdentityNotMappedException] {
 
-            Write-Warning 'Identity Not Mapped Exception. The SID could not be translated to an account name.'
-            $FoundName = $null
+                Write-Warning -Message 'Identity Not Mapped Exception. The SID could not be translated to an account name.'
+                $FoundName = $null
 
-        } catch {
-            Write-Error -Message ('
-                An unexpected error occurred while converting SID
-                SID: {0}
-                {1}' -f
-                $PSBoundParameters['SID'], $_
-            )
+            } catch {
+                Write-Error -Message ('
+                    An unexpected error occurred while converting SID
+                    SID: {0}
+                    {1}' -f
+                    $PSBoundParameters['SID'], $_
+                )
 
-            $FoundName = $null
-        }#end Try-Catch
+                $FoundName = $null
+            }#end Try-Catch
+
+        } #end If-Else
 
     } #end Process
 

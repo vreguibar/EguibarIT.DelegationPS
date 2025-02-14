@@ -1,4 +1,4 @@
-﻿function ConvertTo-SID {
+﻿function Convert-NameToSID {
     <#
         .SYNOPSIS
             Converts an account name to a Security Identifier (SID).
@@ -12,7 +12,8 @@
             domain\username or just username for local accounts.
 
         .EXAMPLE
-            PS C:\> ConvertTo-SID -AccountName "EguibarIT\davade"
+            Convert-NameToSID -AccountName "EguibarIT\davade"
+            'S-1-5-21-3623811015-3361044348-30300820-1013'
 
         .INPUTS
             [string] - Account name.
@@ -57,10 +58,12 @@
 
             Write-Verbose -Message ('Converting {0} to SID.' -f $AccountName)
 
-            return [System.Security.Principal.SecurityIdentifier]::new($AccountName.SID.Value)
+            If ($AccountName) {
 
-            Write-Verbose -Message ('Successfully converted {0} to SID: {1}.' -f $AccountName, $sid)
+                return [System.Security.Principal.SecurityIdentifier]::new($AccountName.SID.Value)
 
+                Write-Verbose -Message ('Successfully converted {0} to SID: {1}.' -f $AccountName, $sid)
+            } # end If
         } catch {
             Write-Error -Message ('Failed to convert {0} to SID. Error: {1}' -f $AccountName, $_.Exception.Message)
             #Get-ErrorDetail -ErrorRecord $_

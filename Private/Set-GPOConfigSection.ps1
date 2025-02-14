@@ -170,7 +170,7 @@
 
                         try {
                             # Call function to resolve SID
-                            $resolvedAccount = ConvertTo-AccountName -SID $sid
+                            $resolvedAccount = Convert-SidToName -SID $sid
                         } catch {
                             $txt = [System.Text.StringBuilder]::new()
                             [void]$txt.AppendLine($Constants.NL)
@@ -223,7 +223,7 @@
                         if ($adObject) {
                             $sid = $adObject.SID.Value
                         } else {
-                            $sid = Test-NameIsWellKnownSid -Name $member
+                            $sid = (Test-NameIsWellKnownSid -Name $member).value
                         } #end If-Else
 
                     } #end If-Else
