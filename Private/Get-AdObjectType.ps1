@@ -51,12 +51,12 @@
         Microsoft.ActiveDirectory.Management.ADServiceAccount
 
     .NOTES
-        Version:         1.4
-            DateModified:    14/Feb/2025
-            LasModifiedBy:   Vicente Rodriguez Eguibar
-                vicente@eguibar.com
-                Eguibar Information Technology S.L.
-                http://www.eguibarit.com
+        Version:         1.5
+        DateModified:    14/Feb/2025
+        LastModifiedBy:  Vicente Rodriguez Eguibar
+                    vicente@eguibar.com
+                    Eguibar Information Technology S.L.
+                    http://www.eguibarit.com
     #>
 
     [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'low')]
@@ -112,6 +112,7 @@
 
                 Write-Verbose -Message ('Identity is an AD object of type: {0}' -f $Identity.GetType().Name)
                 $ReturnValue = $Identity
+
             } elseif ($Identity -is [string]) {
                 # Check if identity is a string
 
@@ -135,15 +136,22 @@
 
                 if ($wellKnownSid) {
                     Write-Verbose -Message ('
-                        Identity {0} is a Well-Known SID: {1}' -f $Identity, $wellKnownSid)
+                        Identity {0} is a Well-Known SID: {1}
+                        ' -f $Identity, $wellKnownSid
+                    )
 
                     try {
+
                         # Attempt to create a SecurityIdentifier object
                         $ReturnValue = [System.Security.Principal.SecurityIdentifier]::New($wellKnownSid)
+
                     } catch {
+
                         # Fallback to returning the SID as a string
                         $ReturnValue = $wellKnownSid
+
                     } #end try-catch
+                    
                 } else {
                     # Resolve identity using AD queries
 

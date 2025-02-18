@@ -86,6 +86,7 @@
             Position = 2)]
         [AllowNull()]
         [AllowEmptyString()]
+        [string[]]
         $Members,
 
         [Parameter(Mandatory = $true,
@@ -117,183 +118,131 @@
     } #end Begin
 
     Process {
+
         try {
-
-            # Ensure Members is always an array
-            if ($null -eq $Members -or ($Members.Count -eq 1 -and [string]::IsNullOrEmpty($Members[0]))) {
+            # Ensure Members is an array with at least an empty string if null
+            if (-not $Members -or ($Members.Count -eq 1 -and [string]::IsNullOrEmpty($Members[0]))) {
                 $Members = @([string]::Empty)
-            } elseif ($Members -isnot [System.Collections.IEnumerable]) {
-                $Members = @($Members)
-            }
+            } #end if
 
-            # Check if the key exists
+            # Ensure section exists
+            if (-not $GptTmpl.SectionExists($CurrentSection)) {
+
+                Write-Verbose -Message ('
+                    Creating missing section: {0}
+                    ' -f $CurrentSection
+                )
+                $GptTmpl.AddSection($CurrentSection)
+            } #end if
+
+            # Retrieve existing key value
             $currentValue = $GptTmpl.GetKeyValue($CurrentSection, $CurrentKey)
 
-            if ([string]::IsNullOrEmpty($currentValue)) {
-
-                Write-Verbose -Message ('
-                    Key {0} not found in
-                    section {1}.
-                    Creating new key.' -f
-                    $CurrentKey, $CurrentSection
-                )
-
+            $existingMembers = if ($currentValue) {
+                $currentValue.TrimEnd(',').Split(',', [StringSplitOptions]::RemoveEmptyEntries)
             } else {
-                Write-Verbose -Message ('
-                    Key {0} found in
-                    section {1}.
-                    Processing existing members.' -f
-                    $CurrentKey, $CurrentSection
-                )
+                @()
+            } #end if
 
-                # Process existing members
+            # Process existing members
+            foreach ($member in $existingMembers) {
 
-                # get value, separate it by comma and remove empty
-                $existingMembers = $currentValue.TrimEnd(',').Split(',', [StringSplitOptions]::RemoveEmptyEntries)
+                # remove heading '*'
+                $sid = $member.TrimStart('*')
 
-                if (
-                    ($existingMembers.Count -eq 1) -and
-                    [string]::IsNullOrEmpty($existingMembers[0])
-                ) {
+                try {
+                    # Check account SID
+                    $resolvedAccount = Convert-SidToName -SID $sid
 
-                    Write-Verbose -Message 'Existing value is a single null string.'
+                    if ($resolvedAccount) {
 
-                } else {
+                        [void]$resolvedMembers.Add('*{0}' -f $sid)
+                        Write-Verbose -Message ('
+                            Existing member resolved: {0}
+                            SID: {1}
+                            ' -f $resolvedAccount[0], $sid
+                        )
 
-                    # Iterate all existing members
-                    foreach ($member in $existingMembers) {
+                    } #end if
 
-                        $resolvedAccount = $null
+                } catch {
+                    Write-Warning -Message ('Failed to resolve SID: {0}. It may not exist anymore.' -f $sid)
+                } #end try-catch
 
-                        #remove * prefix from member
-                        $sid = $member.TrimStart('*')
-
-                        try {
-                            # Call function to resolve SID
-                            $resolvedAccount = Convert-SidToName -SID $sid
-                        } catch {
-                            $txt = [System.Text.StringBuilder]::new()
-                            [void]$txt.AppendLine($Constants.NL)
-                            [void]$txt.AppendLine('Failed to resolve new member with SID: {0}' -f $sid)
-                            [void]$txt.AppendLine('Item might not be added to the corresponding section. Please verify it!')
-                            [void]$txt.AppendLine($Constants.NL)
-                            Write-Warning -Message $txt
-                            ##Get-ErrorDetail -ErrorRecord $_
-                        } #end Try-Catch
-
-                        if ($resolvedAccount) {
-                            [void]$resolvedMembers.Add('*{0}' -f $sid)
-                            Write-Verbose ('
-                                Resolved existing member: {0}
-                                                     SID: {1}' -f
-                                $resolvedAccount[0], $sid
-                            )
-                        } #end If
-                    } #end Foreach
-                } #end If-Else
-            } #end If-Else
+            } #end foreach
 
             # Process new members
-            if (
-                ($null -eq $Members) -or
-                (($Members.Count -eq 1) -and [string]::IsNullOrEmpty($Members[0]))
-            ) {
-                Write-Verbose -Message 'New members parameter is null or a single null string.'
-
-                $resolvedMembers.Clear()
-                [void]$resolvedMembers.Add( [string]::Empty )
-
-            }
-            #iterate all new members
             foreach ($member in $Members) {
 
                 if (-not [string]::IsNullOrWhiteSpace($member)) {
 
-                    # Handle Distinguished Names (DNs)
-                    if ($member -match '^cn=') {
-                        $groupName = ($member -split ',')[0] -replace '^cn=', ''
-                        $adObject = Get-ADGroup -Identity $groupName -ErrorAction Stop
-                        $sid = $adObject.SID.Value
-                    } else {
+                    try {
+                        # check AD object type and retrieve object SID
+                        $CurrentMember = Get-AdObjectType -Identity $member
 
-                        # Resolve SID to AD Identity
-                        #$sid = Resolve-MemberIdentity -Member $member
-                        $ReturnedMember = Get-AdObjectType -Identity $member
+                        if ($CurrentMember -is [string]) {
 
-                        if ($adObject) {
-                            $sid = $adObject.SID.Value
+                            # Already a SID
+                            $sid = $CurrentMember
+
+                        } elseif ($CurrentMember.PSObject.Properties['Value']) {
+
+                            # Extract SID from object
+                            $sid = $CurrentMember.Value
+
                         } else {
-                            $sid = (Test-NameIsWellKnownSid -Name $member).value
-                        } #end If-Else
 
-                    } #end If-Else
+                            Write-Error -Message ('
+                                Unexpected return type from Get-AdObjectType: {0}
+                                ' -f $CurrentMember.GetType().Name
+                            )
 
-                    if ($sid) {
+                        } #end if-elseif-else
 
-                        [void]$resolvedMembers.Add('*{0}' -f $sid)
-                        Write-Verbose ('
-                                Resolved new member: {0}
-                                                SID: {1}' -f
-                            $member, $sid
-                        )
+                        if ($sid) {
 
-                    } else {
-                        $txt = [System.Text.StringBuilder]::new()
-                        [void]$txt.AppendLine($Constants.NL)
-                        [void]$txt.AppendLine('Failed to resolve new member: {0}' -f $member)
-                        [void]$txt.AppendLine('Item might not be added to the corresponding section. Please verify it!')
-                        [void]$txt.AppendLine($Constants.NL)
-                        Write-Warning -Message $txt
-                        ##Get-ErrorDetail -ErrorRecord $_
-                    } #end If-Else
+                            [void]$resolvedMembers.Add('*{0}' -f $sid)
+                            Write-Verbose -Message ('
+                                New member resolved: {0}
+                                SID: {1}
+                                ' -f $member, $sid
+                            )
 
-                } #end If
+                        } #end If
+                    } catch {
+                        Write-Warning -Message ('Failed to resolve new member: {0}' -f $member)
+                    } #end try-catch
+
+                } #end if
 
             } #end Foreach
 
-            # Convert resolved members to string
-            $updatedValue = if (
-                ($resolvedMembers.Count -eq 1) -and
-                ($null -eq $resolvedMembers[0])
-            ) {
-
-                # add empty string
+            # Prepare the final string for GptTmpl
+            $finalValue = if ($resolvedMembers.Count -eq 1 -and [string]::IsNullOrEmpty($resolvedMembers[0])) {
                 [string]::Empty
-
             } else {
+                ($resolvedMembers -join ',').TrimEnd(',')
+            } #end if
 
-                # Join all members to a comma limited string
-                ($resolvedMembers | Sort-Object) -join ','
+            # Update the GPO template
+            if ($PSCmdlet.ShouldProcess("$CurrentSection -> $CurrentKey", 'Updating GptTmpl')) {
+                $GptTmpl.SetKeyValue($CurrentSection, $CurrentKey, $finalValue)
+            } #end if
 
-            } #end If-Else
-
-            # remove unwanted characters from the end.
-            $updatedValue = $updatedValue.TrimEnd(',. ')
-
-            if ($PSCmdlet.ShouldProcess("$CurrentKey in section $CurrentSection", 'Updating key value')) {
-
-                # Update the GPT template
-                $GptTmpl.SetKeyValue($CurrentSection, $CurrentKey, $updatedValue)
-
-                Write-Verbose -Message ('
-                    Updated key {0}
-                    in section {1}
-                    with value: {2}' -f
-                    $CurrentKey, $CurrentSection, $updatedValue
-                )
-
-            } else {
-                Write-Verbose -Message 'Skipping update due to WhatIf condition'
-            }
+            Write-Verbose -Message ('
+                GPO section updated
+                Current Section: {0}
+                Current Key: {1}
+                Value: {2}
+                ' -f $CurrentSection, $CurrentKey, $finalValue
+            )
 
         } catch {
-            Write-Error -Message ('
-                Failed to update key {0} in section {1}.
-                {2}' -f
-                $CurrentKey, $CurrentSection, $_
-            )
-            ##Get-ErrorDetail -ErrorRecord $_
-        } #end Try-Catch
+
+            Write-Error -Message ('An error occurred while processing {0}: {1}' -f $CurrentKey, $_)
+
+        } #end try-catch
+
     } #end Process
 
     End {

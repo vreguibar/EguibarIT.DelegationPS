@@ -1198,8 +1198,16 @@
                     $GptTmpl = Set-GPOConfigSection @Splat
 
                 } Catch {
-                    Write-Error -Message ('Something went wrong. {0}' -f $_)
-                    ##Get-ErrorDetail -ErrorRecord $_
+
+                    Write-Error -Message ('
+                        Something went wrong while trying to update Key-Value pairs (before Set-GPOConfigSection).
+                        Section: {0}
+                        Key: {1}
+                        Members: {2}
+                        {3}
+                        ' -f $Rights.Section, $Rights.Key, $Rights.members, $_
+                    )
+
                 } #end Try-Catch
 
             } #end If

@@ -29,8 +29,8 @@
                 Get-ADRootDSE                          | ActiveDirectory
                 Get-ADObject                           | ActiveDirectory
 
-            Version:         1.1
-            DateModified:    14/Mar/2024
+            Version:         1.2
+            DateModified:    17/Feb/2025
             LastModifiedBy:  Vicente Rodriguez Eguibar
                 vicente@eguibar.com
                 Eguibar Information Technology S.L.
@@ -79,14 +79,14 @@
         Write-Verbose -Message ('Attempting to convert SID: {0} to account name' -f $PSBoundParameters['SID'])
 
         # Check Well-Known SIDs first
-        if ($Variables.WellKnownSIDs.Keys.ContainsKey($PSBoundParameters['SID'])) {
+        if ($Variables.WellKnownSIDs.Contains($PSBoundParameters['SID'])) {
 
             Write-Verbose -Message ('
                         Resolved SID: {0}
                 from Well-Known SIDs: {1}' -f
-                $Sid, $Variables.WellKnownSIDs[$PSBoundParameters['SID']]
+                $SID, $Variables.WellKnownSIDs[$PSBoundParameters['SID']]
             )
-            $FoundName = $Variables.WellKnownSIDs[$Sid]
+            $FoundName = $Variables.WellKnownSIDs[$SID]
 
         } else {
 
@@ -101,8 +101,9 @@
 
                 Write-Verbose -Message ('
                     Successfully converted SID {0}
-                    to account name: {1}' -f
-                    $Sid, $objUser.Value
+                    to account name: {1}
+                    ' -f
+                    $SID, $FoundName
                 )
 
             } catch [System.Security.Principal.IdentityNotMappedException] {
