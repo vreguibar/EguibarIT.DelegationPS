@@ -84,6 +84,9 @@
     )
 
     Begin {
+
+        Set-StrictMode -Version Latest
+
         $txt = ($Variables.HeaderHousekeeping -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
@@ -151,7 +154,7 @@
                         $ReturnValue = $wellKnownSid
 
                     } #end try-catch
-                    
+
                 } else {
                     # Resolve identity using AD queries
 

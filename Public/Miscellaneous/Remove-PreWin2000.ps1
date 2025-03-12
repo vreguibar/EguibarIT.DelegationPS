@@ -40,6 +40,8 @@
 
     begin {
 
+        Set-StrictMode -Version Latest
+
         $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
@@ -55,7 +57,7 @@
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
         # Get 'Pre-Windows 2000 Compatible Access' group by SID
-        $PreWin2000 = Get-AdGroup -Filter * | Where-Object { $_.SID -like 'S-1-5-32-554' }
+        $PreWin2000 = Get-ADGroup -Filter * | Where-Object { $_.SID -like 'S-1-5-32-554' }
 
     } #end Begin
 

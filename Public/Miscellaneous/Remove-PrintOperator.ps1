@@ -41,6 +41,8 @@
 
     begin {
 
+        Set-StrictMode -Version Latest
+
         $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
@@ -57,7 +59,7 @@
 
 
         # Get 'Print Operators' group by SID
-        $PrintOperators = Get-AdGroup -Filter * | Where-Object { $_.SID -like 'S-1-5-32-550' }
+        $PrintOperators = Get-ADGroup -Filter * | Where-Object { $_.SID -like 'S-1-5-32-550' }
 
 
         # $Variables.GuidMap is empty. Call function to fill it up

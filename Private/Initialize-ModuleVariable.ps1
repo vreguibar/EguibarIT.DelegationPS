@@ -31,6 +31,8 @@
 
     Begin {
 
+        Set-StrictMode -Version Latest
+
         ##############################
         # Module imports
         Import-Module 'ActiveDirectory' -Force -Verbose:$false | Out-Null

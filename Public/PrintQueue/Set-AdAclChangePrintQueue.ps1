@@ -69,6 +69,8 @@ function Set-AdAclChangePrintQueue {
 
     Begin {
 
+        Set-StrictMode -Version Latest
+
         $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,

@@ -41,6 +41,8 @@ Function Remove-AuthUser {
 
     Begin {
 
+        Set-StrictMode -Version Latest
+
         $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
@@ -56,7 +58,7 @@ Function Remove-AuthUser {
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
         # Get 'Authenticated Users' group by SID
-        $AuthenticatedUsers = Get-AdGroup -Filter * | Where-Object { $_.SID -like 'S-1-5-11' }
+        $AuthenticatedUsers = Get-ADGroup -Filter * | Where-Object { $_.SID -like 'S-1-5-11' }
 
     } #end Begin
 

@@ -131,6 +131,9 @@
     )
 
     Begin {
+
+        Set-StrictMode -Version Latest
+
         $txt = ($Variables.Header -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,

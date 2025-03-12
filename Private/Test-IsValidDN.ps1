@@ -47,6 +47,8 @@
 
     Begin {
 
+        Set-StrictMode -Version Latest
+
         ##############################
         # Module imports
         # Initialize a boolean variable to store validation result

@@ -132,6 +132,8 @@
 
     Begin {
 
+        Set-StrictMode -Version Latest
+
         $ErrorActionPreference = 'Stop'
 
         [hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)

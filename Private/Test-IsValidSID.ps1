@@ -60,6 +60,8 @@
 
     Begin {
 
+        Set-StrictMode -Version Latest
+
         ##############################
         # Module imports
 

@@ -72,6 +72,8 @@
 
     Begin {
 
+        Set-StrictMode -Version Latest
+
         $error.clear()
 
         $txt = ($Variables.HeaderDelegation -f

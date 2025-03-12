@@ -119,6 +119,9 @@
     )
 
     Begin {
+
+        Set-StrictMode -Version Latest
+
         $txt = ($Variables.HeaderHousekeeping -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,

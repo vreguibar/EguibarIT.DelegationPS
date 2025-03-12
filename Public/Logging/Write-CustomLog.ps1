@@ -178,6 +178,9 @@
     )
 
     Begin {
+
+        Set-StrictMode -Version Latest
+
         $ErrorActionPreference = 'Stop'
 
         # Mask sensitive data

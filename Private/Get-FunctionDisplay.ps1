@@ -46,6 +46,7 @@
     )
 
     Begin {
+        Set-StrictMode -Version Latest
     } # end Begin
 
     Process {

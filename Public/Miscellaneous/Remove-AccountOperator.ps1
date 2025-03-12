@@ -41,6 +41,8 @@ Function Remove-AccountOperator {
 
     begin {
 
+        Set-StrictMode -Version Latest
+
         $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
@@ -56,7 +58,7 @@ Function Remove-AccountOperator {
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
         # Get 'Account Operators' group by SID
-        $AccountOperators = Get-AdGroup -Filter * | Where-Object { $_.SID -like 'S-1-5-32-548' }
+        $AccountOperators = Get-ADGroup -Filter * | Where-Object { $_.SID -like 'S-1-5-32-548' }
 
     } #end Begin
 
