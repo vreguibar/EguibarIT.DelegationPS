@@ -1,29 +1,47 @@
 ﻿function Test-IsValidSID {
     <#
         .SYNOPSIS
-            Cmdlet will check if the input string is a valid SID.
+            Validates if the given input is a valid SID.
 
         .DESCRIPTION
-            Cmdlet will check if the input string is a valid SID.
-
-            Cmdlet is intended as a diagnostic tool for input validation
+            This function checks if an input is a syntactically valid Security Identifier (SID).
+            Additionally, it verifies if the SID exists within a predefined hashtable of well-known SIDs.
 
         .PARAMETER ObjectSID
             A string representing the object Security Identifier (SID).
 
         .EXAMPLE
-            Test-IsValidDN -ObjectSID 'S-1-5-21-2562450185-1914323539-512974444-1234'
+            Test-IsValidSID -ObjectSID 'S-1-5-21-2562450185-1914323539-512974444-1234'
+            Returns: True or False
+
+        .EXAMPLE
+            'S-1-5-18' | Test-SIDValidity
+            Returns: True (since it matches the well-known SYSTEM SID)
+
+        .OUTPUTS
+            [bool] - Returns $true if the SID is valid, otherwise returns $false.
 
         .NOTES
-            https://pscustomobject.github.io/powershell/howto/identity%20management/PowerShell-Check-If-String-Is-A-DN/
-            Version:         1.0
-            DateModified:    08/Oct/2021
+            Used Functions:
+                Name                                 ║ Module/Namespace
+                ═════════════════════════════════════╬════════════════════════════════════════
+                Get-ADObject                         ║ ActiveDirectory
+
+        .NOTES
+            Version:         1.1
+            DateModified:    12/Mar/2025
             LasModifiedBy:   Vicente Rodriguez Eguibar
                 vicente@eguibar.com
                 Eguibar Information Technology S.L.
                 http://www.eguibarit.com
+
+        .LINK
+            https://pscustomobject.github.io/powershell/howto/identity%20management/PowerShell-Check-If-String-Is-A-DN/
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Test-IsValidSID.ps1
     #>
-    [CmdletBinding(ConfirmImpact = 'Low', SupportsShouldProcess = $false)]
+    [CmdletBinding(ConfirmImpact = 'Low', SupportsShouldProcess = $true)]
     [OutputType([bool])]
 
     param
@@ -60,49 +78,53 @@
     } #end Begin
 
     Process {
-        # try RegEx
-        Try {
 
-            #if ($Variables.WellKnownSIDs -Contains $ObjectSID) {
-            If ($Variables.WellKnownSIDs.Keys.Contains($ObjectSID)) {
+        if ($PSCmdlet.ShouldProcess($ObjectSID, 'Validate SID format and existence')) {
 
-                Write-Verbose -Message ('The SID {0} is a WellKnownSid.' -f $ObjectSID)
-                $isValid = $true
+            # try RegEx
+            Try {
 
-            } elseIf ($ObjectSID -match $Constants.SidRegEx) {
+                #if ($Variables.WellKnownSIDs -Contains $ObjectSID) {
+                If ($Variables.WellKnownSIDs.Keys.Contains($ObjectSID)) {
 
-                Write-Verbose -Message ('The SID {0} is valid.' -f $ObjectSID)
-                $isValid = $true
+                    Write-Verbose -Message ('The SID {0} is a WellKnownSid.' -f $ObjectSID)
+                    $isValid = $true
 
-            } else {
+                } elseIf ($ObjectSID -match $Constants.SidRegEx) {
 
-                Write-Verbose -Message ('[WARNING] The SID {0} is NOT valid!.' -f $ObjectSID)
-                $isValid = $false
+                    Write-Verbose -Message ('The SID {0} is valid.' -f $ObjectSID)
+                    $isValid = $true
 
-            } #end If-Else
-        } catch {
-            # Handle exceptions gracefully
-            Write-Error -Message ('An error occurred when validating the SID: {0}' -f $_)
-            ##Get-ErrorDetail -ErrorRecord $_
-        } #end Try-Catch
+                } else {
 
-        <#
-        # try Native SID
-        Try {
-            # Perform the actual validation
-            [System.Security.Principal.SecurityIdentifier]$sid = $Sid
-            $isValid = $True
+                    Write-Verbose -Message ('[WARNING] The SID {0} is NOT valid!.' -f $ObjectSID)
+                    $isValid = $false
 
-            # Provide verbose output
-            if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
-                Write-Verbose "objectSID validation result by [SecurityIdentifier]: $isValid"
-            } #end If
+                } #end If-Else
+            } catch {
+                # Handle exceptions gracefully
+                Write-Error -Message ('An error occurred when validating the SID: {0}' -f $_)
+                ##Get-ErrorDetail -ErrorRecord $_
+            } #end Try-Catch
 
-        } catch {
-            # Handle exceptions gracefully
-            Write-Error "An error occurred on [SecurityIdentifier] comparison: $_"
-        } #end Try-Catch
-         #>
+            <#
+                # try Native SID
+                Try {
+                    # Perform the actual validation
+                    [System.Security.Principal.SecurityIdentifier]$sid = $Sid
+                    $isValid = $True
+
+                    # Provide verbose output
+                    if ($PSCmdlet.MyInvocation.BoundParameters['Verbose']) {
+                        Write-Verbose "objectSID validation result by [SecurityIdentifier]: $isValid"
+                    } #end If
+
+                } catch {
+                    # Handle exceptions gracefully
+                    Write-Error "An error occurred on [SecurityIdentifier] comparison: $_"
+                } #end Try-Catch
+            #>
+        } #end If
     } #end Process
 
     end {

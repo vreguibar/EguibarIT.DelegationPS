@@ -145,33 +145,44 @@
             } #end if
 
             # Process existing members
-            foreach ($member in $existingMembers) {
+            if ($existingMembers -and $existingMembers.Count -gt 0) {
+                foreach ($member in $existingMembers) {
 
-                # remove heading '*'
-                $sid = $member.TrimStart('*')
+                    # remove heading '*'
+                    $sid = $member.TrimStart('*')
 
-                try {
-                    # Check account SID
-                    $resolvedAccount = Convert-SidToName -SID $sid
+                    try {
+                        # Check account SID
+                        $resolvedAccount = Convert-SidToName -SID $sid
 
-                    if ($resolvedAccount) {
+                        if ($resolvedAccount) {
 
-                        [void]$resolvedMembers.Add('*{0}' -f $sid)
-                        Write-Verbose -Message ('
-                            Existing member resolved: {0}
-                            SID: {1}
-                            ' -f $resolvedAccount[0], $sid
+                            [void]$resolvedMembers.Add('*{0}' -f $sid)
+
+                            Write-Verbose -Message ('
+                                Existing member resolved: {0}
+                                SID: {1}
+                                ' -f $resolvedAccount[0], $sid
+                            )
+
+                        } else {
+                            Write-Warning -Message ('
+                                Could not resolve existing SID: {0}.
+                                It may not exist anymore.' -f $sid
+                            )
+                        } #end if-else
+
+                    } catch {
+                        Write-Warning -Message ('
+                            Failed to resolve SID: {0}.
+                            Error: {1}' -f $sid, $_.Exception.Message
                         )
-
-                    } #end if
-
-                } catch {
-                    Write-Warning -Message ('Failed to resolve SID: {0}. It may not exist anymore.' -f $sid)
-                } #end try-catch
-
-            } #end foreach
+                    } #end try-catch
+                } #end foreach
+            } #end if
 
             # Process new members
+            Write-Verbose -Message ('Processing {0} new members' -f $Members.Count)
             foreach ($member in $Members) {
 
                 if (-not [string]::IsNullOrWhiteSpace($member)) {
@@ -180,37 +191,81 @@
                         # check AD object type and retrieve object SID
                         $CurrentMember = Get-AdObjectType -Identity $member
 
-                        if ($CurrentMember -is [string]) {
+                        # Extract SID based on type
+                        $sid = $null
 
-                            # Already a SID
+                        if ($null -eq $CurrentMember) {
+
+                            Write-Warning -Message ('Could not resolve member: {0}' -f $member)
+                            continue
+
+                        } elseif ($CurrentMember -is [string]) {
+
+                            # Already a SID string
                             $sid = $CurrentMember
+                            Write-Verbose -Message ('Member {0} is a SID string: {1}' -f $member, $sid)
 
-                        } elseif ($CurrentMember.PSObject.Properties['Value']) {
+                        } elseif ($CurrentMember -is [System.Security.Principal.SecurityIdentifier]) {
 
-                            # Extract SID from object
+                            # SecurityIdentifier object
                             $sid = $CurrentMember.Value
+                            Write-Verbose -Message ('Member {0} is a SecurityIdentifier object with value: {1}' -f $member, $sid)
+
+                        } elseif ($CurrentMember -is [Microsoft.ActiveDirectory.Management.ADObject] -or
+                            $CurrentMember -is [Microsoft.ActiveDirectory.Management.ADAccount] -or
+                            $CurrentMember -is [Microsoft.ActiveDirectory.Management.ADComputer] -or
+                            $CurrentMember -is [Microsoft.ActiveDirectory.Management.ADGroup] -or
+                            $CurrentMember -is [Microsoft.ActiveDirectory.Management.ADOrganizationalUnit] -or
+                            $CurrentMember -is [Microsoft.ActiveDirectory.Management.ADServiceAccount]) {
+
+                            # Any AD object type
+                            $sid = $CurrentMember.SID.Value
+                            Write-Verbose -Message ('Member {0} is an AD object with SID: {1}' -f $member, $sid)
 
                         } else {
 
-                            Write-Error -Message ('
-                                Unexpected return type from Get-AdObjectType: {0}
-                                ' -f $CurrentMember.GetType().Name
-                            )
+                            # Try to extract value property if it exists
+                            if ($CurrentMember.PSObject.Properties['SID']) {
 
-                        } #end if-elseif-else
+                                if ($CurrentMember.SID -is [System.Security.Principal.SecurityIdentifier]) {
+                                    $sid = $CurrentMember.SID.Value
+                                } else {
+                                    $sid = $CurrentMember.SID
+                                }
+
+                                Write-Verbose -Message ('Member {0} has SID property: {1}' -f $member, $sid)
+
+                            } elseif ($CurrentMember.PSObject.Properties['Value']) {
+                                $sid = $CurrentMember.Value
+
+                                Write-Verbose -Message ('Member {0} has Value property: {1}' -f $member, $sid)
+
+                            } else {
+
+                                Write-Warning -Message ('Unexpected return type from Get-AdObjectType: {0}, cannot extract SID' -f $CurrentMember.GetType().FullName)
+                                continue
+                            } #end If-ElseIf-Else
+                        } #end If-ElseIf-ElseIf-ElseIf-Else
 
                         if ($sid) {
 
                             [void]$resolvedMembers.Add('*{0}' -f $sid)
+
                             Write-Verbose -Message ('
                                 New member resolved: {0}
                                 SID: {1}
                                 ' -f $member, $sid
                             )
 
-                        } #end If
+                        } else {
+
+                            Write-Warning -Message ('Could not extract SID for member: {0}' -f $member)
+
+                        } #end If-else
+
                     } catch {
-                        Write-Warning -Message ('Failed to resolve new member: {0}' -f $member)
+                        Write-Warning -Message ('Failed to resolve new member: {0}, Error: {1}' -f $member, $_.Exception.Message)
+                        Write-Verbose -Message ('Stack trace: {0}' -f $_.Exception.StackTrace)
                     } #end try-catch
 
                 } #end if
@@ -227,19 +282,20 @@
             # Update the GPO template
             if ($PSCmdlet.ShouldProcess("$CurrentSection -> $CurrentKey", 'Updating GptTmpl')) {
                 $GptTmpl.SetKeyValue($CurrentSection, $CurrentKey, $finalValue)
-            } #end if
 
-            Write-Verbose -Message ('
+                Write-Verbose -Message ('
                 GPO section updated
                 Current Section: {0}
                 Current Key: {1}
                 Value: {2}
                 ' -f $CurrentSection, $CurrentKey, $finalValue
-            )
+                )
 
+            } #end if
         } catch {
 
-            Write-Error -Message ('An error occurred while processing {0}: {1}' -f $CurrentKey, $_)
+            Write-Error -Message ('An error occurred while processing {0}: {1}' -f $CurrentKey, $_.Exception.Message)
+            Write-Verbose -Message ('Stack trace: {0}' -f $_.Exception.StackTrace)
 
         } #end try-catch
 
