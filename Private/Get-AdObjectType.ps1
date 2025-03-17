@@ -51,12 +51,29 @@
         Microsoft.ActiveDirectory.Management.ADServiceAccount
 
     .NOTES
-        Version:         1.5
-        DateModified:    14/Feb/2025
+        Required modules/prerequisites:
+        - Windows PowerShell 5.1 or PowerShell 7+
+        - Active Directory module
+
+        Used Functions:
+            Name                                       ║ Module/Namespace
+            ═══════════════════════════════════════════╬══════════════════════════════
+            Write-Verbose                              ║ Microsoft.PowerShell.Utility
+            Write-Warning                              ║ Microsoft.PowerShell.Utility
+            Write-Error                                ║ Microsoft.PowerShell.Utility
+            Get-ADObject                               ║ ActiveDirectory
+            Get-ADUser                                 ║ ActiveDirectory
+            Get-ADGroup                                ║ ActiveDirectory
+            Get-ADComputer                             ║ ActiveDirectory
+            Get-ADOrganizationalUnit                   ║ ActiveDirectory
+            Get-ADServiceAccount                       ║ ActiveDirectory
+
+        Version:         1.6
+        DateModified:    13/Mar/2025
         LastModifiedBy:  Vicente Rodriguez Eguibar
-                    vicente@eguibar.com
-                    Eguibar Information Technology S.L.
-                    http://www.eguibarit.com
+            vicente@eguibar.com
+            Eguibar Information Technology S.L.
+            http://www.eguibarit.com
     #>
 
     [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'low')]
@@ -76,7 +93,7 @@
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             ValueFromRemainingArguments = $false,
-            HelpMessage = 'Identity of the object',
+            HelpMessage = 'Specify the identity of the AD object.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [Alias('ID', 'SamAccountName', 'DistinguishedName', 'DN', 'SID', 'GUID')]
@@ -87,7 +104,7 @@
 
         Set-StrictMode -Version Latest
 
-        $txt = ($Variables.HeaderHousekeeping -f
+        $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
             (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
@@ -102,12 +119,14 @@
         ##############################
         # Variables Definition
 
-        $ReturnValue = $null
-        $newObject = $null
+        [object]$ReturnValue = $null
+        [object]$NewObject = $null
 
     } # End Begin Section
 
     Process {
+
+        Write-Verbose -Message ('Attempting to determine the type of AD object for identity: {0}' -f $Identity)
 
         try {
             # Check if identity is an AD object
@@ -124,7 +143,7 @@
                 # Check if it's a Well-Known SID (by SID or name)
                 $wellKnownSid = $null
 
-                if ($Variables.WellKnownSIDs.Keys -contains $Identity) {
+                if ($Variables.WellKnownSIDs.Contains($Identity)) {
 
                     # Input is a Well-Known SID (e.g., "S-1-1-0")
                     $wellKnownSid = $Identity
@@ -222,7 +241,7 @@
     } # End Process Section
 
     End {
-        $txt = ($Variables.FooterHousekeeping -f $MyInvocation.InvocationName,
+        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
             'getting AD object type (Private Function).'
         )
         Write-Verbose -Message $txt

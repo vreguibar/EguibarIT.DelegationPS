@@ -36,7 +36,12 @@ Function Remove-AccountOperator {
         [ValidateScript({ Test-IsValidDN -ObjectDN $_ }, ErrorMessage = 'DistinguishedName provided is not valid! Please Check.')]
         [Alias('DN', 'DistinguishedName')]
         [String]
-        $LDAPpath
+        $LDAPpath,
+
+        [Parameter(Mandatory = $false,
+            HelpMessage = 'Force the operation without confirmation.')]
+        [switch]
+        $Force
     )
 
     begin {

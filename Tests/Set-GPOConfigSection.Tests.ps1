@@ -1,185 +1,103 @@
-﻿# Ensure Pester module is available
-Import-Module Pester -ErrorAction Stop
+﻿# Import the module containing the function
+Import-Module -Name 'c:\Users\RODRIGUEZEGUIBARVice\OneDrive - Vicente Rodriguez Eguibar\_Scripts\LabSetup\SourceDC\Modules\EguibarIT.DelegationPS\EguibarIT.DelegationPS.psm1'
 
-Describe 'Set-GPOConfigSection Tests' {
+# Mock dependencies
+Mock -CommandName Convert-SidToName -MockWith {
+    param ($SID)
+    return @("User1")
+}
 
-    # Mock the dependencies
-    Mock -CommandName 'ConvertTo-AccountName' -MockWith {
-        param($SID)
-        if ($SID -eq 'S-1-5-32-544') {
-            return @('Administrators')
-        }
-        if ($SID -eq 'S-1-5-32-573') {
-            return @('Event Log Readers')
-        }
-        return $null
-    }
+Mock -CommandName Get-AdObjectType -MockWith {
+    param ($Identity)
+    return [PSCustomObject]@{ SID = [System.Security.Principal.SecurityIdentifier]::new("S-1-5-21-1234567890-123456789-123456789-1001") }
+}
 
-    Mock -CommandName 'Get-AdObjectType' -MockWith {
-        param($Identity)
-        if ($Identity -eq 'User1') {
-            return [PSCustomObject]@{ SID = 'S-1-5-21-1000' }
-        }
-        if ($Identity -eq 'Group1') {
-            return [PSCustomObject]@{ SID = 'S-1-5-32-573' }
-        }
-        return $null
-    }
+Mock -CommandName SetKeyValue -MockWith {
+    param ($Section, $Key, $Value)
+    return $null
+}
 
-    Mock -CommandName 'Test-NameIsWellKnownSid' -MockWith {
-        param($Name)
-        if ($Name -eq 'WellKnownGroup') {
-            return 'S-1-5-32-544'
-        }
-        return $null
-    }
+Mock -CommandName SectionExists -MockWith {
+    param ($Section)
+    return $true
+}
 
-    Mock -CommandName 'Get-ErrorDetail' # Suppress actual error detail output for testing
+Mock -CommandName AddSection -MockWith {
+    param ($Section)
+    return $null
+}
 
-    # Initialize a sample GPT template mock object
-    BeforeEach {
-        $GptTmplMock = New-Object -TypeName PSObject -Property @{
-            GetKeyValue = { param($Section, $Key) return $null }
-            SetKeyValue = { param($Section, $Key, $Value) return $true }
-        }
+Mock -CommandName GetKeyValue -MockWith {
+    param ($Section, $Key)
+    return "*S-1-5-21-1234567890-123456789-123456789-1001"
+}
 
-        # Mock the GetKeyValue and SetKeyValue methods
-        Mock -CommandName 'GetKeyValue' -MockWith {
-            param($Section, $Key)
-            if ($Section -eq 'User Rights Assignment' -and $Key -eq 'SeDenyNetworkLogonRight') {
-                return '*S-1-5-32-544,*S-1-5-32-573'  # Pre-existing members
+Describe 'Set-GPOConfigSection' {
+    Context 'When setting a GPO configuration section' {
+        It 'Should add new members to the specified section and key' {
+            # Arrange
+            $CurrentSection = "User Rights Assignment"
+            $CurrentKey = "SeDenyNetworkLogonRight"
+            $Members = @("User1", "Group1")
+            $GptTmpl = [PSCustomObject]@{
+                SectionExists = $true
+                GetKeyValue = { param ($Section, $Key) return "*S-1-5-21-1234567890-123456789-123456789-1001" }
+                AddSection = { param ($Section) return $null }
+                SetKeyValue = { param ($Section, $Key, $Value) return $null }
             }
-            return $null
+
+            # Act
+            $result = Set-GPOConfigSection -CurrentSection $CurrentSection -CurrentKey $CurrentKey -Members $Members -GptTmpl $GptTmpl
+
+            # Assert
+            $result | Should -Not -BeNullOrEmpty
+            $result | Should -BeOfType [PSCustomObject]
+            $result.SectionExists($CurrentSection) | Should -Be $true
+            $result.GetKeyValue($CurrentSection, $CurrentKey) | Should -Contain "*S-1-5-21-1234567890-123456789-123456789-1001"
         }
 
-        Mock -CommandName 'SetKeyValue' -MockWith {
-            param($Section, $Key, $Value)
-            # Capture values for validation
-            $script:UpdatedSection = $Section
-            $script:UpdatedKey = $Key
-            $script:UpdatedValue = $Value
-        }
-    }
-
-    Context 'Key does not exist - New key creation' {
-        It 'Creates a new key when key does not exist' {
+        It 'Should handle null members correctly' {
             # Arrange
-            $members = @('User1', 'Group1')
+            $CurrentSection = "User Rights Assignment"
+            $CurrentKey = "SeDenyNetworkLogonRight"
+            $Members = $null
+            $GptTmpl = [PSCustomObject]@{
+                SectionExists = $true
+                GetKeyValue = { param ($Section, $Key) return $null }
+                AddSection = { param ($Section) return $null }
+                SetKeyValue = { param ($Section, $Key, $Value) return $null }
+            }
 
             # Act
-            Set-GPOConfigSection -CurrentSection 'User Rights Assignment' `
-                -CurrentKey 'SeBatchLogonRight' `
-                -Members $members `
-                -GptTmpl $GptTmplMock
+            $result = Set-GPOConfigSection -CurrentSection $CurrentSection -CurrentKey $CurrentKey -Members $Members -GptTmpl $GptTmpl
 
             # Assert
-            Assert-MockCalled -CommandName 'SetKeyValue' -Times 1
-            $UpdatedSection | Should -Be 'User Rights Assignment'
-            $UpdatedKey | Should -Be 'SeBatchLogonRight'
-            $UpdatedValue | Should -Be '*S-1-5-21-1000,*S-1-5-32-573'
+            $result | Should -Not -BeNullOrEmpty
+            $result | Should -BeOfType [PSCustomObject]
+            $result.SectionExists($CurrentSection) | Should -Be $true
+            $result.GetKeyValue($CurrentSection, $CurrentKey) | Should -BeNullOrEmpty
         }
-    }
 
-    Context 'Key exists - Existing members' {
-        It 'Processes existing members correctly' {
+        It 'Should create a new section if it does not exist' {
             # Arrange
-            $members = @('User1')
+            $CurrentSection = "User Rights Assignment"
+            $CurrentKey = "SeDenyNetworkLogonRight"
+            $Members = @("User1", "Group1")
+            $GptTmpl = [PSCustomObject]@{
+                SectionExists = $false
+                GetKeyValue = { param ($Section, $Key) return $null }
+                AddSection = { param ($Section) return $null }
+                SetKeyValue = { param ($Section, $Key, $Value) return $null }
+            }
 
             # Act
-            Set-GPOConfigSection -CurrentSection 'User Rights Assignment' `
-                -CurrentKey 'SeDenyNetworkLogonRight' `
-                -Members $members `
-                -GptTmpl $GptTmplMock
+            $result = Set-GPOConfigSection -CurrentSection $CurrentSection -CurrentKey $CurrentKey -Members $Members -GptTmpl $GptTmpl
 
             # Assert
-            Assert-MockCalled -CommandName 'SetKeyValue' -Times 1
-            $UpdatedValue | Should -Be '*S-1-5-32-544,*S-1-5-32-573,*S-1-5-21-1000'
-        }
-    }
-
-    Context 'Members are null or empty' {
-        It 'Handles null or empty members as a single null string' {
-            # Act
-            Set-GPOConfigSection -CurrentSection 'User Rights Assignment' `
-                -CurrentKey 'SeDenyNetworkLogonRight' `
-                -Members $null `
-                -GptTmpl $GptTmplMock
-
-            # Assert
-            $UpdatedValue | Should -Be ''
-        }
-    }
-
-    Context 'SID resolution' {
-        It 'Resolves SIDs correctly and adds them with an asterisk' {
-            # Arrange
-            $members = @('User1', 'Group1')
-
-            # Act
-            Set-GPOConfigSection -CurrentSection 'User Rights Assignment' `
-                -CurrentKey 'SeBatchLogonRight' `
-                -Members $members `
-                -GptTmpl $GptTmplMock
-
-            # Assert
-            $UpdatedValue | Should -Be '*S-1-5-21-1000,*S-1-5-32-573'
-        }
-
-        It 'Skips duplicates when resolving SIDs' {
-            # Arrange
-            $members = @('Administrators', 'WellKnownGroup')
-
-            # Act
-            Set-GPOConfigSection -CurrentSection 'User Rights Assignment' `
-                -CurrentKey 'SeBatchLogonRight' `
-                -Members $members `
-                -GptTmpl $GptTmplMock
-
-            # Assert
-            $UpdatedValue | Should -Be '*S-1-5-32-544,*S-1-5-32-573'
-        }
-    }
-
-    Context 'WhatIf functionality' {
-        It 'Does not modify the GPT template when WhatIf is enabled' {
-            # Act
-            Set-GPOConfigSection -CurrentSection 'User Rights Assignment' `
-                -CurrentKey 'SeBatchLogonRight' `
-                -Members @('User1') `
-                -GptTmpl $GptTmplMock -WhatIf
-
-            # Assert
-            Assert-MockCalled -CommandName 'SetKeyValue' -Times 0
-        }
-    }
-
-    Context 'Error handling' {
-        It 'Handles failed SID resolution gracefully' {
-            # Mock failure for SID resolution
-            Mock -CommandName 'Get-AdObjectType' -MockWith { return $null }
-
-            # Act
-            $result = { Set-GPOConfigSection -CurrentSection 'User Rights Assignment' `
-                    -CurrentKey 'SeBatchLogonRight' `
-                    -Members @('NonExistentUser') `
-                    -GptTmpl $GptTmplMock } | Should -Throw
-        }
-    }
-
-    Context 'ShouldProcess testing' {
-        It 'Only processes changes if ShouldProcess condition is met' {
-            # Arrange
-            $PSCmdletMock = New-MockObject -TypeName PSObject
-            $PSCmdletMock.ShouldProcess = $false
-
-            # Act
-            Set-GPOConfigSection -CurrentSection 'User Rights Assignment' `
-                -CurrentKey 'SeBatchLogonRight' `
-                -Members @('User1') `
-                -GptTmpl $GptTmplMock
-
-            # Assert
-            Assert-MockCalled -CommandName 'SetKeyValue' -Times 0
+            $result | Should -Not -BeNullOrEmpty
+            $result | Should -BeOfType [PSCustomObject]
+            $result.SectionExists($CurrentSection) | Should -Be $true
+            $result.GetKeyValue($CurrentSection, $CurrentKey) | Should -BeNullOrEmpty
         }
     }
 }

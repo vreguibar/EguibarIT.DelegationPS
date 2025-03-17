@@ -27,6 +27,7 @@ Sources/packages/*
 Lib/Default/*
 Lib/Standard/*
 Lib/Core/*
+Public/GPO/Test-GpoPrivilegeRights.ps1
 # Local History for Visual Studio Code
 .history/
 # Built Visual Studio Code Extensions

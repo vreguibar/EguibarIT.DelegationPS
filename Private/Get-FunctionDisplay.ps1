@@ -66,7 +66,6 @@
             $display = 'No PsBoundParameters to display.'
         } #end If
         $display += $Constants.NL
-        $display += $Constants.NL
 
     } # end Process
 

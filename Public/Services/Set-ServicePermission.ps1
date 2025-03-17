@@ -122,7 +122,7 @@
 
         Set-StrictMode -Version Latest
 
-        $txt = ($Variables.HeaderHousekeeping -f
+        $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
             (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
@@ -363,7 +363,7 @@
     } #end Process
 
     End {
-        $txt = ($Variables.FooterHousekeeping -f $MyInvocation.InvocationName,
+        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
             'setting permissions on service.'
         )
         Write-Verbose -Message $txt

@@ -52,8 +52,8 @@
                 System.Security.Principal.NTAccount          ║ .NET Framework
                 System.Security.Principal.SecurityIdentifier ║ .NET Framework
 
-            Version:         1.3
-            DateModified:    12/Mar/2025
+            Version:         1.4
+            DateModified:    13/Mar/2025
             LastModifiedBy:  Vicente Rodriguez Eguibar
                 vicente@eguibar.com
                 Eguibar Information Technology S.L.
@@ -105,6 +105,7 @@
 
         [System.Security.Principal.SecurityIdentifier]$SecurityIdentifier = $null
         [System.Security.Principal.NTAccount]$NTAccount = $null
+        [System.Collections.Hashtable]$Cache = @{}
 
     } #end Begin
 
@@ -127,7 +128,7 @@
                   ($SID.SID -is [System.Security.Principal.SecurityIdentifier] -or
                    ($SID.SID -is [string] -and
                    ((Test-IsValidSID -ObjectSID $SID.SID) -or
-                $WellKnownSIDs.Keys.Contains($SID.SID))))) {
+                $Variables.WellKnownSIDs.Contains($SID.SID))))) {
                 # Check if it's a pipeline object with SID property
 
                 if ($SID.SID -is [System.Security.Principal.SecurityIdentifier]) {
@@ -138,7 +139,7 @@
 
                 } else {
 
-                    if ($WellKnownSIDs.Keys.Contains($SID.SID)) {
+                    if ($Variables.WellKnownSIDs.Contains($SID.SID)) {
 
                         $isValid = $true
                         Write-Verbose -Message 'SID from property is a Well-Known SID'
@@ -156,7 +157,7 @@
             } elseif ($SID -is [string]) {
                 # Check if it's a string SID
 
-                if ($WellKnownSIDs.Keys.Contains($SID)) {
+                if ($Variables.WellKnownSIDs.Contains($SID)) {
 
                     $isValid = $true
                     Write-Verbose -Message 'Input is a Well-Known SID string'
@@ -176,37 +177,50 @@
 
             } #end If
 
-            # Proceed with conversion based on validation result
-            # First check if it's a Well-Known SID in our hashtable
-            if ($SID -is [string] -and $WellKnownSIDs.Keys.Contains($SID)) {
+            # Check cache first
+            if ($Cache.Contains($SID)) {
 
-                Write-Verbose -Message ('Resolving Well-Known SID: {0} from predefined list' -f $SID)
+                Write-Verbose -Message ('SID found in cache: {0}' -f $SID)
+                $NTAccount = $Cache[$SID]
 
-                # Use .NET to ensure proper object is returned
-                $SecurityIdentifier = [System.Security.Principal.SecurityIdentifier]::new($SID)
+            } else {
 
-            } elseif ($SID -is [string] -and -not $SecurityIdentifier) {
-                # If it's a string but not in our Well-Known list, convert to SecurityIdentifier
+                # Proceed with conversion based on validation result
+                # First check if it's a Well-Known SID in our hashtable
+                if ($Variables.WellKnownSIDs.Contains($SID)) {
 
-                Write-Verbose -Message ('Converting string SID to SecurityIdentifier object: {0}' -f $SID)
-                $SecurityIdentifier = [System.Security.Principal.SecurityIdentifier]::new($SID)
+                    Write-Verbose -Message ('Resolving Well-Known SID: {0} from predefined list' -f $SID)
+                    $NTAccount = $Variables.WellKnownSIDs[$SID]
 
-            } #end If-ElseIf
+                } else {
 
-            # Translate SID to NTAccount if ShouldProcess passes
-            $ShouldProcessMessage = 'Translate SID {0} to NT Account Name' -f $SecurityIdentifier
-            if ($PSCmdlet.ShouldProcess($SecurityIdentifier, $ShouldProcessMessage)) {
+                    # If it's not a well-known SID, proceed with translation
+                    if ($SID -is [string] -and -not $SecurityIdentifier) {
 
-                Write-Verbose -Message 'Translating SID to NTAccount'
-                $NTAccount = $SecurityIdentifier.Translate([System.Security.Principal.NTAccount])
+                        Write-Verbose -Message ('Converting string SID to SecurityIdentifier object: {0}' -f $SID)
+                        $SecurityIdentifier = [System.Security.Principal.SecurityIdentifier]::new($SID)
 
-                # Return the NTAccount object
+                    } #end If
+
+                    # Translate SID to NTAccount if ShouldProcess passes
+                    $ShouldProcessMessage = 'Translate SID {0} to NT Account Name' -f $SecurityIdentifier
+                    if ($PSCmdlet.ShouldProcess($SecurityIdentifier, $ShouldProcessMessage)) {
+
+                        Write-Verbose -Message 'Translating SID to NTAccount'
+                        $NTAccount = $SecurityIdentifier.Translate([System.Security.Principal.NTAccount])
+
+                    }
+                }
+                # Cache the result
+                $Cache[$SID] = $NTAccount
                 Write-Verbose -Message ('Successfully translated to: {0}' -f $NTAccount)
-                $NTAccount
-            }
+            } #end If-Else
+
+            $NTAccount
+
         } catch [System.Security.Principal.IdentityNotMappedException] {
 
-            Write-Warning -Message ('Identity Not Mapped Exception. The SID could not be translated to an account name: {0}' -f $SID)
+            Write-Error -Message ('Identity Not Mapped Exception. The SID could not be translated to an account name: {0}' -f $SID)
 
         } catch [System.ArgumentException] {
 
@@ -215,6 +229,7 @@
         } catch {
 
             Write-Error -Message ('An unexpected error occurred while converting SID {0}: {1}"' -f $SID, $_)
+
         } #end Try-Catch
 
     } #end Process
@@ -224,7 +239,5 @@
             'translating SID to Name (Private Function).'
         )
         Write-Verbose -Message $txt
-
-        return $FoundName
     } #end End
 }

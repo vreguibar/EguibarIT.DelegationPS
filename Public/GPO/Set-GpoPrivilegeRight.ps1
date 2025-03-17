@@ -1,19 +1,39 @@
 ﻿Function Set-GpoPrivilegeRight {
     <#
         .Synopsis
-            Set the Privileged Rights into a Group Policy Objects (MUST be executed on DomainController)
+            Modifies user rights assignments in a specified Group Policy Object (MUST be executed on DomainController)
 
         .DESCRIPTION
-            The function modifies the Privileged Rights in a Group Policy Object based on
-            the Delegation Model with Tiers. This includes setting and denying rights such
-            as "Log on as a batch job", "Log on as a service", etc.
+            The Set-GpoPrivilegeRight function allows for detailed configuration of user rights
+            assignments within a Group Policy Object. It can grant or deny various privilege rights
+            such as network logon, interactive logon, machine account creation, and backup privileges.
+
+            This function follows the Active Directory tiering model and adheres to security best practices.
+            It is designed to work in large-scale AD environments and minimizes performance overhead.
 
         .EXAMPLE
             Set-GpoPrivilegeRight -GpoToModify "Default Domain" -BatchLogon "Domain\User1","Domain\User2"
             This example assigns "Log on as a batch job" rights to User1 and User2 in the "Default Domain" GPO.
 
         .EXAMPLE
-            Set-GpoPrivilegeRight -GpoToModify "Default Domain" -NetworkLogon "SL_InfraRight"
+            Test-GpoPrivilegeRight -GpoToModify 'Domain Controllers Policy' -NetworkLogon 'DOMAIN\Domain Admins'
+
+            This command grants the "Access this computer from the network" right to the "Domain Admins" group
+            in the "Domain Controllers Policy" GPO.
+
+        .EXAMPLE
+            Test-GpoPrivilegeRight -GpoToModify 'Workstations Policy' -DenyInteractiveLogon 'DOMAIN\Remote Users'
+
+            This command denies the "Allow Log On Locally" right to the "Remote Users" group in the
+            "Workstations Policy" GPO.
+
+        .EXAMPLE
+            Test-GpoPrivilegeRight -GpoToModify 'Servers Policy' -NetworkLogon 'DOMAIN\Server Admins' -DenyNetworkLogon 'DOMAIN\Domain Users' -Backup 'DOMAIN\Backup Operators'
+
+            This command makes multiple privilege right modifications in the "Servers Policy" GPO:
+            - Grants "Access this computer from the network" to "Server Admins"
+            - Denies "Access this computer from the network" to "Domain Users"
+            - Grants "Back up files and directories" to "Backup Operators"
 
         .EXAMPLE
             $Splat = @{
@@ -64,7 +84,7 @@
             Each parameter uses an Array with members named after the parameter.
 
         .PARAMETER GpoToModify
-            [STRING] Name of the GPO which will get the Restricted Groups modification.
+            Name of the GPO which will get the Privilege Right modification.
 
         .PARAMETER NetworkLogon
             Identity (SamAccountName) to be GRANTED the right "Access this computer from the network
@@ -183,18 +203,34 @@
         .PARAMETER TakeOwnership
             Identity (SamAccountName) to configure the right "Take ownership of files or other objects".
 
-        .NOTES
-            Used Functions:
-                Name                                   | Module
-                ---------------------------------------|--------------------------
-                Get-GPO                                | Microsoft.GroupPolicy
-                Set-AclConstructor6                    | EguibarIT.DelegationPS
-                Get-AttributeSchemaHashTable           | EguibarIT.DelegationPS
-                Get-ExtendedRightHashTable             | EguibarIT.DelegationPS
+        .OUTPUTS
+            System.Void
 
         .NOTES
-            Version:         2.0
-            DateModified:    17/Jun/2024
+            Required Modules:
+            - GroupPolicy
+            - ActiveDirectory
+            - EguibarIT
+            - EguibarIT.DelegationPS
+
+           Used Functions:
+                Name                                   ║ Module/Namespace
+                ═══════════════════════════════════════╬══════════════════════════════
+                Get-GPO                                ║ Microsoft.GroupPolicy
+                Write-Verbose                          ║ Microsoft.PowerShell.Utility
+                Write-Warning                          ║ Microsoft.PowerShell.Utility
+                Write-Error                            ║ Microsoft.PowerShell.Utility
+                Enum.WellKnownSids                     ║ EguibarIT.DelegationPS
+                Convert-SidToName                      ║ EguibarIT.DelegationPS
+                Get-AdObjectType                       ║ EguibarIT.DelegationPS
+                Get-GptTemplate                        ║ EguibarIT.DelegationPS
+                Set-GPOConfigSection                   ║ EguibarIT.DelegationPS
+                Update-GpoVersion                      ║ EguibarIT.DelegationPS
+                Get-FunctionDisplay                    ║ EguibarIT.DelegationPS
+
+        .NOTES
+            Version:         2.2
+            DateModified:    14/Mar/2025
             LasModifiedBy:   Vicente Rodriguez Eguibar
                 vicente@eguibar.com
                 Eguibar Information Technology S.L.
@@ -564,7 +600,12 @@
             HelpMessage = 'Identity (SamAccountName) to configure the right "Take ownership of files or other objects".',
             Position = 39)]
         [System.Collections.Generic.List[object]]
-        $TakeOwnership
+        $TakeOwnership,
+
+        [Parameter(Mandatory = $false,
+            HelpMessage = 'Force the operation without confirmation.')]
+        [switch]
+        $Force
 
     )
 
@@ -587,6 +628,8 @@
 
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
         $ArrayList = [System.Collections.Generic.List[object]]::New()
+
+
 
         $CurrentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent()
 
@@ -620,6 +663,9 @@
                 .PARAMETER Members
                     A list of members (objects) that will be associated with the given privilege right.
 
+                .PARAMETER Description
+                    A description of the privilege right for verbose logging.
+
                 .EXAMPLE
                     Add-Right -Key 'SeBackupPrivilege' -Members @('Domain\Admins', 'Local\Backup Operators')
             #>
@@ -629,6 +675,7 @@
             param (
 
                 [Parameter(Mandatory = $true)]
+                [ValidateNotNullOrEmpty()]
                 [string]
                 $Key,
 
@@ -637,21 +684,39 @@
                 [AllowEmptyString()]
                 [AllowEmptyCollection()]
                 [System.Collections.Generic.List[object]]
-                $Members
+                $Members,
+
+                [Parameter(Mandatory = $false)]
+                [string]
+                $Description = ''
             )
 
             [Hashtable]$TmpHash = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
-            #if ($PSCmdlet.ShouldProcess($Key, "Assign $Description")) {
+            # Ensure Members is always a collection
+            if ($null -eq $Members) {
+
+                $MembersList = [System.Collections.Generic.List[object]]::New()
+
+            } elseif ($Members -is [string]) {
+
+                #$MembersList = @($Members)
+                $MembersList.AddRange($Members)
+
+            } else {
+
+                $MembersList = $Members
+
+            } #end If-ElseIf-Else
+
             $TmpHash = @{
-                iniContent = $iniContent
-                Section    = 'Privilege Rights'
-                Key        = $Key
-                Members    = $Members
-                #Description = $Description
+                Section     = 'Privilege Rights'
+                Key         = $Key
+                Members     = $MembersList
+                Description = $Description
             }
             [void]$ArrayList.Add($TmpHash)
-            #}
+
         } #end Function Add-Right
 
 
@@ -660,20 +725,32 @@
 
 
         # Verify that given GPO exists.
-        $Gpo = Get-GPO -Name $PSBoundParameters['GpoToModify'] -ErrorAction SilentlyContinue
-        if (-not $Gpo) {
-            throw "GPO '$GpoToModify' does not exist."
-        }
+        try {
+            $Gpo = Get-GPO -Name $PSBoundParameters['GpoToModify'] -ErrorAction Stop
 
+        } catch {
 
+            $ErrorMessage = 'GPO "{0}" does not exist or cannot be accessed.' -f $GpoToModify
+            Write-Error -Message $ErrorMessage
+            throw $ErrorMessage
+        } #end Try/Catch
 
 
         # Get the GptTmpl.inf content and store it in variable
-        $GptTmpl = Get-GptTemplate -GpoName $PSBoundParameters['GpoToModify']
+        try {
 
-        if (($null -eq $GptTmpl) -or ($GptTmpl -isnot [IniFileHandler.IniFile])) {
-            throw 'Failed to get a valid IniFileHandler.IniFile object from Get-GptTemplate'
-        } #end If
+            $GptTmpl = Get-GptTemplate -GpoName $PSBoundParameters['GpoToModify']
+
+            if (($null -eq $GptTmpl) -or ($GptTmpl -isnot [IniFileHandler.IniFile])) {
+                throw 'Failed to get a valid IniFileHandler.IniFile object from Get-GptTemplate'
+            } #end If
+
+        } catch {
+
+            $ErrorMessage = 'Failed to retrieve GptTmpl.inf from GPO ''{0}'': {1}' -f $GpoToModify, $_.Exception.Message
+            Write-Error -Message $ErrorMessage
+            throw $ErrorMessage
+        } #end Try/Catch
 
         # Check GPT does contains default sections ([Unicode] and [Version])
         If ( -not (($GptTmpl.SectionExists('Version')) -and
@@ -705,41 +782,41 @@
 
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/access-credential-manager-as-a-trusted-caller
         $Splat = @{
-            Key     = 'SeTrustedCredManAccessPrivilege'
-            Members = [string]::Empty
-            #Description = 'Access Credential Manager as a trusted caller'
+            Key         = 'SeTrustedCredManAccessPrivilege'
+            Members     = [string]::Empty
+            Description = 'Access Credential Manager as a trusted caller'
         }
         Add-Right @Splat
 
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/act-as-part-of-the-operating-system
         $Splat = @{
-            Key     = 'SeTcbPrivilege'
-            Members = [string]::Empty
-            #Description = 'Act as part of the operating system'
+            Key         = 'SeTcbPrivilege'
+            Members     = [string]::Empty
+            Description = 'Act as part of the operating system'
         }
         Add-Right @Splat
 
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/create-a-token-object
         $Splat = @{
-            Key     = 'SeCreateTokenPrivilege'
-            Members = [string]::Empty
-            #Description = 'Create a token object'
+            Key         = 'SeCreateTokenPrivilege'
+            Members     = [string]::Empty
+            Description = 'Create a token object'
         }
         Add-Right @Splat
 
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/create-permanent-shared-objects
         $Splat = @{
-            Key     = 'SeCreatePermanentPrivilege'
-            Members = [string]::Empty
-            #Description = 'Create permanent shared objects'
+            Key         = 'SeCreatePermanentPrivilege'
+            Members     = [string]::Empty
+            Description = 'Create permanent shared objects'
         }
         Add-Right @Splat
 
         # https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/debug-programs
         $Splat = @{
-            Key     = 'SeDebugPrivilege'
-            Members = [string]::Empty
-            #Description = 'Debug Programs'
+            Key         = 'SeDebugPrivilege'
+            Members     = [string]::Empty
+            Description = 'Debug Programs'
         }
         Add-Right @Splat
 
@@ -747,7 +824,7 @@
         $Splat = @{
             Key     = 'SeLockMemoryPrivilege'
             Members = [string]::Empty
-            ##Description = 'Lock pages in memory'
+            #Description = 'Lock pages in memory'
         }
         Add-Right @Splat
 
@@ -767,8 +844,9 @@
         if ($PSBoundParameters.ContainsKey('NetworkLogon')) {
             Write-Verbose -Message 'GRANTING "Access this computer from the network" right...'
             $Splat = @{
-                Key     = 'SeNetworkLogonRight'
-                Members = $NetworkLogon
+                Key         = 'SeNetworkLogonRight'
+                Members     = $NetworkLogon
+                Description = 'Access this computer from the network'
             }
             Add-Right @Splat
         } #end If
@@ -776,9 +854,9 @@
         # DENY NetworkLogon
         If ($PSBoundParameters.ContainsKey('DenyNetworkLogon')) {
             $Splat = @{
-                Key     = 'SeDenyNetworkLogonRight'
-                Members = $DenyNetworkLogon
-                #Description = 'Deny access to this computer from the network'
+                Key         = 'SeDenyNetworkLogonRight'
+                Members     = $DenyNetworkLogon
+                Description = 'Deny access to this computer from the network'
             }
             Add-Right @Splat
         } #end If
@@ -786,9 +864,9 @@
         # InteractiveLogon
         If ($PSBoundParameters.ContainsKey('InteractiveLogon')) {
             $Splat = @{
-                Key     = 'SeInteractiveLogonRight'
-                Members = $InteractiveLogon
-                #Description = 'Allow log on locally'
+                Key         = 'SeInteractiveLogonRight'
+                Members     = $InteractiveLogon
+                Description = 'Allow log on locally'
             }
             Add-Right @Splat
         } #end If
@@ -796,9 +874,9 @@
         # DENY InteractiveLogon
         If ($PSBoundParameters.ContainsKey('DenyInteractiveLogon')) {
             $Splat = @{
-                Key     = 'SeDenyInteractiveLogonRight'
-                Members = $DenyInteractiveLogon
-                #Description = 'Deny log on locally'
+                Key         = 'SeDenyInteractiveLogonRight'
+                Members     = $DenyInteractiveLogon
+                Description = 'Deny log on locally'
             }
             Add-Right @Splat
         } #end If
@@ -806,9 +884,9 @@
         # RemoteInteractiveLogon (RDP)
         If ($PSBoundParameters.ContainsKey('RemoteInteractiveLogon')) {
             $Splat = @{
-                Key     = 'SeRemoteInteractiveLogonRight'
-                Members = $RemoteInteractiveLogon
-                #Description = 'Allow log on through Remote Desktop Services'
+                Key         = 'SeRemoteInteractiveLogonRight'
+                Members     = $RemoteInteractiveLogon
+                Description = 'Allow log on through Remote Desktop Services'
             }
             Add-Right @Splat
         } #end If
@@ -816,9 +894,9 @@
         # DENY RemoteInteractiveLogon (RDP)
         If ($PSBoundParameters.ContainsKey('DenyRemoteInteractiveLogon')) {
             $Splat = @{
-                Key     = 'SeDenyRemoteInteractiveLogonRight'
-                Members = $DenyRemoteInteractiveLogon
-                #Description = 'Deny log on through Remote Desktop Services'
+                Key         = 'SeDenyRemoteInteractiveLogonRight'
+                Members     = $DenyRemoteInteractiveLogon
+                Description = 'Deny log on through Remote Desktop Services'
             }
             Add-Right @Splat
         } #end If
@@ -826,9 +904,9 @@
         # BatchLogon
         If ($PSBoundParameters.ContainsKey('BatchLogon')) {
             $Splat = @{
-                Key     = 'SeBatchLogonRight'
-                Members = $BatchLogon
-                #Description = 'Log on as a batch job'
+                Key         = 'SeBatchLogonRight'
+                Members     = $BatchLogon
+                Description = 'Log on as a batch job'
             }
             Add-Right @Splat
         } #end If
@@ -836,9 +914,9 @@
         # DENY BatchLogon
         If ($PSBoundParameters.ContainsKey('DenyBatchLogon')) {
             $Splat = @{
-                Key     = 'SeDenyBatchLogonRight'
-                Members = $DenyBatchLogon
-                #Description = 'Deny log on as a batch job'
+                Key         = 'SeDenyBatchLogonRight'
+                Members     = $DenyBatchLogon
+                Description = 'Deny log on as a batch job'
             }
             Add-Right @Splat
         } #end If
@@ -846,9 +924,9 @@
         # ServiceLogon
         If ($PSBoundParameters.ContainsKey('ServiceLogon')) {
             $Splat = @{
-                Key     = 'SeServiceLogonRight'
-                Members = $ServiceLogon
-                #Description = 'Log on as a service'
+                Key         = 'SeServiceLogonRight'
+                Members     = $ServiceLogon
+                Description = 'Log on as a service'
             }
             Add-Right @Splat
         } #end If
@@ -856,9 +934,9 @@
         # DENY ServiceLogon
         If ($PSBoundParameters.ContainsKey('DenyServiceLogon')) {
             $Splat = @{
-                Key     = 'SeDenyServiceLogonRight'
-                Members = $DenyServiceLogon
-                #Description = 'Deny log on as a service'
+                Key         = 'SeDenyServiceLogonRight'
+                Members     = $DenyServiceLogon
+                Description = 'Deny log on as a service'
             }
             Add-Right @Splat
         } #end If
@@ -876,9 +954,9 @@
         # Add workstations to domain
         If ($PSBoundParameters.ContainsKey('MachineAccount')) {
             $Splat = @{
-                Key     = 'SeMachineAccountPrivilege'
-                Members = $MachineAccount
-                #Description = 'Add workstations to domain'
+                Key         = 'SeMachineAccountPrivilege'
+                Members     = $MachineAccount
+                Description = 'Add workstations to domain'
             }
             Add-Right @Splat
         } #end If
@@ -886,9 +964,9 @@
         # Adjust memory quotas for a process
         If ($PSBoundParameters.ContainsKey('IncreaseQuota')) {
             $Splat = @{
-                Key     = 'SeIncreaseQuotaPrivilege'
-                Members = $IncreaseQuota
-                #Description = 'Adjust memory quotas for a process'
+                Key         = 'SeIncreaseQuotaPrivilege'
+                Members     = $IncreaseQuota
+                Description = 'Adjust memory quotas for a process'
             }
             Add-Right @Splat
         } #end If
@@ -896,9 +974,9 @@
         # Back up files and directories
         If ($PSBoundParameters.ContainsKey('Backup')) {
             $Splat = @{
-                Key     = 'SeBackupPrivilege'
-                Members = $Backup
-                #Description = 'Back up files and directories'
+                Key         = 'SeBackupPrivilege'
+                Members     = $Backup
+                Description = 'Back up files and directories'
             }
             Add-Right @Splat
         } #end If
@@ -906,9 +984,9 @@
         # Bypass traverse checking
         If ($PSBoundParameters.ContainsKey('ChangeNotify')) {
             $Splat = @{
-                Key     = 'SeChangeNotifyPrivilege'
-                Members = $ChangeNotify
-                #Description = 'Bypass traverse checking'
+                Key         = 'SeChangeNotifyPrivilege'
+                Members     = $ChangeNotify
+                Description = 'Bypass traverse checking'
             }
             Add-Right @Splat
         } #end If
@@ -916,9 +994,9 @@
         # Change the system time
         If ($PSBoundParameters.ContainsKey('Systemtime')) {
             $Splat = @{
-                Key     = 'SeSystemtimePrivilege'
-                Members = $Systemtime
-                #Description = 'Change the system time'
+                Key         = 'SeSystemtimePrivilege'
+                Members     = $Systemtime
+                Description = 'Change the system time'
             }
             Add-Right @Splat
         } #end If
@@ -926,9 +1004,9 @@
         # Change the time zone
         If ($PSBoundParameters.ContainsKey('TimeZone')) {
             $Splat = @{
-                Key     = 'SeTimeZonePrivilege'
-                Members = $TimeZone
-                #Description = 'Change the time zone'
+                Key         = 'SeTimeZonePrivilege'
+                Members     = $TimeZone
+                Description = 'Change the time zone'
             }
             Add-Right @Splat
         } #end If
@@ -936,9 +1014,9 @@
         # Create a pagefile
         If ($PSBoundParameters.ContainsKey('CreatePagefile')) {
             $Splat = @{
-                Key     = 'SeCreatePagefilePrivilege'
-                Members = $CreatePagefile
-                #Description = 'Create a pagefile'
+                Key         = 'SeCreatePagefilePrivilege'
+                Members     = $CreatePagefile
+                Description = 'Create a pagefile'
             }
             Add-Right @Splat
         } #end If
@@ -946,9 +1024,9 @@
         # Create global objects
         If ($PSBoundParameters.ContainsKey('CreateGlobal')) {
             $Splat = @{
-                Key     = 'SeCreateGlobalPrivilege'
-                Members = $CreateGlobal
-                #Description = 'Create global objects'
+                Key         = 'SeCreateGlobalPrivilege'
+                Members     = $CreateGlobal
+                Description = 'Create global objects'
             }
             Add-Right @Splat
         } #end If
@@ -956,9 +1034,9 @@
         # Create symbolic links
         If ($PSBoundParameters.ContainsKey('CreateSymbolicLink')) {
             $Splat = @{
-                Key     = 'SeCreateSymbolicLinkPrivilege'
-                Members = $CreateSymbolicLink
-                #Description = 'Create symbolic links'
+                Key         = 'SeCreateSymbolicLinkPrivilege'
+                Members     = $CreateSymbolicLink
+                Description = 'Create symbolic links'
             }
             Add-Right @Splat
         } #end If
@@ -966,9 +1044,9 @@
         # Enable computer and user accounts to be trusted for delegation
         If ($PSBoundParameters.ContainsKey('EnableDelegation')) {
             $Splat = @{
-                Key     = 'SeEnableDelegationPrivilege'
-                Members = $EnableDelegation
-                #Description = 'Enable computer and user accounts to be trusted for delegation'
+                Key         = 'SeEnableDelegationPrivilege'
+                Members     = $EnableDelegation
+                Description = 'Enable computer and user accounts to be trusted for delegation'
             }
             Add-Right @Splat
         } #end If
@@ -976,9 +1054,9 @@
         # Force shutdown from a remote system
         If ($PSBoundParameters.ContainsKey('RemoteShutdown')) {
             $Splat = @{
-                Key     = 'SeRemoteShutdownPrivilege'
-                Members = $RemoteShutdown
-                #Description = 'Force shutdown from a remote system'
+                Key         = 'SeRemoteShutdownPrivilege'
+                Members     = $RemoteShutdown
+                Description = 'Force shutdown from a remote system'
             }
             Add-Right @Splat
         } #end If
@@ -986,9 +1064,9 @@
         # Generate security audits
         If ($PSBoundParameters.ContainsKey('Audit')) {
             $Splat = @{
-                Key     = 'SeAuditPrivilege'
-                Members = $Audit
-                #Description = 'Generate security audits'
+                Key         = 'SeAuditPrivilege'
+                Members     = $Audit
+                Description = 'Generate security audits'
             }
             Add-Right @Splat
         } #end If
@@ -996,9 +1074,9 @@
         # Impersonate a client after authentication
         If ($PSBoundParameters.ContainsKey('Impersonate')) {
             $Splat = @{
-                Key     = 'SeImpersonatePrivilege'
-                Members = $Impersonate
-                #Description = 'Impersonate a client after authentication'
+                Key         = 'SeImpersonatePrivilege'
+                Members     = $Impersonate
+                Description = 'Impersonate a client after authentication'
             }
             Add-Right @Splat
         } #end If
@@ -1006,9 +1084,9 @@
         # Increase a process working set
         If ($PSBoundParameters.ContainsKey('IncreaseWorkingSet')) {
             $Splat = @{
-                Key     = 'SeIncreaseWorkingSetPrivilege'
-                Members = $IncreaseWorkingSet
-                #Description = 'Increase a process working set'
+                Key         = 'SeIncreaseWorkingSetPrivilege'
+                Members     = $IncreaseWorkingSet
+                Description = 'Increase a process working set'
             }
             Add-Right @Splat
         } #end If
@@ -1016,9 +1094,9 @@
         # Increase scheduling priority
         If ($PSBoundParameters.ContainsKey('IncreaseBasePriority')) {
             $Splat = @{
-                Key     = 'SeIncreaseBasePriorityPrivilege'
-                Members = $IncreaseBasePriority
-                #Description = 'Increase scheduling priority'
+                Key         = 'SeIncreaseBasePriorityPrivilege'
+                Members     = $IncreaseBasePriority
+                Description = 'Increase scheduling priority'
             }
             Add-Right @Splat
         } #end If
@@ -1026,9 +1104,9 @@
         # Load and unload device drivers
         If ($PSBoundParameters.ContainsKey('LoadDriver')) {
             $Splat = @{
-                Key     = 'SeLoadDriverPrivilege'
-                Members = $LoadDriver
-                #Description = 'Load and unload device drivers'
+                Key         = 'SeLoadDriverPrivilege'
+                Members     = $LoadDriver
+                Description = 'Load and unload device drivers'
             }
             Add-Right @Splat
         } #end If
@@ -1036,9 +1114,9 @@
         # Manage auditing and security log
         If ($PSBoundParameters.ContainsKey('AuditSecurity')) {
             $Splat = @{
-                Key     = 'SeSecurityPrivilege'
-                Members = $AuditSecurity
-                #Description = 'Manage auditing and security log'
+                Key         = 'SeSecurityPrivilege'
+                Members     = $AuditSecurity
+                Description = 'Manage auditing and security log'
             }
             Add-Right @Splat
         } #end If
@@ -1046,9 +1124,9 @@
         # Modify an object label
         If ($PSBoundParameters.ContainsKey('Relabel')) {
             $Splat = @{
-                Key     = 'SeRelabelPrivilege'
-                Members = $Relabel
-                #Description = 'Modify an object label'
+                Key         = 'SeRelabelPrivilege'
+                Members     = $Relabel
+                Description = 'Modify an object label'
             }
             Add-Right @Splat
         } #end If
@@ -1056,9 +1134,9 @@
         # Modify firmware environment values
         If ($PSBoundParameters.ContainsKey('SystemEnvironment')) {
             $Splat = @{
-                Key     = 'SeSystemEnvironmentPrivilege'
-                Members = $SystemEnvironment
-                #Description = 'Modify firmware environment values'
+                Key         = 'SeSystemEnvironmentPrivilege'
+                Members     = $SystemEnvironment
+                Description = 'Modify firmware environment values'
             }
             Add-Right @Splat
         } #end If
@@ -1066,9 +1144,9 @@
         # Obtain an impersonation token for another user in the same session
         If ($PSBoundParameters.ContainsKey('DelegateSessionUserImpersonate')) {
             $Splat = @{
-                Key     = 'SeDelegateSessionUserImpersonatePrivilege'
-                Members = $DelegateSessionUserImpersonate
-                #Description = 'Obtain an impersonation token for another user in the same session'
+                Key         = 'SeDelegateSessionUserImpersonatePrivilege'
+                Members     = $DelegateSessionUserImpersonate
+                Description = 'Obtain an impersonation token for another user in the same session'
             }
             Add-Right @Splat
         } #end If
@@ -1076,9 +1154,9 @@
         # Perform volume maintenance tasks
         If ($PSBoundParameters.ContainsKey('ManageVolume')) {
             $Splat = @{
-                Key     = 'SeManageVolumePrivilege'
-                Members = $ManageVolume
-                #Description = 'Perform volume maintenance tasks'
+                Key         = 'SeManageVolumePrivilege'
+                Members     = $ManageVolume
+                Description = 'Perform volume maintenance tasks'
             }
             Add-Right @Splat
         } #end If
@@ -1086,9 +1164,9 @@
         # Profile single process
         If ($PSBoundParameters.ContainsKey('ProfileSingleProcess')) {
             $Splat = @{
-                Key     = 'SeProfileSingleProcessPrivilege'
-                Members = $ProfileSingleProcess
-                #Description = 'Profile single process'
+                Key         = 'SeProfileSingleProcessPrivilege'
+                Members     = $ProfileSingleProcess
+                Description = 'Profile single process'
             }
             Add-Right @Splat
         } #end If
@@ -1096,9 +1174,9 @@
         # Profile system performance
         If ($PSBoundParameters.ContainsKey('SystemProfile')) {
             $Splat = @{
-                Key     = 'SeSystemProfilePrivilege'
-                Members = $SystemProfile
-                #Description = 'Profile system performance'
+                Key         = 'SeSystemProfilePrivilege'
+                Members     = $SystemProfile
+                Description = 'Profile system performance'
             }
             Add-Right @Splat
         } #end If
@@ -1106,9 +1184,9 @@
         # Remove computer from docking station
         If ($PSBoundParameters.ContainsKey('Undock')) {
             $Splat = @{
-                Key     = 'SeUndockPrivilege'
-                Members = $Undock
-                #Description = 'Remove computer from docking station'
+                Key         = 'SeUndockPrivilege'
+                Members     = $Undock
+                Description = 'Remove computer from docking station'
             }
             Add-Right @Splat
         } #end If
@@ -1116,9 +1194,9 @@
         # Replace a process level token
         If ($PSBoundParameters.ContainsKey('AssignPrimaryToken')) {
             $Splat = @{
-                Key     = 'SeAssignPrimaryTokenPrivilege'
-                Members = $AssignPrimaryToken
-                #Description = 'Replace a process level token'
+                Key         = 'SeAssignPrimaryTokenPrivilege'
+                Members     = $AssignPrimaryToken
+                Description = 'Replace a process level token'
             }
             Add-Right @Splat
         } #end If
@@ -1126,9 +1204,9 @@
         # Restore files and directories
         If ($PSBoundParameters.ContainsKey('Restore')) {
             $Splat = @{
-                Key     = 'SeRestorePrivilege'
-                Members = $Restore
-                #Description = 'Restore files and directories'
+                Key         = 'SeRestorePrivilege'
+                Members     = $Restore
+                Description = 'Restore files and directories'
             }
             Add-Right @Splat
         } #end If
@@ -1136,9 +1214,9 @@
         # Shut down the system
         If ($PSBoundParameters.ContainsKey('Shutdown')) {
             $Splat = @{
-                Key     = 'SeShutdownPrivilege'
-                Members = $Shutdown
-                #Description = 'Shut down the system'
+                Key         = 'SeShutdownPrivilege'
+                Members     = $Shutdown
+                Description = 'Shut down the system'
             }
             Add-Right @Splat
         } #end If
@@ -1146,9 +1224,9 @@
         # Synchronize directory service data
         If ($PSBoundParameters.ContainsKey('SyncAgent')) {
             $Splat = @{
-                Key     = 'SeSyncAgentPrivilege'
-                Members = $SyncAgent
-                #Description = 'Synchronize directory service data'
+                Key         = 'SeSyncAgentPrivilege'
+                Members     = $SyncAgent
+                Description = 'Synchronize directory service data'
             }
             Add-Right @Splat
         } #end If
@@ -1156,9 +1234,9 @@
         # Take ownership of files or other objects
         If ($PSBoundParameters.ContainsKey('TakeOwnership')) {
             $Splat = @{
-                Key     = 'SeTakeOwnershipPrivilege'
-                Members = $TakeOwnership
-                #Description = 'Take ownership of files or other objects'
+                Key         = 'SeTakeOwnershipPrivilege'
+                Members     = $TakeOwnership
+                Description = 'Take ownership of files or other objects'
             }
             Add-Right @Splat
         } #end If
@@ -1174,59 +1252,89 @@
 
         Foreach ($Rights in $ArrayList) {
 
-            If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], ('Delegate the permissions for "{0}"?') -f $Rights)) {
+            $RightDescription = if ($Rights.Description) {
+                $Rights.Description
+            } else {
+                $Rights.Key
+            }
 
-                # Check if [Privilege Rights] section exist. Create it if it does not exist
-                If (-not $GptTmpl.SectionExists($Rights.Section)) {
+            try {
+                if ($Force -or $PSCmdlet.ShouldProcess($GpoToModify, ('Configure privilege right: {0}' -f $RightDescription))) {
 
-                    Write-Verbose -Message ('Section "{0}" does not exist. Creating it!.' -f $Rights.Section)
-                    $GptTmpl.AddSection($Rights.Section)
+                    # Check if [Privilege Rights] section exist. Create it if it does not exist
+                    If (-not $GptTmpl.SectionExists($Rights.Section)) {
 
-                } #end If
+                        Write-Verbose -Message ('Section "{0}" does not exist. Creating it!.' -f $Rights.Section)
+                        $GptTmpl.AddSection($Rights.Section)
 
+                    } #end If
 
+                    # Ensure Members is properly formatted
+                    $MembersList = if ($null -eq $Rights.Members) {
 
-                # Add corresponding Key-Value pairs.
-                # Each pair will verify proper members are added.
-                Try {
+                        [System.Collections.Generic.List[object]]::new()
 
+                    } elseif ($Rights.Members -is [string] -or -not $Rights.Members.GetType().IsGenericType) {
+
+                        [System.Collections.Generic.List[object]]::new(@($Rights.Members))
+
+                    } else {
+
+                        [System.Collections.Generic.List[object]]::new($Rights.Members)
+
+                    }#end If-ElseIf-Else
+
+                    # Add corresponding Key-Value pairs.
+                    # Each pair will verify proper members are added.
                     $Splat = @{
                         CurrentSection = $Rights.Section
                         CurrentKey     = $Rights.Key
-                        Members        = $Rights.members
+                        Members        = $MembersList
                         GptTmpl        = $GptTmpl
                         Confirm        = $false
+                        ErrorAction    = 'Stop'
                     }
                     $GptTmpl = Set-GPOConfigSection @Splat
 
-                } Catch {
+                } #end If
+            } catch {
 
-                    Write-Error -Message ('
-                        Something went wrong while trying to update Key-Value pairs (before Set-GPOConfigSection).
-                        Section: {0}
-                        Key: {1}
-                        Members: {2}
-                        {3}
-                        ' -f $Rights.Section, $Rights.Key, $Rights.members, $_
-                    )
+                $ErrorMessage = [System.Text.StringBuilder]::new()
+                [void]$ErrorMessage.AppendLine( 'Something went wrong while trying to update Key-Value pairs.' )
+                [void]$ErrorMessage.AppendLine( '    GPO:     {0}' -f $PSBoundParameters['GpoToModify'] )
+                [void]$ErrorMessage.AppendLine( '    Section: {0}' -f $Rights.Section )
+                [void]$ErrorMessage.AppendLine( '    Key:     {0}' -f $Rights.Key )
+                [void]$ErrorMessage.AppendLine( '    Members: {0}' -f ($Rights.Members -join ', ') )
+                [void]$ErrorMessage.AppendLine( 'Error: {0}' -f $_.Exception.Message )
 
-                } #end Try-Catch
+                Write-Error -Message $ErrorMessage.ToString()
+                # Continue processing other rights, but log the error
+                continue
 
-            } #end If
+            } #end Try-Catch
         } #end Foreach
 
 
         # Save INI file
         Try {
+
             $GptTmpl.SaveFile()
-            Write-Verbose -Message ('Saving changes to GptTmpl.inf file og GPO {0}' -f $PSBoundParameters['GpoToModify'])
+            Write-Verbose -Message ('Saving changes to GptTmpl.inf file of GPO {0}' -f $PSBoundParameters['GpoToModify'])
 
         } Catch {
-            Write-Error -Message ('Something went wrong while trying to save the GptTmpl.inf file...')
-            ##Get-ErrorDetail -ErrorRecord $_
-            Throw
+
+            $ErrorMessage = 'Failed to save GptTmpl.inf file: {0}' -f $_.Exception.Message
+            Write-Error -Message $ErrorMessage
+            throw $ErrorMessage
+
         } Finally {
-            $GptTmpl.Dispose()
+
+            if ($null -ne $GptTmpl) {
+
+                $GptTmpl.Dispose()
+                Write-Verbose -Message 'Disposed GptTmpl object'
+
+            } #end If
         } #end Try-Catch-Finally
 
         # Increment Version

@@ -21,20 +21,18 @@
                         Administrators would be *S-1-5-32-544,
                         Event Log Readers would be *S-1-5-32-573,
                         Server Operators would be *S-1-5-32-549...
-
-                    full string value would be *S-1-5-32-544,*S-1-5-32-573,*S-1-5-32-549 ).
+                        full string value would be *S-1-5-32-544,*S-1-5-32-573,*S-1-5-32-549 ).
 
                 E.- Get value as array and strip prefix '*', just having pure SID.
                 F.- Iterate through all members, except if just 1 value and this is null.
-                G.- Each member or iteration has to be resolved (first remove * prefix, otherwise will throw an error), either a "normal" SID or a Well-Known SID. Having SID translated to an account to ensure that it continues to exist on ActiveDirectory. If the account is successfully translated, meaning it does exist in AD, and it can be added to the OK list with an * prefix. Skip duplicated.
+                G.- Each member or iteration has to be resolved (first remove * prefix, otherwise will throw an error), either a Well-Known SID or a "normal" SID. Excluding WellKnownSids, have SID translated to an account to ensure that it continues to exist on ActiveDirectory. If the account is successfully translated, meaning it does exist in AD, and it can be added to the OK list with an * prefix. Skip duplicated. WellKnownSids can be added directly with * prefix.
+                H.- If the account does not exist, it should be skipped and a warning should be displayed.
             4.- Key did not exist, so no values exist either. Key was created earlier.
-                A.- Get new members from Parameter Members (Tis parameter can accept $null and should be treated as a single null string)
-                B.- Each member or iteration has to be resolved, either a "normal" SID or a Well-Known SID. Having SID translated to an account to ensure that it continues to exist on ActiveDirectory. If the account is successfully translated, meaning it does exist in AD, it can be added to the OK list with an * prefix. Skip duplicated.
+                A.- Get new members from Parameter Members (This parameter can accept $null and should be treated as a single null string)
+                B.- Each member or iteration has to be resolved, either a Well-Known SID or a "normal" SID. Having SID translated to an account to ensure that it continues to exist on ActiveDirectory. If the account is successfully translated, meaning it does exist in AD, it can be added to the OK list with an * prefix. Skip duplicated. WellKnownSids can be added directly with * prefix.
             5.- Convert the arrayList to a comma-delimited string (except if nullString single instance). trim end comma, period or space.
             6. Add key and value the $GptTmpl
             7.- Return updated $GptTmpl
-
-
 
         .PARAMETER CurrentSection
              The section in the GPT template file to be configured (e.g., "Privilege Rights" or "Registry Values").
@@ -53,8 +51,36 @@
             [IniFileHandler.IniFile]
 
         .EXAMPLE
-            Set-GPOConfigSection -CurrentSection "User Rights Assignment" -CurrentKey "SeDenyNetworkLogonRight" -Members @("User1", "Group1") -GptTmpl $GptTmpl
+            Set-GPOConfigSection -CurrentSection "User Rights Assignment" -CurrentKey "SeDenyNetworkLogonRight" -Members @("TheUgly", "SG_AdAdmins") -GptTmpl $GptTmpl
 
+        .EXAMPLE
+            Set-GPOConfigSection -CurrentSection "Privilege Rights" -CurrentKey "SeAuditPrivilege" -Members @("TheGood", "SG_InfraAdmins") -GptTmpl $GptTmpl
+
+        .NOTES
+            Required modules/prerequisites:
+                - ActiveDirectory
+                - GroupPolicy
+                - EguibarIT
+                - EguibarIT.DelegationPS
+
+            Used Functions:
+                Name                                        ║ Module/Namespace
+                ════════════════════════════════════════════╬══════════════════════════════
+                Write-Verbose                               ║ Microsoft.PowerShell.Utility
+                Write-Warning                               ║ Microsoft.PowerShell.Utility
+                Write-Error                                 ║ Microsoft.PowerShell.Utility
+                Get-FunctionDisplay                         ║ EguibarIT.DelegationPS
+                Convert-SidToName                           ║ EguibarIT.DelegationPS
+                Get-AdObjectType                            ║ EguibarIT.DelegationPS
+                IniFileHandler.IniFile                      ║ EguibarIT.DelegationPS
+
+        .NOTES
+            Version:         1.2
+            DateModified:    2025-03-13
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar Information Technology S.L.
+                            http://www.eguibarit.com
     #>
 
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
@@ -73,7 +99,7 @@
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'TheKEY within given section (ex. SeAuditPrivilege or SeBatchLogonRight).',
+            HelpMessage = 'The KEY within given section (ex. SeAuditPrivilege or SeBatchLogonRight).',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
         [string]
@@ -86,7 +112,7 @@
             Position = 2)]
         [AllowNull()]
         [AllowEmptyString()]
-        [string[]]
+        [System.Collections.Generic.List[object]]
         $Members,
 
         [Parameter(Mandatory = $true,
@@ -125,13 +151,19 @@
         try {
             # Ensure Members is an array with at least an empty string if null
             if (-not $Members -or ($Members.Count -eq 1 -and [string]::IsNullOrEmpty($Members[0]))) {
-                $Members = @([string]::Empty)
-            } #end if
+
+                $Members = [System.Collections.Generic.List[object]]::new()
+                #$Members = @([string]::Empty)
+                $Members.Add([string]::Empty)
+            }
+            #elseif (-not ($Members -is [array])) {
+            #    $Members = @($Members)
+            #} #end if-else
 
             # Ensure section exists
             if (-not $GptTmpl.SectionExists($CurrentSection)) {
 
-                Write-Verbose -Message ('
+                Write-Debug -Message ('
                     Creating missing section: {0}
                     ' -f $CurrentSection
                 )
@@ -139,6 +171,7 @@
             } #end if
 
             # Retrieve existing key value
+            Write-Debug -Message 'Retrieve existing key value'
             $currentValue = $GptTmpl.GetKeyValue($CurrentSection, $CurrentKey)
 
             $existingMembers = if ($currentValue) {
@@ -149,6 +182,12 @@
 
             # Process existing members
             if ($existingMembers -and $existingMembers.Count -gt 0) {
+
+                Write-Debug -Message ('
+                    Processing {0} existing members
+                    ' -f $existingMembers.Count
+                )
+
                 foreach ($member in $existingMembers) {
 
                     # remove heading '*'
@@ -162,7 +201,7 @@
 
                             [void]$resolvedMembers.Add('*{0}' -f $sid)
 
-                            Write-Verbose -Message ('
+                            Write-Debug -Message ('
                                 Existing member resolved: {0}
                                 SID: {1}
                                 ' -f $resolvedAccount[0], $sid
@@ -176,7 +215,7 @@
                         } #end if-else
 
                     } catch {
-                        Write-Warning -Message ('
+                        Write-Error -Message ('
                             Failed to resolve SID: {0}.
                             Error: {1}' -f $sid, $_.Exception.Message
                         )
@@ -185,7 +224,7 @@
             } #end if
 
             # Process new members
-            Write-Verbose -Message ('Processing {0} new members' -f $Members.Count)
+            Write-Debug -Message ('Processing {0} new members' -f $Members.Count)
             foreach ($member in $Members) {
 
                 if (-not [string]::IsNullOrWhiteSpace($member)) {
@@ -206,13 +245,13 @@
 
                             # Already a SID string
                             $sid = $CurrentMember
-                            Write-Verbose -Message ('Member {0} is a SID string: {1}' -f $member, $sid)
+                            Write-Debug -Message ('Member {0} is a SID string: {1}' -f $member, $sid)
 
                         } elseif ($CurrentMember -is [System.Security.Principal.SecurityIdentifier]) {
 
                             # SecurityIdentifier object
                             $sid = $CurrentMember.Value
-                            Write-Verbose -Message ('Member {0} is a SecurityIdentifier object with value: {1}' -f $member, $sid)
+                            Write-Debug -Message ('Member {0} is a SecurityIdentifier object with value: {1}' -f $member, $sid)
 
                         } elseif ($CurrentMember -is [Microsoft.ActiveDirectory.Management.ADObject] -or
                             $CurrentMember -is [Microsoft.ActiveDirectory.Management.ADAccount] -or
@@ -223,7 +262,7 @@
 
                             # Any AD object type
                             $sid = $CurrentMember.SID.Value
-                            Write-Verbose -Message ('Member {0} is an AD object with SID: {1}' -f $member, $sid)
+                            Write-Debug -Message ('Member {0} is an AD object with SID: {1}' -f $member, $sid)
 
                         } else {
 
@@ -236,16 +275,19 @@
                                     $sid = $CurrentMember.SID
                                 }
 
-                                Write-Verbose -Message ('Member {0} has SID property: {1}' -f $member, $sid)
+                                Write-Debug -Message ('Member {0} has SID property: {1}' -f $member, $sid)
 
                             } elseif ($CurrentMember.PSObject.Properties['Value']) {
                                 $sid = $CurrentMember.Value
 
-                                Write-Verbose -Message ('Member {0} has Value property: {1}' -f $member, $sid)
+                                Write-Debug -Message ('Member {0} has Value property: {1}' -f $member, $sid)
 
                             } else {
 
-                                Write-Warning -Message ('Unexpected return type from Get-AdObjectType: {0}, cannot extract SID' -f $CurrentMember.GetType().FullName)
+                                Write-Warning -Message ('
+                                    Unexpected return type from Get-AdObjectType: {0}, cannot extract SID
+                                    ' -f $CurrentMember.GetType().FullName
+                                )
                                 continue
                             } #end If-ElseIf-Else
                         } #end If-ElseIf-ElseIf-ElseIf-Else
@@ -254,7 +296,7 @@
 
                             [void]$resolvedMembers.Add('*{0}' -f $sid)
 
-                            Write-Verbose -Message ('
+                            Write-Debug -Message ('
                                 New member resolved: {0}
                                 SID: {1}
                                 ' -f $member, $sid
@@ -267,7 +309,9 @@
                         } #end If-else
 
                     } catch {
-                        Write-Warning -Message ('Failed to resolve new member: {0}, Error: {1}' -f $member, $_.Exception.Message)
+                        Write-Error -Message ('
+                            Failed to resolve new member: {0}, Error: {1}' -f $member, $_.Exception.Message
+                        )
                         Write-Verbose -Message ('Stack trace: {0}' -f $_.Exception.StackTrace)
                     } #end try-catch
 
@@ -287,11 +331,11 @@
                 $GptTmpl.SetKeyValue($CurrentSection, $CurrentKey, $finalValue)
 
                 Write-Verbose -Message ('
-                GPO section updated
-                Current Section: {0}
-                Current Key: {1}
-                Value: {2}
-                ' -f $CurrentSection, $CurrentKey, $finalValue
+                    GPO section updated
+                        Current Section: {0}
+                        Current Key:     {1}
+                        Value:           {2}
+                    ' -f $CurrentSection, $CurrentKey, $finalValue
                 )
 
             } #end if
