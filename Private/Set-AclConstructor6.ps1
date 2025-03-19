@@ -11,8 +11,7 @@ function Set-AclConstructor6 {
             It supports batch processing and is optimized for large AD environments.
 
         .PARAMETER Id
-            Specifies the SamAccountName of the delegated group or user.
-            This is the identity for which the access rule will be modified.
+            Specifies the SamAccountName of the delegated group or user. This is the identity for which the access rule will be modified.
             It can be a variable containing the AD group.
 
         .PARAMETER LDAPPath
@@ -181,7 +180,6 @@ function Set-AclConstructor6 {
             HelpMessage = 'GUID of the object',
             Position = 4)]
         [AllowNull()]
-        [GUID]
         $ObjectType,
 
         # PARAM6 STRING representing ActiveDirectory Security Inheritance
@@ -202,7 +200,6 @@ function Set-AclConstructor6 {
             HelpMessage = 'GUID of the Inherited object or Extended Right',
             Position = 6)]
         [AllowNull()]
-        [GUID]
         $InheritedObjectType,
 
         # PARAM8 SWITCH if $false (default) will add the rule. If $true, it will remove the rule
@@ -223,7 +220,7 @@ function Set-AclConstructor6 {
         if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
 
             $txt = ($Variables.HeaderDelegation -f
-                (Get-Date).ToString('dd/MMM/yyyy'),
+                (Get-Date).ToShortDateString(),
                 $MyInvocation.Mycommand,
                 (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
             )
@@ -241,6 +238,16 @@ function Set-AclConstructor6 {
         [String]$ObjectPath = $null
         [Bool]$IsWellKnownSid = $false
         [HashTable]$AdObjectCache = @{}
+
+        # If ObjectType is String, onvert to GUID
+        If ($ObjectType -is [System.String]) {
+            [guid]::New($PSBoundParameters['ObjectType']) | Out-Null
+        } #end If
+
+        # If ObjectType is String, onvert to GUID
+        If ($InheritedObjectType -is [System.String]) {
+            [guid]::New($PSBoundParameters['InheritedObjectType']) | Out-Null
+        } #end If
 
     } #end Begin
 
