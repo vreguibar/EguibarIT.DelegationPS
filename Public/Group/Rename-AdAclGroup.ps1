@@ -69,12 +69,15 @@
 
         Set-StrictMode -Version Latest
 
-        $txt = ($Variables.HeaderDelegation -f
+        # Display function header if variables exist
+        if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
+            $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToString('dd/MMM/yyyy'),
-            $MyInvocation.Mycommand,
+                $MyInvocation.Mycommand,
             (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
-        )
-        Write-Verbose -Message $txt
+            )
+            Write-Verbose -Message $txt
+        } #end if
 
         ##############################
         # Module imports
