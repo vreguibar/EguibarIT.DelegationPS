@@ -223,7 +223,7 @@ function Set-AclConstructor6 {
         if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
 
             $txt = ($Variables.HeaderDelegation -f
-                (Get-Date).ToShortDateString(),
+                (Get-Date).ToString('dd/MMM/yyyy'),
                 $MyInvocation.Mycommand,
                 (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
             )

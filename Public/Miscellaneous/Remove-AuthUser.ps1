@@ -44,7 +44,7 @@ Function Remove-AuthUser {
         Set-StrictMode -Version Latest
 
         $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToShortDateString(),
+            (Get-Date).ToString('dd/MMM/yyyy'),
             $MyInvocation.Mycommand,
             (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
         )

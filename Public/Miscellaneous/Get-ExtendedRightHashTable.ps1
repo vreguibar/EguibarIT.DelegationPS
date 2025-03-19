@@ -25,7 +25,7 @@
         Set-StrictMode -Version Latest
 
         $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToShortDateString(),
+            (Get-Date).ToString('dd/MMM/yyyy'),
             $MyInvocation.Mycommand,
             'This function does not uses any Parameter.'
         )
