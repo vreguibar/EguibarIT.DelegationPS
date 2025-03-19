@@ -1,6 +1,6 @@
 ﻿Function Get-FunctionDisplay {
     <#
-        .Synopsis
+        .SYNOPSIS
             Formats and displays the PsBoundParameters hashtable in a visually appealing way.
 
         .DESCRIPTION
@@ -10,6 +10,8 @@
 
             This function is particularly useful for debugging or providing verbose output in complex
             PowerShell functions to show what parameters were passed to the function.
+
+            The function uses StringBuilder for efficient string building operations.
 
         .EXAMPLE
             Get-FunctionDisplay -HashTable $PsBoundParameters
@@ -39,11 +41,18 @@
             Number of tab characters to use for indentation in the formatted output.
             Default value is 2.
 
-         .OUTPUTS
+        .OUTPUTS
             [System.String]
             Returns a formatted string representation of the provided hashtable.
 
         .NOTES
+            Version:         2.0
+            DateModified:    19/Mar/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
+
             Used Functions:
                 Name                                       ║ Module/Namespace
                 ═══════════════════════════════════════════╬══════════════════════════════
@@ -51,18 +60,15 @@
                 Out-String                                 ║ Microsoft.PowerShell.Utility
                 Write-Verbose                              ║ Microsoft.PowerShell.Utility
                 Write-Warning                              ║ Microsoft.PowerShell.Utility
+                StringBuilder                              ║ [System.Text.StringBuilder]
 
-        .NOTES
-            Version:         1.1
-            DateModified:    19/Mar/2025
-            LasModifiedBy:   Vicente Rodriguez Eguibar
-                vicente@eguibar.com
-                Eguibar IT
-                http://www.eguibarit.com
+            Required Modules:
+                None - Uses built-in PowerShell cmdlets and .NET classes
 
         .LINK
-            https://www.eguibarit.com/powershell-formatting-functions/
+            https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Get-FunctionDisplay.ps1
             https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/format-table
+            https://learn.microsoft.com/en-us/dotnet/api/system.text.stringbuilder
     #>
 
     [CmdletBinding(
@@ -74,25 +80,29 @@
     [OutputType([String])]
 
     Param (
-        [Parameter(Mandatory = $true,
+        [Parameter(
+            Mandatory = $true,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            ValueFromRemainingArguments = $true,
-            HelpMessage = 'Hashtable variable from calling function containing PsBoundParameters to format accordingly',
-            ParameterSetName = 'Default',
-            Position = 0)]
+            ValueFromRemainingArguments = $false,
+            HelpMessage = 'Hashtable containing parameters to format (typically $PsBoundParameters).',
+            Position = 0,
+            ParameterSetName = 'Default'
+        )]
         [ValidateNotNull()]
         [Alias('Parameters', 'Params', 'BoundParameters')]
         [Hashtable]
         $HashTable,
 
-        [Parameter(Mandatory = $false,
+        [Parameter(
+            Mandatory = $false,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Number of tab characters to use for indentation in the formatted output.',
-            ParameterSetName = 'Default',
-            Position = 1)]
+            Position = 1,
+            ParameterSetName = 'Default'
+        )]
         [ValidateNotNull()]
         [ValidateRange(0, 10)]
         [PSDefaultValue(Help = 'Default Value is "2"')]
@@ -102,37 +112,64 @@
     )
 
     Begin {
+        # Set strict mode
         Set-StrictMode -Version Latest
 
-        ##############################
         # Variables Definition
-        [string]$FormattedOutput = [string]::Empty
-        [int]$TotalHashtableCount = 0
+        [System.Text.StringBuilder]$sb = [System.Text.StringBuilder]::New(1024)
+        [string]$IndentString = $Constants.HTab * $TabCount
 
     } # end Begin
 
     Process {
+        try {
+            # Start with a new line
+            [void]$sb.AppendLine()
 
-        # Display PSBoundparameters formatted nicely for Verbose output
+            # Validate if HashTable is not empty
+            if ($HashTable.Count -gt 0) {
+                # Get hashtable formatted as a table
+                $FormattedTable = $HashTable | Format-Table -AutoSize | Out-String
 
-        $display = $Constants.NL
+                # Process each line of the table output
+                $TableLines = $FormattedTable -split $Constants.NL
 
-        # Validate if HashTable is not empty
-        if ($HashTable.Count -gt 0) {
-            # Get hashtable formatted properly
-            $pb = $HashTable | Format-Table -AutoSize | Out-String
+                foreach ($Line in $TableLines) {
 
-            # Add corresponding tabs and new lines to each table member
-            $display += $pb -split $Constants.NL | ForEach-Object { "$($Constants.HTab * $TabCount)$_" } | Out-String
-        } else {
-            $display = 'No PsBoundParameters to display.'
-        } #end If
-        $display += $Constants.NL
+                    # Add indentation to each line and append to StringBuilder
+                    if (-not [string]::IsNullOrWhiteSpace($Line)) {
 
+                        [void]$sb.Append($IndentString).AppendLine($Line)
+
+                    } # end if
+
+                } # end foreach
+
+            } else {
+
+                # Handle empty hashtable case
+                [void]$sb.AppendLine('Empty hashtable received, no parameters to display.')
+
+            } # end If
+
+            # Add extra newlines for readability
+            [void]$sb.AppendLine()
+
+        } catch {
+            # Handle any errors during processing
+            Write-Warning -Message ('Error formatting hashtable: {0}' -f $_.Exception.Message)
+
+            [void]$sb.Clear()
+            [void]$sb.AppendLine('Error formatting parameters: {0}' -f $_.Exception.Message)
+
+        } # end try-catch
     } # end Process
 
     End {
-        Return $display
-    } #end END
 
-} #end Function
+        # Return the final formatted output as string
+        return $sb.ToString()
+
+    } # end End
+
+} # end Function Get-FunctionDisplay
