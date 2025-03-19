@@ -2,15 +2,17 @@
 
 function Set-AclConstructor4 {
     <#
-        .SYNOPSIS
+        .Synopsis
             Modifies ACLs on Active Directory objects.
 
         .DESCRIPTION
             This function adds or removes access rules to an Active Directory object
-            using a constructor with 4 parameters to specify the access rule details.
+            using a constructor with 5 parameters to specify the access rule details.
+            It supports batch processing and is optimized for large AD environments.
 
         .PARAMETER Id
-            Specifies the SamAccountName of the delegated group or user. This is the identity for which the access rule will be modified.
+            Specifies the SamAccountName of the delegated group or user.
+            This is the identity for which the access rule will be modified.
             It can be a variable containing the AD group.
 
         .PARAMETER LDAPPath
@@ -53,26 +55,48 @@ function Set-AclConstructor4 {
             }
             Set-AclConstructor4 @splat
 
+        .OUTPUTS
+            [void]
+
         .NOTES
             Used Functions:
-                Name                                   | Module
-                ---------------------------------------|--------------------------
-                Get-ADObject                           | ActiveDirectory
-                Get-Acl                                | Microsoft.Powershell.Security
-                Set-Acl                                | Microsoft.Powershell.Security
-                New-Object                             | Microsoft.Powershell.Utility
-                Get-AdObjectType                       | EguibarIT.DelegationPS
-                Test-IsValidDN                         | EguibarIT.DelegationPS
-                Get-CurrentErrorToDisplay              | EguibarIT.DelegationPS
+                 Name                                      ║ Module/Namespace
+                ═══════════════════════════════════════════╬══════════════════════════════
+                Get-ADObject                               ║ ActiveDirectory
+                Get-Acl                                    ║ Microsoft.PowerShell.Security
+                Set-Acl                                    ║ Microsoft.PowerShell.Security
+                Test-IsValidDN                             ║ EguibarIT.DelegationPS
+                Get-AdObjectType                           ║ EguibarIT.DelegationPS
+                Write-Verbose                              ║ Microsoft.PowerShell.Utility
+                Write-Error                                ║ Microsoft.PowerShell.Utility
+                Test-IsValidDN                             ║ EguibarIT.DelegationPS
+
         .NOTES
-            Version:         1.1
-            DateModified:    08/Feb/2024
+            Version:         3.0
+            DateModified:    18/Mar/2025
             LasModifiedBy:   Vicente Rodriguez Eguibar
                 vicente@eguibar.com
-                Eguibar Information Technology S.L.
+                Eguibar IT
                 http://www.eguibarit.com
+
+        .LINK
+            https://docs.microsoft.com/en-us/powershell/module/activedirectory/get-adobject
+            https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.security/get-acl
+            https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-acl
+            https://msdn.microsoft.com/en-us/library/w72e8e69.aspx
+            https://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectoryrights
+            https://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectorysecurityinheritance
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Set-AclConstructor4.ps1
     #>
-    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
+
+    [CmdletBinding(
+        SupportsShouldProcess = $true,
+        ConfirmImpact = 'Low',
+        DefaultParameterSetName = 'Default',
+        PositionalBinding = $true
+    )]
     [OutputType([void])]
 
     param (
@@ -132,7 +156,6 @@ function Set-AclConstructor4 {
             HelpMessage = 'Schema GUID of the affected object, either object or Extended Right.',
             Position = 4)]
         [AllowNull()]
-        [Guid]
         $ObjectType,
 
         # PARAM6 SWITCH if $false (default) will add the rule. If $true, it will remove the rule
@@ -162,128 +185,225 @@ function Set-AclConstructor4 {
         ##############################
         # Variables Definition
 
-        $groupObject, $groupSID, $TmpSid, $acl, $Arg1, $Arg2, $Arg3, $Arg4, $RuleArguments = $null
+        [System.Security.Principal.SecurityIdentifier]$GroupSid = $null
+        [System.DirectoryServices.ActiveDirectoryAccessRule]$AccessRule = $null
+        [String]$ObjectPath = $null
+        [Bool]$IsWellKnownSid = $false
+        [HashTable]$AdObjectCache = @{}
+
+        # If ObjectType is String, convert to GUID
+        If ($ObjectType -is [System.String]) {
+            [guid]::New($PSBoundParameters['ObjectType']) | Out-Null
+        } #end If
 
     } #end Begin
 
     Process {
 
-        # Collect the SID for the trustee we will be delegating to.
-        # NULL will be returned if ID is a WellKnownSid
-        #
-        # Check if Identity is a WellKnownSID
-        # Looking in var $Variables.WellKnownSIDs by Value (ej. 'authenticated users')
-        # must be in lowercase to work
-        If ($Variables.WellKnownSIDs.Values -Contains $PSBoundParameters['Id']) {
-
-            # return SID of the WellKnownSid
-            #$groupSID = $Variables.WellKnownSIDs.keys.where{ $Variables.WellKnownSIDs[$_].Contains($Id) }
-            $TmpSid = ($Variables.WellKnownSIDs.GetEnumerator() | Where-Object { $_.value -eq $PSBoundParameters['Id'] }).Name
-
-            $groupSID = [System.Security.Principal.SecurityIdentifier]::New($TmpSid)
-
-            Write-Verbose -Message 'Identity is Well-Known SID. Retrieving the Well-Known SID'
-        } else {
-            $GroupObject = Get-AdObjectType -Identity $PSBoundParameters['Id']
-
-            Write-Verbose -Message 'Identity is already a Group Object. Retrieving the Group'
-        }
-
-        # $groupObject will be NULL if ID is a WellKnownSid
-        If ($null -ne $GroupObject) {
-
-            # If identity is NOT a WellKnownSID, the function will translate to existing Object SID.
-            $groupSID = [System.Security.Principal.SecurityIdentifier]::New($groupObject.SID)
-
-            Write-Verbose -Message 'Retrieving SID of Identity'
-        }
-
-
-        #Get a reference to the Object we want to delegate
         try {
+            #############################
+            # Identify and resolve the trustee
+            #############################
 
-            #
-            $object = Get-ADObject -Identity $PSBoundParameters['LDAPPath']
+            # Check if Identity is a Well-Known SID
+            if ($null -ne $Variables -and
+                $null -ne $Variables.WellKnownSIDs -and
+                $Variables.WellKnownSIDs.Values -contains $Id) {
 
-            Write-Verbose -Message ('Accessing the object from given LdapPath {0}.' -f $PSBoundParameters['LDAPPath'])
+                # Find and create SID for well-known identity
+                $TmpSid = ($Variables.WellKnownSIDs.GetEnumerator() | Where-Object { $_.Value -eq $Id }).Name
 
-        } Catch {
-            Write-Error -Message ('Error while trying to access LDAP object {0}' -f $PSBoundParameters['LDAPPath'])
-            #Get-ErrorDetail -ErrorRecord $_
+                if ($null -ne $TmpSid) {
+
+                    $GroupSid = [System.Security.Principal.SecurityIdentifier]::new($TmpSid)
+                    $IsWellKnownSid = $true
+
+                    Write-Debug -Message ('Identity {0} is a Well-Known SID. Retrieved SID: {1}' -f $Id, $GroupSid.Value)
+
+                } else {
+
+                    Write-Error -Message ('Well-known identity {0} found but unable to resolve SID' -f $Id)
+                    return
+
+                } #end if-else
+
+            } else {
+
+                # Get object information for the identity
+                try {
+
+                    $GroupObject = Get-AdObjectType -Identity $Id
+
+                    if ($null -ne $GroupObject -and
+                        $null -ne $GroupObject.SID) {
+
+                        $GroupSid = [System.Security.Principal.SecurityIdentifier]::new($GroupObject.SID)
+
+                        Write-Debug -Message ('Resolved identity {0} to SID: {1}' -f $Id, $GroupSid.Value)
+
+                    } else {
+
+                        Write-Error -Message ('Failed to resolve identity {0} to a valid security principal' -f $Id)
+                        return
+
+                    } #end if-else
+
+                } catch {
+
+                    Write-Error -Message ('Error resolving identity {0}: {1}' -f $Id, $_.Exception.Message)
+                    throw
+
+                } #end try-catch
+            } #end if-else
+
+            #############################
+            # Get reference to target object
+            #############################
+            try {
+
+                # Use caching to avoid redundant queries
+                if ($AdObjectCache.ContainsKey($LDAPPath)) {
+
+                    $Object = $AdObjectCache[$LDAPPath]
+
+                    Write-Debug -Message ('Using cached object for LDAP path: {0}' -f $LDAPPath)
+
+                } else {
+
+                    # Use server-side filtering for better performance
+                    $Object = Get-ADObject -Identity $LDAPPath -Properties nTSecurityDescriptor
+
+                    $AdObjectCache[$LDAPPath] = $Object
+
+                    Write-Debug -Message ('Retrieved object from AD: {0}' -f $Object.DistinguishedName)
+
+                } #end if-else
+
+                # Prepare the AD path for Get-Acl
+                $ObjectPath = ('AD:\{0}' -f $Object.DistinguishedName)
+
+            } catch {
+
+                Write-Error -Message ('Error retrieving AD object {0}: {1}' -f $LDAPPath, $_.Exception.Message)
+                throw
+
+            } #end try-catch
+
+            #############################
+            # Get current ACL
+            #############################
+            try {
+
+                $Acl = Get-Acl -Path $ObjectPath
+
+                Write-Debug -Message ('Retrieved current DACL for object: {0}' -f $Object.DistinguishedName)
+
+            } catch {
+
+                Write-Error -Message ('Error retrieving ACL for {0}: {1}' -f $Object.DistinguishedName, $_.Exception.Message)
+                throw
+
+            } #end try-catch
+
+
+            #############################
+            # Prepare access rule arguments
+            #############################
+            # 1. Identity Reference (Trustee)
+            $IdentityRef = [System.Security.Principal.IdentityReference]$GroupSid
+
+            # 2. Active Directory Rights
+            $ActiveDirectoryRight = [System.DirectoryServices.ActiveDirectoryRights]$PSBoundParameters['AdRight']
+
+            # 3. Access Control Type (Allow/Deny)
+            $ACType = [System.Security.AccessControl.AccessControlType]$PSBoundParameters['AccessControlType']
+
+            # 4. Object Type (GUID)
+            # Parameter already properly typed as Guid
+
+
+            # Create Access Rule object
+            $AccessRule = [System.DirectoryServices.ActiveDirectoryAccessRule]::new(
+                $IdentityRef,
+                $ActiveDirectoryRight,
+                $ACType,
+                $PSBoundParameters['ObjectType']
+            )
+
+            #############################
+            # Add or Remove the rule
+            #############################
+            if ($RemoveRule) {
+
+                # Remove the access rule
+                if ($PSCmdlet.ShouldProcess(
+                        $Object.DistinguishedName,
+                    ('Remove {0} access rule for {1}' -f $ActiveDirectoryRight, $Id))) {
+
+                    # Find and remove matching rules
+                    $RulesToRemove = $Acl.Access | Where-Object {
+                        $_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value -eq $GroupSid.Value -and
+                        $_.ActiveDirectoryRights -eq $ActiveDirectoryRight -and
+                        $_.AccessControlType -eq $ACType -and
+                        $_.ObjectType -eq $ObjectType
+                    }
+
+                    foreach ($RuleToRemove in $RulesToRemove) {
+
+                        $null = $Acl.RemoveAccessRule($RuleToRemove)
+
+                    } #end foreach
+
+                    Write-Verbose -Message ('Removed {0} access rule(s) from {1} for {2}' -f
+                        $RulesToRemove.Count, $Object.DistinguishedName, $Id)
+                } #end if
+
+            } else {
+
+                # Add the access rule
+                if ($PSCmdlet.ShouldProcess(
+                        $Object.DistinguishedName,
+                    ('Add {0} access rule for {1}' -f $ActiveDirectoryRight, $Id))) {
+
+                    $null = $Acl.AddAccessRule($AccessRule)
+
+                    Write-Verbose -Message ('Added {0} access rule to {1} for {2}' -f
+                        $ActiveDirectoryRight, $Object.DistinguishedName, $Id)
+                } #end if
+
+            } #end if-else
+
+            #############################
+            # Apply the modified ACL
+            #############################
+            try {
+
+                if ($PSCmdlet.ShouldProcess(
+                        $Object.DistinguishedName,
+                        'Apply modified ACL')) {
+
+                    Set-Acl -AclObject $Acl -Path $ObjectPath
+                    Write-Verbose -Message ('Applied modified ACL to {0}' -f $Object.DistinguishedName)
+
+                } #end if
+
+            } catch {
+
+                Write-Error -Message ('
+                    Error applying modified ACL to {0}: {1}
+                    ' -f $Object.DistinguishedName, $_.Exception.Message
+                )
+                throw
+            } #end try-catch
+
+        } catch {
+
+            Write-Error -Message ('Error processing {0}: {1}' -f $LDAPPath, $_.Exception.Message)
+            Write-Error -Message $_.ScriptStackTrace
             throw
-        } #end Try-Catch
 
+        } #end try-catch
 
-        #Get a copy of the current DACL on the object
-        try {
-            $acl = Get-Acl -Path ('AD:\{0}' -f $object.DistinguishedName)
-
-            Write-Verbose -Message ('Get a copy of the current DACL on the object DN {0}.' -f $object.DistinguishedName)
-
-        } Catch {
-            Write-Error -Message ('Error while trying to Get a copy of the current DACL {0}' -f $object.DistinguishedName)
-            #Get-ErrorDetail -ErrorRecord $_
-            throw
-        } #end Try-Catch
-
-
-
-        # Start creating the Access Rule Arguments
-        #  Provide the trustee identity (Group who gets the permissions)
-        $Arg1 = [Security.Principal.IdentityReference] $groupSID
-
-        # Set what to do (AD Rights http://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectoryrights(v=vs.110).aspx)
-        $Arg2 = [DirectoryServices.ActiveDirectoryRights] $PSBoundParameters['AdRight']
-
-        # Define if allowed or denied (AccessControlType - Allow/Denied)
-        $Arg3 = [Security.AccessControl.AccessControlType] $PSBoundParameters['AccessControlType']
-
-        # Set the object GUID
-        $Arg4 = $PSBoundParameters['ObjectType']
-
-        $RuleArguments = $Arg1, $Arg2, $Arg3, $Arg4
-
-
-
-        # If parameter RemoveRule is False (default when omitted) it will ADD the Access Rule
-        # if TRUE then will REMOVE the access rule
-        If ($PSBoundParameters['RemoveRule']) {
-            # Action when TRUE is REMOVE
-
-            if ($Force -or $PSCmdlet.ShouldProcess($object.DistinguishedName, "Removing access rule for $($PSBoundParameters['Id'])")) {
-
-                #Create an Access Control Entry for new permission we wish to remove
-                [void]$acl.RemoveAccessRule(([System.DirectoryServices.ActiveDirectoryAccessRule]::New($Arg1, $Arg2, $Arg3, $Arg4)))
-                #$null = $acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
-
-                Write-Verbose -Message ('Removed access rule from {0}' -f $objectDN.DistinguishedName)
-            } #end If
-        } else {
-            # Action when FALSE is ADD
-
-            if ($Force -or $PSCmdlet.ShouldProcess($object.DistinguishedName, "Adding access rule for $($PSBoundParameters['Id'])")) {
-
-                #Create an Access Control Entry for new permission we wish to add
-                [void]$acl.AddAccessRule(([System.DirectoryServices.ActiveDirectoryAccessRule]::New($Arg1, $Arg2, $Arg3, $Arg4)))
-                #$null = $acl.AddAccessRule((New-Object -TypeName System.DirectoryServices.ActiveDirectoryAccessRule -ArgumentList $RuleArguments))
-
-                Write-Verbose -Message ('Added access rule to {0}' -f $objectDN.DistinguishedName)
-            } #end If
-        } #end If-Else
-
-
-
-        try {
-            #Re-apply the modified DACL to the OU
-            Set-Acl -AclObject $acl -Path ('AD:\{0}' -f $object.DistinguishedName)
-
-            Write-Verbose -Message ('Re-apply the modified DACL to the {0}' -f $objectDN.DistinguishedName)
-
-        } Catch {
-            Write-Error -Message ('Error when trying to re-apply the modified DACL to the {0}' -f $objectDN.DistinguishedName)
-            #Get-ErrorDetail -ErrorRecord $_
-            throw
-        } #end Try-Catch
     } #end Process
 
     End {

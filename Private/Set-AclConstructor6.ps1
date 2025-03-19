@@ -86,16 +86,16 @@ function Set-AclConstructor6 {
 
         .NOTES
             Used Functions:
-                 Name                                  ║ Module/Namespace
-            ═══════════════════════════════════════════╬══════════════════════════════
-            Get-ADObject                               ║ ActiveDirectory
-            Get-Acl                                    ║ Microsoft.PowerShell.Security
-            Set-Acl                                    ║ Microsoft.PowerShell.Security
-            Test-IsValidDN                             ║ EguibarIT.DelegationPS
-            Get-AdObjectType                           ║ EguibarIT.DelegationPS
-            Write-Verbose                              ║ Microsoft.PowerShell.Utility
-            Write-Error                                ║ Microsoft.PowerShell.Utility
-            Test-IsValidDN                             ║ EguibarIT.DelegationPS
+                 Name                                      ║ Module/Namespace
+                ═══════════════════════════════════════════╬══════════════════════════════
+                Get-ADObject                               ║ ActiveDirectory
+                Get-Acl                                    ║ Microsoft.PowerShell.Security
+                Set-Acl                                    ║ Microsoft.PowerShell.Security
+                Test-IsValidDN                             ║ EguibarIT.DelegationPS
+                Get-AdObjectType                           ║ EguibarIT.DelegationPS
+                Write-Verbose                              ║ Microsoft.PowerShell.Utility
+                Write-Error                                ║ Microsoft.PowerShell.Utility
+                Test-IsValidDN                             ║ EguibarIT.DelegationPS
 
         .NOTES
             Version:         3.0
@@ -117,7 +117,12 @@ function Set-AclConstructor6 {
             https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Set-AclConstructor6.ps1
   #>
 
-    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
+    [CmdletBinding(
+        SupportsShouldProcess = $true,
+        ConfirmImpact = 'Low',
+        DefaultParameterSetName = 'Default',
+        PositionalBinding = $true
+    )]
     [OutputType([void])]
 
     param (
@@ -244,7 +249,7 @@ function Set-AclConstructor6 {
             [guid]::New($PSBoundParameters['ObjectType']) | Out-Null
         } #end If
 
-        # If ObjectType is String, onvert to GUID
+        # If ObjectType is String, convert to GUID
         If ($InheritedObjectType -is [System.String]) {
             [guid]::New($PSBoundParameters['InheritedObjectType']) | Out-Null
         } #end If
