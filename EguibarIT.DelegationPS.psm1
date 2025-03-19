@@ -6,9 +6,9 @@ if (Test-Path -Path "$PSScriptRoot\Enums") {
     foreach ($Item in $Enums) {
         Try {
             . $Item.FullName
-            Write-Verbose -Message ('Enum Imported {0}' -f $($Item.BaseName))
+            Write-Debug -Message ('Enum Imported {0}' -f $($Item.BaseName))
         } Catch {
-            Write-Error -Message "Could not load Enum [$($Item.Name)] : $($_.Message)"
+            Write-Error -Message ('Could not load Enum [{0}] : {1}' -f $Item.Name, $_.Message)
             throw
         } #end Try-Catch
     } #end Foreach
@@ -21,9 +21,9 @@ if (Test-Path -Path "$PSScriptRoot\Classes") {
     foreach ($Item in $Classes) {
         Try {
             . $Item.FullName
-            Write-Verbose -Message ('Class Imported {0}' -f $($Item.BaseName))
+            Write-Debug -Message ('Class Imported {0}' -f $($Item.BaseName))
         } Catch {
-            Write-Error -Message "Could not load Class [$($Item.Name)] : $($_.Message)"
+            Write-Error -Message ('Could not load Class [{0}] : {1}' -f $Item.Name, $_.Message)
             throw
         } #end Try-Catch
     } #end Foreach
@@ -35,9 +35,9 @@ $Private = @( Get-ChildItem -Path "$PSScriptRoot\Private\" -Filter *.ps1 -ErrorA
 foreach ($Item in $Private) {
     Try {
         . $Item.Fullname
-        Write-Verbose -Message ('Private Function Imported {0}' -f $($Item.BaseName))
+        Write-Debug -Message ('Private Function Imported {0}' -f $($Item.BaseName))
     } Catch {
-        Write-Error -Message "Failed to import private function from $($Item.Fullname): $($_.Exception.Message)"
+        Write-Error -Message ('Failed to import private function from {0}: {1}"' -f $Item.Fullname, $_.Exception.Message)
         Throw
     }
 }
@@ -47,20 +47,11 @@ $Public = @( Get-ChildItem -Path "$PSScriptRoot\Public\" -Filter *.ps1 -ErrorAct
 foreach ($Item in $Public) {
     Try {
         . $Item.Fullname
-        Write-Verbose -Message ('Public Function Imported {0}' -f $($Item.BaseName))
+        Write-Debug -Message ('Public Function Imported {0}' -f $($Item.BaseName))
     } Catch {
-        Write-Error -Message "Failed to import public function from $($Item.Fullname): $($_.Exception.Message)"
+        Write-Error -Message ('Failed to import public function from {0}: {1}"' -f $Item.Fullname, $_.Exception.Message)
         Throw
     }
-}
-
-Try {
-    # Call function Initialize-ModuleVariable to fill-up $Variables
-    Initialize-ModuleVariable
-    return $true
-} catch {
-    Write-Error -Message ('Failed to update AD variables: {0}' -f $_)
-    return $false
 }
 
 Export-ModuleMember -Function '*' -Alias '*' -Verbose:$false | Out-Null
@@ -73,4 +64,5 @@ Try {
     Write-Error -Message ('Failed to update AD variables: {0}' -f $_)
     return $false
 }
+
 
