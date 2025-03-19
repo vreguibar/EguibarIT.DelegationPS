@@ -8,12 +8,37 @@
             human-readable display name in Active Directory. It supports translating GUIDs for
             classSchema objects, attributeSchema objects, and extended rights.
 
+            The function first checks if the provided GUID is a null GUID. If not, it searches the
+            schema naming context for a matching schemaIDGUID. If found, it determines whether it's
+            a classSchema or attributeSchema object and formats the output accordingly. If not found
+            in the schema, it checks the Extended-Rights container in the configuration naming context.
+
         .PARAMETER Guid
             The GUID to be translated into a display name. It must be a valid GUID format.
+            This parameter accepts pipeline input.
 
         .EXAMPLE
             Convert-GUIDToName -Guid "bf967aba-0de6-11d0-a285-00aa003049e2"
+
+            Output: user [classSchema]
+
             Converts the specified GUID to its display name in Active Directory.
+
+        .EXAMPLE
+            "bf967a86-0de6-11d0-a285-00aa003049e2" | Convert-GUIDToName
+
+            Output: computer [classSchema]
+
+            Converts the specified GUID to its display name using pipeline input.
+
+        .EXAMPLE
+            $Splat = @{
+                GUID = 'bf967aba-0de6-11d0-a285-00aa003049e2'
+                Verbose = $true
+            }
+            Convert-GUIDToName @Splat
+
+            Output with verbose information about the conversion process.
 
         .EXAMPLE
             ---------- Class Schema
@@ -21,6 +46,7 @@
             Convert-GUIDToName -Guid "bf967a9c-0de6-11d0-a285-00aa003049e2" # group
             Convert-GUIDToName -Guid "b7b13124-b82e-11d0-afee-0000f80367c1" # subnet
             Convert-GUIDToName -Guid "bf967aba-0de6-11d0-a285-00aa003049e2" # user
+
             ---------- Attribute Schema
             Convert-GUIDToName -Guid "bf967915-0de6-11d0-a285-00aa003049e2" # AccountExpires
             Convert-GUIDToName -Guid "f0f8ff84-1191-11d0-a060-00aa006c33ed" # StreetAddress (attributeSchema)
@@ -30,6 +56,7 @@
             Convert-GUIDToName -Guid "bf9679b5-0de6-11d0-a285-00aa003049e2" # Manager
             Convert-GUIDToName -Guid "8d3bca50-1d7e-11d0-a081-00aa006c33ed" # Picture
             Convert-GUIDToName -Guid "3e0abfd0-126a-11d0-a060-00aa006c33ed" # SamAccountName
+
             ---------- Extended Rights
             Convert-GUIDToName -Guid "68b1d179-0d15-4d4f-ab71-46152e79a7bc" # Allowed to Authenticate [Extended Right]
             Convert-GUIDToName -Guid "ba33815a-4f93-4c76-87f3-57574bff8109" # Migrate SID History [Extended Right]
@@ -47,21 +74,43 @@
             }
             Convert-GUIDToName @Splat
 
+        .OUTPUTS
+            [String]
+            Returns a string with the format "Name [Type]" where Type is classSchema, attributeSchema,
+            or ExtendedRight.
+
         .NOTES
             Used Functions:
-                Name                                   | Module
-                ---------------------------------------|--------------------------
-                Get-ADRootDSE                          | ActiveDirectory
-                Get-ADObject                           | ActiveDirectory
+                Name                                       ║ Module/Namespace
+                ═══════════════════════════════════════════╬══════════════════════════════
+                Get-ADRootDSE                              ║ ActiveDirectory
+                Get-ADObject                               ║ ActiveDirectory
+                Write-Verbose                              ║ Microsoft.PowerShell.Utility
+                Write-Error                                ║ Microsoft.PowerShell.Utility
+
         .NOTES
-            Version:         1.2
-            DateModified:    07/Feb/2024
+            Version:         2.0
+            DateModified:   19/Mar/2025
             LasModifiedBy:   Vicente Rodriguez Eguibar
                 vicente@eguibar.com
-                Eguibar Information Technology S.L.
+                Eguibar IT
                 http://www.eguibarit.com
+
+        .LINK
+             https://learn.microsoft.com/en-us/windows/win32/adschema/attributes-all
+                https://learn.microsoft.com/en-us/windows/win32/adschema/classes
+                https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-adts/1522b774-6464-41a3-87a5-1e5633c3fbbb
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Convert-GUIDToName.ps1
     #>
-    [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'Low')]
+
+    [CmdletBinding(
+        SupportsShouldProcess = $false,
+        ConfirmImpact = 'Low',
+        DefaultParameterSetName = 'Default',
+        PositionalBinding = $true
+    )]
     [OutputType([String])]
 
     param (
@@ -69,10 +118,14 @@
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'STRING representing the GUID',
+            HelpMessage = 'Enter a GUID to translate into a display name',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [ValidatePattern('^[{(]?[0-9A-Fa-f]{8}[-]?([0-9A-Fa-f]{4}[-]?){3}[0-9A-Fa-f]{12}[)}]?$')]
+        [ValidatePattern(
+            '^[{(]?[0-9A-Fa-f]{8}[-]?([0-9A-Fa-f]{4}[-]?){3}[0-9A-Fa-f]{12}[)}]?$',
+            ErrorMessage = 'The string specified "{0}" is not a valid GUID format.'
+        )]
+        [Alias('ID', 'ObjectGUID')]
         [string]
         $Guid
     )
@@ -84,9 +137,9 @@
         # Display function header if variables exist
         if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
             $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToString('dd/MMM/yyyy'),
+                (Get-Date).ToString('dd/MMM/yyyy'),
                 $MyInvocation.Mycommand,
-            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
+                (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
             )
             Write-Verbose -Message $txt
         } #end if
@@ -100,71 +153,89 @@
         [String]$Output = $null
         [hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
-        # Ensure string is converted to GUID
-        if ($guid -is [String]) {
-
-            Write-Verbose -Message ('Converting string {0} to GUID' -f $guid)
-            [GUID]$guid = [System.guid]::New($guid)
-
-        }
     } #end Begin
 
     Process {
 
-        # Get ALL [nullGUID]
-        #If ($guid -eq $Constants.guidNull) {
-        If ($guid -eq ([System.guid]::New('00000000-0000-0000-0000-000000000000'))) {
-            $Output = 'All [GuidNULL]'
-        } else {
+        Try {
 
-            $Splat = @{
-                SearchBase = $Variables.SchemaNamingContext
-                Filter     = { schemaIDGUID -eq $guid }
-                Properties = 'lDAPDisplayName'
-            }
-            $result = Get-ADObject @Splat
+            # Ensure string is converted to GUID
+            if ($PSBoundParameters['guid'] -is [String]) {
 
-            #if $Result return empty, is because GUID is Extended Right
-            #Check result value
-            If ($result) {
+                Write-Verbose -Message ('Converting string {0} to GUID' -f $guid)
+                [GUID]$guid = [System.guid]::New($PSBoundParameters['guid']) | Out-Null
 
-                # Check result for classSchema
-                If ($result.ObjectClass -eq 'classSchema') {
+            } #end If
 
-                    Write-Verbose -Message 'Found it as ClassSchema'
-                    $Output = ('{0} [classSchema]' -f $result.lDAPDisplayName)
+            # Get ALL [GuidNULL]
+            If ($guid -eq ([System.guid]::New('00000000-0000-0000-0000-000000000000'))) {
 
-                } #end If
+                $Output = 'All [GuidNULL]'
 
-                # Check result for attributeSchema
-                If ($result.ObjectClass -eq 'attributeSchema') {
-
-                    Write-Verbose -Message 'Found it as AttributeSchema'
-                    $Output = ('{0} [attributeSchema]' -f $result.lDAPDisplayName)
-
-                } #end If
-
-            } elseif ($null -eq $result -and
-                $value -ne 0 -and
-                $value -ne '' -and
-                    ($value -isnot [array] -or $value.Length -ne 0) -and
-                $value -ne $false) {
-
-                # Check GUID for Extended Right
-                $SearchBase = 'CN=Extended-Rights,{0}' -f $Variables.configurationNamingContext
+            } else {
 
                 $Splat = @{
-                    SearchBase = $SearchBase
-                    Filter     = { rightsGUID -eq $guid }
-                    Properties = 'DisplayName', 'rightsGUID'
+                    SearchBase  = $Variables.SchemaNamingContext
+                    Filter      = { schemaIDGUID -eq $guid }
+                    Properties  = 'lDAPDisplayName'
+                    ErrorAction = 'Stop'
                 }
                 $result = Get-ADObject @Splat
 
-                Write-Verbose -Message 'Found it as ExtendedRight'
-                $Output = ('{0} [ExtendedRight]' -f $Result.DisplayName)
+                #if $Result return empty, is because GUID is Extended Right
+                #Check result value
+                If ($result) {
 
-            } #end If-ElseIf
-        } #end If-Else
+                    # Check result for classSchema
+                    If ($result.ObjectClass -eq 'classSchema') {
+
+                        Write-Verbose -Message 'Found it as ClassSchema'
+                        $Output = ('{0} [classSchema]' -f $result.lDAPDisplayName)
+
+                    } #end If
+
+                    # Check result for attributeSchema
+                    If ($result.ObjectClass -eq 'attributeSchema') {
+
+                        Write-Verbose -Message 'Found it as AttributeSchema'
+                        $Output = ('{0} [attributeSchema]' -f $result.lDAPDisplayName)
+
+                    } #end If
+
+                } else {
+
+                    # If not found in schema, check extended rights
+                    $SearchBase = 'CN=Extended-Rights,{0}' -f $Variables.configurationNamingContext
+
+                    $Splat = @{
+                        SearchBase  = $SearchBase
+                        Filter      = { rightsGUID -eq $guid }
+                        Properties  = 'DisplayName', 'rightsGUID'
+                        ErrorAction = 'Stop'
+                    }
+                    $result = Get-ADObject @Splat
+
+                    if ($Result) {
+
+                        Write-Verbose -Message ('Found it as ExtendedRight: {0}' -f $Result.DisplayName)
+                        $Output = ('{0} [ExtendedRight]' -f $Result.DisplayName)
+
+                    } else {
+
+                        Write-Verbose -Message 'GUID not found in any known location'
+                        $Output = ('Unknown GUID: {0}' -f $Guid)
+
+                    } #end if-else
+
+                } #end If-ElseIf
+            } #end If-Else
+
+        } catch {
+
+            Write-Error -Message ('Error processing GUID {0}: {1}' -f $Guid, $_.Exception.Message)
+            return
+
+        } #end try-catch
 
     } #end Process
 
@@ -176,4 +247,5 @@
 
         Return $Output
     } #end End
-} #end Function
+
+} #end Function Convert-GUIDToName
