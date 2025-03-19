@@ -54,7 +54,23 @@ foreach ($Item in $Public) {
     }
 }
 
+Try {
+    # Call function Initialize-ModuleVariable to fill-up $Variables
+    Initialize-ModuleVariable
+    return $true
+} catch {
+    Write-Error -Message ('Failed to update AD variables: {0}' -f $_)
+    return $false
+}
+
 Export-ModuleMember -Function '*' -Alias '*' -Verbose:$false | Out-Null
 
-# Call function Initialize-ModuleVariable to fill-up $Variables
-Initialize-ModuleVariable
+Try {
+    # Call function Initialize-ModuleVariable to fill-up $Variables
+    Initialize-ModuleVariable
+    return $true
+} catch {
+    Write-Error -Message ('Failed to update AD variables: {0}' -f $_)
+    return $false
+}
+

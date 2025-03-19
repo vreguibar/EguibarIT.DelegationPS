@@ -134,7 +134,7 @@
 
         Set-StrictMode -Version Latest
 
-        $txt = ($Variables.Header -f
+        $txt = ($Variables.HeaderDelegation -f
             (Get-Date).ToShortDateString(),
             $MyInvocation.Mycommand,
             (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
@@ -277,7 +277,7 @@
     End {
         $VerbosePreference = $Preference
 
-        $txt = ($Variables.Footer -f $MyInvocation.InvocationName,
+        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
             'importing module.'
         )
         Write-Verbose -Message $txt
