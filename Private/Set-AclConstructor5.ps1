@@ -195,11 +195,13 @@ function Set-AclConstructor5 {
         Set-StrictMode -Version Latest
 
         # Display function header if variables exist
-        if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
+        if ($null -ne $Variables -and
+            $null -ne $Variables.HeaderDelegation) {
+
             $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToString('dd/MMM/yyyy'),
+                (Get-Date).ToString('dd/MMM/yyyy'),
                 $MyInvocation.Mycommand,
-            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
+                (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
             )
             Write-Verbose -Message $txt
         } #end if
@@ -457,9 +459,14 @@ function Set-AclConstructor5 {
     } #end Process
 
     End {
-        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
-            'adding access rule with 5 arguments (Private Function).'
-        )
-        Write-Verbose -Message $txt
+        # Display function footer if variables exist
+        if ($null -ne $Variables -and
+            $null -ne $Variables.FooterDelegation) {
+
+            $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
+                'adding access rule with 5 arguments (Private Function).'
+            )
+            Write-Verbose -Message $txt
+        } #end if
     } #end END
 }

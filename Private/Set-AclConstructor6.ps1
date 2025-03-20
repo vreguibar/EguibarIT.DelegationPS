@@ -222,7 +222,8 @@ function Set-AclConstructor6 {
         Set-StrictMode -Version Latest
 
         # Display function header if variables exist
-        if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
+        if ($null -ne $Variables -and
+            $null -ne $Variables.HeaderDelegation) {
 
             $txt = ($Variables.HeaderDelegation -f
                 (Get-Date).ToShortDateString(),
@@ -520,6 +521,7 @@ function Set-AclConstructor6 {
         # Display function footer if variables exist
         if ($null -ne $Variables -and
             $null -ne $Variables.FooterDelegation) {
+
             $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
                 'adding/removing access rule with 6 arguments (Private Function).'
             )
