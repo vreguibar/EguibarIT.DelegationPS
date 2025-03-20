@@ -76,12 +76,15 @@
 
         Set-StrictMode -Version Latest
 
-        $txt = ($Variables.Header -f
-            (Get-Date).ToString('dd/MMM/yyyy'),
-            $MyInvocation.Mycommand,
-            (Get-FunctionDisplay -Hashtable $PsBoundParameters -Verbose:$False)
-        )
-        Write-Verbose -Message $txt
+        # Display function header if variables exist
+        if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
+            $txt = ($Variables.HeaderDelegation -f
+                (Get-Date).ToString('dd/MMM/yyyy'),
+                $MyInvocation.MyCommand,
+                (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$false)
+            )
+            Write-Verbose -Message $txt
+        } #end if
 
         ##############################
         # Variables Definition
@@ -145,7 +148,7 @@
     } #end Process
 
     End {
-        $txt = ($Variables.Footer -f $MyInvocation.InvocationName,
+        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
             'initializing Event Logging. (Private Function)'
         )
         Write-Verbose -Message $txt

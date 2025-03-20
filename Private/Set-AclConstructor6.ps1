@@ -3,7 +3,7 @@
 function Set-AclConstructor6 {
     <#
         .Synopsis
-            Modifies ACLs on Active Directory objects.
+            Modifies ACLs on Active Directory objects using a 6-parameter access rule constructor.
 
         .DESCRIPTION
             This function adds or removes access rules to an Active Directory object
@@ -244,15 +244,57 @@ function Set-AclConstructor6 {
         [Bool]$IsWellKnownSid = $false
         [HashTable]$AdObjectCache = @{}
 
-        # If ObjectType is String, onvert to GUID
-        If ($ObjectType -is [System.String]) {
-            [guid]::New($PSBoundParameters['ObjectType']) | Out-Null
-        } #end If
+        # Convert ObjectType to GUID if it's a string
+        if ($null -ne $PSBoundParameters['ObjectType']) {
 
-        # If ObjectType is String, convert to GUID
-        If ($InheritedObjectType -is [System.String]) {
-            [guid]::New($PSBoundParameters['InheritedObjectType']) | Out-Null
-        } #end If
+            if ($PSBoundParameters['ObjectType'] -is [System.String]) {
+
+                try {
+
+                    $ObjectTypeGuid = [Guid]::Parse($PSBoundParameters['ObjectType'])
+                    Write-Debug -Message ('Successfully parsed ObjectType string to GUID: {0}' -f $ObjectTypeGuid)
+
+                } catch {
+
+                    Write-Error -Message ('Failed to parse ObjectType as GUID: {0}' -f $PSBoundParameters['ObjectType'])
+                    throw
+
+                } #end try-catch
+
+            } elseif ($PSBoundParameters['ObjectType'] -is [Guid]) {
+
+                $ObjectTypeGuid = $PSBoundParameters['ObjectType']
+                Write-Debug -Message ('Using provided ObjectType GUID: {0}' -f $ObjectTypeGuid)
+
+            } #end if-elseif
+
+        } #end if
+
+        # Convert InheritedObjectType to GUID if it's a string
+        if ($null -ne $PSBoundParameters['InheritedObjectType']) {
+
+            if ($PSBoundParameters['InheritedObjectType'] -is [System.String]) {
+
+                try {
+
+                    $InheritedObjectTypeGuid = [Guid]::Parse($PSBoundParameters['InheritedObjectType'])
+                    Write-Debug -Message ('Successfully parsed InheritedObjectType string to GUID: {0}' -f $InheritedObjectTypeGuid)
+
+                } catch {
+
+                    Write-Error -Message ('Failed to parse InheritedObjectType as GUID: {0}' -f $PSBoundParameters['InheritedObjectType'])
+                    throw
+
+                } #end try-catch
+
+            } elseif ($PSBoundParameters['InheritedObjectType'] -is [Guid]) {
+
+                $InheritedObjectTypeGuid = $PSBoundParameters['InheritedObjectType']
+                Write-Debug -Message ('Using provided InheritedObjectType GUID: {0}' -f $InheritedObjectTypeGuid)
+
+            } #end if-elseif
+
+        } #end if
 
     } #end Begin
 
@@ -261,6 +303,8 @@ function Set-AclConstructor6 {
             #############################
             # Identify and resolve the trustee
             #############################
+
+            Write-Debug -Message ('Beginning to resolve identity: {0}' -f $Id)
 
             # Check if Identity is a Well-Known SID
             if ($null -ne $Variables -and
@@ -389,9 +433,9 @@ function Set-AclConstructor6 {
                 $IdentityRef,
                 $ActiveDirectoryRight,
                 $ACType,
-                $PSBoundParameters['ObjectType'],
+                $ObjectTypeGuid,
                 $SecurityInheritance,
-                $PSBoundParameters['InheritedObjectType']
+                $InheritedObjectTypeGuid
             )
 
             #############################
@@ -409,9 +453,9 @@ function Set-AclConstructor6 {
                         $_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value -eq $GroupSid.Value -and
                         $_.ActiveDirectoryRights -eq $ActiveDirectoryRight -and
                         $_.AccessControlType -eq $ACType -and
-                        $_.ObjectType -eq $ObjectType -and
+                        $_.ObjectType -eq $ObjectTypeGuid -and
                         $_.InheritanceType -eq $SecurityInheritance -and
-                        $_.InheritedObjectType -eq $InheritedObjectType
+                        $_.InheritedObjectType -eq $InheritedObjectTypeGuid
                     }
 
                     foreach ($RuleToRemove in $RulesToRemove) {

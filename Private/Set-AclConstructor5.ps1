@@ -216,10 +216,31 @@ function Set-AclConstructor5 {
         [Bool]$IsWellKnownSid = $false
         [HashTable]$AdObjectCache = @{}
 
-        # If ObjectType is String, convert to GUID
-        If ($ObjectType -is [System.String]) {
-            [guid]::New($PSBoundParameters['ObjectType']) | Out-Null
-        } #end If
+        # Convert ObjectType to GUID if it's a string
+        if ($null -ne $PSBoundParameters['ObjectType']) {
+
+            if ($PSBoundParameters['ObjectType'] -is [System.String]) {
+
+                try {
+
+                    $ObjectTypeGuid = [Guid]::Parse($PSBoundParameters['ObjectType'])
+                    Write-Debug -Message ('Successfully parsed ObjectType string to GUID: {0}' -f $ObjectTypeGuid)
+
+                } catch {
+
+                    Write-Error -Message ('Failed to parse ObjectType as GUID: {0}' -f $PSBoundParameters['ObjectType'])
+                    throw
+
+                } #end try-catch
+
+            } elseif ($PSBoundParameters['ObjectType'] -is [Guid]) {
+
+                $ObjectTypeGuid = $PSBoundParameters['ObjectType']
+                Write-Debug -Message ('Using provided ObjectType GUID: {0}' -f $ObjectTypeGuid)
+
+            } #end if-elseif
+
+        } #end if
 
     } #end Begin
 
@@ -354,7 +375,7 @@ function Set-AclConstructor5 {
                 $IdentityRef,
                 $ActiveDirectoryRight,
                 $ACType,
-                $PSBoundParameters['ObjectType'],
+                $ObjectTypeGuid,
                 $SecurityInheritance
             )
 
@@ -373,7 +394,7 @@ function Set-AclConstructor5 {
                         $_.IdentityReference.Translate([System.Security.Principal.SecurityIdentifier]).Value -eq $GroupSid.Value -and
                         $_.ActiveDirectoryRights -eq $ActiveDirectoryRight -and
                         $_.AccessControlType -eq $ACType -and
-                        $_.ObjectType -eq $ObjectType -and
+                        $_.ObjectType -eq $ObjectTypeGuid -and
                         $_.InheritanceType -eq $SecurityInheritance
                     }
 
