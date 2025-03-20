@@ -6,12 +6,17 @@
         .DESCRIPTION
             This function translates a given Security Identifier (SID) to the corresponding NT Account Name
             using .NET classes. It accepts both string representations of SIDs and SID objects.
-            It first checks against a comprehensive list of Well-Known SIDs before attempting dynamic resolution.
-            The function is optimized for performance in large Active Directory environments.
+
+            The function first checks against a comprehensive list of Well-Known SIDs before attempting
+            dynamic resolution. It implements caching to optimize performance in large Active Directory
+            environments and supports batch processing through the pipeline.
+
+            For improved security, the function performs thorough validation of input SIDs before processing.
 
         .PARAMETER SID
             The Security Identifier (SID) to convert. Can be either a string representation of a SID
-            or a System.Security.Principal.SecurityIdentifier object.
+            or a System.Security.Principal.SecurityIdentifier object. This parameter also accepts
+            pipeline input with objects containing a SID property.
 
         .EXAMPLE
             Convert-SidToName -SID 'S-1-5-21-3623811015-3361044348-30300820-1013'
@@ -61,12 +66,17 @@
 
         .LINK
             https://learn.microsoft.com/en-us/dotnet/api/system.security.principal.securityidentifier.translate
+            https://learn.microsoft.com/en-us/windows/win32/secauthz/well-known-sids
 
         .LINK
             https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Convert-SidToName.ps1
     #>
 
-    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
+    [CmdletBinding(
+        SupportsShouldProcess = $true,
+        ConfirmImpact = 'Low',
+        PositionalBinding = $true
+    )]
     [OutputType([System.Security.Principal.NTAccount])]
 
     param (
@@ -77,7 +87,7 @@
             ValueFromRemainingArguments = $true,
             HelpMessage = 'Enter a Security Identifier (SID) string or object to convert to an account name.',
             Position = 0)]
-        [Alias('SecurityIdentifier')]
+        [Alias('SecurityIdentifier', 'Identity')]
         [ValidateScript(
             { Test-IsValidSID -ObjectSID $_ },
             ErrorMessage = '[PARAMETER] Provided SID is not valid! Function will not continue. Please check.'
@@ -128,9 +138,9 @@
                 Write-Verbose -Message 'Input is already a SecurityIdentifier object'
 
             } elseif ($SID.PSObject.Properties.Name -contains 'SID' -and
-                  ($SID.SID -is [System.Security.Principal.SecurityIdentifier] -or
-                   ($SID.SID -is [string] -and
-                   ((Test-IsValidSID -ObjectSID $SID.SID) -or
+                    ($SID.SID -is [System.Security.Principal.SecurityIdentifier] -or
+                    ($SID.SID -is [string] -and
+                    ((Test-IsValidSID -ObjectSID $SID.SID) -or
                 $Variables.WellKnownSIDs.Contains($SID.SID))))) {
                 # Check if it's a pipeline object with SID property
 
@@ -238,9 +248,14 @@
     } #end Process
 
     End {
-        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
-            'translating SID to Name (Private Function).'
-        )
-        Write-Verbose -Message $txt
+        # Display function footer if variables exist
+        if ($null -ne $Variables -and $null -ne $Variables.FooterDelegation) {
+
+            $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
+                'translating SID to Name (Private Function).'
+            )
+            Write-Verbose -Message $txt
+
+        } #end if
     } #end End
 }
