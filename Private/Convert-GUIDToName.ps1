@@ -83,7 +83,6 @@
             Used Functions:
                 Name                                       ║ Module/Namespace
                 ═══════════════════════════════════════════╬══════════════════════════════
-                Get-ADRootDSE                              ║ ActiveDirectory
                 Get-ADObject                               ║ ActiveDirectory
                 Write-Verbose                              ║ Microsoft.PowerShell.Utility
                 Write-Error                                ║ Microsoft.PowerShell.Utility
