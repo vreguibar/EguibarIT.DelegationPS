@@ -239,10 +239,15 @@
     } #end Process
 
     End {
-        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
-            'converting GUID to name (Private Function).'
-        )
-        Write-Verbose -Message $txt
+        # Display function footer if variables exist
+        if ($null -ne $Variables -and $null -ne $Variables.FooterDelegation) {
+
+            $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
+                'converting GUID to name (Private Function).'
+            )
+            Write-Verbose -Message $txt
+
+        } #end if
 
         Return $Output
     } #end End
