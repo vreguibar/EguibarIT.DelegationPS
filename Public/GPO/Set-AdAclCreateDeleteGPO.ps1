@@ -123,6 +123,7 @@
             ObjectType            = $Constants.guidNull
             AdSecurityInheritance = 'None'
         }
+
         # Check if RemoveRule switch is present.
         if ($PSBoundParameters['RemoveRule']) {
 

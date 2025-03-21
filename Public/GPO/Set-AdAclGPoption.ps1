@@ -103,30 +103,37 @@
             AdSecurityInheritance = 'All'
         }
         # Check if RemoveRule switch is present.
-        If ($PSBoundParameters['RemoveRule']) {
+        if ($PSBoundParameters['RemoveRule']) {
 
-            if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for Create/Delete GPO?')) {
-                # Add the parameter to remove the rule
-                $Splat.Add('RemoveRule', $true)
-            } #end If
-        } #end If
+            $Splat['RemoveRule'] = $true
+            $ActionDescription = ('Remove GpOption permissions from group {0}' -f $PSBoundParameters['Group'])
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for Create/Delete GPO?')) {
+        } else {
+
+            $ActionDescription = ('Grant GpOption permissions to group {0}' -f $PSBoundParameters['Group'])
+
+        } #end If-Else
+
+        # Perform the action with ShouldProcess
+        if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], $ActionDescription)) {
+
             Set-AclConstructor5 @Splat
+            Write-Verbose -Message ('Successfully completed {0}' -f $ActionDescription)
+
         } #end If
     }
 
     End {
 
-        if ($RemoveRule) {
-            Write-Verbose ('Permissions removal process completed for group: {0}' -f $PSBoundParameters['Group'])
-        } else {
-            Write-Verbose ('Permissions delegation process completed for group: {0}' -f $PSBoundParameters['Group'])
-        } #end If-Else
+        # Display function footer if variables exist
+        if ($null -ne $Variables -and
+            $null -ne $Variables.FooterDelegation) {
 
-        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
-            'delegating gpOptions.'
-        )
-        Write-Verbose -Message $txt
+            $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
+                $ActionDescription
+            )
+            Write-Verbose -Message $txt
+        } #end if
+
     } #end END
-}
+} #end function Set-AdAclGPoption
