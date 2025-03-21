@@ -125,7 +125,6 @@
             ErrorMessage = 'The string specified "{0}" is not a valid GUID format.'
         )]
         [Alias('ID', 'ObjectGUID')]
-        [string]
         $Guid
     )
 
@@ -159,10 +158,10 @@
         Try {
 
             # Ensure string is converted to GUID
-            if ($PSBoundParameters['guid'] -is [String]) {
+            if ($PSBoundParameters['Guid'] -is [String]) {
 
                 Write-Verbose -Message ('Converting string {0} to GUID' -f $guid)
-                [GUID]$guid = [System.guid]::New($PSBoundParameters['guid']) | Out-Null
+                [GUID]$Guid = [System.guid]::New($PSBoundParameters['Guid'])
 
             } #end If
 

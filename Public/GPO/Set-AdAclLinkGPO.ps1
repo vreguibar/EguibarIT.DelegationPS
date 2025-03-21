@@ -74,6 +74,9 @@
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
+        Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case is empty a function is called to fill it up.'
+        Get-AttributeSchemaHashTable
+
         # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
         $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
 
