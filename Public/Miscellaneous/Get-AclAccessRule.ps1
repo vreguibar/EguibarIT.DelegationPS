@@ -319,7 +319,7 @@
 
             [void]$sb.AppendLine('       LDAPpath : {0}' -f $LDAPpath)
             [void]$sb.AppendLine('       Total ACE found : {0}' -f $AclAccess.count)
-            [void]$sb.AppendLine('------------------------------------------------------------')
+            [void]$sb.AppendLine('├────────────────────────────────────────────────────────────┤')
 
             # Process each ACE
             $AceCount = $AclAccess.Count
@@ -399,6 +399,7 @@
             $Splat = @{
                 InputObject = $result
                 Property    = 'ACENumber',
+                '──────────────────────────────',
                 @{Name = 'Id'; Expression = { "$blue$($_.Id)$reset" } },
                 @{Name = 'AdRight'; Expression = { "$blue$($_.AdRight)$reset" } },
                 @{Name = 'AccessControlType'; Expression = { "$blue$($_.AccessControlType)$reset" } },
