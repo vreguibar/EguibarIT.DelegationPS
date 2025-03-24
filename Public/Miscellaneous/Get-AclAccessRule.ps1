@@ -34,10 +34,76 @@
             * InheritedObjectType: GUID of the inherited object type (translated to readable name)
             * IsInherited: Whether the ACE is inherited (True or False)
 
-            The Set-AclConstructor* functions can be used to create new ACEs and apply them to objects. As a guidance, use:
+        .FUNCTIONALITY
+            Output from this function can be used by the Set-AclConstructor* functions to create new ACEs
+             and apply them to objects. As a guidance, use:
+
                 * Set-AclConstructor4 when we have available ID, AdRight, AccessControlType and ObjectType
+                    Get-AclAccessRule4 output
+                        ACENumber              : 1
+                        DistinguishedName      : CN=Schema,CN=Configuration,DC=EguibarIT,DC=local
+                        Id                     : EguibarIT\XXXX
+                        ActiveDirectoryRights  : ExtendedRight
+                        AccessControlType      : Allow
+                        ObjectType             : Change Schema Master [Extended Rights]
+                        X    InheritanceType        : None
+                        X    InheritedObjectType    : GuidNULL
+                        X    IsInherited            : False
+
+                        $Splat = @{
+                            LDAPPath          = 'CN=Schema,CN=Configuration,DC=EguibarIT,DC=local'
+                            Id                = 'EguibarIT\XXXX'
+                            AdRight           = 'ExtendedRight'
+                            AccessControlType = 'Allow'
+                            ObjectType        = 'Change Schema Master [Extended Rights]'
+                        }
+                        Set-AclConstructor4 @Splat
+
                 * Set-AclConstructor5 when we have same as above, plus AdSecurityInheritance
+                    Get-AclAccessRule5 output
+                        ACENumber             : 1
+                        DistinguishedName     : CN=Sites,CN=Configuration,DC=EguibarIT,DC=local
+                        Id                    : EguibarIT\XXXX
+                        AdRight               : ReadProperty, WriteProperty
+                        AccessControlType     : Allow
+                        ObjectType            : siteLink [classSchema]
+                        AdSecurityInheritance : All
+                        X    InheritedObjectType   : All [GuidNULL]
+                        X    IsInherited           : False
+
+                        $Splat = @{
+                            LDAPPath              = 'CN=Sites,CN=Configuration,DC=EguibarIT,DC=local'
+                            Id                    = 'EguibarIT\XXXX'
+                            AdRight               = ReadProperty, WriteProperty
+                            AccessControlType     = 'Allow'
+                            ObjectType            = 'siteLink [classSchema]'
+                            AdSecurityInheritance = All
+                        }
+                        Set-AclConstructor5 @Splat
+
                 * Set-AclConstructor6 when we have same as above, plus InheritedObjectType
+                Get-AclAccessRule6 output
+                    ACE number          : 1
+                    DistinguishedName   : CN=Sites,CN=Configuration,DC=EguibarIT,DC=local
+                    Id                  : EguibarIT\XXXX
+                    AdRight             : CreateChild, DeleteChild
+                    AccessControlType   : Allow
+                    ObjectType          : GuidNULL
+                    InheritanceType     : Descendents
+                    InheritedObjectType : site [ClassSchema]
+                    X    IsInherited         : False
+
+                        $Splat = @{
+                            LDAPPath              = 'CN=Sites,CN=Configuration,DC=EguibarIT,DC=local'
+                            Id                    = 'EguibarIT\XXXX'
+                            AdRight               = CreateChild, DeleteChild
+                            AccessControlType     = 'Allow'
+                            ObjectType            = GuidNULL
+                            AdSecurityInheritance = All
+                            InheritedObjectType   = site [ClassSchema]
+                        }
+                        Set-AclConstructor6 @Splat
+
 
         .PARAMETER LDAPPath
             Distinguished Name of the Active Directory object to retrieve ACEs from.
