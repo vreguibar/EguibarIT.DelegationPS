@@ -1,73 +1,113 @@
 ﻿Function Import-MyModule {
     <#
         .SYNOPSIS
-        Imports a PowerShell module with enhanced error handling and functionality.
+            Imports a PowerShell module with enhanced error handling and functionality.
 
         .DESCRIPTION
-            This function imports a specified PowerShell module with additional
-            error handling, verbose output, and advanced features. It checks if the module
-            is available, handles different versions, and provides options for forced imports
-            and minimum version requirements. It also accepts additional arguments for maximum flexibility.
+            This function provides a robust wrapper around Import-Module with additional
+            features and safeguards:
+
+            - Enhanced error handling and detailed error messages
+            - Version control (minimum and specific versions)
+            - Verbose logging of import process
+            - Support for special modules (GroupPolicy, ServerManager)
+            - Pipeline input support
+            - Module pre-existence checking
+            - Force import capabilities
+            - Global scope options
+
+            The function is idempotent and handles edge cases gracefully.
 
         .PARAMETER Name
-            The name of the module to import.
+            The name of the module to import. Required. Accepts pipeline input.
 
         .PARAMETER MinimumVersion
-            The minimum version of the module to import. If specified, the function will
-            import the newest version that meets this criteria.
+            The minimum acceptable version of the module. Optional.
+            Format: Major.Minor.Build.Revision
 
         .PARAMETER RequiredVersion
-            The exact version of the module to import. If specified, only this version
-            will be imported.
+            The exact version of the module required. Optional.
+            If specified, only this version will be imported.
 
         .PARAMETER Force
-            Forces a module to be imported even if it's already imported.
+            Forces a module import even if already loaded. Optional.
 
         .PARAMETER Global
-            Imports the module into the global session state.
+            Imports the module into the global scope. Optional.
 
         .PARAMETER PassThru
-            Returns the imported module object.
+            Returns the imported module object. Optional.
 
         .PARAMETER Prefix
-            Adds a prefix to the imported module's cmdlets and other items.
+            Adds a prefix to imported module commands. Optional.
 
         .PARAMETER DisableNameChecking
-            Suppresses the message that warns you when you import a cmdlet or function
-            whose name includes an unapproved verb or a prohibited character.
+            Suppresses naming convention warnings. Optional.
 
         .PARAMETER NoClobber
-            Prevents importing commands that would hide or overwrite existing commands.
+            Prevents overwriting existing commands. Optional.
 
         .PARAMETER Scope
-            Defines the scope of the import, either 'Global' or 'Local'.
+            Specifies import scope: 'Global' or 'Local'. Optional.
 
         .PARAMETER SkipEditionCheck
-            Skips the edition check if importing modules designed for Windows PowerShell in PowerShell Core.
+            Skips PowerShell edition compatibility check. Optional.
 
         .PARAMETER UseWindowsPowerShell
-            Forces the module to be imported using Windows PowerShell instead of PowerShell Core.
-
-
-        .EXAMPLE
-            Import-MyModule -Name ActiveDirectory
-            Tries to import the ActiveDirectory module, providing verbose output
-            and handling errors if the module is not available.
+            Forces Windows PowerShell compatibility mode. Optional.
 
         .EXAMPLE
-            Import-MyModule -Name AzureAD -MinimumVersion 2.0.0 -Force -Verbose
-            Imports the AzureAD module with a minimum version of 2.0.0, forcing the import
-            even if it's already loaded, and provides verbose output.
+            Import-MyModule -Name 'ActiveDirectory'
+
+            Imports the ActiveDirectory module with default settings.
+
+        .EXAMPLE
+            'AzureAD', 'MSOnline' | Import-MyModule -Force -Verbose
+
+            Imports multiple modules via pipeline with forced import and verbose output.
+
+        .EXAMPLE
+            Import-MyModule -Name 'Exchange' -MinimumVersion '2.0.0' -Prefix 'EX' -PassThru
+
+            Imports Exchange module with version check, command prefix, and returns the module object.
+
+        .OUTPUTS
+            [System.Management.Automation.PSModuleInfo]
+            When -PassThru is specified, returns the imported module object.
 
         .NOTES
-            Version:        2.1
-            DateModified:   27/Aug/2024
+            Used Functions:
+                Name                                 ║ Module
+                ═════════════════════════════════════╬══════════════════════════════
+                Import-Module                        ║ Microsoft.PowerShell.Core
+                Get-Module                           ║ Microsoft.PowerShell.Core
+                Write-Verbose                        ║ Microsoft.PowerShell.Utility
+                Write-Error                          ║ Microsoft.PowerShell.Utility
+
+        .NOTES
+            Version:        2.2
+            DateModified:    24/Mar/2025
             LastModifiedBy: Vicente Rodriguez Eguibar
                 vicente@eguibar.com
-                Eguibar Information Technology S.L.
+                Eguibar IT
                 http://www.eguibarit.com
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Public/Miscellaneous/Import-MyModule.ps1
+
+        .LINK
+            https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/import-module
+
+        .COMPONENT
+            PowerShell Module Management
+
+        .ROLE
+            System Administration
     #>
-    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [CmdletBinding(
+        SupportsShouldProcess = $true,
+        ConfirmImpact = 'Low'
+    )]
     [OutputType([System.Management.Automation.PSModuleInfo])]
 
     Param (
@@ -137,9 +177,9 @@
         # Display function header if variables exist
         if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
             $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToString('dd/MMM/yyyy'),
+                (Get-Date).ToString('dd/MMM/yyyy'),
                 $MyInvocation.Mycommand,
-            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
+                (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
             )
             Write-Verbose -Message $txt
         } #end if
@@ -150,70 +190,34 @@
         ##############################
         # Variables Definition
 
-        $Preference = $VerbosePreference
-        $VerbosePreference = 'SilentlyContinue'
-
-        $functionName = $MyInvocation.MyCommand.Name
+        # Store original verbose preference
+        $originalVerbosePreference = $VerbosePreference
 
         # Get Hashtable with corresponding parameters to import module
+        # Build import parameters hashtable
         $importParams = @{
-            Name        = $name
+            Name        = $Name
             ErrorAction = 'Stop'
+            Verbose     = $PSBoundParameters['Verbose'] -eq $true
         }
 
-
-        if ($Force) {
-            $importParams['Force'] = $true
-        } #end If
-
-        if ($Global) {
-            $importParams['Global'] = $true
-        } #end If
 
         # Add optional parameters if specified
-        if ($PSBoundParameters.ContainsKey('MinimumVersion')) {
-            $importParams['MinimumVersion'] = $MinimumVersion
-        } #end If
+        $optionalParams = @(
+            'Force', 'Global', 'MinimumVersion', 'RequiredVersion', 'PassThru',
+            'Prefix', 'DisableNameChecking', 'NoClobber', 'Scope', 'SkipEditionCheck',
+            'UseWindowsPowerShell'
+        )
 
-        if ($PSBoundParameters.ContainsKey('RequiredVersion')) {
-            $importParams['RequiredVersion'] = $RequiredVersion
-        } #end If
+        foreach ($param in $optionalParams) {
 
-        if ($PassThru) {
-            $importParams['PassThru'] = $true
-        } #end If
+            if ($PSBoundParameters.ContainsKey($param)) {
 
-        if ($PSBoundParameters.ContainsKey('Prefix')) {
-            $importParams['Prefix'] = $Prefix
-        } #end If
+                $importParams[$param] = $PSBoundParameters[$param]
 
-        if ($DisableNameChecking) {
-            $importParams['DisableNameChecking'] = $true
-        } #end If
+            } #end If
 
-        if ($NoClobber) {
-            $importParams['NoClobber'] = $true
-        } #end If
-
-        if ($Scope) {
-            $importParams['Scope'] = $PSBoundParameters['Scope']
-        } #end If
-
-        if ($SkipEditionCheck) {
-            $importParams['SkipEditionCheck'] = $true
-        } #end If
-
-        if ($UseWindowsPowerShell) {
-            $importParams['UseWindowsPowerShell'] = $true
-        } #end If
-
-
-        # Handle Verbose parameter correctly
-        if ($PSBoundParameters['Verbose'] -eq $true) {
-            $importParams['Verbose'] = $true
-        } elseIf (($PSBoundParameters['Verbose'] -eq $false) -or (-Not $PSBoundParameters.ContainsKey('Verbose'))) {
-            $importParams['Verbose'] = $false
-        }
+        } #end ForEach
 
     } #end Begin
 
@@ -221,68 +225,92 @@
 
         try {
 
-            If ($Name -eq 'GroupPolicy') {
-                $x = 'C:\Windows\system32\WindowsPowerShell\v1.0\Modules\GroupPolicy\GroupPolicy.psd1'
-                Import-Module $x -Verbose:$PSBoundParameters['Verbose']
+            # Handle special modules
+            $specialModules = @{
+                'GroupPolicy'   = 'C:\Windows\system32\WindowsPowerShell\v1.0\Modules\GroupPolicy\GroupPolicy.psd1'
+                'ServerManager' = 'C:\Windows\system32\WindowsPowerShell\v1.0\Modules\ServerManager\ServerManager.psd1'
             }
 
-            If ($Name -eq 'ServerManager') {
-                $x = 'C:\Windows\system32\WindowsPowerShell\v1.0\Modules\ServerManager\ServerManager.psd1'
-                Import-Module $x -Verbose:$PSBoundParameters['Verbose']
-            }
+            if ($specialModules.ContainsKey($Name)) {
 
-            # Change this part to correctly check for module availability
-            $availableModule = Get-Module -Name $Name -ErrorAction SilentlyContinue -Verbose:$PSBoundParameters['Verbose']
+                if (Test-Path -Path $specialModules[$Name]) {
+
+                    if ($PSCmdlet.ShouldProcess($Name, 'Import special module')) {
+
+                        Import-Module -Name $specialModules[$Name] @importParams
+                        Write-Verbose -Message ('Successfully imported special module {0}' -f $Name)
+                        return
+                    } #end If
+
+                } else {
+
+                    throw ('Special module path not found: {0}' -f $specialModules[$Name])
+
+                } #end If-Else
+
+            } #end If
 
             if (-not $availableModule) {
                 Write-Error -Message ('Module "{0}" is not installed. Please install the module before importing.' -f $Name)
             } #end If
 
 
-            # Check if the module is already imported
-            $importedModule = Get-Module -Name $Name -ErrorAction SilentlyContinue -Verbose:$PSBoundParameters['Verbose']
+            # Check if module is available
+            $availableModule = Get-Module -Name $Name -ListAvailable -ErrorAction SilentlyContinue
+            if (-not $availableModule) {
 
-            if ($null -ne $importedModule -and -not $Force) {
-                Write-Verbose -Message ('[{0}] Module {1} is already imported.' -f $functionName, $Name)
-
-                if ($PassThru) {
-                    return $Module
-                } #end If
-                return
+                throw ('Module {0} is not installed' -f $Name)
 
             } #end If
 
-            # Perform the import
-            if ($PSCmdlet.ShouldProcess($Name, 'Import Module')) {
+            # Check if already imported
+            $importedModule = Get-Module -Name $Name -ErrorAction SilentlyContinue
+            if ($null -ne $importedModule -and -not $Force) {
 
-                $importedModule = Import-Module @importParams -Verbose:$PSBoundParameters['Verbose']
-
-                Write-Verbose -Message ('[{0}] Successfully imported module {1}' -f $functionName, $Name)
-
+                Write-Verbose -Message ('Module {0} is already imported' -f $Name)
 
                 if ($PassThru) {
                     return $importedModule
                 } #end If
 
-                Write-Verbose -Message ('Module {0} has been successfully imported.' -f $ModuleName)
-            } #end else
+                return
+            } #end If
+
+            # Perform the import
+            if ($PSCmdlet.ShouldProcess($Name, 'Import module')) {
+
+                $importedModule = Import-Module @importParams
+                Write-Verbose -Message ('Successfully imported module {0}' -f $Name)
+
+                if ($PassThru) {
+                    return $importedModule
+                } #end If
+
+            } #end If
+
 
 
 
         } catch {
-            Write-Error -Message ('[{0}] Error importing module {1}: {2}' -f $functionName, $Name, $_)
-            #Get-ErrorDetail -ErrorRecord $_
-            #throw
+
+            Write-Error -Message ('Failed to import module {0}: {1}' -f $Name, $_.Exception.Message)
+
         } #end Try-Catch
 
     } #end Process
 
     End {
-        $VerbosePreference = $Preference
+        # Restore original verbose preference
+        $VerbosePreference = $originalVerbosePreference
 
-        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
-            'importing module.'
-        )
-        Write-Verbose -Message $txt
+        if ($null -ne $Variables -and
+            $null -ne $Variables.FooterDelegation) {
+
+            $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
+                'importing module.'
+            )
+            Write-Verbose -Message $txt
+        }#end if
+
     } #end End
-} #end Function
+} #end Function Import-MyModule

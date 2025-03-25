@@ -1,33 +1,81 @@
 ﻿Function Set-AdAclFullControlDHCP {
     <#
-        .Synopsis
-            Set delegation to fully manage Dynamic Host Configuration Protocol (DHCP)
+        .SYNOPSIS
+            Set delegation to fully manage Dynamic Host Configuration Protocol (DHCP).
+
         .DESCRIPTION
-            Configures the configuration container to delegate the permissions to a group so it can fully manage Dynamic Host Configuration Protocol (DHCP).
+            This function configures the configuration container to delegate full DHCP management permissions
+            to a specified group. It:
+
+            - Sets GenericAll rights on dHCPClass objects and descendants
+            - Configures CreateChild and DeleteChild rights for dHCPClass objects
+            - Supports both adding and removing delegations
+            - Implements proper error handling and progress tracking
+            - Supports -WhatIf and -Confirm for safe execution
+
+        .PARAMETER Group
+            The identity of the group receiving the delegation. This should typically be a Domain Local group.
+            Accepts pipeline input and can be specified as group name or Distinguished Name.
+
+        .PARAMETER RemoveRule
+            If specified, removes the delegated permissions instead of adding them.
+            Use with caution as this affects DHCP management capabilities.
+
         .EXAMPLE
             Set-AdAclFullControlDHCP -Group "SL_DHCPRight"
+
+            Delegates full DHCP management permissions to the specified group.
+
         .EXAMPLE
             Set-AdAclFullControlDHCP -Group "SL_DHCPRight" -RemoveRule
-        .PARAMETER Group
-            [STRING] Identity of the group getting the delegation.
-        .PARAMETER RemoveRule
-            [SWITCH] If present, the access rule will be removed
+
+            Removes DHCP management permissions from the specified group.
+
+        .EXAMPLE
+            "SG_DHCPAdmins" | Set-AdAclFullControlDHCP -WhatIf
+
+            Shows what changes would be made without actually making them.
+
+        .OUTPUTS
+            [void]
+
         .NOTES
             Used Functions:
-                Name                                   | Module
-                ---------------------------------------|--------------------------
-                Set-AclConstructor5                    | EguibarIT.DelegationPS
-                Set-AclConstructor6                    | EguibarIT.DelegationPS
-                Get-AttributeSchemaHashTable           | EguibarIT.DelegationPS
+                Name                                 ║ Module
+                ═════════════════════════════════════╬══════════════════════════════
+                Set-AclConstructor5                  ║ EguibarIT.DelegationPS
+                Set-AclConstructor6                  ║ EguibarIT.DelegationPS
+                Get-AttributeSchemaHashTable         ║ EguibarIT.DelegationPS
+                Get-AdObjectType                     ║ EguibarIT.DelegationPS
+                Write-Verbose                        ║ Microsoft.PowerShell.Utility
+                Write-Error                          ║ Microsoft.PowerShell.Utility
+
         .NOTES
-            Version:         1.2
-            DateModified:    07/Dec/2016
+            Version:         1.3
+            DateModified:    24/Mar/2025
             LasModifiedBy:   Vicente Rodriguez Eguibar
                 vicente@eguibar.com
-                Eguibar Information Technology S.L.
+                Eguibar IT
                 http://www.eguibarit.com
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Public/Miscellaneous/Set-AdAclFullControlDHCP.ps1
+
+        .LINK
+            https://docs.microsoft.com/en-us/windows-server/networking/technologies/dhcp/dhcp-deploy-wps
+
+        .COMPONENT
+            ActiveDirectory
+
+        .ROLE
+            Security Administration
+
     #>
-    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+
+    [CmdletBinding(
+        SupportsShouldProcess = $true,
+        ConfirmImpact = 'Medium'
+    )]
     [OutputType([void])]
 
     Param (
@@ -59,9 +107,9 @@
         # Display function header if variables exist
         if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
             $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToString('dd/MMM/yyyy'),
+                (Get-Date).ToString('dd/MMM/yyyy'),
                 $MyInvocation.Mycommand,
-            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
+                (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
             )
             Write-Verbose -Message $txt
         } #end if
@@ -73,15 +121,30 @@
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
-        Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case is empty a function is called to fill it up.'
-        Get-AttributeSchemaHashTable
+        try {
+            Write-Debug -Message 'Initializing attribute schema hash table...'
+            Get-AttributeSchemaHashTable
 
-        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
-        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
+            # Verify Group exists
+            $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
+
+            if (-not $CurrentGroup) {
+                throw ('Group {0} not found or not accessible' -f $PSBoundParameters['Group'])
+            } #end If
+
+        } catch {
+
+            Write-Error -Message ('Initialization failed: {0}' -f $_.Exception.Message)
+            return
+
+        } #end Try-Catch
 
     } #end Begin
 
     Process {
+
+        $operation = $RemoveRule ? 'Remove' : 'Add'
+
         <#
             ACENumber              : 1
             IdentityReference      : EguibarIT\xxx
@@ -104,14 +167,15 @@
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
 
-            if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for dHCPClass?')) {
-                # Add the parameter to remove the rule
-                $Splat.Add('RemoveRule', $true)
-            } #end If
+            # Add the parameter to remove the rule
+            $Splat.Add('RemoveRule', $true)
+
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for dHCPClass?')) {
+        if ($PSCmdlet.ShouldProcess($Group, ('{0} GenericAll permissions on DHCP objects' -f $operation))) {
+
             Set-AclConstructor6 @Splat
+
         } #end If
 
         <#
@@ -135,15 +199,17 @@
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
 
-            if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for dHCPClass?')) {
-                # Add the parameter to remove the rule
-                $Splat.Add('RemoveRule', $true)
-            } #end If
+            # Add the parameter to remove the rule
+            $Splat.Add('RemoveRule', $true)
+
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for dHCPClass?')) {
+        if ($PSCmdlet.ShouldProcess($Group, ('{0} Create/Delete permissions on DHCP objects' -f $operation))) {
+
             Set-AclConstructor5 @Splat
+
         } #end If
+
     } #end Process
 
     End {
@@ -154,9 +220,13 @@
             Write-Verbose ('Permissions delegation process completed for group: {0} ' -f $PSBoundParameters['Group'])
         } #end If-Else
 
-        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
-            'delegating DHCP.'
-        )
-        Write-Verbose -Message $txt
+        if ($null -ne $Variables -and
+            $null -ne $Variables.FooterDelegation) {
+
+            $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
+                'delegating DHCP.'
+            )
+            Write-Verbose -Message $txt
+        } #end if
     } #end END
-}
+} #end Function Set-AdAclFullControlDHCP
