@@ -191,7 +191,6 @@
 
             } Catch {
                 Write-Error -Message ('Something went wrong while setting File Security. {0}' -f $_)
-                ##Get-ErrorDetail -ErrorRecord $_
             } #end Try-Catch
 
         } #end If
@@ -204,7 +203,6 @@
 
         } Catch {
             Write-Error -Message ('Something went wrong while trying to save the GptTmpl.inf file...')
-            ##Get-ErrorDetail -ErrorRecord $_
             Throw
         } Finally {
             $GptTmpl.Dispose()

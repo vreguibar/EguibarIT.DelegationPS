@@ -129,7 +129,6 @@
                     Write-Verbose -Message ('Successfully removed {0} for {1}' -f $_.AceType, $PSBoundParameters['Group'])
                 } catch {
                     Write-Error -Message "Failed to remove access because $($_.Exception.Message)"
-                    #Get-ErrorDetail -ErrorRecord $_
                 } #end Try-Catch
             } #end $Permission
 
@@ -148,7 +147,6 @@
                 Write-Verbose -Message 'Successfully set binary ACL in the registry'
             } catch {
                 Write-Error -Message ('Failed to set Security in the registry because {0}' -f $_.Exception.Message)
-                #Get-ErrorDetail -ErrorRecord $_
             } #end Try-Catch
         } #end If
 

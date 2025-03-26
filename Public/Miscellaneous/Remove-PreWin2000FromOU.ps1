@@ -132,7 +132,6 @@
             } #end If
         } catch {
             Write-Error -Message 'Error when removing Pre-Windows 2000 from OU'
-            #Get-ErrorDetail -ErrorRecord $_
             throw
         }
     } #end Process
