@@ -5,7 +5,7 @@
             return [PSCustomObject]@{
                 ObjectClass       = 'user'
                 SamAccountName    = 'testuser'
-                DistinguishedName = 'CN=testuser,DC=contoso,DC=com'
+                DistinguishedName = 'CN=testuser,DC=EguibarIT,DC=local'
             }
         }
 
@@ -13,7 +13,7 @@
             return [PSCustomObject]@{
                 ObjectClass       = 'computer'
                 Name              = 'TESTPC'
-                DistinguishedName = 'CN=TESTPC,DC=contoso,DC=com'
+                DistinguishedName = 'CN=TESTPC,DC=EguibarIT,DC=local'
             }
         }
 
@@ -21,7 +21,7 @@
             return [PSCustomObject]@{
                 ObjectClass       = 'group'
                 Name              = 'TestGroup'
-                DistinguishedName = 'CN=TestGroup,DC=contoso,DC=com'
+                DistinguishedName = 'CN=TestGroup,DC=EguibarIT,DC=local'
             }
         }
 
@@ -29,7 +29,7 @@
             return [PSCustomObject]@{
                 ObjectClass       = 'organizationalUnit'
                 Name              = 'TestOU'
-                DistinguishedName = 'OU=TestOU,DC=contoso,DC=com'
+                DistinguishedName = 'OU=TestOU,DC=EguibarIT,DC=local'
             }
         }
 
@@ -37,7 +37,7 @@
             return [PSCustomObject]@{
                 ObjectClass       = 'msDS-GroupManagedServiceAccount'
                 Name              = 'TestGMSA'
-                DistinguishedName = 'CN=TestGMSA,DC=contoso,DC=com'
+                DistinguishedName = 'CN=TestGMSA,DC=EguibarIT,DC=local'
             }
         }
 
@@ -88,7 +88,7 @@
         }
 
         It 'Should handle DistinguishedName' {
-            $result = Get-AdObjectType -Identity 'CN=testuser,DC=contoso,DC=com'
+            $result = Get-AdObjectType -Identity 'CN=testuser,DC=EguibarIT,DC=local'
             $result | Should -Not -BeNullOrEmpty
         }
 
