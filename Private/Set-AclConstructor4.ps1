@@ -86,6 +86,7 @@ function Set-AclConstructor4 {
             https://msdn.microsoft.com/en-us/library/w72e8e69.aspx
             https://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectoryrights
             https://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectorysecurityinheritance
+            https://learn.microsoft.com/en-us/dotnet/api/system.directoryservices.activedirectoryaccessrule.-ctor?view=windowsdesktop-9.0&viewFallbackFrom=dotnet-plat-ext-6.0#system-directoryservices-activedirectoryaccessrule-ctor(system-security-principal-identityreference-system-directoryservices-activedirectoryrights-system-security-accesscontrol-accesscontroltype-system-directoryservices-activedirectorysecurityinheritance)
 
         .LINK
             https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Set-AclConstructor4.ps1
