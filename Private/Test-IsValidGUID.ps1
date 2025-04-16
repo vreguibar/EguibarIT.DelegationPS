@@ -43,6 +43,9 @@
                 vicente@eguibar.com
                 Eguibar IT
                 http://www.eguibarit.com
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT/blob/main/Private/Test-IsValidGUID.ps1
     #>
 
     [CmdletBinding(ConfirmImpact = 'Low',
@@ -100,4 +103,4 @@
     end {
         return $isValid
     } #end End
-} #end Function
+} #end Function Test-IsValidGUID

@@ -139,11 +139,13 @@
         Set-StrictMode -Version Latest
 
         # Display function header if variables exist
-        if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
-            $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToString('dd/MMM/yyyy'),
+        if ($null -ne $Variables -and
+            $null -ne $Variables.HeaderHousekeeping) {
+
+            $txt = ($Variables.HeaderHousekeeping -f
+                (Get-Date).ToString('dd/MMM/yyyy'),
                 $MyInvocation.Mycommand,
-            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
+                (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
             )
             Write-Verbose -Message $txt
         } #end if
@@ -285,8 +287,10 @@
 
     End {
         # Display function footer if variables exist
-        if ($null -ne $Variables -and $null -ne $Variables.FooterDelegation) {
-            $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
+        if ($null -ne $Variables -and
+            $null -ne $Variables.FooterHousekeeping) {
+
+            $txt = ($Variables.Footer -f $MyInvocation.InvocationName,
                 'getting AD object type (Private Function).'
             )
             Write-Verbose -Message $txt
