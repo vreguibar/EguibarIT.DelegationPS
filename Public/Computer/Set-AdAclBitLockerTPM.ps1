@@ -120,13 +120,13 @@ function Set-AdAclBitLockerTPM {
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
 
-            if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msTPM-OwnerInformation?')) {
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msTPM-OwnerInformation?')) {
                 # Add the parameter to remove the rule
                 $Splat.Add('RemoveRule', $true)
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msTPM-OwnerInformation?')) {
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msTPM-OwnerInformation?')) {
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -153,13 +153,13 @@ function Set-AdAclBitLockerTPM {
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
 
-            if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msTPM-OwnerInformation?')) {
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msTPM-OwnerInformation?')) {
                 # Add the parameter to remove the rule
                 $Splat.Add('RemoveRule', $true)
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msTPM-OwnerInformation?')) {
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msTPM-OwnerInformation?')) {
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -186,13 +186,13 @@ function Set-AdAclBitLockerTPM {
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
 
-            if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msFVE-RecoveryInformation?')) {
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msFVE-RecoveryInformation?')) {
                 # Add the parameter to remove the rule
                 $Splat.Add('RemoveRule', $true)
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msFVE-RecoveryInformation?')) {
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msFVE-RecoveryInformation?')) {
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -218,28 +218,40 @@ function Set-AdAclBitLockerTPM {
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
 
-            if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msTPM-TpmInformationForComputer?')) {
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msTPM-TpmInformationForComputer?')) {
                 # Add the parameter to remove the rule
                 $Splat.Add('RemoveRule', $true)
             } #end If
         } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msTPM-TpmInformationForComputer?')) {
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msTPM-TpmInformationForComputer?')) {
             Set-AclConstructor6 @Splat
         } #end If
     } #end Process
 
     End {
-
-        if ($RemoveRule) {
-            Write-Verbose ('Permissions removal process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
+        # Report completion status based on whether permissions were removed or added
+        if ($PSBoundParameters['RemoveRule']) {
+            Write-Verbose -Message ('Permissions removal process completed for group: {0} on {1}' -f
+                $PSBoundParameters['Group'],
+                $PSBoundParameters['LDAPpath']
+            )
         } else {
-            Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
+            Write-Verbose -Message ('Permissions delegation process completed for group: {0} on {1}' -f
+                $PSBoundParameters['Group'],
+                $PSBoundParameters['LDAPpath']
+            )
         } #end If-Else
 
-        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
-            'delegating BitLocker & TPM.'
-        )
-        Write-Verbose -Message $txt
-    } #end END
-}
+        # Display function footer if variables exist
+        if ($null -ne $Variables -and
+            $null -ne $Variables.FooterDelegation) {
+
+            $txt = ($Variables.FooterDelegation -f
+                $MyInvocation.InvocationName,
+                'delegating BitLocker & TPM.'
+            )
+            Write-Verbose -Message $txt
+        } #end If
+    } #end End
+} #end function Set-AdAclBitLockerTPM

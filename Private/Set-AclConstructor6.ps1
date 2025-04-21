@@ -1,6 +1,4 @@
-﻿# Constructor W/6 attributes https://msdn.microsoft.com/en-us/library/w72e8e69.aspx
-
-function Set-AclConstructor6 {
+﻿function Set-AclConstructor6 {
     <#
         .Synopsis
             Modifies ACLs on Active Directory objects using a 6-parameter access rule constructor.
@@ -10,41 +8,68 @@ function Set-AclConstructor6 {
             using a constructor with 6 parameters to specify the access rule details.
             It supports batch processing and is optimized for large AD environments.
 
+            This constructor form is used when you need to specify both ObjectType and InheritedObjectType GUIDs
+            for granular permission control on specific object types within Active Directory.
+
         .PARAMETER Id
-            Specifies the SamAccountName of the delegated group or user. This is the identity for which the access rule will be modified.
-            It can be a variable containing the AD group.
+            Specifies the identity (user or group) to which the permission will be granted or from which it will be removed.
+            This can be provided as a SamAccountName, Distinguished Name, ObjectGUID, or as an Active Directory object.
+            The function will resolve the identity to its SID automatically.
 
         .PARAMETER LDAPPath
-            Specifies the LDAP path of the target Active Directory object.
+            Specifies the LDAP path (Distinguished Name) of the target Active Directory object
+            where the permissions will be modified. This must be a valid DN in the directory.
 
         .PARAMETER AdRight
-            Specifies the Active Directory rights. Valid options include CreateChild, DeleteChild, and others.
+            Specifies the Active Directory rights to grant or remove. This can be a single right or multiple rights combined.
+            Valid values include: CreateChild, DeleteChild, ListChildren, Self, ReadProperty, WriteProperty, DeleteTree,
+            ListObject, ExtendedRight, Delete, ReadControl, GenericExecute, GenericWrite, GenericRead, WriteDacl, WriteOwner,
+            GenericAll, Synchronize, AccessSystemSecurity.
 
         .PARAMETER AccessControlType
-            Specifies whether the access control is to Allow or Deny.
+            Specifies whether the access control is to Allow or Deny the specified permissions.
+            Valid values are "Allow" and "Deny".
 
         .PARAMETER ObjectType
-            Specifies the object type GUID. Use for specific property access or extended rights.
+            Specifies the object type GUID that the access rule applies to. This can be:
+            - A property set GUID
+            - An extended right GUID
+            - A validated write GUID
+            - A property GUID
+            - An object GUID
+
+            Use this parameter when you need to control access to specific attributes or operations.
+            Can be provided as a GUID string or a GUID object.
 
         .PARAMETER AdSecurityInheritance
-            Security inheritance of the new right (All, Children, Descendents, None, SelfAndChildren)
+            Specifies how the access rule is inherited by child objects.
+            Valid values include:
+            - "All": The access rule is inherited by this object and all child objects
+            - "Descendents": The access rule is inherited by all child objects
+            - "None": The access rule is not inherited
+            - "SelfAndChildren": The access rule is inherited by the immediate child objects
+            - "Children": The access rule is inherited only by child objects
 
         .PARAMETER InheritedObjectType
-            [GUID] of the Inherited object or Extended Right
+            Specifies the GUID of the object type that can inherit this access rule.
+            This parameter is used to limit the inheritance to specific types of child objects.
+            Can be provided as a GUID string or a GUID object.
 
         .PARAMETER RemoveRule
-            If specified, the access rule will be removed. If omitted, the access rule will be added.
+            If specified, the access rule will be removed instead of added.
+            By default, the function adds the specified access rule.
 
         .EXAMPLE
-            Set-AclConstructor6 -Id "SG_SiteAdmins_XXXX"
-            -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
-            -AdRight "CreateChild,DeleteChild"
-            -AccessControlType "Allow"
-            -InheritedObjectType 12345678-abcd-1234-abcd-0123456789012
-            -ObjectType 12345678-abcd-1234-abcd-0123456789012
-            -AdSecurityInheritance "All"
+            Set-AclConstructor6 -Id "SG_SiteAdmins_XXXX" `
+                               -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local" `
+                               -AdRight "CreateChild,DeleteChild" `
+                               -AccessControlType "Allow" `
+                               -ObjectType "12345678-abcd-1234-abcd-0123456789012" `
+                               -AdSecurityInheritance "All" `
+                               -InheritedObjectType "12345678-abcd-1234-abcd-0123456789012"
 
             This example adds CreateChild and DeleteChild rights for the SG_SiteAdmins_XXXX group to the specified OU.
+            The permissions apply to objects of the specified Object Type and are inherited by objects of the specified InheritedObjectType.
 
         .EXAMPLE
             $Splat = @{
@@ -52,13 +77,14 @@ function Set-AclConstructor6 {
                 LDAPPath              = "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
                 AdRight               = "CreateChild,DeleteChild"
                 AccessControlType     = "Allow"
-                ObjectType            = '12345678-abcd-1234-abcd-0123456789012'
+                ObjectType            = "12345678-abcd-1234-abcd-0123456789012"
                 AdSecurityInheritance = "All"
-                ObjectType            = '12345678-abcd-1234-abcd-0123456789012'
+                InheritedObjectType   = "87654321-dcba-4321-dcba-210987654321"
             }
             Set-AclConstructor6 @Splat
 
             This example uses splatting to provide the parameters for adding permissions.
+            The permission will apply to the specified Object Type and be inherited by the specified InheritedObjectType.
 
         .EXAMPLE
             $group = Get-AdGroup "SG_SiteAdmins_XXXX"
@@ -68,53 +94,74 @@ function Set-AclConstructor6 {
                 LDAPPath              = "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
                 AdRight               = "CreateChild,DeleteChild"
                 AccessControlType     = "Allow"
-                ObjectType            = '12345678-abcd-1234-abcd-0123456789012'
+                ObjectType            = "12345678-abcd-1234-abcd-0123456789012"
                 AdSecurityInheritance = "All"
-                ObjectType            = '12345678-abcd-1234-abcd-0123456789012'
+                InheritedObjectType   = "87654321-dcba-4321-dcba-210987654321"
+                RemoveRule            = $true
             }
             Set-AclConstructor6 @Splat
 
             This example removes CreateChild and DeleteChild rights from the specified OU for the SG_SiteAdmins_XXXX group.
+            It demonstrates using an AD object directly for the Id parameter and using the RemoveRule switch.
 
         .EXAMPLE
             Import-Csv -Path ".\permissions.csv" | Set-AclConstructor6
 
             This example demonstrates pipeline input, assuming the CSV has appropriate column names matching parameter names.
+            This allows for bulk permission operations defined in a CSV file.
+
+        .INPUTS
+            System.String
+            System.DirectoryServices.ActiveDirectoryRights
+            System.Security.AccessControl.AccessControlType
+            System.Guid
+            System.DirectoryServices.ActiveDirectorySecurityInheritance
+            System.Boolean
 
         .OUTPUTS
             [void]
 
         .NOTES
             Used Functions:
-                 Name                                      ║ Module/Namespace
+                Name                                       ║ Module/Namespace
                 ═══════════════════════════════════════════╬══════════════════════════════
                 Get-ADObject                               ║ ActiveDirectory
                 Get-Acl                                    ║ Microsoft.PowerShell.Security
                 Set-Acl                                    ║ Microsoft.PowerShell.Security
                 Test-IsValidDN                             ║ EguibarIT.DelegationPS
                 Get-AdObjectType                           ║ EguibarIT.DelegationPS
+                Get-FunctionDisplay                        ║ EguibarIT.DelegationPS
                 Write-Verbose                              ║ Microsoft.PowerShell.Utility
+                Write-Debug                                ║ Microsoft.PowerShell.Utility
                 Write-Error                                ║ Microsoft.PowerShell.Utility
-                Test-IsValidDN                             ║ EguibarIT.DelegationPS
 
         .NOTES
-            Version:         3.0
-            DateModified:    18/Mar/2025
+            Version:         3.1
+            DateModified:    11/Jun/2024
             LasModifiedBy:   Vicente Rodriguez Eguibar
-                vicente@eguibar.com
-                Eguibar IT
-                http://www.eguibarit.com
+                        vicente@eguibar.com
+                        Eguibar IT
+                        http://www.eguibarit.com
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Set-AclConstructor6.ps1
 
         .LINK
             https://docs.microsoft.com/en-us/powershell/module/activedirectory/get-adobject
             https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.security/get-acl
             https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-acl
-            https://msdn.microsoft.com/en-us/library/w72e8e69.aspx
             https://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectoryrights
             https://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectorysecurityinheritance
+            https://msdn.microsoft.com/en-us/library/w72e8e69.aspx
 
-        .LINK
-            https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Set-AclConstructor6.ps1
+        .COMPONENT
+            Active Directory Security
+
+        .ROLE
+            Security Administrator
+
+        .FUNCTIONALITY
+            Active Directory Permission Management
   #>
 
     [CmdletBinding(
@@ -529,4 +576,4 @@ function Set-AclConstructor6 {
         } #end if
 
     } #end END
-} #end Function
+} #end Function Set-AclConstructor6

@@ -1,37 +1,46 @@
 ﻿function Get-GptTemplate {
     <#
         .SYNOPSIS
-            Retrieves the GPT template (GptTmpl.inf) for a specified Group Policy Object.
+            Retrieves or creates the GPT template (GptTmpl.inf) for a specified Group Policy Object.
 
         .DESCRIPTION
-            This function retrieves the GPT template path for a specified Group Policy Object (GPO).
-            It ensures the necessary directory structure exists in SYSVOL, creates the GptTmpl.inf
-            file if it doesn't exist, and returns an IniFileHandler.IniFile object representing
-            the template.
+            This function retrieves or creates the GPT template file (GptTmpl.inf) for a specified Group Policy Object (GPO).
 
-            The function supports pipeline input and handles errors gracefully with detailed
-            error messages for better troubleshooting. It automatically creates the required
-            directory structure and template file if they don't exist.
+            It performs the following operations:
+            - Retrieves the specified GPO using the Group Policy module
+            - Locates or creates the necessary directory structure in SYSVOL
+            - Creates the GptTmpl.inf file if it doesn't exist
+            - Returns an IniFileHandler.IniFile object representing the template
+
+            This function is essential for Group Policy security settings management as it provides
+            access to the underlying infrastructure file that stores security configurations.
+
+            The function handles errors gracefully with detailed error messages for better troubleshooting
+            and supports pipeline input for efficient batch processing.
 
         .PARAMETER GpoName
             The name of the Group Policy Object (GPO) for which the GPT template is to be retrieved.
-            This parameter accepts pipeline input.
+            This parameter accepts both direct input and pipeline input, including objects from Get-GPO.
 
         .PARAMETER DomainName
-            The FQDN of the domain containing the GPO. If not specified, the current user's domain is used.
+            The Fully Qualified Domain Name (FQDN) of the domain containing the GPO.
+            If not specified, the current user's domain (from environment variable USERDNSDOMAIN) is used.
 
         .PARAMETER Server
-            The Domain Controller to connect to. If not specified, the nearest Domain Controller is used.
+            The Domain Controller to connect to for Group Policy operations.
+            If not specified, the nearest Domain Controller is automatically selected.
 
         .EXAMPLE
             Get-GptTemplate -GpoName "Default Domain Policy"
 
             Retrieves the GPT template for the "Default Domain Policy" GPO in the current domain.
+            Creates the template file if it doesn't exist.
 
         .EXAMPLE
-            Get-GptTemplate -GpoName "Default Domain Policy" -DomainName "EguibarIT.local"
+            Get-GptTemplate -GpoName "Default Domain Policy" -DomainName "EguibarIT.local" -Server "DC01.EguibarIT.local"
 
-            Retrieves the GPT template for the "Default Domain Policy" GPO in the EguibarIT.local domain.
+            Retrieves the GPT template for the "Default Domain Policy" GPO in the EguibarIT.local domain,
+            connecting to the specified domain controller DC01.EguibarIT.local.
 
         .EXAMPLE
             Get-GPO -Name "Default Domain Policy" | Get-GptTemplate
@@ -60,14 +69,13 @@
                 Test-Path                        ║ Microsoft.PowerShell.Management
                 Write-Error                      ║ Microsoft.PowerShell.Utility
                 Write-Verbose                    ║ Microsoft.PowerShell.Utility
-                Write-Progress                   ║ Microsoft.PowerShell.Utility
                 Write-Debug                      ║ Microsoft.PowerShell.Utility
-                Get-FunctionDisplay              ║ EguibarIT
-                Import-MyModule                  ║ EguibarIT
+                Get-FunctionDisplay              ║ EguibarIT.DelegationPS
+                Import-MyModule                  ║ EguibarIT.DelegationPS
 
         .NOTES
-            Version:        1.1
-            DateModified:   20/Mar/2025
+            Version:        1.2
+            DateModified:   21/Mar/2025
             LastModifiedBy: Vicente Rodriguez Eguibar
                             vicente@eguibar.com
                             Eguibar IT
@@ -75,6 +83,18 @@
 
         .LINK
             https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Get-GptTemplate.ps1
+
+        .COMPONENT
+            GroupPolicy
+
+        .ROLE
+            System Administration
+            Group Policy Management
+
+        .FUNCTIONALITY
+            Group Policy
+            Security Configuration
+            GPO Management
     #>
 
     [CmdletBinding(SupportsShouldProcess = $true,

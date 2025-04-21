@@ -57,10 +57,11 @@ function Set-AclConstructor4 {
 
         .OUTPUTS
             [void]
+            This function does not return any objects. It modifies ACLs directly on Active Directory objects.
 
         .NOTES
             Used Functions:
-                 Name                                      ║ Module/Namespace
+                Name                                       ║ Module/Namespace
                 ═══════════════════════════════════════════╬══════════════════════════════
                 Get-ADObject                               ║ ActiveDirectory
                 Get-Acl                                    ║ Microsoft.PowerShell.Security
@@ -69,27 +70,36 @@ function Set-AclConstructor4 {
                 Get-AdObjectType                           ║ EguibarIT.DelegationPS
                 Write-Verbose                              ║ Microsoft.PowerShell.Utility
                 Write-Error                                ║ Microsoft.PowerShell.Utility
-                Test-IsValidDN                             ║ EguibarIT.DelegationPS
+                Write-Debug                                ║ Microsoft.PowerShell.Utility
+                Get-FunctionDisplay                        ║ EguibarIT.DelegationPS
 
         .NOTES
-            Version:         3.0
-            DateModified:    18/Mar/2025
-            LasModifiedBy:   Vicente Rodriguez Eguibar
-                vicente@eguibar.com
-                Eguibar IT
-                http://www.eguibarit.com
+            Version:         3.1
+            DateModified:    23/May/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
 
         .LINK
             https://docs.microsoft.com/en-us/powershell/module/activedirectory/get-adobject
             https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.security/get-acl
             https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-acl
-            https://msdn.microsoft.com/en-us/library/w72e8e69.aspx
-            https://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectoryrights
-            https://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectorysecurityinheritance
-            https://learn.microsoft.com/en-us/dotnet/api/system.directoryservices.activedirectoryaccessrule.-ctor?view=windowsdesktop-9.0&viewFallbackFrom=dotnet-plat-ext-6.0#system-directoryservices-activedirectoryaccessrule-ctor(system-security-principal-identityreference-system-directoryservices-activedirectoryrights-system-security-accesscontrol-accesscontroltype-system-directoryservices-activedirectorysecurityinheritance)
+            https://docs.microsoft.com/en-us/dotnet/api/system.directoryservices.activedirectoryrights
+            https://docs.microsoft.com/en-us/dotnet/api/system.directoryservices.activedirectorysecurityinheritance
+            https://learn.microsoft.com/en-us/dotnet/api/system.directoryservices.activedirectoryaccessrule.-ctor?view=windowsdesktop-9.0#system-directoryservices-activedirectoryaccessrule-ctor(system-security-principal-identityreference-system-directoryservices-activedirectoryrights-system-security-accesscontrol-accesscontroltype-system-guid)
 
         .LINK
             https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Set-AclConstructor4.ps1
+
+        .COMPONENT
+            Active Directory Security
+
+        .ROLE
+            Security Administration
+
+        .FUNCTIONALITY
+            Active Directory ACL Management
     #>
 
     [CmdletBinding(
@@ -122,7 +132,10 @@ function Set-AclConstructor4 {
             HelpMessage = 'Distinguished (DN) Name of the object. The LDAP path to the object where the ACL will be changed.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
-        [ValidateScript({ Test-IsValidDN -ObjectDN $_ }, ErrorMessage = 'DistinguishedName provided is not valid! Please Check.')]
+        [ValidateScript(
+            { Test-IsValidDN -ObjectDN $_ },
+            ErrorMessage = 'DistinguishedName provided is not valid! Please Check.'
+        )]
         [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath,
