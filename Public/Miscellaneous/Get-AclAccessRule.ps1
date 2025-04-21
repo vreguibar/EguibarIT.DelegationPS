@@ -181,7 +181,8 @@
             https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Public/Miscellaneous/Get-AclAccessRule.ps1
     #>
 
-    [CmdletBinding(SupportsShouldProcess = $false,
+    [CmdletBinding(
+        SupportsShouldProcess = $false,
         ConfirmImpact = 'Low'
     )]
     [OutputType([System.Collections.ArrayList])]
@@ -237,6 +238,8 @@
 
         ##############################
         # Variables Definition
+
+        [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
         [System.Collections.ArrayList]$result = [System.Collections.ArrayList]::New()
         [System.Text.StringBuilder]$sb = [System.Text.StringBuilder]::new()
 
@@ -273,6 +276,7 @@
         # Clear StringBuilder for new processing
         [void]$sb.Clear()
         [void]$sb.AppendLine()
+        [void]$sb.AppendLine('       ACE (Access Control Entry)')
 
         Write-Verbose -Message ('Processing LDAP path: {0}' -f $LDAPPath)
 
@@ -295,16 +299,14 @@
                         Select-Object -ExpandProperty Access |
                             Where-Object -FilterScript {
                                 $_.IdentityReference -match $PSBoundParameters['searchBy']
-                            })
+                            }
+                )
 
-                [void]$sb.AppendLine('       ACE (Access Control Entry)')
                 [void]$sb.AppendLine('            Filtered By: {0}' -f $PSBoundParameters['SearchBy'])
 
             } else {
 
                 $AclAccess = @($Acl | Select-Object -ExpandProperty Access)
-
-                [void]$sb.AppendLine('       All ACE (Access Control Entry)')
 
             } #end If-Else
 
@@ -324,8 +326,14 @@
             # Process each ACE
             $AceCount = $AclAccess.Count
             for ($i = 0; $i -lt $AceCount; $i++) {
+
+                $Splat = @{
+                    Activity        = 'Processing Access Control Entries'
+                    Status          = ('Processing entry {0} of {1}' -f ($i + 1), $AceCount)
+                    PercentComplete = (($i + 1) / $AceCount * 100)
+                }
                 # Update progress bar
-                Write-Progress -Activity 'Processing Access Control Entries' -Status ('Processing entry {0} of {1}' -f ($i + 1), $AceCount) -PercentComplete (($i + 1) / $AceCount * 100)
+                Write-Progress @Splat
 
                 # Get the current ACE
                 $entry = $AclAccess[$i]
@@ -392,29 +400,77 @@
         } #end try-catch
 
         # If results are available and not being piped elsewhere, format them for display
-        if ($result.Count -gt 0 -and $MyInvocation.ExpectingInput -eq $false) {
+        if ($result.Count -gt 0) {
+            # Only display formatted output if not being used in a pipeline
+            if (-not $MyInvocation.ExpectingInput -and [System.Console]::IsOutputRedirected -eq $false) {
+                # Output the summary information from StringBuilder
+                Write-Output $sb.ToString()
 
-            $sb.ToString()
+                # Check if terminal supports ANSI colors
+                $supportsAnsi = $Host.UI.SupportsVirtualTerminal -or ($env:TERM -like '*xterm*') -or ($env:ConEmuANSI -eq 'ON')
 
-            $Splat = @{
-                InputObject = $result
-                Property    = 'ACENumber',
-                '──────────────────────────────',
-                @{Name = 'Id'; Expression = { "$blue$($_.Id)$reset" } },
-                @{Name = 'AdRight'; Expression = { "$blue$($_.AdRight)$reset" } },
-                @{Name = 'AccessControlType'; Expression = { "$blue$($_.AccessControlType)$reset" } },
-                @{Name = 'ObjectType'; Expression = { "$blue$($_.ObjectType)$reset" } },
-                @{Name = 'AdSecurityInheritance'; Expression = { "$yellow$($_.AdSecurityInheritance)$reset" } },
-                @{Name = 'InheritedObjectType'; Expression = { "$purple$($_.InheritedObjectType)$reset" } },
-                @{Name = 'IsInherited'; Expression = { "$cyan$($_.IsInherited)$reset" } }
+                # If ANSI is supported, use colors, otherwise use plain text
+                if ($supportsAnsi) {
+                    # Create a more readable and color-coded output
+                    $Splat = @{
+                        InputObject = $result
+                        Property    = @(
+                            @{Name = 'ACE #'; Expression = { $_.ACENumber } },
+                            @{Name = 'Identity'; Expression = { "$blue$($_.Id)$reset" } },
+                            @{Name = 'Rights'; Expression = { "$green$($_.AdRight)$reset" } },
+                            @{Name = 'Type'; Expression = {
+                                    if ($_.AccessControlType -eq 'Allow') {
+                                        "${green}Allow$reset"
+                                    } else {
+                                        "${red}Deny$reset"
+                                    }
+                                }
+                            },
+                            @{Name = 'ObjectType'; Expression = { "$cyan$($_.ObjectType)$reset" } },
+                            @{Name = 'Inheritance'; Expression = { "$yellow$($_.AdSecurityInheritance)$reset" } },
+                            @{Name = 'InheritedObjectType'; Expression = { "$purple$($_.InheritedObjectType)$reset" } },
+                            @{Name = 'Inherited'; Expression = {
+                                    if ($_.IsInherited) {
+                                        "${green}Yes$reset"
+                                    } else {
+                                        "${gray}No$reset"
+                                    }
+                                }
+                            }
+                        )
+                    } #end Splat
+                } else {
+                    # Plain text output for terminals without ANSI support
+                    $Splat = @{
+                        InputObject = $result
+                        Property    = @(
+                            @{Name = 'ACE #'; Expression = { $_.ACENumber } },
+                            @{Name = 'Identity'; Expression = { $_.Id } },
+                            @{Name = 'Rights'; Expression = { $_.AdRight } },
+                            @{Name = 'Type'; Expression = { $_.AccessControlType } },
+                            @{Name = 'ObjectType'; Expression = { $_.ObjectType } },
+                            @{Name = 'Inheritance'; Expression = { $_.AdSecurityInheritance } },
+                            @{Name = 'InheritedObjectType'; Expression = { $_.InheritedObjectType } },
+                            @{Name = 'Inherited'; Expression = { $_.IsInherited } }
+                        )
+                    } #end Splat
+                }
+
+                try {
+                    Format-Table @Splat -AutoSize -Wrap
+                } catch {
+                    Write-Warning -Message "Error formatting output table: $($_.Exception.Message)"
+                    # Fallback to simple display
+                    $result | Format-Table -AutoSize
+                } #end try-catch
             }
-            Format-List @Splat
 
+            # Always return the result objects for pipeline or assignment
+            return $result
         } else {
-
-            # Return the result for pipeline operations
-            Return $result
-
+            # Return empty array if no results found
+            Write-Verbose -Message 'No ACE entries were found or matched the criteria'
+            return $result
         } #end If-Else
     } #end End
 } #end Function Get-AclAccessRule
