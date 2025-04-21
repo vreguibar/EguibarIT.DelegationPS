@@ -1,34 +1,74 @@
 ﻿#Permissions on Computers to access BitLocker and TPM information
 function Set-AdAclBitLockerTPM {
     <#
-        .Synopsis
+        .SYNOPSIS
             The function will delegate the right to access BitLocker and TPM computer information in an OU
+
         .DESCRIPTION
-            The function will delegate the permission for a group to Modify BitLocker and TPM information of Computer object
+            The function will delegate the permission for a group to Modify BitLocker and TPM information of Computer objects.
+            This includes the ability to read and write TPM owner information, manage BitLocker recovery information,
+            and handle TPM information for computers in the designated OU.
+
+        .PARAMETER Group
+            Identity of the group getting the delegation, usually a DomainLocal group.
+
+        .PARAMETER LDAPpath
+            Distinguished Name of the OU where the BitLocker and TPM computer information will be accessed.
+
+        .PARAMETER RemoveRule
+            If present, the access rule will be removed instead of being added.
+
+        .PARAMETER Force
+            If present, bypasses confirmation prompts for actions.
+
         .EXAMPLE
             Set-AdAclBitLockerTPM -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
+
+            Grants the group "SG_SiteAdmins_XXXX" rights to manage BitLocker and TPM information for computers in the specified OU.
+
         .EXAMPLE
             Set-AdAclBitLockerTPM -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local" -RemoveRule
-        .PARAMETER Group
-            [STRING] for the Delegated Group Name
-        .PARAMETER LDAPpath
-            [STRING] Distinguished Name of the OU where the BitLocker and TPM computer information will be accessed.
-        .PARAMETER RemoveRule
-            [SWITCH] If present, the access rule will be removed
+
+            Removes the BitLocker and TPM management permissions for the group "SG_SiteAdmins_XXXX" from the specified OU.
+
+        .INPUTS
+            System.String for Group and LDAPpath parameters.
+            System.Management.Automation.SwitchParameter for RemoveRule and Force parameters.
+
+        .OUTPUTS
+            None. This function does not generate any output.
+
         .NOTES
             Used Functions:
-                Name                                   | Module
-                ---------------------------------------|--------------------------
-                Set-AclConstructor6                    | EguibarIT.DelegationPS
-                Get-AttributeSchemaHashTable           | EguibarIT.DelegationPS
+                Name                                       ║ Module/Namespace
+                ═══════════════════════════════════════════╬══════════════════════════════
+                Set-AclConstructor6                        ║ EguibarIT.DelegationPS
+                Get-AttributeSchemaHashTable               ║ EguibarIT.DelegationPS
+                Get-AdObjectType                           ║ EguibarIT.DelegationPS
+                Test-IsValidDN                             ║ EguibarIT.DelegationPS
+                Get-FunctionDisplay                        ║ EguibarIT.DelegationPS
+
         .NOTES
             Version:         1.0
             DateModified:    18/Oct/2016
-            LasModifiedBy:   Vicente Rodriguez Eguibar
-                vicente@eguibar.com
-                Eguibar Information Technology S.L.
-                http://www.eguibarit.com
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar Information Technology S.L.
+                            http://www.eguibarit.com
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS
+
+        .COMPONENT
+            Active Directory
+
+        .ROLE
+            Security Management
+
+        .FUNCTIONALITY
+            BitLocker and TPM permissions management
     #>
+
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     [OutputType([void])]
 
@@ -50,7 +90,10 @@ function Set-AdAclBitLockerTPM {
             HelpMessage = 'Distinguished Name of the OU where the BitLocker and TPM computer information will be accessed.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
-        [ValidateScript({ Test-IsValidDN -ObjectDN $_ }, ErrorMessage = 'DistinguishedName provided is not valid! Please Check.')]
+        [ValidateScript(
+            { Test-IsValidDN -ObjectDN $_ },
+            ErrorMessage = 'DistinguishedName provided is not valid! Please Check.'
+        )]
         [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath,
@@ -63,7 +106,12 @@ function Set-AdAclBitLockerTPM {
             Position = 2)]
         [ValidateNotNullOrEmpty()]
         [Switch]
-        $RemoveRule
+        $RemoveRule,
+
+        # Force parameter to bypass confirmation prompts
+        [Parameter(Mandatory = $false)]
+        [Switch]
+        $Force
     )
 
     Begin {
@@ -73,9 +121,9 @@ function Set-AdAclBitLockerTPM {
         # Display function header if variables exist
         if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
             $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToString('dd/MMM/yyyy'),
+                (Get-Date).ToString('dd/MMM/yyyy'),
                 $MyInvocation.Mycommand,
-            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
+                (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
             )
             Write-Verbose -Message $txt
         } #end if
@@ -120,13 +168,13 @@ function Set-AdAclBitLockerTPM {
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
 
-            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msTPM-OwnerInformation?')) {
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msTPM-OwnerInformation?', $Force)) {
                 # Add the parameter to remove the rule
                 $Splat.Add('RemoveRule', $true)
             } #end If
         } #end If
 
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msTPM-OwnerInformation?')) {
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msTPM-OwnerInformation?', $Force)) {
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -153,13 +201,13 @@ function Set-AdAclBitLockerTPM {
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
 
-            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msTPM-OwnerInformation?')) {
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msTPM-OwnerInformation?', $Force)) {
                 # Add the parameter to remove the rule
                 $Splat.Add('RemoveRule', $true)
             } #end If
         } #end If
 
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msTPM-OwnerInformation?')) {
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msTPM-OwnerInformation?', $Force)) {
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -186,13 +234,21 @@ function Set-AdAclBitLockerTPM {
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
 
-            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msFVE-RecoveryInformation?')) {
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'],
+                    'Remove permissions to msFVE-RecoveryInformation?',
+                    $Force)) {
+
                 # Add the parameter to remove the rule
                 $Splat.Add('RemoveRule', $true)
+
             } #end If
+
         } #end If
 
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msFVE-RecoveryInformation?')) {
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'],
+                'Delegate the permissions to msFVE-RecoveryInformation?',
+                $Force)) {
+
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -218,15 +274,24 @@ function Set-AdAclBitLockerTPM {
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
 
-            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msTPM-TpmInformationForComputer?')) {
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'],
+                    'Remove permissions to msTPM-TpmInformationForComputer?',
+                    $Force)) {
+
                 # Add the parameter to remove the rule
                 $Splat.Add('RemoveRule', $true)
             } #end If
+
         } #end If
 
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msTPM-TpmInformationForComputer?')) {
+
+        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'],
+                'Delegate the permissions to msTPM-TpmInformationForComputer?',
+                $Force)) {
+
             Set-AclConstructor6 @Splat
         } #end If
+
     } #end Process
 
     End {
@@ -253,5 +318,6 @@ function Set-AdAclBitLockerTPM {
             )
             Write-Verbose -Message $txt
         } #end If
+
     } #end End
 } #end function Set-AdAclBitLockerTPM

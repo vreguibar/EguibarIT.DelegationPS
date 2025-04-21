@@ -1,64 +1,105 @@
 ﻿function Set-AdAclCreateDeleteComputer {
     <#
-        .Synopsis
-            The function will delegate the permission for a group to create/Delete
-            Computer objects in an OU
+        .SYNOPSIS
+            Delegates permission for a group to create/delete Computer objects in an OU.
+
         .DESCRIPTION
             Configures the container (OU) to delegate the permissions to a group so it can create/delete computer objects.
-        .EXAMPLE
-            Set-AdAclCreateDeleteComputer -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
-        .EXAMPLE
-            Set-AdAclCreateDeleteComputer -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local" -RemoveRule
+            This function assigns the necessary permissions for computer account creation and management.
+
         .PARAMETER Group
-            [STRING] for the Delegated Group Name
+            Identity of the group getting the delegation, usually a DomainLocal group.
+
         .PARAMETER LDAPpath
-            [STRING] Distinguished Name of the OU where the computer will get password reset
+            Distinguished Name of the OU where the permissions will be set.
+
         .PARAMETER RemoveRule
-            [SWITCH] If present, the access rule will be removed
+            If present, the access rules will be removed instead of added.
+
+        .EXAMPLE
+            Set-AdAclCreateDeleteComputer -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Computers,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
+
+            Delegates Create/Delete computer permissions to the group "SG_SiteAdmins_XXXX" on the specified OU.
+
+        .EXAMPLE
+            Set-AdAclCreateDeleteComputer -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Computers,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local" -RemoveRule
+
+            Removes the Create/Delete computer permissions from the group "SG_SiteAdmins_XXXX" on the specified OU.
+
+        .INPUTS
+            [String] Group
+            [String] LDAPpath
+            [Switch] RemoveRule
+
+        .OUTPUTS
+            None. This function does not generate any output.
+
         .NOTES
             Used Functions:
-                Name                                   | Module
-                ---------------------------------------|--------------------------
-                Set-AclConstructor5                    | EguibarIT.DelegationPS
-                Get-AttributeSchemaHashTable           | EguibarIT.DelegationPS
+                Name                                       ║ Module/Namespace
+                ═══════════════════════════════════════════╬══════════════════════════════
+                Set-AclConstructor5                        ║ EguibarIT.DelegationPS
+                Get-AttributeSchemaHashTable               ║ EguibarIT.DelegationPS
+                Get-AdObjectType                           ║ EguibarIT.DelegationPS
+                Test-IsValidDN                             ║ EguibarIT.DelegationPS
+                Get-FunctionDisplay                        ║ EguibarIT.DelegationPS
+
         .NOTES
-            Version:         1.2
-            DateModified:    07/Dec/2016
-            LasModifiedBy:   Vicente Rodriguez Eguibar
-                vicente@eguibar.com
-                Eguibar Information Technology S.L.
-                http://www.eguibarit.com
+            Version:         1.3
+            DateModified:    11/May/2023
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar Information Technology S.L.
+                            http://www.eguibarit.com
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS
+
+        .COMPONENT
+            Active Directory
+
+        .ROLE
+            Security, ActiveDirectory, Delegation
+
+        .FUNCTIONALITY
+            Delegation, Computer Management
     #>
-    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [CmdletBinding(
+        SupportsShouldProcess = $true,
+        ConfirmImpact = 'Medium'
+    )]
     [OutputType([void])]
 
     Param (
-        # PARAM1 STRING for the Delegated Group Name
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity of the group getting the delegation, usually a DomainLocal group.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         $Group,
 
-        # PARAM2 Distinguished Name of the OU where the computer will get password reset
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Distinguished Name of the OU where the computer will get password reset',
+            ValueFromRemainingArguments = $false,
+            HelpMessage = 'Distinguished Name of the OU where the permissions will be set.',
             Position = 1)]
         [ValidateNotNullOrEmpty()]
-        [ValidateScript({ Test-IsValidDN -ObjectDN $_ }, ErrorMessage = 'DistinguishedName provided is not valid! Please Check.')]
+        [ValidateScript(
+            { Test-IsValidDN -ObjectDN $_ },
+            ErrorMessage = 'Distinguished Name provided is not valid! Please check the format.'
+        )]
         [Alias('DN', 'DistinguishedName')]
         [String]
         $LDAPpath,
 
-        # PARAM3 SWITCH If present, the access rule will be removed.
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'If present, the access rule will be removed.',
             Position = 2)]
         [ValidateNotNullOrEmpty()]
@@ -67,15 +108,16 @@
     )
 
     Begin {
-
         Set-StrictMode -Version Latest
 
         # Display function header if variables exist
-        if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
+        if ($null -ne $Variables -and
+            $null -ne $Variables.HeaderDelegation) {
+
             $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToString('dd/MMM/yyyy'),
+                (Get-Date).ToString('dd/MMM/yyyy'),
                 $MyInvocation.Mycommand,
-            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
+                (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
             )
             Write-Verbose -Message $txt
         } #end if
@@ -87,12 +129,22 @@
         # Variables Definition
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
-        Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case is empty a function is called to fill it up.'
-        Get-AttributeSchemaHashTable
+        try {
 
-        # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
-        $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
+            Write-Verbose -Message 'Checking variable $Variables.GuidMap. In case it is empty, a function is called to fill it.'
+            Get-AttributeSchemaHashTable
 
+            # Verify Group exists and return it as Microsoft.ActiveDirectory.Management.AdGroup
+            $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
+
+            Write-Verbose -Message ('Group {0} found and ready for delegation' -f $PSBoundParameters['Group'])
+
+        } catch {
+
+            Write-Error -Message ('Error initializing variables or validating group: {0}' -f $_.Exception.Message)
+            return
+
+        }
     } #end Begin
 
     Process {
@@ -107,6 +159,7 @@
                 InheritedObjectType : GuidNULL
                         IsInherited = False
         #>
+        # Set the ACE for the group to have GenericAll permissions on descendant computer objects in the specified OU.
         $Splat = @{
             Id                    = $CurrentGroup
             LDAPPath              = $PSBoundParameters['LDAPpath']
@@ -114,20 +167,40 @@
             AccessControlType     = 'Allow'
             ObjectType            = $Variables.GuidMap['computer']
             AdSecurityInheritance = 'Descendents'
-
         }
-        # Check if RemoveRule switch is present.
+
+        # Check if RemoveRule switch is present
         If ($PSBoundParameters['RemoveRule']) {
 
-            if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for computer?')) {
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['LDAPpath'],
+                ('Remove GenericAll permissions for {0} on descendant computer objects' -f $PSBoundParameters['Group']))) {
+
                 # Add the parameter to remove the rule
                 $Splat.Add('RemoveRule', $true)
-            } #end If
-        } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for computer?')) {
-            Set-AclConstructor5 @Splat
-        } #end If
+                Set-AclConstructor5 @Splat
+                Write-Verbose -Message (
+                    'Removed GenericAll permission for {0}
+                        on descendant computer objects in {1}' -f
+                    $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath']
+                )
+            } #end If
+
+        } else {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['LDAPpath'],
+                ('Grant GenericAll permissions for {0}
+                on descendant computer objects' -f $PSBoundParameters['Group']))) {
+
+                Set-AclConstructor5 @Splat
+                Write-Verbose -Message (
+                    'Granted GenericAll permission for {0} on descendant computer objects in {1}' -f
+                    $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath']
+                )
+            } #end If
+
+        } #end If-Else
+
 
         <#
             ACE number: 2
@@ -148,31 +221,51 @@
             ObjectType            = $Variables.GuidMap['computer']
             AdSecurityInheritance = 'All'
         }
-        # Check if RemoveRule switch is present.
+
+        # Check if RemoveRule switch is present
         If ($PSBoundParameters['RemoveRule']) {
 
-            if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions for computer?')) {
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['LDAPpath'],
+                ('Remove CreateChild/DeleteChild permissions for {0} on computer objects' -f $PSBoundParameters['Group']))) {
+
                 # Add the parameter to remove the rule
                 $Splat.Add('RemoveRule', $true)
-            } #end If
-        } #end If
 
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions for computer?')) {
-            Set-AclConstructor5 @Splat
-        } #end If
+                Set-AclConstructor5 @Splat
+                Write-Verbose -Message (
+                    'Removed CreateChild/DeleteChild permissions for {0} in {1}' -f
+                    $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath']
+                )
+            } #end If
+
+        } else {
+
+            if ($PSCmdlet.ShouldProcess($PSBoundParameters['LDAPpath'],
+                ('Grant CreateChild/DeleteChild permissions for {0} on computer objects' -f $PSBoundParameters['Group']))) {
+
+                Set-AclConstructor5 @Splat
+                Write-Verbose -Message ('Granted CreateChild/DeleteChild permissions for {0} in {1}' -f
+                    $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
+            } #end If
+
+        } #end If-Else
+
     } #end Process
 
     End {
+        # Display function footer if variables exist
+        if ($null -ne $Variables -and
+            $null -ne $Variables.FooterDelegation) {
 
-        if ($RemoveRule) {
-            Write-Verbose ('Permissions removal process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
-        } else {
-            Write-Verbose ('Permissions delegation process completed for group: {0} on {1}' -f $PSBoundParameters['Group'], $PSBoundParameters['LDAPpath'])
-        } #end If-Else
-
-        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
-            'delegating Create/Delete computer.'
-        )
-        Write-Verbose -Message $txt
-    } #end END
-}
+            $ActionMessage = $(if ($PSBoundParameters['RemoveRule']) {
+                    'removing'
+                } else {
+                    'delegating'
+                })
+            $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
+                ('{0} Create/Delete computer permissions.' -f $ActionMessage)
+            )
+            Write-Verbose -Message $txt
+        } #end if
+    } #end End
+} #end function Set-AdAclCreateDeleteComputer
