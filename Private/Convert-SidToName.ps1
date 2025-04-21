@@ -1,52 +1,74 @@
 ﻿Function Convert-SidToName {
     <#
         .SYNOPSIS
-            Converts a Security Identifier (SID) to its corresponding Account Name.
+            Converts a Security Identifier (SID) to its corresponding NT Account Name.
 
         .DESCRIPTION
             This function translates a given Security Identifier (SID) to the corresponding NT Account Name
-            using .NET classes. It accepts both string representations of SIDs and SID objects.
+            using .NET Framework classes. It accepts both string representations of SIDs and SID objects.
 
             The function first checks against a comprehensive list of Well-Known SIDs before attempting
-            dynamic resolution. It implements caching to optimize performance in large Active Directory
-            environments and supports batch processing through the pipeline.
+            dynamic resolution through the Windows API. It implements caching to optimize performance in large
+            Active Directory environments where the same SIDs may be repeatedly resolved.
 
-            For improved security, the function performs thorough validation of input SIDs before processing.
+            For improved security and reliability, the function performs thorough validation of input SIDs
+            before processing and handles various error conditions that might occur during translation.
+
+            The function supports pipeline input, making it suitable for batch processing of SIDs.
 
         .PARAMETER SID
-            The Security Identifier (SID) to convert. Can be either a string representation of a SID
-            or a System.Security.Principal.SecurityIdentifier object. This parameter also accepts
-            pipeline input with objects containing a SID property.
+            The Security Identifier (SID) to convert. This parameter accepts:
+            - String representation of a SID (e.g., "S-1-5-32-544")
+            - System.Security.Principal.SecurityIdentifier object
+            - Any object with a SID property containing either of the above
+
+            This parameter supports pipeline input by value and by property name.
 
         .EXAMPLE
             Convert-SidToName -SID 'S-1-5-21-3623811015-3361044348-30300820-1013'
-            EguibarIT\davade
 
-            Converts the specified SID string to its corresponding NT Account Name.
+            # Output: EguibarIT\davade
 
-        .EXAMPLE
-            Get-ADUser -Identity davade | Select-Object SID | Convert-SidToAccountName
-
-            Retrieves the SID for user davade and converts it to the corresponding NT Account Name.
+            Converts the specified domain SID string to its corresponding NT Account Name.
 
         .EXAMPLE
-            "S-1-5-32-544" | Convert-SidToAccountName
+            Get-ADUser -Identity davade | Select-Object SID | Convert-SidToName
 
-            Converts the Well-Known SID for the Administrators group to "BUILTIN\Administrators".
+            Retrieves the SID for user davade from Active Directory and converts it to the corresponding NT Account Name.
+
+        .EXAMPLE
+            "S-1-5-32-544" | Convert-SidToName
+
+            # Output: BUILTIN\Administrators
+
+            Converts the Well-Known SID for the Administrators group using pipeline input.
 
         .EXAMPLE
             $SidObj = [System.Security.Principal.SecurityIdentifier]::new("S-1-5-18")
-            Convert-SidToAccountName -SID $SidObj
+            Convert-SidToName -SID $SidObj
 
-            Creates a SecurityIdentifier object for the Local System account and converts it to "NT AUTHORITY\SYSTEM".
+            # Output: NT AUTHORITY\SYSTEM
+
+            Creates a SecurityIdentifier object for the Local System account and converts it to the NT account name.
 
         .OUTPUTS
-             System.Security.Principal.NTAccount
+            System.Security.Principal.NTAccount
+
+            Returns an NTAccount object representing the account name corresponding to the provided SID.
+            The string representation follows the format "DOMAIN\Username" or "BUILTIN\GroupName".
 
         .NOTES
             Required modules/prerequisites:
             - Windows PowerShell 5.1 or PowerShell 7+
-            - Active Directory module (for AD-related operations)
+            - .NET Framework Security Principal classes
+
+            Performance considerations:
+            - The function implements caching to improve performance with repeated SID lookups
+            - Well-Known SIDs are resolved using a predefined lookup table without API calls
+
+            Error handling:
+            - Returns detailed error messages for invalid SIDs
+            - Handles IdentityNotMappedException for SIDs that cannot be resolved
 
             Used Functions:
                 Name                                         ║ Module/Namespace
@@ -54,11 +76,13 @@
                 Write-Verbose                                ║ Microsoft.PowerShell.Utility
                 Write-Warning                                ║ Microsoft.PowerShell.Utility
                 Write-Error                                  ║ Microsoft.PowerShell.Utility
+                Test-IsValidSID                              ║ EguibarIT.DelegationPS
+                Get-FunctionDisplay                          ║ EguibarIT.DelegationPS
                 System.Security.Principal.NTAccount          ║ .NET Framework
                 System.Security.Principal.SecurityIdentifier ║ .NET Framework
 
-            Version:         1.4
-            DateModified:    13/Mar/2025
+            Version:         1.5
+            DateModified:    14/Mar/2025
             LastModifiedBy:  Vicente Rodriguez Eguibar
                 vicente@eguibar.com
                 Eguibar Information Technology S.L.
@@ -70,17 +94,25 @@
 
         .LINK
             https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Convert-SidToName.ps1
+
+        .COMPONENT
+            Active Directory
+
+        .ROLE
+            Identity Management
+
+        .FUNCTIONALITY
+            SID translation, Security principal resolution, Identity management
     #>
 
     [CmdletBinding(
         SupportsShouldProcess = $true,
-        ConfirmImpact = 'Low',
-        PositionalBinding = $true
+        ConfirmImpact = 'Low'
     )]
     [OutputType([System.Security.Principal.NTAccount])]
 
     param (
-        # PARAM1 STRING representing the GUID
+        # Security Identifier to convert to an account name
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
@@ -97,7 +129,7 @@
     )
 
     Begin {
-
+        # Set strict mode to catch potential issues
         Set-StrictMode -Version Latest
 
         # Display function header if variables exist
@@ -116,21 +148,28 @@
         ##############################
         # Variables Definition
 
+        # Initialize variables for SID and account objects
         [System.Security.Principal.SecurityIdentifier]$SecurityIdentifier = $null
         [System.Security.Principal.NTAccount]$NTAccount = $null
+
+        # Create a cache hashtable to optimize performance with repeated lookups
         [System.Collections.Hashtable]$Cache = @{}
+
+        Write-Debug -Message 'Function initialized and ready to process SIDs'
 
     } #end Begin
 
     Process {
-
-        Write-Verbose -Message ('Attempting to convert SID: {0} to account name' -f $PSBoundParameters['SID'])
+        # Log the input SID for debugging purposes
+        Write-Debug -Message ('Attempting to convert SID: {0} to account name' -f $PSBoundParameters['SID'])
 
         try {
-            # First, validate if input is a valid SID
+            # Initialize validation flag
             [bool]$isValid = $false
 
-            # Check if it's a SecurityIdentifier object
+            # VALIDATION PHASE: Determine the type of input and validate accordingly
+
+            # Case 1: Input is already a SecurityIdentifier object
             if ($SID -is [System.Security.Principal.SecurityIdentifier]) {
 
                 $SecurityIdentifier = $SID
@@ -142,8 +181,8 @@
                     ($SID.SID -is [string] -and
                     ((Test-IsValidSID -ObjectSID $SID.SID) -or
                 $Variables.WellKnownSIDs.Contains($SID.SID))))) {
-                # Check if it's a pipeline object with SID property
 
+                # If the SID property contains a SecurityIdentifier object
                 if ($SID.SID -is [System.Security.Principal.SecurityIdentifier]) {
 
                     $SecurityIdentifier = $SID.SID
@@ -152,6 +191,7 @@
 
                 } else {
 
+                    # If the SID property contains a string SID
                     if ($Variables.WellKnownSIDs.Contains($SID.SID)) {
 
                         $isValid = $true
@@ -164,12 +204,12 @@
 
                     } #end If-ElseIf
 
-                    $SID = $SID.SID  # Continue processing with the string SID
-                } #end If-ElseIf
-
+                    # Continue processing with the string SID extracted from the property
+                    $SID = $SID.SID
+                } #end If-Else
             } elseif ($SID -is [string]) {
-                # Check if it's a string SID
 
+                # Check against Well-Known SIDs list
                 if ($Variables.WellKnownSIDs.Contains($SID)) {
 
                     $isValid = $true
@@ -181,8 +221,10 @@
                     Write-Verbose -Message 'Input matches valid SID pattern'
 
                 } #end If-ElseIf
+
             } #end If-ElseIf
 
+            # If validation failed, exit with error
             if (-not $isValid) {
 
                 Write-Error -Message ('Invalid SID format: {0}' -f $SID)
@@ -190,16 +232,18 @@
 
             } #end If
 
-            # Check cache first
+            # RESOLUTION PHASE: Convert the validated SID to account name
+
+            # Check cache first for performance optimization
             if ($Cache.Contains($SID)) {
 
                 Write-Verbose -Message ('SID found in cache: {0}' -f $SID)
                 $NTAccount = $Cache[$SID]
 
             } else {
+                # Not in cache, perform resolution
 
-                # Proceed with conversion based on validation result
-                # First check if it's a Well-Known SID in our hashtable
+                # Special handling for Well-Known SIDs
                 if ($Variables.WellKnownSIDs.Contains($SID)) {
 
                     Write-Verbose -Message ('Resolving Well-Known SID: {0} from predefined list' -f $SID)
@@ -207,7 +251,7 @@
 
                 } else {
 
-                    # If it's not a well-known SID, proceed with translation
+                    # Convert string SID to SecurityIdentifier object if needed
                     if ($SID -is [string] -and -not $SecurityIdentifier) {
 
                         Write-Verbose -Message ('Converting string SID to SecurityIdentifier object: {0}' -f $SID)
@@ -215,33 +259,47 @@
 
                     } #end If
 
-                    # Translate SID to NTAccount if ShouldProcess passes
+                    # Use ShouldProcess for verbose output and potential -WhatIf support
                     $ShouldProcessMessage = 'Translate SID {0} to NT Account Name' -f $SecurityIdentifier
                     if ($PSCmdlet.ShouldProcess($SecurityIdentifier, $ShouldProcessMessage)) {
 
-                        Write-Verbose -Message 'Translating SID to NTAccount'
+                        Write-Verbose -Message 'Translating SID to NTAccount using .NET Framework'
                         $NTAccount = $SecurityIdentifier.Translate([System.Security.Principal.NTAccount])
 
-                    }
-                }
-                # Cache the result
+                    } #end If
+
+                } #end If-Else
+
+                # Store result in cache for future lookups
                 $Cache[$SID] = $NTAccount
                 Write-Verbose -Message ('Successfully translated to: {0}' -f $NTAccount)
+
             } #end If-Else
 
-            $NTAccount
+            # Return the NT Account name to the pipeline
+            return $NTAccount
 
-        } catch [System.Security.Principal.IdentityNotMappedException] {
+        }
+        # ERROR HANDLING PHASE: Handle specific exception types
+        catch [System.Security.Principal.IdentityNotMappedException] {
 
-            Write-Error -Message ('Identity Not Mapped Exception. The SID could not be translated to an account name: {0}' -f $SID)
+            # This occurs when the SID cannot be mapped to an account name
+            Write-Error -Message ('
+                Identity Not Mapped Exception.
+                The SID could not be translated to an account name: {0}' -f $SID
+            )
 
         } catch [System.ArgumentException] {
 
-            Write-Error -Message ('Invalid SID format: {0}' -f $SID)
+            # This occurs when the SID format is invalid
+            Write-Error -Message ('Invalid SID format: {0}' -f $SID) -Category InvalidArgument
 
         } catch {
-
-            Write-Error -Message ('An unexpected error occurred while converting SID {0}: {1}"' -f $SID, $_)
+            # Catch-all for unexpected errors
+            Write-Error -Message (
+                'An unexpected error occurred while converting SID {0}: {1}' -f
+                $SID, $_.Exception.Message
+            ) -Category NotSpecified
 
         } #end Try-Catch
 
@@ -249,13 +307,19 @@
 
     End {
         # Display function footer if variables exist
-        if ($null -ne $Variables -and $null -ne $Variables.FooterDelegation) {
+        if ($null -ne $Variables -and
+            $null -ne $Variables.FooterDelegation) {
 
             $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
                 'translating SID to Name (Private Function).'
             )
             Write-Verbose -Message $txt
-
         } #end if
+
+        # Clear cache and sensitive data from memory for better resource management
+        $Cache = $null
+        $SecurityIdentifier = $null
+
+        Write-Verbose -Message 'SID to Name conversion completed'
     } #end End
-}
+} #end Function Convert-SidToName
