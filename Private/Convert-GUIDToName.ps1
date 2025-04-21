@@ -86,29 +86,38 @@
                 Get-ADObject                               ║ ActiveDirectory
                 Write-Verbose                              ║ Microsoft.PowerShell.Utility
                 Write-Error                                ║ Microsoft.PowerShell.Utility
+                Test-IsValidGUID                           ║ EguibarIT.DelegationPS
+                Get-FunctionDisplay                        ║ EguibarIT.DelegationPS
 
         .NOTES
             Version:         2.0
-            DateModified:   19/Mar/2025
-            LasModifiedBy:   Vicente Rodriguez Eguibar
-                vicente@eguibar.com
-                Eguibar IT
-                http://www.eguibarit.com
+            DateModified:    19/Mar/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
 
         .LINK
-             https://learn.microsoft.com/en-us/windows/win32/adschema/attributes-all
-                https://learn.microsoft.com/en-us/windows/win32/adschema/classes
-                https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-adts/1522b774-6464-41a3-87a5-1e5633c3fbbb
+            https://learn.microsoft.com/en-us/windows/win32/adschema/attributes-all
+            https://learn.microsoft.com/en-us/windows/win32/adschema/classes
+            https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-adts/1522b774-6464-41a3-87a5-1e5633c3fbbb
 
         .LINK
             https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Convert-GUIDToName.ps1
+
+        .COMPONENT
+            Active Directory
+
+        .ROLE
+            Identity Management
+
+        .FUNCTIONALITY
+            Schema Translation, GUID Resolution, Active Directory Object Identification
     #>
 
     [CmdletBinding(
         SupportsShouldProcess = $false,
-        ConfirmImpact = 'Low',
-        DefaultParameterSetName = 'Default',
-        PositionalBinding = $true
+        ConfirmImpact = 'Low'
     )]
     [OutputType([String])]
 
@@ -120,9 +129,9 @@
             HelpMessage = 'Enter a GUID to translate into a display name',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
-        [ValidatePattern(
-            '^[{(]?[0-9A-Fa-f]{8}[-]?([0-9A-Fa-f]{4}[-]?){3}[0-9A-Fa-f]{12}[)}]?$',
-            ErrorMessage = 'The string specified "{0}" is not a valid GUID format.'
+        [ValidateScript(
+            { Test-IsValidGUID -ObjectGUID $_ },
+            ErrorMessage = '[PARAMETER] Provided GUID is not valid! Function will not continue. Please check.'
         )]
         [Alias('ID', 'ObjectGUID')]
         $Guid
@@ -154,6 +163,7 @@
     } #end Begin
 
     Process {
+
 
         Try {
 
@@ -234,6 +244,7 @@
             return
 
         } #end try-catch
+
 
     } #end Process
 
