@@ -99,10 +99,18 @@
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Switch indicator to remove the unknown SID.',
-            Position = 0)]
+            Position = 1)]
         [ValidateNotNullOrEmpty()]
         [switch]
-        $RemoveSID
+        $RemoveSID,
+
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $false,
+            ValueFromPipelineByPropertyName = $false,
+            HelpMessage = 'If present, the function will not ask for confirmation when performing actions.',
+            Position = 2)]
+        [Switch]
+        $Force
     )
 
     Begin {

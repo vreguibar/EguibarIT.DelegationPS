@@ -71,7 +71,15 @@
             Position = 2)]
         [Alias('Host', 'PC', 'Server', 'HostName')]
         [String]
-        $Computer
+        $Computer,
+
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $false,
+            ValueFromPipelineByPropertyName = $false,
+            HelpMessage = 'If present, the function will not ask for confirmation when performing actions.',
+            Position = 3)]
+        [Switch]
+        $Force
 
     )
 

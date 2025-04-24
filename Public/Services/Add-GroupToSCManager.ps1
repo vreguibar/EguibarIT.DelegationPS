@@ -67,7 +67,15 @@
             HelpMessage = 'Remote computer to execute the commands.',
             Position = 1)]
         [Alias('Host', 'PC', 'Server', 'HostName', 'ComputerName')]
-        $Computer
+        $Computer,
+
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $false,
+            ValueFromPipelineByPropertyName = $false,
+            HelpMessage = 'If present, the function will not ask for confirmation when performing actions.',
+            Position = 2)]
+        [Switch]
+        $Force
     )
 
     Begin {

@@ -65,7 +65,15 @@ function Set-AdAclComputerPublicInfo {
             Position = 2)]
         [ValidateNotNullOrEmpty()]
         [Switch]
-        $RemoveRule
+        $RemoveRule,
+
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $false,
+            ValueFromPipelineByPropertyName = $false,
+            HelpMessage = 'If present, the function will not ask for confirmation when performing actions.',
+            Position = 3)]
+        [Switch]
+        $Force
     )
 
     Begin {
@@ -75,9 +83,9 @@ function Set-AdAclComputerPublicInfo {
         # Display function header if variables exist
         if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
             $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToString('dd/MMM/yyyy'),
+                (Get-Date).ToString('dd/MMM/yyyy'),
                 $MyInvocation.Mycommand,
-            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
+                (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
             )
             Write-Verbose -Message $txt
         } #end if

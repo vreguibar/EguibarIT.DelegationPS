@@ -65,7 +65,15 @@ function Set-AdAclUserGroupMembership {
             Position = 2)]
         [ValidateNotNullOrEmpty()]
         [Switch]
-        $RemoveRule
+        $RemoveRule,
+
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $false,
+            ValueFromPipelineByPropertyName = $false,
+            HelpMessage = 'If present, the function will not ask for confirmation when performing actions.',
+            Position = 3)]
+        [Switch]
+        $Force
     )
 
     Begin {

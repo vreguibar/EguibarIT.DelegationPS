@@ -95,11 +95,12 @@
         [String]
         $LDAPpath,
 
-        [Parameter(
-            Mandatory = $false,
-            HelpMessage = 'Force the operation without confirmation.'
-        )]
-        [switch]
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $false,
+            ValueFromPipelineByPropertyName = $false,
+            HelpMessage = 'If present, the function will not ask for confirmation when performing actions.',
+            Position = 1)]
+        [Switch]
         $Force
     )
 

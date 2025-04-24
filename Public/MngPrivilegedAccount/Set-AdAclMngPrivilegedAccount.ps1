@@ -9,10 +9,15 @@
             Set-AdAclMngPrivilegedAccount -Group "SL_PUM"
         .EXAMPLE
             Set-AdAclMngPrivilegedAccount -Group "SL_PUM" -RemoveRule
+        .EXAMPLE
+            Set-AdAclMngPrivilegedAccount -Group "SL_PUM" -Force
+            Performs the operation without prompting for confirmation.
         .PARAMETER Group
             Identity of the group getting the delegation.
         .PARAMETER RemoveRule
             [SWITCH] If present, the access rule will be removed
+        .PARAMETER Force
+            [SWITCH] If present, the function will not ask for confirmation when performing actions.
         .NOTES
             Used Functions:
                 Name                                   | Module
@@ -20,15 +25,22 @@
                 Set-AclConstructor5                    | EguibarIT.DelegationPS
                 Get-AttributeSchemaHashTable           | EguibarIT.DelegationPS
                 Get-ExtendedRightHashTable             | EguibarIT.DelegationPS
+                Get-AdObjectType                       | EguibarIT.DelegationPS
+                Get-FunctionDisplay                    | EguibarIT.DelegationPS
+
         .NOTES
-            Version:         1.2
-            DateModified:    07/Dec/2016
+            Version:         1.3
+            DateModified:    24/Apr/2025
             LasModifiedBy:   Vicente Rodriguez Eguibar
                 vicente@eguibar.com
-                Eguibar Information Technology S.L.
+                Eguibar IT
                 http://www.eguibarit.com
     #>
-    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+
+    [CmdletBinding(
+        SupportsShouldProcess = $true,
+        ConfirmImpact = 'Medium'
+    )]
     [OutputType([void])]
 
     Param (
@@ -42,7 +54,7 @@
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         $Group,
 
-        # PARAM3 SWITCH If present, the access rule will be removed.
+        # PARAM2 SWITCH If present, the access rule will be removed.
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
@@ -50,7 +62,16 @@
             Position = 1)]
         [ValidateNotNullOrEmpty()]
         [Switch]
-        $RemoveRule
+        $RemoveRule,
+
+        # PARAM3 SWITCH If present, the function will not ask for confirmation.
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $false,
+            ValueFromPipelineByPropertyName = $false,
+            HelpMessage = 'If present, the function will not ask for confirmation when performing actions.',
+            Position = 2)]
+        [Switch]
+        $Force
     )
 
     Begin {
@@ -60,9 +81,9 @@
         # Display function header if variables exist
         if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
             $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToString('dd/MMM/yyyy'),
+                (Get-Date).ToString('dd/MMM/yyyy'),
                 $MyInvocation.Mycommand,
-            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
+                (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
             )
             Write-Verbose -Message $txt
         } #end if
