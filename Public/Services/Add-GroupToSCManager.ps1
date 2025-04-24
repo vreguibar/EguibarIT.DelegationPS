@@ -34,7 +34,7 @@
             Used Functions:
                 Name                                   | Module
                 ---------------------------------------|--------------------------
-                Get-AdObjectType                       | EguibarIT.DelegationPS & EguibarIT.HousekeepingPS
+                Get-AdObjectType                       | EguibarIT.DelegationPS
                 Write-Verbose                          | Microsoft.PowerShell.Utility
                 Write-Error                            | Microsoft.PowerShell.Utility
 

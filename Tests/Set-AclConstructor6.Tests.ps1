@@ -264,19 +264,17 @@ BeforeAll {
 
     # Create global variables needed by the function
     $Global:Variables = @{
-        HeaderDelegation   = 'Test Header {0} {1} {2}'
-        FooterDelegation   = 'Test Footer {0} {1}'
-        HeaderHousekeeping = 'Test Header {0} {1} {2}'
-        FooterHousekeeping = 'Test Footer {0} {1}'
-        WellKnownSIDs      = @{
+        HeaderDelegation  = 'Test Header {0} {1} {2}'
+        FooterDelegation  = 'Test Footer {0} {1}'
+        WellKnownSIDs     = @{
             'S-1-5-18'     = 'LOCAL_SYSTEM'
             'S-1-5-32-544' = 'Administrators'
         }
-        GuidMap            = @{
+        GuidMap           = @{
             'User'     = 'bf967aba-0de6-11d0-a285-00aa003049e2'
             'Computer' = 'bf967a86-0de6-11d0-a285-00aa003049e2'
         }
-        ExtendedRightsMap  = @{
+        ExtendedRightsMap = @{
             'Reset-Password' = '00299570-246d-11d0-a768-00aa006e0529'
         }
     }

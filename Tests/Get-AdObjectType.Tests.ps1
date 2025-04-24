@@ -19,8 +19,8 @@ BeforeAll {
 
     # Create a global Variables object to simulate module variables
     $global:Variables = @{
-        HeaderHousekeeping = 'Date: {0} - Function: {1} - Parameters: {2}'
-        FooterHousekeeping = 'Function {0} finished {1}'
+        HeaderDelegation   = 'Date: {0} - Function: {1} - Parameters: {2}'
+        FooterDelegation = 'Function {0} finished {1}'
         Footer             = 'Function {0} finished {1}'
         WellKnownSIDs      = @{
             'S-1-1-0'      = 'Everyone'

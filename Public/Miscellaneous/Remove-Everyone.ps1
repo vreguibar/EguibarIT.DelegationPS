@@ -124,15 +124,15 @@ Function Remove-Everyone {
     process {
         try {
             <#
-            ACENumber              : 2
-            IdentityReference      : Everyone
-            ActiveDirectoryRights : ReadProperty, WriteProperty, GenericExecute
-            AccessControlType      : Allow
-            ObjectType             : GuidNULL
-            InheritanceType        : All
-            InheritedObjectType    : GuidNULL
-            IsInherited            : False
-        #>
+                ACENumber              : 2
+                IdentityReference      : Everyone
+                ActiveDirectoryRights : ReadProperty, WriteProperty, GenericExecute
+                AccessControlType      : Allow
+                ObjectType             : GuidNULL
+                InheritanceType        : All
+                InheritedObjectType    : GuidNULL
+                IsInherited            : False
+            #>
             $Splat = @{
                 Id                    = 'EVERYONE'
                 LDAPPath              = $PSBoundParameters['LDAPPath']
@@ -142,11 +142,34 @@ Function Remove-Everyone {
                 AdSecurityInheritance = 'All'
                 RemoveRule            = $true
             }
+
+            # Fix ShouldProcess to use the correct parameter (LDAPPath instead of Group)
             If ($Force -or
-                $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "EVERYONE" permissions?')) {
+                $PSCmdlet.ShouldProcess($PSBoundParameters['LDAPPath'], 'Remove "EVERYONE" permissions?')) {
 
-                Set-AclConstructor5 @Splat
+                # Ensure Constants is available before using it
+                if ($null -eq $Constants -or $null -eq $Constants.GuidNULL) {
 
+                    Write-Verbose -Message 'Using null for ObjectType as Constants.GuidNULL is not available'
+                    $Splat['ObjectType'] = [System.guid]::New('00000000-0000-0000-0000-000000000000')
+
+                }
+
+                # Call Set-AclConstructor5 and store the result
+                try {
+
+                    Set-AclConstructor5 @Splat
+                    Write-Verbose -Message ('Successfully removed Everyone permissions from {0}' -f $LDAPpath)
+
+                } catch {
+
+                    Write-Error -Message (
+                        'Failed to remove Everyone permissions from {0}: {1}' -f
+                        $LDAPpath,
+                        $_.Exception.Message
+                    )
+
+                }
             } #end If
         } catch {
 
