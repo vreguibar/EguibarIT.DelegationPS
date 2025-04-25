@@ -291,6 +291,7 @@
         [String]$ObjectPath = $null
         [Bool]$IsWellKnownSid = $false
         [HashTable]$AdObjectCache = @{}
+        [int]$RulesRemovedCount = 0
 
         # Convert ObjectType to GUID if it's a string
         if ($null -ne $PSBoundParameters['ObjectType']) {
@@ -326,11 +327,18 @@
                 try {
 
                     $InheritedObjectTypeGuid = [Guid]::Parse($PSBoundParameters['InheritedObjectType'])
-                    Write-Debug -Message ('Successfully parsed InheritedObjectType string to GUID: {0}' -f $InheritedObjectTypeGuid)
+
+                    Write-Debug -Message (
+                        'Successfully parsed InheritedObjectType string to GUID: {0}' -f
+                        $InheritedObjectTypeGuid
+                    )
 
                 } catch {
 
-                    Write-Error -Message ('Failed to parse InheritedObjectType as GUID: {0}' -f $PSBoundParameters['InheritedObjectType'])
+                    Write-Error -Message (
+                        'Failed to parse InheritedObjectType as GUID: {0}' -f
+                        $PSBoundParameters['InheritedObjectType']
+                    )
                     throw
 
                 } #end try-catch
@@ -506,14 +514,22 @@
                         $_.InheritedObjectType -eq $InheritedObjectTypeGuid
                     }
 
-                    foreach ($RuleToRemove in $RulesToRemove) {
-
-                        $null = $Acl.RemoveAccessRule($RuleToRemove)
-
-                    } #end foreach
+                    # Check if any rules were found
+                    if ($null -ne $RulesToRemove) {
+                        if ($RulesToRemove -is [array]) {
+                            foreach ($RuleToRemove in $RulesToRemove) {
+                                $null = $Acl.RemoveAccessRule($RuleToRemove)
+                                $RulesRemovedCount++
+                            } #end foreach
+                        } else {
+                            # Single object case
+                            $null = $Acl.RemoveAccessRule($RulesToRemove)
+                            $RulesRemovedCount = 1
+                        }
+                    } #end if
 
                     Write-Verbose -Message ('Removed {0} access rule(s) from {1} for {2}' -f
-                        $RulesToRemove.Count, $Object.DistinguishedName, $Id)
+                        $RulesRemovedCount, $Object.DistinguishedName, $Id)
                 } #end if
 
             } else {
