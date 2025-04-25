@@ -150,9 +150,9 @@
 
         # Initialize logging
         if ($null -ne $Variables -and
-            $null -ne $Variables.Header) {
+            $null -ne $Variables.HeaderDelegation) {
 
-            $txt = ($Variables.Header -f
+            $txt = ($Variables.HeaderDelegation -f
                 (Get-Date).ToShortDateString(),
                 $MyInvocation.Mycommand,
                 (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
