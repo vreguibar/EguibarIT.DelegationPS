@@ -368,9 +368,9 @@
         $VerbosePreference = $OriginalVerbosePreference
 
         if ($null -ne $Variables -and
-            $null -ne $Variables.Footer) {
+            $null -ne $Variables.FooterDelegation) {
 
-            $txt = ($Variables.Footer -f $MyInvocation.InvocationName,
+            $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
                 'importing module.'
             )
             Write-Verbose -Message $txt

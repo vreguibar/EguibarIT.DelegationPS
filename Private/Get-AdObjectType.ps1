@@ -290,7 +290,7 @@
         if ($null -ne $Variables -and
             $null -ne $Variables.FooterDelegation) {
 
-            $txt = ($Variables.Footer -f $MyInvocation.InvocationName,
+            $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
                 'getting AD object type (Private Function).'
             )
             Write-Verbose -Message $txt
