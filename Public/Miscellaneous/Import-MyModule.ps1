@@ -212,22 +212,38 @@
             $ImportParams['NoClobber'] = $true
         } #end If
 
-        if ($PSBoundParameters.ContainsKey('Scope')) {
-            $ImportParams['Scope'] = $Scope
-        } #end If
+        # Only add these parameters if running in PowerShell 7+
+        if ($PSVersionTable.PSVersion.Major -ge 7) {
 
-        if ($SkipEditionCheck) {
-            $ImportParams['SkipEditionCheck'] = $true
-        } #end If
+            if ($PSBoundParameters.ContainsKey('Scope')) {
+                $ImportParams['Scope'] = $Scope
+            } #end If
 
-        if ($UseWindowsPowerShell) {
-            $ImportParams['UseWindowsPowerShell'] = $true
-        } #end If
+            if ($SkipEditionCheck) {
+                $ImportParams['SkipEditionCheck'] = $true
+            } #end If
+
+            if ($UseWindowsPowerShell) {
+                $ImportParams['UseWindowsPowerShell'] = $true
+            } #end If
+
+        } else {
+
+            # Warn if user tries to use these parameters in Windows PowerShell
+            if ($PSBoundParameters.ContainsKey('Scope') -or $SkipEditionCheck -or $UseWindowsPowerShell) {
+
+                Write-Warning -Message ('
+                    Parameters -Scope, -SkipEditionCheck, and -UseWindowsPowerShell
+                    are only supported in PowerShell 7 and above.
+                    They will be ignored.'
+                )
+            } #º
+        } #end If-else
 
         # Handle Verbose parameter correctly
         if ($PSBoundParameters.ContainsKey('Verbose')) {
             $ImportParams['Verbose'] = $PSBoundParameters['Verbose']
-        }
+        } #end If
 
     } #end Begin
 
@@ -302,7 +318,7 @@
                     $FunctionName, $Name
                 )
 
-            } #end If
+            } #end If-else
 
             # Check if the module is already imported
             $ImportedModule = Get-Module -Name $Name -ErrorAction SilentlyContinue -Verbose:$false

@@ -1,4 +1,5 @@
-﻿Function Set-GpoFileSecurity {
+# Set-GpoFileSecurity.ps1
+Function Set-GpoFileSecurity {
 
     <#
         .SYNOPSIS
@@ -29,8 +30,8 @@
             None.
 
         .NOTES
-            Version:         1.1
-            DateModified:    12/Nov/2024
+            Version:         1.2
+            DateModified:    23/May/2025
             LasModifiedBy:   Vicente Rodriguez Eguibar
                 vicente@eguibar.com
                 Eguibar Information Technology S.L.
@@ -136,7 +137,7 @@
 
         If (
             $Force -or
-            $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], ('Delegate file permissions for "{0}"?') -f $Rights)
+            $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate file permissions for GPO')
         ) {
 
             # Check if [[File Security]] section exist. Create it if it does not exist
@@ -225,3 +226,4 @@
         Write-Verbose -Message $txt
     } #end
 } #end Function
+

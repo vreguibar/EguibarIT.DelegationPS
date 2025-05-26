@@ -85,7 +85,7 @@
             DateModified:    14/Mar/2025
             LastModifiedBy:  Vicente Rodriguez Eguibar
                 vicente@eguibar.com
-                Eguibar Information Technology S.L.
+                Eguibar IT
                 http://www.eguibarit.com
 
         .LINK
@@ -155,6 +155,9 @@
         # Create a cache hashtable to optimize performance with repeated lookups
         [System.Collections.Hashtable]$Cache = @{}
 
+        # Define pattern to identify privilege right keys
+        $privilegeRightPattern = '^Se[A-Z][a-zA-Z]+Privilege$'
+
         Write-Debug -Message 'Function initialized and ready to process SIDs'
 
     } #end Begin
@@ -164,6 +167,14 @@
         Write-Debug -Message ('Attempting to convert SID: {0} to account name' -f $PSBoundParameters['SID'])
 
         try {
+            # Check if input is a privilege right key
+            if ($SID -is [string] -and $SID -match $privilegeRightPattern) {
+
+                Write-Debug -Message ('Skipping privilege right key: {0}' -f $SID)
+                return $null
+
+            } #end If
+
             # Initialize validation flag
             [bool]$isValid = $false
 
@@ -190,7 +201,6 @@
                     Write-Verbose -Message 'Extracted SecurityIdentifier from input object property'
 
                 } else {
-
                     # If the SID property contains a string SID
                     if ($Variables.WellKnownSIDs.Contains($SID.SID)) {
 

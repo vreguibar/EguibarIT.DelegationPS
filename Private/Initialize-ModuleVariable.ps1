@@ -4,49 +4,79 @@
             Initializes or reinitializes module-level variables for the module.
 
         .DESCRIPTION
-            This function sets up the global $Variables variable used throughout the module.
+            This function sets up the global $Variables variable used throughout the EguibarIT.DelegationPS module.
             The $Variables variable is a hashtable that contains simple key-value pairs as well
-            as nested hashtables (e.g. WellKnownSids). This function is automatically invoked on
-            module import and can be called manually via Initialize-ModuleVariable to refresh or
-            reinitialize the variables. The initialization logic is broken into smaller helper functions
-            to simplify maintenance and testing.
+            as nested hashtables (e.g., WellKnownSids, HeaderDelegation, FooterDelegation).
+
+            The function is automatically invoked on module import and can be called manually
+            to refresh or reinitialize the variables. The initialization logic is broken into
+            smaller helper functions to simplify maintenance and testing.
+
+            Variables initialized include:
+            - Active Directory Distinguished Name
+            - Well-known SIDs for common security principals
+            - Property GUIDs for AD attributes
+            - Standard header and footer formats for logging
+            - Module version information
+
+            This function implements lazy loading where possible to improve module import performance.
 
         .PARAMETER Force
             When specified, forces reinitialization of variables even if they already exist.
-            This is useful for troubleshooting or when you need to refresh the environment.
+            This is useful for troubleshooting or when you need to refresh the environment after
+            domain changes or when testing new functionality.
 
         .EXAMPLE
             Initialize-ModuleVariable
-            # Reinitializes the module variables if required.
+
+            Reinitializes the module variables if required, preserving any existing values
+            unless they need to be updated.
 
         .EXAMPLE
             Initialize-ModuleVariable -Force
-            # Forces reinitialization even if $Variables is already set.
+
+            Forces complete reinitialization of all module variables, discarding any existing values
+            and recreating them from scratch. Useful when troubleshooting or after domain changes.
+
+        .INPUTS
+            None. This function does not accept pipeline input.
 
         .OUTPUTS
-            VOID. The function sets global variables in the module.
+            System.Void
+
+            The function does not return any output. It sets global variables in the module scope
+            that are used by other functions in the module.
 
         .NOTES
-            Required Modules/Prerequisites:
-            - None explicitly required; however, the module should export only Constants and Variables.
-            - The function should be called at the end of the module script to ensure all variables are set.
-
             Used Functions:
                 Name                                       ║ Module/Namespace
                 ═══════════════════════════════════════════╬══════════════════════════════
                 Write-Verbose                              ║ Microsoft.PowerShell.Utility
                 Write-Warning                              ║ Microsoft.PowerShell.Utility
                 Write-Error                                ║ Microsoft.PowerShell.Utility
-                Set-StrictMode                             ║ Microsoft.PowerShell.Utility
+                Set-StrictMode                             ║ Microsoft.PowerShell.Core
                 Get-AdObject                               ║ ActiveDirectory
+                Import-Module                              ║ Microsoft.PowerShell.Core
 
         .NOTES
-            Version:         1.1
-            DateModified:    19/Mar/2025
-            LasModifiedBy:   Vicente Rodriguez Eguibar
-                vicente@eguibar.com
-                Eguibar Information Technology S.L.
-                http://www.eguibarit.com
+            Version:         2.0
+            DateModified:    22/May/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS
+
+        .COMPONENT
+            EguibarIT.DelegationPS
+
+        .ROLE
+            Infrastructure
+
+        .FUNCTIONALITY
+            Module Initialization
     #>
     [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'Low')]
     [OutputType([void])]

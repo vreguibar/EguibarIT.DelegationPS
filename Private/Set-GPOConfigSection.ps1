@@ -79,11 +79,14 @@
             DateModified:    2025-03-13
             LastModifiedBy:  Vicente Rodriguez Eguibar
                             vicente@eguibar.com
-                            Eguibar Information Technology S.L.
+                            Eguibar IT
                             http://www.eguibarit.com
     #>
 
-    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    [CmdletBinding(
+        SupportsShouldProcess = $true,
+        ConfirmImpact = 'Medium'
+    )]
     [OutputType([IniFileHandler.IniFile])]
 
     param (
@@ -112,13 +115,14 @@
             Position = 2)]
         [AllowNull()]
         [AllowEmptyString()]
+        [AllowEmptyCollection()]
         [System.Collections.Generic.List[object]]
         $Members,
 
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            HelpMessage = '.',
+            HelpMessage = 'Object representing the INI file values.',
             Position = 3)]
         [ValidateNotNullOrEmpty()]
         [IniFileHandler.IniFile]
@@ -132,9 +136,9 @@
         # Display function header if variables exist
         if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
             $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToString('dd/MMM/yyyy'),
+                (Get-Date).ToString('dd/MMM/yyyy'),
                 $MyInvocation.Mycommand,
-            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
+                (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
             )
             Write-Verbose -Message $txt
         } #end if
@@ -152,25 +156,31 @@
     Process {
 
         try {
+            # Ensure Members is a collection (array or List), not a hashtable or other type
+            if ($null -eq $Members -or $Members -is [hashtable]) {
+                $Members = [System.Collections.Generic.List[object]]::new()
+                $Members.Add([string]::Empty)
+            } elseif ($Members -isnot [System.Collections.IEnumerable] -or $Members -is [string]) {
+                # If Members is a single string or not enumerable, wrap in a list
+                $tmpList = [System.Collections.Generic.List[object]]::new()
+                $tmpList.Add($Members)
+                $Members = $tmpList
+            }
+
             # Ensure Members is an array with at least an empty string if null
-            if (-not $Members -or ($Members.Count -eq 1 -and [string]::IsNullOrEmpty($Members[0]))) {
+            $membersCount = ($Members | Measure-Object).Count
+            if (-not $Members -or ($membersCount -eq 1 -and [string]::IsNullOrEmpty($Members[0]))) {
 
                 $Members = [System.Collections.Generic.List[object]]::new()
-                #$Members = @([string]::Empty)
                 $Members.Add([string]::Empty)
-            }
-            #elseif (-not ($Members -is [array])) {
-            #    $Members = @($Members)
-            #} #end if-else
+            } #end if
 
             # Ensure section exists
             if (-not $GptTmpl.SectionExists($CurrentSection)) {
 
-                Write-Debug -Message ('
-                    Creating missing section: {0}
-                    ' -f $CurrentSection
-                )
+                Write-Debug -Message ('Creating missing section: {0}' -f $CurrentSection)
                 $GptTmpl.AddSection($CurrentSection)
+
             } #end if
 
             # Retrieve existing key value
@@ -186,10 +196,7 @@
             # Process existing members
             if ($existingMembers -and $existingMembers.Count -gt 0) {
 
-                Write-Debug -Message ('
-                    Processing {0} existing members
-                    ' -f $existingMembers.Count
-                )
+                Write-Debug -Message ('Processing {0} existing members' -f ($existingMembers | Measure-Object).Count)
 
                 foreach ($member in $existingMembers) {
 
@@ -222,141 +229,149 @@
                             Failed to resolve SID: {0}.
                             Error: {1}' -f $sid, $_.Exception.Message
                         )
-                    } #end try-catch
-                } #end foreach
-            } #end if
 
-            # Process new members
-            Write-Debug -Message ('Processing {0} new members' -f $Members.Count)
-            foreach ($member in $Members) {
+                    } #end foreach
+                } #end if
 
-                if (-not [string]::IsNullOrWhiteSpace($member)) {
+                # Process new members
+                $membersCount = ($Members | Measure-Object).Count
+                Write-Debug -Message ('Processing {0} new members' -f $membersCount)
+                foreach ($member in $Members) {
 
-                    try {
-                        # check AD object type and retrieve object SID
-                        $CurrentMember = Get-AdObjectType -Identity $member
+                    if (-not [string]::IsNullOrWhiteSpace($member)) {
 
-                        # Extract SID based on type
-                        $sid = $null
+                        try {
+                            # check AD object type and retrieve object SID
+                            $CurrentMember = Get-AdObjectType -Identity $member
 
-                        if ($null -eq $CurrentMember) {
+                            # Extract SID based on type
+                            $sid = $null
 
-                            Write-Warning -Message ('Could not resolve member: {0}' -f $member)
-                            continue
+                            if ($null -eq $CurrentMember) {
 
-                        } elseif ($CurrentMember -is [string]) {
+                                Write-Warning -Message ('Could not resolve member: {0}' -f $member)
+                                continue
 
-                            # Already a SID string
-                            $sid = $CurrentMember
-                            Write-Debug -Message ('Member {0} is a SID string: {1}' -f $member, $sid)
+                            } elseif ($CurrentMember -is [string]) {
 
-                        } elseif ($CurrentMember -is [System.Security.Principal.SecurityIdentifier]) {
+                                # Already a SID string
+                                $sid = $CurrentMember
+                                Write-Debug -Message ('Member {0} is a SID string: {1}' -f $member, $sid)
 
-                            # SecurityIdentifier object
-                            $sid = $CurrentMember.Value
-                            Write-Debug -Message ('Member {0} is a SecurityIdentifier object with value: {1}' -f $member, $sid)
+                            } elseif ($CurrentMember -is [System.Security.Principal.SecurityIdentifier]) {
 
-                        } elseif ($CurrentMember -is [Microsoft.ActiveDirectory.Management.ADObject] -or
-                            $CurrentMember -is [Microsoft.ActiveDirectory.Management.ADAccount] -or
-                            $CurrentMember -is [Microsoft.ActiveDirectory.Management.ADComputer] -or
-                            $CurrentMember -is [Microsoft.ActiveDirectory.Management.ADGroup] -or
-                            $CurrentMember -is [Microsoft.ActiveDirectory.Management.ADOrganizationalUnit] -or
-                            $CurrentMember -is [Microsoft.ActiveDirectory.Management.ADServiceAccount]) {
-
-                            # Any AD object type
-                            $sid = $CurrentMember.SID.Value
-                            Write-Debug -Message ('Member {0} is an AD object with SID: {1}' -f $member, $sid)
-
-                        } else {
-
-                            # Try to extract value property if it exists
-                            if ($CurrentMember.PSObject.Properties['SID']) {
-
-                                if ($CurrentMember.SID -is [System.Security.Principal.SecurityIdentifier]) {
-                                    $sid = $CurrentMember.SID.Value
-                                } else {
-                                    $sid = $CurrentMember.SID
-                                }
-
-                                Write-Debug -Message ('Member {0} has SID property: {1}' -f $member, $sid)
-
-                            } elseif ($CurrentMember.PSObject.Properties['Value']) {
+                                # SecurityIdentifier object
                                 $sid = $CurrentMember.Value
+                                Write-Debug -Message ('Member {0} is a SecurityIdentifier object with value: {1}' -f $member, $sid)
 
-                                Write-Debug -Message ('Member {0} has Value property: {1}' -f $member, $sid)
+                            } elseif ($CurrentMember -is [Microsoft.ActiveDirectory.Management.ADObject] -or
+                                $CurrentMember -is [Microsoft.ActiveDirectory.Management.ADAccount] -or
+                                $CurrentMember -is [Microsoft.ActiveDirectory.Management.ADComputer] -or
+                                $CurrentMember -is [Microsoft.ActiveDirectory.Management.ADGroup] -or
+                                $CurrentMember -is [Microsoft.ActiveDirectory.Management.ADOrganizationalUnit] -or
+                                $CurrentMember -is [Microsoft.ActiveDirectory.Management.ADServiceAccount]) {
+
+                                # Any AD object type
+                                $sid = $CurrentMember.SID.Value
+                                Write-Debug -Message ('Member {0} is an AD object with SID: {1}' -f $member, $sid)
 
                             } else {
 
-                                Write-Warning -Message ('
+                                # Try to extract value property if it exists
+                                if ($CurrentMember.PSObject.Properties['SID']) {
+
+                                    if ($CurrentMember.SID -is [System.Security.Principal.SecurityIdentifier]) {
+
+                                        $sid = $CurrentMember.SID.Value
+
+                                    } else {
+
+                                        $sid = $CurrentMember.SID
+                                    }
+
+                                    Write-Debug -Message ('Member {0} has SID property: {1}' -f $member, $sid)
+
+                                } elseif ($CurrentMember.PSObject.Properties['Value']) {
+                                    $sid = $CurrentMember.Value
+
+                                    Write-Debug -Message ('Member {0} has Value property: {1}' -f $member, $sid)
+
+                                } else {
+
+                                    Write-Warning -Message ('
                                     Unexpected return type from Get-AdObjectType: {0}, cannot extract SID
                                     ' -f $CurrentMember.GetType().FullName
-                                )
-                                continue
-                            } #end If-ElseIf-Else
-                        } #end If-ElseIf-ElseIf-ElseIf-Else
+                                    )
+                                    continue
 
-                        if ($sid) {
+                                } #end If-ElseIf-Else
 
-                            [void]$resolvedMembers.Add('*{0}' -f $sid)
+                            } #end If-ElseIf-ElseIf-ElseIf-Else
 
-                            Write-Debug -Message ('
+                            if ($sid) {
+
+                                [void]$resolvedMembers.Add('*{0}' -f $sid)
+
+                                Write-Debug -Message ('
                                 New member resolved: {0}
                                 SID: {1}
                                 ' -f $member, $sid
-                            )
+                                )
 
-                        } else {
+                            } else {
 
-                            Write-Warning -Message ('Could not extract SID for member: {0}' -f $member)
+                                Write-Warning -Message ('Could not extract SID for member: {0}' -f $member)
 
-                        } #end If-else
+                            } #end If-else
 
-                    } catch {
-                        Write-Error -Message ('
+                        } catch {
+                            Write-Error -Message ('
                             Failed to resolve new member: {0}, Error: {1}' -f $member, $_.Exception.Message
-                        )
-                        Write-Verbose -Message ('Stack trace: {0}' -f $_.Exception.StackTrace)
-                    } #end try-catch
+                            )
+                            Write-Verbose -Message ('Stack trace: {0}' -f $_.Exception.StackTrace)
+                        } #end try-catch
 
+                    } #end if
+
+                } #end Foreach
+
+                # Prepare the final string for GptTmpl
+                $finalValue = if ($resolvedMembers.Count -eq 1 -and [string]::IsNullOrEmpty($resolvedMembers[0])) {
+                    [string]::Empty
+                } else {
+                ($resolvedMembers -join ',').TrimEnd(',')
                 } #end if
 
-            } #end Foreach
+                # Update the GPO template
 
-            # Prepare the final string for GptTmpl
-            $finalValue = if ($resolvedMembers.Count -eq 1 -and [string]::IsNullOrEmpty($resolvedMembers[0])) {
-                [string]::Empty
-            } else {
-                ($resolvedMembers -join ',').TrimEnd(',')
-            } #end if
+                if ($PSCmdlet.ShouldProcess("$CurrentSection -> $CurrentKey", 'Updating GptTmpl')) {
 
-            # Update the GPO template
-            if ($PSCmdlet.ShouldProcess("$CurrentSection -> $CurrentKey", 'Updating GptTmpl')) {
-                $GptTmpl.SetKeyValue($CurrentSection, $CurrentKey, $finalValue)
+                    $GptTmpl.SetKeyValue($CurrentSection, $CurrentKey, $finalValue)
 
-                Write-Verbose -Message ('
-                    GPO section updated
-                        Current Section: {0}
-                        Current Key:     {1}
-                        Value:           {2}
-                    ' -f $CurrentSection, $CurrentKey, $finalValue
-                )
+                    $sb = [System.Text.StringBuilder]::new()
+                    [void]$sb.AppendFormat( 'GPO section updated.{0}', $Constants.NL )
+                    [void]$sb.AppendFormat( '    Section: {0}{1}', $CurrentSection, $Constants.NL )
+                    [void]$sb.AppendFormat( '    Key:     {0}{1}', $CurrentKey, $Constants.NL)
+                    [void]$sb.AppendFormat( '    Members: {0}{1}', $finalValue, $Constants.NL )
 
-            } #end if
-        } catch {
+                    Write-Verbose -Message $sb.ToString()
 
-            Write-Error -Message ('An error occurred while processing {0}: {1}' -f $CurrentKey, $_.Exception.Message)
-            Write-Verbose -Message ('Stack trace: {0}' -f $_.Exception.StackTrace)
+                } #end if
+            } catch {
 
-        } #end try-catch
+                Write-Error -Message ('An error occurred while processing {0}: {1}' -f $CurrentKey, $_.Exception.Message)
+                Write-Verbose -Message ('Stack trace: {0}' -f $_.Exception.StackTrace)
 
-    } #end Process
+            } #end try-catch
 
-    End {
-        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
-            'configuration of GptTmpl object section (Private Function).'
-        )
-        Write-Verbose -Message $txt
+        } #end Process
 
-        return $GptTmpl
-    }
-} #end Set-GPOConfigSection
+        End {
+            if ($null -ne $Variables -and $null -ne $Variables.FooterDelegation) {
+                $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
+                    'configuration of GptTmpl object section (Private Function).')
+                Write-Verbose -Message $txt
+            }
+            return $GptTmpl
+        } #end End
+    } #end function Set-GPOConfigSection

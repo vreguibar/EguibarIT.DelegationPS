@@ -8,7 +8,10 @@
             Additionally, it verifies if the SID exists within a predefined hashtable of well-known SIDs.
 
         .PARAMETER ObjectSID
-            A string representing the object Security Identifier (SID).
+            A string representing the Security Identifier (SID) to validate. This can be:
+            - A standard SID string (e.g., 'S-1-5-21-2562450185-1914323539-512974444-1234')
+            - A well-known SID (e.g., 'S-1-5-18' for Local System)
+            - A domain-prefixed SID (e.g., 'DOMAIN\S-1-5-21-...')
 
         .EXAMPLE
             Test-IsValidSID -ObjectSID 'S-1-5-21-2562450185-1914323539-512974444-1234'
@@ -42,7 +45,11 @@
         .LINK
             https://github.com/vreguibar/EguibarIT/blob/main/Private/Test-IsValidSID.ps1
     #>
-    [CmdletBinding(ConfirmImpact = 'Low', SupportsShouldProcess = $true)]
+
+    [CmdletBinding(
+        ConfirmImpact = 'Low',
+        SupportsShouldProcess = $true
+    )]
     [OutputType([bool])]
 
     param
@@ -77,37 +84,49 @@
 
         # Ensure only account is used (remove anything before \ if exists)
         If ($SIDToValidate -match '\\') {
+
             $SIDToValidate = $SIDToValidate.Split('\')[1]
             Write-Verbose -Message ('Domain format detected. Extracted SID: {0}' -f $SIDToValidate)
+
         } #end If
 
         if ($PSCmdlet.ShouldProcess($SIDToValidate, 'Validate SID format and existence')) {
+
             # Try RegEx validation
             Try {
+
                 # Check if it's a well-known SID first
                 If ($null -ne $Variables -and
                     $null -ne $Variables.WellKnownSIDs -and
-                    $Variables.WellKnownSIDs.ContainsKey($SIDToValidate)) {
+                    $Variables.WellKnownSIDs.Contains($SIDToValidate)) {
+
                     Write-Verbose -Message ('The SID {0} is a WellKnownSid.' -f $SIDToValidate)
                     $isValid = $true
-                }
-                # Then check against regex pattern
-                elseIf ($null -ne $Constants -and
+
+                    # Then check against regex pattern
+                } elseIf ($null -ne $Constants -and
                     $null -ne $Constants.SidRegEx -and
                     $SIDToValidate -match $Constants.SidRegEx) {
+
+                    # If it matches the SID regex, it's valid
                     Write-Verbose -Message ('The SID {0} is valid.' -f $SIDToValidate)
                     $isValid = $true
-                }
-                # If neither, it's invalid
-                else {
+
+                    # If neither, it's invalid
+                } else {
+
                     # This exact message format is expected by the test
                     Write-Verbose -Message ('[WARNING] The SID {0} is NOT valid!.' -f $SIDToValidate)
                     $isValid = $false
+
                 } #end If-Else
+
             } catch {
+
                 # Handle exceptions gracefully
                 Write-Error -Message ('An error occurred when validating the SID: {0}' -f $_.Exception.Message)
                 $isValid = $false
+
             } #end Try-Catch
 
             # Return the validation result within the ShouldProcess block

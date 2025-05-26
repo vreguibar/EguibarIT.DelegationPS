@@ -1,0 +1,215 @@
+function Add-Right {
+
+    <#
+        .SYNOPSIS
+            Adds rights to a collection for delegation purposes.
+
+        .DESCRIPTION
+            This internal function is used to add rights to a collection that is used to construct
+            delegation permissions. It handles various member input types and safely processes them
+            into a standardized format before adding them to the collection.
+
+            The function provides robust validation and type handling to ensure consistency in the
+            access rights collection, regardless of the input format of members. It supports
+            individual strings, arrays, and other enumerable types as input for the Members parameter.
+
+        .PARAMETER Key
+            The key identifier for the right being added to the collection. This typically represents
+            a specific permission or right in the delegation model.
+
+        .PARAMETER Members
+            An array of objects that represent the security principals (users, groups, etc.) to which
+            the right will be assigned. The function handles various input types including strings,
+            arrays, and other enumerable types.
+
+        .PARAMETER Description
+            An optional description of the right being added. Defaults to an empty string if not provided.
+
+        .PARAMETER Collection
+            The target collection to which the rights will be added. This must be a
+            System.Collections.Generic.List<object> that stores all the rights configurations.
+
+        .EXAMPLE
+            $rightsCollection = [System.Collections.Generic.List[object]]::new()
+            Add-Right -Key "CreateChild" -Members "Domain Admins" -Collection $rightsCollection
+
+            Adds a right with key "CreateChild" for the "Domain Admins" group to the specified collection.
+
+        .EXAMPLE
+            $rightsCollection = [System.Collections.Generic.List[object]]::new()
+            $members = @("Domain Admins", "Enterprise Admins")
+            Add-Right -Key "WriteProperty" -Members $members -Description "Allow write access" -Collection $rightsCollection
+
+            Adds a right with key "WriteProperty" for both "Domain Admins" and "Enterprise Admins" groups
+            to the specified collection, with a description of "Allow write access".
+
+        .INPUTS
+            None. This function does not accept pipeline input.
+
+        .OUTPUTS
+            System.Void
+
+            This function does not produce any output. It modifies the collection passed
+            in the Collection parameter.
+
+        .NOTES
+            Used Functions:
+                Name                                       ║ Module/Namespace
+                ═══════════════════════════════════════════╬══════════════════════════════
+                Write-Debug                                ║ Microsoft.PowerShell.Utility
+                Write-Verbose                              ║ Microsoft.PowerShell.Utility
+                Test-MembersProperty                       ║ EguibarIT.DelegationPS
+
+        .NOTES
+            Version:         2.0
+            DateModified:    22/May/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS
+
+        .COMPONENT
+            Active Directory
+
+        .ROLE
+            Security
+
+        .FUNCTIONALITY
+            Delegation, Access Control
+    #>
+
+    [CmdletBinding(
+        SupportsShouldProcess = $false,
+        ConfirmImpact = 'Low'
+    )]
+    [OutputType([System.Void])]
+
+    param (
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $false,
+            ValueFromPipelineByPropertyName = $false,
+            ValueFromRemainingArguments = $false,
+            HelpMessage = 'Key identifier for the right being added',
+            Position = 0
+        )]
+        [string]
+        $Key,
+
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $false,
+            ValueFromPipelineByPropertyName = $false,
+            ValueFromRemainingArguments = $false,
+            HelpMessage = 'Members to which the right will be assigned',
+            Position = 1
+        )]
+        [AllowNull()]
+        [AllowEmptyString()]
+        [AllowEmptyCollection()]
+        [object[]]
+        $Members,
+
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $false,
+            ValueFromPipelineByPropertyName = $false,
+            ValueFromRemainingArguments = $false,
+            HelpMessage = 'Description of the right being added',
+            Position = 2
+        )]
+        [string]
+        $Description = '',
+
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $false,
+            ValueFromPipelineByPropertyName = $false,
+            ValueFromRemainingArguments = $false,
+            HelpMessage = 'Collection to which the right will be added',
+            Position = 3
+        )]
+        [ValidateNotNull()]
+        [System.Collections.Generic.List[object]]
+        $Collection
+    )
+
+    Begin {
+        Set-StrictMode -Version Latest
+    } #end Begin
+
+    Process {
+        try {
+            # Create a strongly typed list that ensures Count property always exists
+            $safeMembers = [System.Collections.Generic.List[string]]::new()
+
+            try {
+                # Safely normalize the members input
+                $membersList = Test-MembersProperty -Members $Members
+
+                # Only process if membersList is not null and has the Count property
+                if ($null -ne $membersList) {
+                    # Safely get count - handle case where Count property might not exist
+                    $count = 0
+                    if ($membersList.PSObject.Properties.Name -contains 'Count') {
+                        $count = $membersList.Count
+                    } elseif ($membersList -is [Array]) {
+                        $count = $membersList.Length
+                    } elseif ($membersList -is [System.Collections.ICollection]) {
+                        $count = $membersList.Count
+                    }
+                    
+                    Write-Debug -Message ('Members list has {0} items' -f $count)
+
+                    # Add each member to our safeMembers list
+                    foreach ($m in $membersList) {
+
+                        if (-not [string]::IsNullOrWhiteSpace($m)) {
+
+                            [void]$safeMembers.Add($m)
+                            Write-Debug -Message ('Added member: {0}' -f $m)
+
+                        } #end If
+                    } #end foreach
+                } #end if
+
+            } catch {
+
+                Write-Warning -Message ('Error normalizing members: {0}' -f $_.Exception.Message)
+                # Continue with empty list if there was an error
+
+            } #end try-catch
+
+            Write-Verbose -Message ('Final members count: {0}' -f $safeMembers.Count)
+
+            # Create the hashtable with our safe members list
+            $TmpHash = @{
+                Section     = 'Privilege Rights'
+                Key         = $Key
+                Members     = $safeMembers
+                Description = $Description
+            }
+
+            try {
+
+                # Add to collection
+                [void]$Collection.Add($TmpHash)
+                Write-Debug -Message ('Added right {0} with {1} unique members' -f $Key, $safeMembers.Count)
+
+            } catch {
+
+                Write-Warning -Message ('Failed to add right {0} to collection: {1}' -f $Key, $_.Exception.Message)
+                throw
+
+            } #end try-catch
+
+        } catch {
+
+            Write-Warning -Message ('Error processing right {0}: {1}' -f $Key, $_.Exception.Message)
+            throw
+
+        } #end try-catch
+    } #end Process
+
+    End {
+    } #end End
+} #end function Add-Right

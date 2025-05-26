@@ -1,34 +1,108 @@
 ﻿function Set-AdAclCreateDeleteOU {
     <#
-        .Synopsis
-            The function will delegate the permission for a group to create/Delete
-            Organizational Units objects within an OU
+        .SYNOPSIS
+            Delegates permissions to create and delete Organizational Units (OUs).
+
         .DESCRIPTION
-            Configures the container (OU) to delegate the permissions to a group so it can create/delete OU objects.
+            The Set-AdAclCreateDeleteOU function delegates permissions to a specified security group
+            to create and delete Organizational Unit (OU) objects within a designated container in
+            Active Directory.
+
+            This function simplifies the process of delegating OU management by:
+            - Adding the necessary Access Control Entries (ACEs) to allow OU creation
+            - Adding permissions to delete OUs, including tree deletion
+            - Setting the correct inheritance flags to control permission scope
+            - Supporting removal of these delegated permissions when needed
+
+            The function is part of a comprehensive delegation model that allows for granular
+            permission assignments in Active Directory environments.
+
+        .PARAMETER Group
+            Specifies the security group that will receive (or from which will be removed)
+            the permissions to create and delete OUs. This parameter accepts:
+            - Security group name (SAM account name)
+            - Distinguished Name
+            - Security Identifier (SID)
+            - Group object from Get-ADGroup
+
+        .PARAMETER LDAPpath
+            Specifies the Distinguished Name (DN) of the container or OU where the group
+            will be able to create and delete OUs. This is the target location for the
+            permission delegation.
+
+        .PARAMETER RemoveRule
+            When specified, removes the previously granted permissions for creating and
+            deleting OUs instead of adding them. Use this parameter to revoke previously
+            delegated permissions.
+
+        .PARAMETER Force
+            When specified, suppresses confirmation prompts when performing the permission
+            changes. Use this parameter in automation scenarios where no user interaction
+            is desired.
+
         .EXAMPLE
             Set-AdAclCreateDeleteOU -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
+
+            Delegates permissions to the SG_SiteAdmins_XXXX group to create and delete OUs
+            within the specified OU.
+
         .EXAMPLE
             Set-AdAclCreateDeleteOU -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local" -RemoveRule
-        .PARAMETER Group
-            [STRING] Identity of the group getting the delegation.
-        .PARAMETER LDAPpath
-            [STRING] Distinguished Name of the OU that can be Changed
-        .PARAMETER RemoveRule
-            [SWITCH] If present, the access rule will be removed
+
+            Removes the permissions for the SG_SiteAdmins_XXXX group to create and delete OUs
+            within the specified OU.
+
+        .EXAMPLE
+            $Splat = @{
+                Group = "SG_SiteAdmins_XXXX"
+                LDAPPath = "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
+                Force = $true
+            }
+            Set-AdAclCreateDeleteOU @Splat
+
+            Delegates OU creation/deletion permissions without prompting for confirmation.
+
+        .INPUTS
+            System.String
+            Microsoft.ActiveDirectory.Management.ADGroup
+
+            You can pipe group names or Group objects from Get-ADGroup to this function.
+
+        .OUTPUTS
+            System.Void
+
+            This function does not generate any output.
+
         .NOTES
             Used Functions:
-                Name                                   | Module
-                ---------------------------------------|--------------------------
-                Set-AclConstructor5                    | EguibarIT.DelegationPS
-                Set-AclConstructor6                    | EguibarIT.DelegationPS
-                Get-AttributeSchemaHashTable           | EguibarIT.DelegationPS
+                Name                                       ║ Module/Namespace
+                ═══════════════════════════════════════════╬══════════════════════════════
+                Set-AclConstructor5                        ║ EguibarIT.DelegationPS
+                Set-AclConstructor6                        ║ EguibarIT.DelegationPS
+                Get-AttributeSchemaHashTable               ║ EguibarIT.DelegationPS
+                Get-AdObjectType                           ║ EguibarIT.DelegationPS
+                Write-Verbose                              ║ Microsoft.PowerShell.Utility
+                Test-IsValidDN                             ║ EguibarIT.DelegationPS
+
         .NOTES
-            Version:         1.1
-            DateModified:    17/Oct/2016
-            LasModifiedBy:   Vicente Rodriguez Eguibar
-                vicente@eguibar.com
-                Eguibar Information Technology S.L.
-                http://www.eguibarit.com
+            Version:         2.0
+            DateModified:    22/May/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS
+
+        .COMPONENT
+            Active Directory
+
+        .ROLE
+            Security Administration
+
+        .FUNCTIONALITY
+            OU Management, Delegation of Control
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     [OutputType([void])]

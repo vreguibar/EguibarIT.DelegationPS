@@ -1,5 +1,4 @@
 ﻿function Write-CustomWarning {
-
     <#
         .SYNOPSIS
             Mimics Write-Warning but with optional logging to the Windows Event Log.
@@ -8,34 +7,43 @@
             This function writes warning messages to the console and, if instructed, to the specified Windows Event Log.
             It supports both predefined and custom event logging, allowing flexibility in logging approaches.
 
+            The function can be used in two main ways:
+            1. With predefined event information using the EventInfo parameter
+            2. With custom event details using EventId, EventName, and EventCategory parameters
+
+            When CreateWindowsEvent switch is present, the message will be written both to the console
+            and to the Windows Event Log. Otherwise, it will only output to the console as a warning.
+
         .PARAMETER CreateWindowsEvent
-            Switch to indicate if a Windows Event Log entry should be created instead of just outputting a verbose message.
+            Switch to indicate if a Windows Event Log entry should be created in addition to outputting a warning message.
 
         .PARAMETER Message
-            The message to be written, either to the console (as verbose) or the Windows Event Log.
+            The message to be written, either to the console (as a warning) or both to the console and the Windows Event Log.
 
         .PARAMETER EventInfo
-            Predefined event information of type [EventIDs], if using predefined events.
+            Predefined event information of type [EventIDs], if using predefined events. These are defined in the
+            Class.Events.ps1 file under the Classes folder.
 
         .PARAMETER EventId
-            Custom event ID if logging a custom event.
+            Custom event ID if logging a custom event. Must be a valid member of the [EventID] enumeration.
 
         .PARAMETER EventName
-            Name of the custom event being logged.
+            Name of the custom event being logged. Used to identify the event in the Windows Event Log.
 
         .PARAMETER EventCategory
-            Custom event category for the event.
+            Custom event category for the event. Must be a valid member of the [EventCategory] enumeration.
 
         .EXAMPLE
-            # Write a simple warning message
-            Write-CustomWarning -Message "Starting process" -Verbose
+            Write-CustomWarning -Message "Process failed to start" -Verbose
+
+            Writes a simple warning message to the console with verbose output.
 
         .EXAMPLE
-            # Log a warning message and also create a Windows Event Log entry with predefined event info
             Write-CustomWarning -CreateWindowsEvent -EventInfo ([EventIDs]::SlowPerformance) -Message "Old hardware detected."
 
+            Logs a warning message to the console and also creates a Windows Event Log entry using a predefined event info.
+
         .EXAMPLE
-            # Log a warning message and also create a Windows Event Log entry with predefined event info
             $Splat = @{
                 CreateWindowsEvent = $true
                 EventInfo          = ([EventIDs]::GetGroupMembership)
@@ -43,20 +51,49 @@
             }
             Write-CustomWarning @Splat
 
-        .EXAMPLE
-            # Log a custom event with specific event details
-            Write-CustomWarning -CreateWindowsEvent -EventId 5001 -EventName "CustomEvent" -EventCategory SystemHealth
-            -Message "Custom verbose message." -Verbose
+            Logs a warning message using splatting with a predefined event information.
 
         .EXAMPLE
-            Write-CustomWarning -CustomEventId ([EventID]::LowDiskSpace) -EventName "LowDiskSpace" -EventCategory SystemHealth
-            -Message "Low disk space detected on C: drive. Free space below 10%." -Verbose
+            Write-CustomWarning -CreateWindowsEvent -EventId ([EventID]::CustomError) -EventName "CustomEvent" -EventCategory SystemHealth -Message "Custom warning message." -Verbose
+
+            Logs a custom event with specific event details to both the console and the Windows Event Log.
+
+        .INPUTS
+            System.String for the Message parameter.
+
+        .OUTPUTS
+            System.Void
 
         .NOTES
-            Ensure necessary event types (EventIDs, EventCategory, etc.) are defined on Class.Events.ps1 file
-            located under Classes folder.
-            This file is written in C# (CSharp) language and compiled in runtime when module is imported. This is
-            due visibility and compatibility issues on modules when using just PowerShell code.
+            Used Functions:
+                Name                                       ║ Module/Namespace
+                ═══════════════════════════════════════════╬══════════════════════════════
+                Write-CustomLog                            ║ EguibarIT.DelegationPS
+                Write-Warning                              ║ Microsoft.PowerShell.Utility
+
+            Ensure necessary event types (EventIDs, EventCategory, etc.) are defined in the Class.Events.ps1 file
+            located under Classes folder. This file is written in C# (CSharp) language and compiled at runtime
+            when the module is imported. This approach addresses visibility and compatibility issues in PowerShell modules.
+
+        .NOTES
+            Version:         2.0
+            DateModified:    22/May/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS
+
+        .COMPONENT
+            Logging
+
+        .ROLE
+            System Administration
+
+        .FUNCTIONALITY
+            Event Logging, Warning Messages
     #>
 
     [CmdletBinding(SupportsShouldProcess = $true, DefaultParameterSetName = 'Default')]

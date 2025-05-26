@@ -4,7 +4,8 @@
             Retrieves or creates the GPT template (GptTmpl.inf) for a specified Group Policy Object.
 
         .DESCRIPTION
-            This function retrieves or creates the GPT template file (GptTmpl.inf) for a specified Group Policy Object (GPO).
+            This function retrieves or creates the GPT template file (GptTmpl.inf) for a specified
+            Group Policy Object (GPO).
 
             It performs the following operations:
             - Retrieves the specified GPO using the Group Policy module
@@ -53,48 +54,49 @@
             Retrieves the GPT template for the GPO name passed through the pipeline.
 
         .INPUTS
-            [string] The name of the Group Policy Object (GPO).
-            [Microsoft.GroupPolicy.Gpo] A GPO object from Get-GPO.
+            System.String
+            Microsoft.GroupPolicy.Gpo
+
+            You can pipe a GPO name as a string or a GPO object from Get-GPO to this function.
 
         .OUTPUTS
-            [IniFileHandler.IniFile] Returns an object representing the GPT template if successful.
+            IniFileHandler.IniFile
+
+            Returns an IniFileHandler.IniFile object representing the GPT template if successful.
             Returns $null if the operation fails.
 
         .NOTES
             Used Functions:
-                Name                             ║ Module/Namespace
-                ═════════════════════════════════╬══════════════════════════════
-                Get-GPO                          ║ GroupPolicy
-                New-Item                         ║ Microsoft.PowerShell.Management
-                Test-Path                        ║ Microsoft.PowerShell.Management
-                Write-Error                      ║ Microsoft.PowerShell.Utility
-                Write-Verbose                    ║ Microsoft.PowerShell.Utility
-                Write-Debug                      ║ Microsoft.PowerShell.Utility
-                Get-FunctionDisplay              ║ EguibarIT.DelegationPS
-                Import-MyModule                  ║ EguibarIT.DelegationPS
+                Name                                       ║ Module/Namespace
+                ═══════════════════════════════════════════╬══════════════════════════════
+                Get-GPO                                    ║ GroupPolicy
+                New-Item                                   ║ Microsoft.PowerShell.Management
+                Test-Path                                  ║ Microsoft.PowerShell.Management
+                Write-Error                                ║ Microsoft.PowerShell.Utility
+                Write-Verbose                              ║ Microsoft.PowerShell.Utility
+                Write-Debug                                ║ Microsoft.PowerShell.Utility
+                Get-FunctionDisplay                        ║ EguibarIT.DelegationPS
+                Import-MyModule                            ║ EguibarIT.DelegationPS
 
         .NOTES
-            Version:        1.2
-            DateModified:   21/Mar/2025
-            LastModifiedBy: Vicente Rodriguez Eguibar
+            Version:         2.0
+            DateModified:    22/May/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
                             vicente@eguibar.com
                             Eguibar IT
                             http://www.eguibarit.com
 
         .LINK
-            https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Get-GptTemplate.ps1
+            https://github.com/vreguibar/EguibarIT.DelegationPS
 
         .COMPONENT
-            GroupPolicy
+            Group Policy
 
         .ROLE
-            System Administration
-            Group Policy Management
+            Security Administration
 
         .FUNCTIONALITY
-            Group Policy
-            Security Configuration
-            GPO Management
+            Group Policy Management
     #>
 
     [CmdletBinding(SupportsShouldProcess = $true,
@@ -178,8 +180,6 @@
         # Add ErrorAction to the splat
         $SplatGpo['ErrorAction'] = 'Stop'
 
-        # Initialize the result variable
-        [IniFileHandler.IniFile]$GptTmpl = $null
 
         # Get the domain FQDN - use the provided domain or the current user's domain
         [string]$DomainFQDN = if ($PSBoundParameters.ContainsKey('DomainName')) {
@@ -187,6 +187,8 @@
         } else {
             $env:USERDNSDOMAIN
         } #end if-else
+
+        $PDCEmulator = (Get-ADDomain | Select-Object -Property PDCEmulator).PDCEmulator
 
     } #end Begin
 
@@ -203,6 +205,7 @@
 
 
             # Construct the GPT template path
+            #[string]$DomainPath = '\\{0}\SYSVOL\{0}' -f $PDCEmulator
             [string]$DomainPath = '\\{0}\SYSVOL\{0}' -f $DomainFQDN
             [string]$GpoPath = '{0}\Policies\{1}\Machine\Microsoft\Windows NT\SecEdit\' -f $DomainPath, ('{' + $($Gpo.Id) + '}')
             [string]$GpoPathFile = '{0}GptTmpl.inf' -f $GpoPath

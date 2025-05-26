@@ -1,4 +1,4 @@
-﻿Function Add-GroupToSCManager {
+Function Add-GroupToSCManager {
     <#
         .Synopsis
             Adds a group to the Service Control Manager (SCM) ACL.
@@ -27,6 +27,9 @@
         .PARAMETER Computer
             Remote computer to execute the commands.
 
+        .PARAMETER Force
+            If present, the function will not ask for confirmation when performing actions.
+
         .NOTES
             This function relies on SC.exe located at $env:SystemRoot\System32\
 
@@ -39,8 +42,8 @@
                 Write-Error                            | Microsoft.PowerShell.Utility
 
         .NOTES
-            Version:         1.0
-            DateModified:    20/Mar/2024
+            Version:         1.1
+            DateModified:    23/May/2025
             LasModifiedBy:   Vicente Rodriguez Eguibar
                 vicente@eguibar.com
                 Eguibar IT
@@ -60,7 +63,7 @@
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID')]
         $Group,
 
-        # PARAM1 STRING for the Delegated Group Name
+        # PARAM2 STRING for the Remote Computer Name
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
@@ -69,6 +72,7 @@
         [Alias('Host', 'PC', 'Server', 'HostName', 'ComputerName')]
         $Computer,
 
+        # PARAM3 SWITCH to force operations without confirmation
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $false,
             ValueFromPipelineByPropertyName = $false,
@@ -85,11 +89,13 @@
         $error.clear()
 
         # Display function header if variables exist
-        if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
+        if ($null -ne $Variables -and
+            $null -ne $Variables.HeaderDelegation) {
+
             $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToString('dd/MMM/yyyy'),
+                (Get-Date).ToString('dd/MMM/yyyy'),
                 $MyInvocation.Mycommand,
-            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
+                (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
             )
             Write-Verbose -Message $txt
         } #end if
@@ -100,7 +106,11 @@
         ##############################
         # Variables Definition
 
-        [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
+        # Save current error action preference
+        $savedErrorActionPreference = $ErrorActionPreference
+
+        # Set to Continue to avoid terminating errors
+        $ErrorActionPreference = 'Continue'
 
         # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
         $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
@@ -141,14 +151,13 @@
     } #end Begin
 
     Process {
-
-        # get current 'Service Control Manager (SCM)' acl in SDDL format
+        # Get current 'Service Control Manager (SCM)' acl in SDDL format
         Write-Verbose -Message 'Get current "Service Control Manager (SCM)" acl in SDDL format'
 
         $MySDDL = if ($Computer) {
             (& $ServiceControlCmd.Definition @("\\$Computer", 'sdshow', 'scmanager'))[1]
         } else {
-           ( & $ServiceControlCmd.Definition @('sdshow', 'scmanager'))[1]
+            (& $ServiceControlCmd.Definition @('sdshow', 'scmanager'))[1]
         } #end If-Else
 
         Write-Verbose -Message ('Retrieved SDDL: {0}' -f $MySDDL)
@@ -170,35 +179,58 @@
                     [System.Security.AccessControl.PropagationFlags]::None
                 )
 
-                Write-Verbose -Message ('Successfully Added {0} for {1}' -f $_.AceType, $PSBoundParameters['Group'])
+                $message = 'Successfully Added AccessControlType Allow for {0}'
+                Write-Verbose -Message ($message -f $PSBoundParameters['Group'])
             } catch {
-                Write-Error -Message ('Failed to add access because {0}' -f $_.Exception.Message)
-            }
+                $errorMessage = 'Failed to add access because {0}'
+                Write-Error -Message ($errorMessage -f $_.Exception.Message)
+            } #end Try-Catch
 
             # Commit changes
             Write-Verbose -Message 'Commit changes.'
             try {
                 # Get SDDL
                 Write-Verbose -Message 'Get SDDL from Common Security Descriptor.'
-                $sddl = $Permission.GetSddlForm([System.Security.AccessControl.AccessControlSections]::All)
+                $accessControlSections = [System.Security.AccessControl.AccessControlSections]::All
+                $sddl = $Permission.GetSddlForm($accessControlSections)
 
+                # Use sc.exe to set the SDDL directly
+                # This approach avoids using Set-Acl which requires administrative privileges
                 If ($Computer) {
-                    & $ServiceControlCmd.Definition @("\\$Computer", 'sdset', 'scmanager', "$sddl")
+                    $scArgs = @("\\$Computer", 'sdset', 'scmanager', "$sddl")
+                    $result = & $ServiceControlCmd.Definition $scArgs
                 } else {
-                    & $ServiceControlCmd.Definition @('sdset', 'scmanager', "$sddl")
+                    $scArgs = @('sdset', 'scmanager', "$sddl")
+                    $result = & $ServiceControlCmd.Definition $scArgs
                 }
-                Write-Verbose -Message 'Successfully set ACL in Service Control Manager'
+
+                # Check if the operation was successful
+                if ($LASTEXITCODE -eq 0 -or $result -match 'SUCCESS') {
+                    Write-Verbose -Message 'Successfully set ACL in Service Control Manager'
+                } else {
+                    $failMessage = 'Failed to set Security in the Service Control Manager: {0}'
+                    Write-Error -Message ($failMessage -f $result)
+                }
             } catch {
-                Write-Error -Message ('Failed to set Security in the registry because {0}' -f $_.Exception.Message)
+                $failExMessage = 'Failed to set Security in the Service Control Manager because {0}'
+                Write-Error -Message ($failExMessage -f $_.Exception.Message)
             } #end Try-Catch
         } #end If
 
     } #end Process
 
     End {
-        $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
-            'adding Service Control Manager (SCM) access.'
-        )
-        Write-Verbose -Message $txt
-    } #end END
-} # End Function
+        # Restore previous error action preference
+        $ErrorActionPreference = $savedErrorActionPreference
+
+        # Display function footer if variables exist
+        if ($null -ne $Variables -and
+            $null -ne $Variables.FooterDelegation) {
+
+            $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
+                'adding Service Control Manager (SCM) access.'
+            )
+            Write-Verbose -Message $txt
+        } #end if
+    } #end End
+} #end Function Add-GroupToSCManager

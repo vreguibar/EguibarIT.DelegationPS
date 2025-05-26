@@ -8,6 +8,23 @@
             It returns $True if it is a Well-Known SID or $False otherwise. The function can
             process multiple SIDs in a single execution via the pipeline.
 
+            Well-Known SIDs include accounts and groups that have special meaning within
+            Windows and Active Directory, such as Local System, Administrator, Everyone,
+            and other built-in security principals.
+
+            The function contains a comprehensive mapping of Well-Known SIDs to their
+            corresponding descriptions, which is used for the -Detailed parameter output.
+
+        .PARAMETER SID
+            The Security IDentifier (SID) to check. Accepts multiple SIDs via pipeline.
+            This parameter accepts either string representations of SIDs (e.g., 'S-1-5-18')
+            or SecurityIdentifier objects.
+
+        .PARAMETER Detailed
+            When specified, returns a detailed object including the SID description
+            instead of a simple Boolean value. This provides additional context about
+            the specific Well-Known SID being identified.
+
         .EXAMPLE
             Get-AdWellKnownSID -SID 'S-1-5-18'
 
@@ -26,14 +43,15 @@
             - IsWellKnown: True
             - Description: "Local System Account"
 
-        .PARAMETER SID
-            The Security IDentifier (SID) to check. Accepts multiple SIDs via pipeline.
+        .INPUTS
+            System.String
+            System.Security.Principal.SecurityIdentifier
 
-        .PARAMETER Detailed
-            When specified, returns a detailed object including the SID description.
+            You can pipe SID strings or SecurityIdentifier objects to this function.
 
         .OUTPUTS
-            [Bool] or [PSCustomObject]
+            System.Boolean
+            System.Management.Automation.PSCustomObject
 
             When -Detailed is not specified, returns $True if the SID is a Well-Known SID or $False otherwise.
             When -Detailed is specified, returns a custom object with properties: SID, IsWellKnown, and Description.
@@ -45,19 +63,31 @@
                 Write-Verbose                              ║ Microsoft.PowerShell.Utility
                 Write-Warning                              ║ Microsoft.PowerShell.Utility
                 Write-Error                                ║ Microsoft.PowerShell.Utility
-                Get-FunctionDisplay                        ║ EguibarIT
+                Get-FunctionDisplay                        ║ EguibarIT.DelegationPS
                 Test-IsValidSID                            ║ EguibarIT.DelegationPS
 
         .NOTES
-            Version:         2.1
-            DateModified:    20/Mar/2025
+            Version:         2.2
+            DateModified:    22/May/2025
             LastModifiedBy:  Vicente Rodriguez Eguibar
                             vicente@eguibar.com
                             Eguibar IT
                             http://www.eguibarit.com
 
         .LINK
-            https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Get-AdWellKnownSID.ps1
+            https://github.com/vreguibar/EguibarIT.DelegationPS
+
+        .LINK
+            https://learn.microsoft.com/en-us/windows/win32/secauthz/well-known-sids
+
+        .COMPONENT
+            Active Directory
+
+        .ROLE
+            Security
+
+        .FUNCTIONALITY
+            Identity Management, SID Resolution
     #>
 
     [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'Medium')]

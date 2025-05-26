@@ -87,9 +87,9 @@
         # Display function header if variables exist
         if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
             $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToString('dd/MMM/yyyy'),
+                (Get-Date).ToString('dd/MMM/yyyy'),
                 $MyInvocation.Mycommand,
-            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
+                (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
             )
             Write-Verbose -Message $txt
         } #end if
@@ -133,8 +133,7 @@
 
         If (
             $Force -or
-            $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], ('Delegate registry permissions for "{0}"?') -f $Rights)
-        ) {
+            $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate registry permissions for "{0}"?')) {
 
             # Check if [[File Security]] section exist. Create it if it does not exist
             If (-not $GptTmpl.SectionExists('Registry Keys')) {

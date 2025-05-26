@@ -148,12 +148,13 @@ Function Remove-Everyone {
                 $PSCmdlet.ShouldProcess($PSBoundParameters['LDAPPath'], 'Remove "EVERYONE" permissions?')) {
 
                 # Ensure Constants is available before using it
-                if ($null -eq $Constants -or $null -eq $Constants.GuidNULL) {
+                if ($null -eq $Constants -or
+                    $null -eq $Constants.GuidNULL) {
 
                     Write-Verbose -Message 'Using null for ObjectType as Constants.GuidNULL is not available'
                     $Splat['ObjectType'] = [System.guid]::New('00000000-0000-0000-0000-000000000000')
 
-                }
+                } #end If
 
                 # Call Set-AclConstructor5 and store the result
                 try {

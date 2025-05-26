@@ -1,15 +1,24 @@
 ﻿function Set-AclConstructor6 {
     <#
-        .Synopsis
+        .SYNOPSIS
             Modifies ACLs on Active Directory objects using a 6-parameter access rule constructor.
 
         .DESCRIPTION
-            This function adds or removes access rules to an Active Directory object
-            using a constructor with 6 parameters to specify the access rule details.
-            It supports batch processing and is optimized for large AD environments.
-
-            This constructor form is used when you need to specify both ObjectType and InheritedObjectType GUIDs
+            The Set-AclConstructor6 function adds or removes access rules to an Active Directory object
+            using a constructor with 6 parameters to specify the access rule details. This specialized
+            constructor form is used when you need to specify both ObjectType and InheritedObjectType GUIDs
             for granular permission control on specific object types within Active Directory.
+
+            The function performs the following operations:
+            1. Validates all input parameters
+            2. Resolves the identity to its Security Identifier (SID)
+            3. Retrieves the current access control list (ACL) of the target object
+            4. Creates a new access rule using the 6-parameter constructor
+            5. Adds or removes the access rule from the ACL
+            6. Applies the modified ACL back to the target object
+
+            It supports batch processing via pipeline input and is optimized for large AD environments
+            by minimizing directory queries and using efficient parameter handling.
 
         .PARAMETER Id
             Specifies the identity (user or group) to which the permission will be granted or from which it will be removed.
@@ -118,8 +127,11 @@
             System.DirectoryServices.ActiveDirectorySecurityInheritance
             System.Boolean
 
+            You can pipe objects with properties that match the parameter names.
+
         .OUTPUTS
-            [void]
+            System.Void
+            This function does not generate any output.
 
         .NOTES
             Used Functions:
@@ -136,12 +148,12 @@
                 Write-Error                                ║ Microsoft.PowerShell.Utility
 
         .NOTES
-            Version:         3.1
-            DateModified:    11/Jun/2024
-            LasModifiedBy:   Vicente Rodriguez Eguibar
-                        vicente@eguibar.com
-                        Eguibar IT
-                        http://www.eguibarit.com
+            Version:         4.0
+            DateModified:    22/May/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
 
         .LINK
             https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Set-AclConstructor6.ps1
@@ -155,13 +167,13 @@
             https://msdn.microsoft.com/en-us/library/w72e8e69.aspx
 
         .COMPONENT
-            Active Directory Security
+            Active Directory
 
         .ROLE
-            Security Administrator
+            Security
 
         .FUNCTIONALITY
-            Active Directory Permission Management
+            AD Permission Management, Access Control, Delegation of Control
   #>
 
     [CmdletBinding(

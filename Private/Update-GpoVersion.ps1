@@ -1,57 +1,90 @@
-﻿# UpdateGpt on file GpoPrivilegeRights.cs
-function Update-GpoVersion {
+﻿function Update-GpoVersion {
 
     <#
         .SYNOPSIS
             Updates the version number of specified Group Policy Objects (GPOs).
 
         .DESCRIPTION
-            The Update-GpoVersion function increments the computer version number of specified GPOs by 3.
-            It updates both the directory object and the GPT.INI file in the SYSVOL share.
-            Supports both single GPO updates and batch processing through pipeline input.
+            This function increments the computer version number of specified Group Policy Objects (GPOs).
+
+            When Group Policy settings are modified programmatically (without using the Group Policy
+            Management Console), the version numbers need to be manually updated to ensure the changes
+            are properly applied to domain computers and users. This function handles that process by:
+
+            - Updating the version number in the Active Directory GPO object
+            - Updating the version number in the GPT.INI file in the SYSVOL share
+            - Supporting both single GPO updates and batch processing via pipeline
+            - Providing proper error handling and validation
+
+            By default, the function increments the version by 3 (1 for user settings, 2 for computer
+            settings) to ensure both parts are refreshed, but this can be customized.
 
         .PARAMETER GpoName
-            The name(s) of the GPO(s) to be updated. Accepts pipeline input.
+            The name of the Group Policy Object to update. This parameter accepts pipeline input,
+            allowing for batch processing of multiple GPOs.
 
         .PARAMETER IncrementBy
-            The number to increment the version by. Defaults to 3.
+            The number to increment the version by. Defaults to 3, which ensures both user (1)
+            and computer (2) settings are refreshed. Valid values range from 1 to 100.
 
         .EXAMPLE
             Update-GpoVersion -GpoName "Default Domain Policy"
-            Updates the specified GPO version number.
+
+            Updates the version number of the "Default Domain Policy" GPO, incrementing it by 3.
 
         .EXAMPLE
             Get-GPO -All | Where-Object {$_.DisplayName -like "*Security*"} | Update-GpoVersion
-            Updates version numbers for all GPOs with "Security" in their name.
+
+            Updates version numbers for all GPOs with "Security" in their name, processing them
+            via the pipeline.
+
+        .EXAMPLE
+            Update-GpoVersion -GpoName "Custom Security Policy" -IncrementBy 1
+
+            Updates only the user settings version number for the specified GPO.
 
         .INPUTS
             System.String
             Microsoft.GroupPolicy.Gpo
 
+            You can pipe GPO names as strings or GPO objects from Get-GPO to this function.
+
         .OUTPUTS
-            None
+            System.Void
+
+            This function does not generate any output. It modifies GPO version numbers directly.
 
         .NOTES
             Used Functions:
-                Name                       ║ Module/Namespace
-                ═══════════════════════════╬══════════════════════════════
-                Get-GPO                    ║ GroupPolicy
-                Write-Verbose              ║ Microsoft.PowerShell.Utility
-                Get-FunctionDisplay        ║ EguibarIT
-                Import-MyModule            ║ EguibarIT
+                Name                                       ║ Module/Namespace
+                ═══════════════════════════════════════════╬══════════════════════════════
+                Get-GPO                                    ║ GroupPolicy
+                Write-Verbose                              ║ Microsoft.PowerShell.Utility
+                Get-FunctionDisplay                        ║ EguibarIT.DelegationPS
+                Import-MyModule                            ║ EguibarIT.DelegationPS
 
         .NOTES
-            Version:         1.1
-            DateModified:   20/Mar/2025
-            LastModifiedBy: Vicente Rodriguez Eguibar
-                        vicente@eguibar.com
-                        Eguibar IT
-                        http://www.eguibarit.com
-
-
+            Version:         2.0
+            DateModified:    22/May/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
 
         .LINK
-            https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Update-GpoVersion.ps1
+            https://github.com/vreguibar/EguibarIT.DelegationPS
+
+        .LINK
+            https://learn.microsoft.com/en-us/powershell/module/groupolicy/get-gpo
+
+        .COMPONENT
+            Group Policy
+
+        .ROLE
+            Security Administration
+
+        .FUNCTIONALITY
+            Group Policy Management
     #>
 
     [CmdletBinding(SupportsShouldProcess = $true,

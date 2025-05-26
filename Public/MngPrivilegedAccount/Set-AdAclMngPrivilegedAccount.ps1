@@ -1,40 +1,91 @@
 ﻿Function Set-AdAclMngPrivilegedAccount {
     <#
-        .Synopsis
-            The function will delegate the permission for a group to Managed Privileged Accounts
+        .SYNOPSIS
+            Delegates permissions to manage privileged accounts by modifying AdminSDHolder permissions.
+
         .DESCRIPTION
-            The function will delegate the permission for a group to
-            Managed Privileged Accounts by modifying the AdminSdHolder
+            The Set-AdAclMngPrivilegedAccount function delegates the necessary Active Directory
+            permissions to allow a specified group to manage privileged accounts in the domain.
+
+            This function works by modifying permissions on the AdminSDHolder object in Active Directory.
+            The AdminSDHolder object is used as a template to overwrite permissions on protected
+            accounts and groups (such as Domain Admins, Enterprise Admins, etc.) during the
+            SDProp process that runs periodically.
+
+            The function adds multiple Access Control Entries (ACEs) to the AdminSDHolder object for:
+            - Managing group membership (adding/removing members)
+            - Resetting passwords
+            - Managing account lockout
+            - Managing the user account control flags
+            - Changing passwords
+
+            When the -RemoveRule parameter is used, the function removes these permissions instead
+            of granting them.
+
+        .PARAMETER Group
+            Identity of the group getting the delegation. Can be specified as SamAccountName,
+            DistinguishedName, ObjectGUID, or SID. This should be a group dedicated to privileged
+            user management.
+
+        .PARAMETER RemoveRule
+            If present, the access rule will be removed instead of being added.
+
+        .PARAMETER Force
+            If present, the function will not ask for confirmation when performing actions.
+
         .EXAMPLE
             Set-AdAclMngPrivilegedAccount -Group "SL_PUM"
+
+            Delegates permissions to the group "SL_PUM" to manage privileged accounts by modifying
+            the AdminSDHolder object permissions.
+
         .EXAMPLE
             Set-AdAclMngPrivilegedAccount -Group "SL_PUM" -RemoveRule
+
+            Removes the previously delegated permissions from group "SL_PUM" for managing
+            privileged accounts.
+
         .EXAMPLE
             Set-AdAclMngPrivilegedAccount -Group "SL_PUM" -Force
-            Performs the operation without prompting for confirmation.
-        .PARAMETER Group
-            Identity of the group getting the delegation.
-        .PARAMETER RemoveRule
-            [SWITCH] If present, the access rule will be removed
-        .PARAMETER Force
-            [SWITCH] If present, the function will not ask for confirmation when performing actions.
-        .NOTES
-            Used Functions:
-                Name                                   | Module
-                ---------------------------------------|--------------------------
-                Set-AclConstructor5                    | EguibarIT.DelegationPS
-                Get-AttributeSchemaHashTable           | EguibarIT.DelegationPS
-                Get-ExtendedRightHashTable             | EguibarIT.DelegationPS
-                Get-AdObjectType                       | EguibarIT.DelegationPS
-                Get-FunctionDisplay                    | EguibarIT.DelegationPS
+
+            Delegates permissions to manage privileged accounts without prompting for confirmation.
+
+        .INPUTS
+            System.String for the Group parameter.
+
+        .OUTPUTS
+            System.Void
 
         .NOTES
-            Version:         1.3
-            DateModified:    24/Apr/2025
-            LasModifiedBy:   Vicente Rodriguez Eguibar
-                vicente@eguibar.com
-                Eguibar IT
-                http://www.eguibarit.com
+            Used Functions:
+                Name                                       ║ Module/Namespace
+                ═══════════════════════════════════════════╬══════════════════════════════
+                Set-AclConstructor5                        ║ EguibarIT.DelegationPS
+                Get-AttributeSchemaHashTable               ║ EguibarIT.DelegationPS
+                Get-ExtendedRightHashTable                 ║ EguibarIT.DelegationPS
+                Get-AdObjectType                           ║ EguibarIT.DelegationPS
+                Get-FunctionDisplay                        ║ EguibarIT.DelegationPS
+                Write-Verbose                              ║ Microsoft.PowerShell.Utility
+
+        .NOTES
+            Version:         2.0
+            DateModified:    22/May/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS
+
+        .COMPONENT
+            Active Directory
+
+        .ROLE
+            Security
+
+        .FUNCTIONALITY
+            Privileged Account Management, Delegation of Control
     #>
 
     [CmdletBinding(

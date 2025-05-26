@@ -1,32 +1,90 @@
 ﻿function Set-AdAclFullControlDFS {
     <#
-        .Synopsis
-            The function will delegate full control permission for a group
-            over DFS
+        .SYNOPSIS
+            Delegates full control permissions for DFS (Distributed File System) management.
+
         .DESCRIPTION
-            The function will delegate full control permission for a group
-            over DFS
-        .EXAMPLE
-            Set-AdAclFullControlDFS -Group "SG_SiteAdmins_XXXX"
-        .EXAMPLE
-            Set-AdAclFullControlDFS -Group "SG_SiteAdmins_XXXX" -RemoveRule
+            The Set-AdAclFullControlDFS function delegates comprehensive DFS management permissions
+            by granting full control over both DFS Global Settings and DFS Configuration objects
+            in Active Directory.
+
+            The function adds two Access Control Entries (ACEs):
+            1. An ACE granting GenericAll rights to the DFSR-GlobalSettings object
+            2. An ACE granting GenericAll rights to the Dfs-Configuration object
+
+            These permissions allow the delegated group to fully manage DFS namespaces and
+            replication settings within the domain. This includes creating, modifying, and
+            deleting DFS namespaces, configuring replication settings, and managing DFS
+            topology.
+
+            When the -RemoveRule parameter is used, the function removes these permissions
+            instead of granting them.
+
         .PARAMETER Group
-            [STRING] for the Delegated Group Name
+            Identity of the group getting the delegation. Can be specified as SamAccountName,
+            DistinguishedName, ObjectGUID, or SID. This should be a group dedicated to DFS
+            administration.
+
         .PARAMETER RemoveRule
-            [SWITCH] If present, the access rule will be removed
+            If present, the access rules will be removed instead of being added.
+
+        .PARAMETER Force
+            If present, the function will not ask for confirmation when performing actions.
+
+        .EXAMPLE
+            Set-AdAclFullControlDFS -Group "SG_DfsAdmins_XXXX"
+
+            Delegates full control permissions over DFS to the group "SG_DfsAdmins_XXXX".
+
+        .EXAMPLE
+            Set-AdAclFullControlDFS -Group "SG_DfsAdmins_XXXX" -RemoveRule
+
+            Removes previously delegated DFS full control permissions from the specified group.
+
+        .EXAMPLE
+            $Splat = @{
+                Group = "SG_DfsAdmins_XXXX"
+                Force = $true
+            }
+            Set-AdAclFullControlDFS @Splat
+
+            Delegates full control permissions without prompting for confirmation.
+
+        .INPUTS
+            System.String for the Group parameter.
+
+        .OUTPUTS
+            System.Void
+
         .NOTES
             Used Functions:
-                Name                                   | Module
-                ---------------------------------------|--------------------------
-                Set-AclConstructor4                    | EguibarIT.DelegationPS
-                Get-AdDomain                           | ActiveDirectory
+                Name                                       ║ Module/Namespace
+                ═══════════════════════════════════════════╬══════════════════════════════
+                Set-AclConstructor4                        ║ EguibarIT.DelegationPS
+                Get-AdDomain                               ║ ActiveDirectory
+                Get-FunctionDisplay                        ║ EguibarIT.DelegationPS
+                Get-AdObjectType                           ║ EguibarIT.DelegationPS
+                Write-Verbose                              ║ Microsoft.PowerShell.Utility
+
         .NOTES
-            Version:         1.1
-            DateModified:    17/Oct/2016
-            LasModifiedBy:   Vicente Rodriguez Eguibar
-                vicente@eguibar.com
-                Eguibar Information Technology S.L.
-                http://www.eguibarit.com
+            Version:         2.0
+            DateModified:    22/May/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS
+
+        .COMPONENT
+            Active Directory
+
+        .ROLE
+            Security
+
+        .FUNCTIONALITY
+            DFS Management, Delegation of Control
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     [OutputType([void])]

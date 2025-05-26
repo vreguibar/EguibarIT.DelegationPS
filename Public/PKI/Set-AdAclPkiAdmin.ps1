@@ -1,33 +1,107 @@
 ﻿function Set-AdAclPkiAdmin {
     <#
-        .Synopsis
-            The function will delegate full control permission for a group
-            over Certificate Authority
+        .SYNOPSIS
+            Delegates full administrative permissions over the Certificate Authority (CA/PKI).
+
         .DESCRIPTION
-            Configures the configuration container to delegate the permissions to a group
-            so it can fully manage Certificate Authority (CA or PKI).
+            The Set-AdAclPkiAdmin function delegates comprehensive administrative permissions
+            for a specified security group over the Active Directory Certificate Services
+            infrastructure. This includes the Certificate Authority (CA) configuration
+            container and related objects.
+
+            The function performs the following actions:
+            - Locates the Public Key Services container in the Configuration partition
+            - Adds or removes Access Control Entries (ACEs) granting full control permissions
+            - Establishes permission inheritance for child objects
+            - Sets up management access for certificate templates and enrollment services
+
+            This delegation enables the specified group to fully administer the PKI environment,
+            including certificate issuance, revocation, template management, and CA configuration.
+
+        .PARAMETER Group
+            Specifies the security group that will receive or have removed PKI administrative
+            permissions. This parameter accepts:
+            - SAM Account Name (e.g., "SG_PkiAdmin")
+            - Distinguished Name
+            - Security Identifier (SID)
+            - Group object from Get-ADGroup
+
+        .PARAMETER ItRightsOuDN
+            Specifies the Distinguished Name of the Organizational Unit containing the Rights groups,
+            where the "Cert Publishers" built-in group resides. This is typically something like
+            "OU=Rights,OU=Admin,DC=EguibarIT,DC=local" in a delegated administration model.
+
+            This parameter is used to identify the location of security groups related to
+            certificate services administration.
+
+        .PARAMETER RemoveRule
+            When specified, removes the PKI administrative permissions instead of granting them.
+            Use this parameter when decommissioning administrative roles or reducing privileges.
+
+        .PARAMETER Force
+            When specified, suppresses confirmation prompts when performing permission changes.
+            This is useful for automation scenarios where no user interaction is desired.
+
         .EXAMPLE
             Set-AdAclPkiAdmin -Group "SG_PkiAdmin" -ItRightsOuDN "OU=Rights,OU=Admin,DC=EguibarIT,DC=local"
+
+            Grants full PKI administrative permissions to the "SG_PkiAdmin" security group.
+
         .EXAMPLE
             Set-AdAclPkiAdmin -Group "SG_PkiAdmin" -ItRightsOuDN "OU=Rights,OU=Admin,DC=EguibarIT,DC=local" -RemoveRule
-        .PARAMETER Group
-            [STRING] for the Delegated Group Name
-        .PARAMETER ItRightsOuDN
-            [STRING] Distinguished Name of the OU having the Rights groups, where the "Cert Publishers" built-in group resides (Usually OU=Rights,OU=Admin,DC=EguibarIT,DC=local).
-        .PARAMETER RemoveRule
-            [SWITCH] If present, the access rule will be removed
+
+            Removes PKI administrative permissions from the "SG_PkiAdmin" security group.
+
+        .EXAMPLE
+            $Splat = @{
+                Group = "SG_PkiAdmin"
+                ItRightsOuDN = "OU=Rights,OU=Admin,DC=EguibarIT,DC=local"
+                Force = $true
+            }
+            Set-AdAclPkiAdmin @Splat
+
+            Grants PKI administrative permissions without confirmation prompts using splatting.
+
+        .INPUTS
+            System.String
+            Microsoft.ActiveDirectory.Management.ADGroup
+
+            You can pipe group names or Group objects from Get-ADGroup to this function.
+
+        .OUTPUTS
+            System.Void
+
+            This function does not generate any output.
+
         .NOTES
             Used Functions:
-                Name                                   | Module
-                ---------------------------------------|--------------------------
-                Set-AclConstructor5                    | EguibarIT.DelegationPS
+                Name                                       ║ Module/Namespace
+                ═══════════════════════════════════════════╬══════════════════════════════
+                Set-AclConstructor5                        ║ EguibarIT.DelegationPS
+                Get-AdObjectType                           ║ EguibarIT.DelegationPS
+                Write-Verbose                              ║ Microsoft.PowerShell.Utility
+                Test-IsValidDN                             ║ EguibarIT.DelegationPS
+
         .NOTES
-            Version:         1.1
-            DateModified:    17/Oct/2016
-            LasModifiedBy:   Vicente Rodriguez Eguibar
-                vicente@eguibar.com
-                Eguibar Information Technology S.L.
-                http://www.eguibarit.com
+            Version:         2.0
+            DateModified:    22/May/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS
+
+        .COMPONENT
+            PKI
+            Active Directory Certificate Services
+
+        .ROLE
+            Security Administration
+
+        .FUNCTIONALITY
+            Certificate Authority Management, PKI Administration
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     [OutputType([void])]

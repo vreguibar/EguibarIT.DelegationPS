@@ -1,34 +1,94 @@
 ﻿function Set-AdAclCreateDeleteContact {
     <#
-        .Synopsis
-            The function will delegate the permission for a group to create/Delete
-            Contact objects in an OU
+        .SYNOPSIS
+            Delegates permissions to a group for creating and deleting Contact objects in an OU.
+
         .DESCRIPTION
-            The function will delegate the permission for a group to create/Delete
-            Contact objects in an OU
-        .EXAMPLE
-            Set-AdAclCreateDeleteContact -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
-        .EXAMPLE
-            Set-AdAclCreateDeleteContact -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local" -RemoveRule
+            The Set-AdAclCreateDeleteContact function delegates the necessary Active Directory permissions
+            to allow a specified group to create and delete contact objects within a specified container
+            or organizational unit (OU).
+
+            The function adds an Access Control Entry (ACE) to the specified OU granting
+            CreateChild and DeleteChild rights specifically for contact objects. This enables
+            the delegated group to create new contacts and delete existing contacts within
+            the specified OU.
+
+            When the -RemoveRule parameter is used, the function removes these permissions instead
+            of granting them.
+
         .PARAMETER Group
-            [STRING] for the Delegated Group Name
+            Identity of the group getting the delegation. Can be specified as SamAccountName,
+            DistinguishedName, ObjectGUID, or SID. This is typically a domain local group
+            responsible for contact management.
+
         .PARAMETER LDAPpath
-            [STRING] Distinguished Name of the OU where the computer will get password reset
+            Distinguished Name of the object (or container) where the permissions are going to
+            be configured. This is typically an Organizational Unit where contacts are managed.
+
         .PARAMETER RemoveRule
-            [SWITCH] If present, the access rule will be removed
+            If present, the access rule will be removed instead of being added.
+
+        .PARAMETER Force
+            If present, the function will not ask for confirmation when performing actions.
+
+        .EXAMPLE
+            Set-AdAclCreateDeleteContact -Group "SG_ContactAdmins_XXXX" -LDAPPath "OU=Contacts,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
+
+            Delegates the permissions for the group "SG_ContactAdmins_XXXX" to create and delete
+            contact objects in the specified OU.
+
+        .EXAMPLE
+            Set-AdAclCreateDeleteContact -Group "SG_ContactAdmins_XXXX" -LDAPPath "OU=Contacts,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local" -RemoveRule
+
+            Removes the permissions for the group "SG_ContactAdmins_XXXX" to create and delete
+            contact objects in the specified OU.
+
+        .EXAMPLE
+            $Splat = @{
+                Group = "SG_ContactAdmins_XXXX"
+                LDAPPath = "OU=Contacts,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
+                Force = $true
+            }
+            Set-AdAclCreateDeleteContact @Splat
+
+            Delegates the permissions without prompting for confirmation.
+
+        .INPUTS
+            System.String for Group and LDAPpath parameters.
+
+        .OUTPUTS
+            System.Void
+
         .NOTES
             Used Functions:
-                Name                                   | Module
-                ---------------------------------------|--------------------------
-                Set-AclConstructor5                    | EguibarIT.DelegationPS
-                Get-AttributeSchemaHashTable           | EguibarIT.DelegationPS
+                Name                                       ║ Module/Namespace
+                ═══════════════════════════════════════════╬══════════════════════════════
+                Set-AclConstructor5                        ║ EguibarIT.DelegationPS
+                Get-AttributeSchemaHashTable               ║ EguibarIT.DelegationPS
+                Get-FunctionDisplay                        ║ EguibarIT.DelegationPS
+                Get-AdObjectType                           ║ EguibarIT.DelegationPS
+                Write-Verbose                              ║ Microsoft.PowerShell.Utility
+                Test-IsValidDN                             ║ EguibarIT.DelegationPS
+
         .NOTES
-            Version:         1.2
-            DateModified:    07/Dec/2016
-            LasModifiedBy:   Vicente Rodriguez Eguibar
-                vicente@eguibar.com
-                Eguibar Information Technology S.L.
-                http://www.eguibarit.com
+            Version:         2.0
+            DateModified:    22/May/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS
+
+        .COMPONENT
+            Active Directory
+
+        .ROLE
+            Security
+
+        .FUNCTIONALITY
+            Contact Management, Delegation of Control
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     [OutputType([void])]

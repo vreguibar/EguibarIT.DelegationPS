@@ -4,48 +4,96 @@
             Validates if the input string is a valid Global Unique Identifier (GUID).
 
         .DESCRIPTION
-            This cmdlet checks if the provided input string adheres to the structure of a valid GUID.
-            It uses a RegEx pattern to validate the GUID format which must be in the format:
-            "550e8400-e29b-41d4-a716-446655440000"
+            This function validates whether a provided string conforms to the standard
+            format of a Global Unique Identifier (GUID). It uses a regular expression
+            pattern from the module's constants to perform the validation.
+
+            GUIDs are 128-bit identifiers that are guaranteed to be unique across all devices
+            and time. They are widely used in Active Directory for identifying schema objects,
+            attributes, and class definitions.
+
+            This function is particularly useful when working with Active Directory schema
+            operations, extended rights, and property sets that are identified by GUIDs.
+
+            The function can be used:
+            - As a standalone validator
+            - As part of a ValidateScript attribute in parameter validation
+            - Within other functions that need to verify GUID inputs
 
         .PARAMETER ObjectGUID
-            The GUID string to validate. Must be in the format "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-            where x represents hexadecimal digits (0-9, a-f, A-F).
+            The GUID string to validate. Must be in the standard format:
+            "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+            Where each 'x' represents a hexadecimal digit (0-9, a-f, A-F).
+
+            Total length is 36 characters including hyphens in the specified positions.
 
         .EXAMPLE
             Test-IsValidGUID -ObjectGUID '550e8400-e29b-41d4-a716-446655440000'
+
             Returns $true as this is a valid GUID format.
 
         .EXAMPLE
             '550e8400-e29b-41d4-a716-446655440000' | Test-IsValidGUID
+
             Shows pipeline input usage. Returns $true.
 
         .EXAMPLE
             Test-IsValidGUID -ObjectGUID 'invalid-guid'
+
             Returns $false as this is not a valid GUID format.
 
+        .EXAMPLE
+            function Set-SchemaAttribute {
+                param (
+                    [ValidateScript({ Test-IsValidGUID -ObjectGUID $_ })]
+                    [string]$AttributeGUID
+                )
+                # Function implementation
+            }
+
+            Shows how to use the function as a validation script in parameter attributes.
+
+        .INPUTS
+            System.String
+
+            You can pipe a string representing a GUID to this function.
+
         .OUTPUTS
-            [bool]
+            System.Boolean
+
             Returns $true if the input is a valid GUID, $false otherwise.
 
         .NOTES
             Used Functions:
-                Name                   ║ Module/Namespace
-                ═══════════════════════╬══════════════════════════════
-                Write-Verbose          ║ Microsoft.PowerShell.Utility
-                Write-Error            ║ Microsoft.PowerShell.Utility
-                Write-Debug            ║ Microsoft.PowerShell.Utility
+                Name                                       ║ Module/Namespace
+                ═══════════════════════════════════════════╬══════════════════════════════
+                Write-Verbose                              ║ Microsoft.PowerShell.Utility
+                Write-Error                                ║ Microsoft.PowerShell.Utility
+                Write-Debug                                ║ Microsoft.PowerShell.Utility
 
         .NOTES
-            Version:         1.2
-            DateModified:    20/Mar/2024
-            LasModifiedBy:   Vicente Rodriguez Eguibar
-                vicente@eguibar.com
-                Eguibar IT
-                http://www.eguibarit.com
+            Version:         2.0
+            DateModified:    22/May/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
 
         .LINK
-            https://github.com/vreguibar/EguibarIT/blob/main/Private/Test-IsValidGUID.ps1
+            https://github.com/vreguibar/EguibarIT.DelegationPS
+
+        .LINK
+            https://learn.microsoft.com/en-us/dotnet/api/system.guid
+
+        .COMPONENT
+            Active Directory
+
+        .ROLE
+            Security
+
+        .FUNCTIONALITY
+            Identity Validation
     #>
 
     [CmdletBinding(ConfirmImpact = 'Low',

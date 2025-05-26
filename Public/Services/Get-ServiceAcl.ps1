@@ -1,4 +1,95 @@
 ﻿function Get-ServiceAcl {
+    <#
+        .SYNOPSIS
+            Retrieves the Access Control List (ACL) for Windows services.
+
+        .DESCRIPTION
+            The Get-ServiceAcl function retrieves the Access Control List (ACL) information for
+            Windows services, showing the security permissions that control who can start, stop,
+            modify, or delete services. This information is critical for security auditing and
+            permission management of services.
+
+            The function can retrieve ACLs for services on the local or remote computers and
+            supports identifying services by either their name or display name.
+
+        .PARAMETER Name
+            Specifies the service name(s) for which to retrieve permissions. Service names are
+            typically short identifiers like 'BITS', 'wuauserv', or 'LanmanServer'. This parameter
+            accepts multiple service names and pipeline input.
+
+        .PARAMETER DisplayName
+            Specifies the display name(s) of services for which to retrieve permissions. Display
+            names are the more descriptive names shown in the Services console, like 'Background
+            Intelligent Transfer Service' or 'Windows Update'. This parameter accepts multiple
+            display names and pipeline input.
+
+        .PARAMETER Computer
+            Specifies the remote computer on which to execute the commands. If not specified,
+            the function runs against the local computer. This parameter accepts computer names,
+            IP addresses, or fully qualified domain names.
+
+        .EXAMPLE
+            Get-ServiceAcl -Name BITS
+
+            Retrieves the access control list for the Background Intelligent Transfer Service on
+            the local computer.
+
+        .EXAMPLE
+            Get-ServiceAcl -DisplayName "Windows Update"
+
+            Retrieves the access control list for the Windows Update service using its display name.
+
+        .EXAMPLE
+            Get-Service -Name BITS, wuauserv | Get-ServiceAcl
+
+            Retrieves ACLs for multiple services by piping the output from Get-Service.
+
+        .EXAMPLE
+            Get-ServiceAcl -Name spooler -Computer "Server01"
+
+            Retrieves the ACL for the Print Spooler service on the remote computer named Server01.
+
+        .INPUTS
+            System.String[]
+
+            You can pipe service names or display names to this function.
+
+        .OUTPUTS
+            System.Security.AccessControl.ServiceSecurity
+
+            Returns objects representing the service security descriptors.
+
+        .NOTES
+            Used Functions:
+                Name                                       ║ Module/Namespace
+                ═══════════════════════════════════════════╬══════════════════════════════
+                Get-Service                                ║ Microsoft.PowerShell.Management
+                Get-Command                                ║ Microsoft.PowerShell.Core
+                Invoke-Command                             ║ Microsoft.PowerShell.Core
+                Write-Verbose                              ║ Microsoft.PowerShell.Utility
+                Get-FunctionDisplay                        ║ EguibarIT.DelegationPS
+
+        .NOTES
+            Version:         2.0
+            DateModified:    22/May/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS
+
+        .COMPONENT
+            Windows Services
+
+        .ROLE
+            Security Administration
+
+        .FUNCTIONALITY
+            Service Permission Management
+    #>
+
     [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'Medium', DefaultParameterSetName = 'ByName')]
     [OutputType([void])]
 

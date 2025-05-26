@@ -11,6 +11,9 @@
 
             The function is optimized for large AD environments and supports batch processing via pipeline input.
 
+            It uses a hierarchical approach to identify objects, trying different methods in sequence to efficiently
+            locate and return the correct object type while minimizing Active Directory queries.
+
         .PARAMETER Identity
             Specifies the identity of the Active Directory object. This parameter is mandatory.
 
@@ -31,22 +34,33 @@
 
         .EXAMPLE
             Get-AdObjectType -Identity "davader"
+
             Retrieves the type of the Active Directory object with the SamAccountName "davader".
 
         .EXAMPLE
             Get-AdObjectType -Identity "CN=davade,OU=Users,OU=BAAD,OU=Sites,DC=EguibarIT,DC=local"
+
             Retrieves the type of the Active Directory object with the
             DistinguishedName "CN=davade,OU=Users,OU=BAAD,OU=Sites,DC=EguibarIT,DC=local".
 
         .EXAMPLE
             Get-AdObjectType -Identity "S-1-5-21-3484526001-1877030748-1169500100-1646"
+
             Retrieves the type of the Active Directory object with the
             SID "S-1-5-21-3484526001-1877030748-1169500100-1646".
 
         .EXAMPLE
             Get-AdObjectType -Identity "35b764b7-06df-4509-a54f-8fd4c26a0805"
+
             Retrieves the type of the Active Directory object with the GUID
             "35b764b7-06df-4509-a54f-8fd4c26a0805".
+
+        .INPUTS
+            System.String
+            Microsoft.ActiveDirectory.Management.ADObject
+            System.Security.Principal.SecurityIdentifier
+
+            You can pipe a string, AD object, or SID to this function.
 
         .OUTPUTS
             Microsoft.ActiveDirectory.Management.ADAccount or
@@ -58,10 +72,6 @@
             System.String
 
         .NOTES
-            Required modules/prerequisites:
-            - Windows PowerShell 5.1 or PowerShell 7+
-            - Active Directory module
-
             Used Functions:
                 Name                                       ║ Module/Namespace
                 ═══════════════════════════════════════════╬══════════════════════════════
@@ -76,24 +86,28 @@
                 Get-ADServiceAccount                       ║ ActiveDirectory
                 Import-MyModule                            ║ EguibarIT.DelegationPS
 
-            .NOTES
-                Version:         1.6
-                DateModified:    13/Mar/2025
-                LastModifiedBy:  Vicente Rodriguez Eguibar
-                    vicente@eguibar.com
-                    Eguibar Information Technology S.L.
-                    http://www.eguibarit.com
+        .NOTES
+            Version:         2.0
+            DateModified:    22/May/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
 
-            .LINK
-                https://docs.microsoft.com/en-us/powershell/module/activedirectory/get-adobject
-                https://docs.microsoft.com/en-us/powershell/module/activedirectory/get-aduser
-                https://docs.microsoft.com/en-us/powershell/module/activedirectory/get-adgroup
-                https://docs.microsoft.com/en-us/powershell/module/activedirectory/get-adcomputer
-                https://docs.microsoft.com/en-us/powershell/module/activedirectory/get-adorganizationalunit
-                https://docs.microsoft.com/en-us/powershell/module/activedirectory/get-adserviceaccount
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS
 
-            .LINK
-                https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Get-AdObjectType.ps1
+        .LINK
+            https://docs.microsoft.com/en-us/powershell/module/activedirectory/
+
+        .COMPONENT
+            Active Directory
+
+        .ROLE
+            Security
+
+        .FUNCTIONALITY
+            AD Object Management, Identity Resolution
     #>
 
     [CmdletBinding(
@@ -174,8 +188,24 @@
         Write-Verbose -Message ('Attempting to determine the type of AD object for identity: {0}' -f $Identity)
 
         try {
-            # Check if identity is an AD object
-            if ($Identity -is [Microsoft.ActiveDirectory.Management.ADObject]) {
+            # Check if identity is a collection type (like List<string>)
+            if ($Identity -is [System.Collections.IEnumerable] -and
+                -not ($Identity -is [string]) -and
+                -not ($Identity -is [Microsoft.ActiveDirectory.Management.ADObject])) {
+
+                # Special handling for List<string> with single item
+                if ($Identity -is [System.Collections.Generic.List[string]] -and
+                    ($Identity | Measure-Object).Count -eq 1) {
+                    # Extract single item and process it
+                    $singleItem = $Identity[0]
+                    Write-Verbose -Message ('Converting List<string> with single item to string: {0}' -f $singleItem)
+                    return (Get-AdObjectType -Identity $singleItem)
+                }
+
+                Write-Warning -Message ('Identity is a collection type and cannot be resolved directly.')
+                return $null
+
+            } elseif ($Identity -is [Microsoft.ActiveDirectory.Management.ADObject]) {
 
                 Write-Verbose -Message ('Identity is an AD object of type: {0}' -f $Identity.GetType().Name)
                 $ReturnValue = $Identity
@@ -199,6 +229,7 @@
                     $wellKnownSid = $Variables.WellKnownSIDs.GetEnumerator() |
                         Where-Object { $_.Value -eq $Identity } |
                             Select-Object -ExpandProperty Key
+
                 } #end If-elseif
 
                 if ($wellKnownSid) {
@@ -301,4 +332,4 @@
         } #end If
     } # End End Section
 
-} #end Function
+} #end Function Get-AdObjectType

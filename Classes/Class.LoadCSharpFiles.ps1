@@ -1,15 +1,34 @@
 ﻿# Function to check if a class is already loaded
 function Test-ClassExist {
+
+    [CmdletBinding()]
+    [OutputType([bool])]
+
     param(
-        [string]$ClassName
+        [Parameter(Mandatory = $true,
+            ValueFromPipeline = $false,
+            ValueFromPipelineByPropertyName = $false,
+            HelpMessage = 'Full name of the class to check')]
+        [string]
+        $ClassName
     )
 
-    # Try to get the type by its full name
-    $type = [Type]::GetType($ClassName, $false, $false)
+    try {
 
-    # Return true if the type exists, otherwise false
-    return [bool]$type
-} #end Function
+        # Try to get the type by its full name
+        $Type = [Type]::GetType($ClassName, $false, $false)
+
+        # Return true if the type exists, otherwise false
+        return [bool]$Type
+
+    } catch {
+
+        Write-Error -Message ('Error checking class existence: {0}' -f $_.Exception.Message)
+        return $false
+
+    } #end Try-Catch
+
+} #end Function #end Function
 
 # Define the class only if it doesn't already exist
 if ((-not (Test-ClassExist 'EventIdInfo')) -or
@@ -18,10 +37,24 @@ if ((-not (Test-ClassExist 'EventIdInfo')) -or
     (-not (Test-ClassExist 'EventSeverity')) -or
     (-not (Test-ClassExist 'EventCategory'))
 ) {
-    Write-Verbose -Message 'Event Info class not loaded. Proceed to load...!'
-    #$EventsFileCS = Get-Content -Path "$PSScriptRoot\Class.Events.cs" -Raw
-    $EventsFileCS = [System.IO.File]::ReadAllText("$PSScriptRoot\Class.Events.cs")
-    Add-Type -Language CSharp -TypeDefinition $EventsFileCS
+    Write-Verbose -Message 'Event Info classes not loaded. Loading Event classes from C#...'
+
+    try {
+
+        $EventsFilePath = Join-Path -Path $PSScriptRoot -ChildPath 'Class.Events.cs'
+        $EventsFileCS = [System.IO.File]::ReadAllText($EventsFilePath)
+        Add-Type -Language CSharp -TypeDefinition $EventsFileCS -ErrorAction Stop
+        Write-Verbose -Message 'Successfully loaded Event Info classes.'
+
+    } catch {
+
+        Write-Error -Message ('Failed to load Event Info classes: {0}' -f $_.Exception.Message)
+
+    } #end Try-Catch
+} else {
+
+    Write-Verbose -Message 'Event Info classes already loaded.'
+
 } #end If
 
 
@@ -32,11 +65,28 @@ if ((-not (Test-ClassExist 'EventIdInfo')) -or
 
 
 # Define the class only if it doesn't already exist
-if ((-not (Test-ClassExist 'IniFile')) -or
-    (-not (Test-ClassExist 'IniSections'))
+if ((-not (Test-ClassExist -ClassName 'IniFileHandler.IniFile')) -or
+    (-not (Test-ClassExist -ClassName 'IniFileHandler.IniSections'))
 ) {
-    $IniFileCS = [System.IO.File]::ReadAllText("$PSScriptRoot\Class.IniFile.cs")
-    Add-Type -Language CSharp -TypeDefinition $IniFileCS
+    Write-Verbose -Message 'IniFile classes not loaded. Loading IniFile classes from C#...'
+
+    try {
+
+        $IniFilePath = Join-Path -Path $PSScriptRoot -ChildPath 'Class.IniFile.cs'
+        $IniFileCS = [System.IO.File]::ReadAllText($IniFilePath)
+        Add-Type -Language CSharp -TypeDefinition $IniFileCS -ErrorAction Stop
+        Write-Verbose -Message 'Successfully loaded IniFile classes.'
+
+    } catch {
+
+        Write-Error -Message ('Failed to load IniFile classes: {0}' -f $_.Exception.Message)
+
+    } #end Try-Catch
+
+} else {
+
+    Write-Verbose -Message 'IniFile classes already loaded.'
+
 } #end If
 
 <## Examples of usage

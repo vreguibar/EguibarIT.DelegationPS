@@ -125,7 +125,9 @@ Function Remove-AuthUser {
 
         try {
             # Get 'Authenticated Users' group by SID using LDAP filter for efficiency
-            $AuthenticatedUsers = Get-ADGroup -LDAPFilter '(objectSID=S-1-5-11)' -ErrorAction Stop
+            #$AuthenticatedUsers = Get-ADGroup -Filter * | Where-Object { $_.SID -like 'S-1-5-11' }
+
+            $AuthenticatedUsers = Get-AdObjectType -Identity 'S-1-5-11'
 
             if (-not $AuthenticatedUsers) {
 
@@ -144,7 +146,7 @@ Function Remove-AuthUser {
 
     Process {
         $Splat = @{
-            Id                    = $AuthenticatedUsers
+            Id                    = 'Authenticated Users'
             LDAPPath              = $PSBoundParameters['LDAPPath']
             AdRight               = 'GenericAll'
             AccessControlType     = 'Allow'

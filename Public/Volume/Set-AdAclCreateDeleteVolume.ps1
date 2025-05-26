@@ -1,33 +1,95 @@
 ﻿function Set-AdAclCreateDeleteVolume {
     <#
-        .Synopsis
-            The function will delegate the permission for a group to create/Delete
-            Volumes (Shared Folders) objects in an OU
+        .SYNOPSIS
+            Delegates permissions to a group for creating and deleting Volume (Shared Folder) objects in an OU.
+
         .DESCRIPTION
-            Configures the container (OU) to delegate the permissions to a group so it can create/delete Volume objects.
-        .EXAMPLE
-            Set-AdAclCreateDeleteVolume -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
-        .EXAMPLE
-            Set-AdAclCreateDeleteVolume -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local" -RemoveRule
+            The Set-AdAclCreateDeleteVolume function delegates the necessary Active Directory permissions
+            to allow a specified group to create and delete volume objects (shared folders) within a
+            specified container or organizational unit (OU).
+
+            The function adds two Access Control Entries (ACEs) to the specified OU:
+            1. An ACE granting GenericAll rights to volume objects, which enables full control over volume objects
+            2. An ACE granting CreateChild and DeleteChild rights specifically for volume objects
+
+            These permissions allow the delegated group to create new shared folders, delete existing
+            shared folders, and manage all properties of shared folders within the specified OU.
+
+            When the -RemoveRule parameter is used, the function removes these permissions instead
+            of granting them.
+
         .PARAMETER Group
-            [STRING] Identity of the group getting the delegation.
+            Identity of the group getting the delegation. Can be specified as SamAccountName,
+            DistinguishedName, ObjectGUID, or SID.
+
         .PARAMETER LDAPpath
-            [STRING] Distinguished Name of the object (or container) where the permissions are going to be configured.
+            Distinguished Name of the object (or container) where the permissions are going to
+            be configured. This is typically an Organizational Unit.
+
         .PARAMETER RemoveRule
-            [SWITCH] If present, the access rule will be removed
+            If present, the access rule will be removed instead of being added.
+
+        .PARAMETER Force
+            If present, the function will not ask for confirmation when performing actions.
+
+        .EXAMPLE
+            Set-AdAclCreateDeleteVolume -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=SharedFolders,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
+
+            Delegates the permissions for the group "SG_SiteAdmins_XXXX" to create and delete
+            volume objects (shared folders) in the specified OU.
+
+        .EXAMPLE
+            Set-AdAclCreateDeleteVolume -Group "SG_SiteAdmins_XXXX" -LDAPPath "OU=SharedFolders,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local" -RemoveRule
+
+            Removes the permissions for the group "SG_SiteAdmins_XXXX" to create and delete
+            volume objects in the specified OU.
+
+        .EXAMPLE
+            $Splat = @{
+                Group = "SG_SiteAdmins_XXXX"
+                LDAPPath = "OU=SharedFolders,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
+                Force = $true
+            }
+            Set-AdAclCreateDeleteVolume @Splat
+
+            Delegates the permissions without prompting for confirmation.
+
+        .INPUTS
+            System.String for Group and LDAPpath parameters.
+
+        .OUTPUTS
+            System.Void
+
         .NOTES
             Used Functions:
-                Name                                   | Module
-                ---------------------------------------|--------------------------
-                Set-AclConstructor5                    | EguibarIT.DelegationPS
-                Get-AttributeSchemaHashTable           | EguibarIT.DelegationPS
+                Name                                       ║ Module/Namespace
+                ═══════════════════════════════════════════╬══════════════════════════════
+                Set-AclConstructor5                        ║ EguibarIT.DelegationPS
+                Get-AttributeSchemaHashTable               ║ EguibarIT.DelegationPS
+                Get-FunctionDisplay                        ║ EguibarIT.DelegationPS
+                Get-AdObjectType                           ║ EguibarIT.DelegationPS
+                Write-Verbose                              ║ Microsoft.PowerShell.Utility
+                Test-IsValidDN                             ║ EguibarIT.DelegationPS
+
         .NOTES
-            Version:         1.1
-            DateModified:    17/Oct/2016
-            LasModifiedBy:   Vicente Rodriguez Eguibar
-                vicente@eguibar.com
-                Eguibar Information Technology S.L.
-                http://www.eguibarit.com
+            Version:         2.0
+            DateModified:    22/May/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS
+
+        .COMPONENT
+            Active Directory
+
+        .ROLE
+            Security
+
+        .FUNCTIONALITY
+            Volume Management, Shared Folders, Delegation of Control
     #>
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     [OutputType([void])]

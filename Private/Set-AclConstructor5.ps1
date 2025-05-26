@@ -1,91 +1,83 @@
 ﻿function Set-AclConstructor5 {
     <#
         .SYNOPSIS
-            Modifies ACLs (Access Control Lists) on Active Directory objects using a 5-parameter constructor.
+            Modifies ACLs on Active Directory objects using a 5-parameter constructor with inheritance control.
 
         .DESCRIPTION
-            The Set-AclConstructor5 function adds or removes access rules to/from Active Directory objects.
-            It uses a constructor with 5 parameters to specify the access rule details.
+            This function adds or removes access control entries (ACEs) on Active Directory objects
+            using the ActiveDirectoryAccessRule constructor with 5 parameters:
+            - Identity Reference
+            - Active Directory Rights
+            - Access Control Type
+            - Object Type GUID
+            - Active Directory Security Inheritance
 
-            This function is designed for efficient permission management in Active Directory environments,
-            supporting batch processing and optimized for large AD environments with 100k+ objects.
+            The function provides granular control over permissions by allowing you to specify
+            precise object types (schema GUIDs) and inheritance settings. It is optimized for large AD
+            environments and supports efficient batch processing through splatting.
 
-            The function can:
-            - Add a new access rule to an object
-            - Remove an existing access rule from an object
-            - Handle various types of Active Directory rights
-            - Apply permissions with different inheritance levels
+            This constructor is particularly useful when you need to apply permissions with specific
+            inheritance settings, controlling exactly how permissions flow down through the AD hierarchy.
 
         .PARAMETER Id
-            Specifies the identity (SamAccountName, SID, or AD object) of the delegated group or user.
-            This is the identity for which the access rule will be created or modified.
-            It can be provided as a string containing the SamAccountName, a security principal object,
-            or a variable containing an AD group/user.
-
-            The function will resolve this to a SecurityIdentifier for use in the access rule.
+            Specifies the security principal (user, group, computer) that will receive the permission.
+            This parameter accepts:
+            - String: SamAccountName of the delegated group or user
+            - AD object: Variable containing an AD user or group object
+            - SID: Security Identifier object or string
 
         .PARAMETER LDAPPath
-            Specifies the LDAP path (Distinguished Name) of the target Active Directory object.
-            This is the object whose ACL will be modified.
-
-            The path must be a valid Distinguished Name in the Active Directory environment.
+            Specifies the LDAP path (Distinguished Name) of the target Active Directory object
+            on which the permissions will be set. This must be a valid LDAP path in the domain.
 
         .PARAMETER AdRight
-            Specifies the Active Directory rights to grant or deny.
-
-            Valid options include:
-            - CreateChild: Right to create child objects
-            - DeleteChild: Right to delete child objects
-            - ListContents: Right to list contents
-            - Self: Right to manipulate attributes of the object itself
-            - ReadProperty: Right to read properties
-            - WriteProperty: Right to write properties
-            - DeleteTree: Right to delete a tree of objects
-            - Delete: Right to delete the object
-            - GenericRead: Combination of standard read rights
-            - GenericWrite: Combination of standard write rights
-            - GenericAll: Full control rights
-            - WriteDacl: Right to modify the DACL
-            - WriteOwner: Right to change ownership
-            - ReadControl: Right to read security information
-
-            This parameter accepts multiple values as a comma-separated string array.
+            Specifies the Active Directory rights to assign. This parameter accepts multiple values
+            separated by commas. Valid values include:
+            - CreateChild
+            - DeleteChild
+            - ListChildren
+            - Self
+            - ReadProperty
+            - WriteProperty
+            - DeleteTree
+            - ListObject
+            - ExtendedRight
+            - Delete
+            - ReadControl
+            - GenericExecute
+            - GenericWrite
+            - GenericRead
+            - WriteDacl
+            - WriteOwner
+            - GenericAll
+            - Synchronize
+            - AccessSystemSecurity
 
         .PARAMETER AccessControlType
-            Specifies whether the access control is to Allow or Deny the specified rights.
-
-            Valid values are:
-            - Allow: Grants the specified permissions
-            - Deny: Explicitly blocks the specified permissions
+            Specifies whether to Allow or Deny the permission. Valid values are:
+            - Allow
+            - Deny
 
         .PARAMETER ObjectType
-            Specifies the object type GUID to which the access rule applies.
+            Specifies the object type GUID that defines the type of object the permission applies to.
+            This can be:
+            - Property set GUID
+            - Extended right GUID
+            - Object class GUID
 
-            This parameter can be used to:
-            - Target specific property sets (like Personal-Information)
-            - Apply extended rights (like User-Force-Change-Password)
-            - Restrict creation of specific object types
-
-            Can be provided as a GUID string or a System.Guid object.
-            For schema-wide applications, this can be set to null.
+            Object type GUIDs determine the specific attributes or operations the permission applies to.
 
         .PARAMETER AdSecurityInheritance
-            Specifies the security inheritance level of the new access rule.
-
-            Valid values are:
-            - All: The ACE is inherited by this object and all child objects
-            - Children: The ACE is inherited by child objects but not by this object
-            - Descendents: The ACE is inherited by all objects within the tree but not by this object
-            - None: The ACE is not inherited by child objects
-            - SelfAndChildren: The ACE is inherited by this object and its immediate children
+            Specifies how the permission is inherited by child objects. Valid values are:
+            - All: The permission applies to this object and all child objects
+            - Children: The permission applies only to child objects
+            - Descendents: The permission applies to all objects within the subtree except this object
+            - None: The permission is not inherited
+            - SelfAndChildren: The permission applies to this object and immediate children only
 
         .PARAMETER RemoveRule
-            If specified, the matching access rule will be removed instead of added.
-
-            If omitted (default), the specified access rule will be added to the object.
-
-            When removing rules, the function will match all parameters exactly to identify
-            which rule(s) to remove.
+            If specified, the access rule will be removed instead of added.
+            By default, the function adds the specified permission.
 
         .EXAMPLE
             Set-AclConstructor5 -Id "SG_SiteAdmins_XXXX" `
@@ -95,8 +87,8 @@
                 -ObjectType "bf967aba-0de6-11d0-a285-00aa003049e2" `
                 -AdSecurityInheritance "All"
 
-            Description: This example grants the "SG_SiteAdmins_XXXX" group permission to create and delete
-            User objects (specified by the ObjectType GUID) within the specified OU and all its child objects.
+            Grants the SG_SiteAdmins_XXXX group permission to create and delete user objects
+            in the specified OU and all its child OUs.
 
         .EXAMPLE
             $Splat = @{
@@ -109,8 +101,7 @@
             }
             Set-AclConstructor5 @Splat
 
-            Description: This example demonstrates using splatting to pass parameters to the function,
-            making the code more readable and maintainable, especially with multiple parameter sets.
+            Uses splatting to grant the same permissions as the previous example.
 
         .EXAMPLE
             $group = Get-AdGroup "SG_SiteAdmins_XXXX"
@@ -120,16 +111,18 @@
                 LDAPPath              = "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
                 AdRight               = "ReadProperty,WriteProperty"
                 AccessControlType     = "Allow"
-                ObjectType            = "4c164200-20c0-11d0-a768-00aa006e0529"  # User Account Restrictions property set
+                ObjectType            = "4c164200-20c0-11d0-a768-00aa006e0529"
                 AdSecurityInheritance = "Descendents"
             }
             Set-AclConstructor5 @Splat
 
-            Description: This example demonstrates using an AD group object directly as the identity,
-            and granting read/write permissions to the "User Account Restrictions" property set
-            (account lockout settings, etc.) for all descendant objects.
+            Uses an AD group object to grant read/write permissions to the User Account Restrictions
+            property set for all descendant objects (but not the OU itself).
 
-        .EXAMPLE
+        .INPUTS
+            [System.String]
+            [Microsoft.ActiveDirectory.Management.ADGroup]
+                    .EXAMPLE
             $Splat = @{
                 Id                    = "SG_SiteAdmins_XXXX"
                 LDAPPath              = "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
@@ -141,21 +134,21 @@
             }
             Set-AclConstructor5 @Splat
 
-            Description: This example demonstrates removing a previously granted permission.
-            It removes the "GenericAll" (Full Control) permission that was granted to the
-            SG_SiteAdmins_XXXX group on the specified OU.
+            Removes the previously granted GenericAll (Full Control) permission from the
+            SG_SiteAdmins_XXXX group on the specified OU and its child objects.
 
         .INPUTS
-            [System.String]
-            [Microsoft.ActiveDirectory.Management.ADGroup]
-            [Microsoft.ActiveDirectory.Management.ADUser]
+            System.String
+            Microsoft.ActiveDirectory.Management.ADGroup
+            Microsoft.ActiveDirectory.Management.ADUser
 
-            You can pipe the Id and LDAPPath parameters to this function.
+            You can pipe identity values and LDAP paths to this function.
 
         .OUTPUTS
-            [void]
+            System.Void
 
-            This function does not generate any output.
+            This function does not generate any output. It modifies ACLs directly
+            on Active Directory objects.
 
         .NOTES
             Used Functions:
@@ -172,31 +165,27 @@
                 Write-Debug                                ║ Microsoft.PowerShell.Utility
 
         .NOTES
-            Version:         3.1
-            DateModified:    12/Apr/2024
-            LastModifiedBy:   Vicente Rodriguez Eguibar
+            Version:         4.0
+            DateModified:    22/May/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
                             vicente@eguibar.com
                             Eguibar IT
                             http://www.eguibarit.com
 
         .LINK
-            https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Set-AclConstructor5.ps1
+            https://github.com/vreguibar/EguibarIT.DelegationPS
 
         .LINK
-            https://docs.microsoft.com/en-us/powershell/module/activedirectory/get-adobject
-            https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.security/get-acl
-            https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-acl
-            https://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectoryrights
-            https://msdn.microsoft.com/en-us/library/system.directoryservices.activedirectorysecurityinheritance
+            https://learn.microsoft.com/en-us/dotnet/api/system.directoryservices.activedirectoryaccessrule.-ctor?view=windowsdesktop-9.0#system-directoryservices-activedirectoryaccessrule-ctor(system-security-principal-identityreference-system-directoryservices-activedirectoryrights-system-security-accesscontrol-accesscontroltype-system-guid-system-directoryservices-activedirectorysecurityinheritance)
 
         .COMPONENT
             Active Directory
 
         .ROLE
-            Administrators
+            Security Administration
 
         .FUNCTIONALITY
-            Active Directory, Security, Access Control, Delegation
+            Access Control Management
     #>
 
     [CmdletBinding(

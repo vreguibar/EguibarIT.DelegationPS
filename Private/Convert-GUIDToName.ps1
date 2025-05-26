@@ -13,6 +13,9 @@
             a classSchema or attributeSchema object and formats the output accordingly. If not found
             in the schema, it checks the Extended-Rights container in the configuration naming context.
 
+            This function is particularly useful for interpreting security descriptors and ACLs where
+            GUIDs are used to reference schema objects or extended rights.
+
         .PARAMETER Guid
             The GUID to be translated into a display name. It must be a valid GUID format.
             This parameter accepts pipeline input.
@@ -67,15 +70,13 @@
             Convert-GUIDToName -Guid "77b5b886-944a-11d1-aebd-0000f80367c1" # Personal Information [Property Set]
             Convert-GUIDToName -Guid "4c164200-20c0-11d0-a768-00aa006e0529" # Account Restrictions [Property Set]
 
-        .EXAMPLE
-            $Splat = @{
-                GUID    = 'bf967aba-0de6-11d0-a285-00aa003049e2'
-                Verbose = $true
-            }
-            Convert-GUIDToName @Splat
+        .INPUTS
+            System.String
+            System.Guid
+            You can pipe a string or Guid object representing a GUID to this function.
 
         .OUTPUTS
-            [String]
+            System.String
             Returns a string with the format "Name [Type]" where Type is classSchema, attributeSchema,
             or ExtendedRight.
 
@@ -91,14 +92,26 @@
 
         .NOTES
             Version:         2.0
-            DateModified:    19/Mar/2025
+            DateModified:    22/May/2025
             LastModifiedBy:  Vicente Rodriguez Eguibar
                             vicente@eguibar.com
                             Eguibar IT
                             http://www.eguibarit.com
 
         .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS
+
+        .LINK
             https://learn.microsoft.com/en-us/windows/win32/adschema/attributes-all
+
+        .COMPONENT
+            Active Directory
+
+        .ROLE
+            Security
+
+        .FUNCTIONALITY
+            AD Schema, GUID Translation
             https://learn.microsoft.com/en-us/windows/win32/adschema/classes
             https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-adts/1522b774-6464-41a3-87a5-1e5633c3fbbb
 

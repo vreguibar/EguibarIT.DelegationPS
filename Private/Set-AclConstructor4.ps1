@@ -1,47 +1,93 @@
-﻿# Constructor W/4 attributes https://docs.microsoft.com/en-us/dotnet/api/system.directoryservices.activedirectoryaccessrule.-ctor?view=dotnet-plat-ext-6.0#system-directoryservices-activedirectoryaccessrule-ctor(system-security-principal-identityreference-system-directoryservices-activedirectoryrights-system-security-accesscontrol-accesscontroltype-system-directoryservices-activedirectorysecurityinheritance)
-
-function Set-AclConstructor4 {
+﻿function Set-AclConstructor4 {
     <#
-        .Synopsis
-            Modifies ACLs on Active Directory objects.
+        .SYNOPSIS
+            Modifies ACLs on Active Directory objects using a 4-parameter constructor.
 
         .DESCRIPTION
-            This function adds or removes access rules to an Active Directory object
-            using a constructor with 5 parameters to specify the access rule details.
-            It supports batch processing and is optimized for large AD environments.
+            This function adds or removes access control entries (ACEs) on Active Directory objects
+            using the ActiveDirectoryAccessRule constructor with 4 parameters:
+            - Identity Reference
+            - Active Directory Rights
+            - Access Control Type
+            - Object Type GUID
+
+            The function provides granular control over permissions by allowing you to specify
+            precise object types (schema GUIDs) for operations. It is optimized for large AD
+            environments through efficient error handling and validation.
+
+            This constructor is particularly useful when you need to apply permissions to specific
+            object types or attributes in AD, rather than to all objects or properties.
 
         .PARAMETER Id
-            Specifies the SamAccountName of the delegated group or user.
-            This is the identity for which the access rule will be modified.
-            It can be a variable containing the AD group.
+            Specifies the security principal (user, group, computer) that will receive the permission.
+            This parameter accepts:
+            - String: SamAccountName of the delegated group or user
+            - AD object: Variable containing an AD user or group object
+            - SID: Security Identifier object or string
 
         .PARAMETER LDAPPath
-            Specifies the LDAP path of the target Active Directory object.
+            Specifies the LDAP path (Distinguished Name) of the target Active Directory object
+            on which the permissions will be set. This must be a valid LDAP path in the domain.
 
         .PARAMETER AdRight
-            Specifies the Active Directory rights. Valid options include CreateChild, DeleteChild, and others.
+            Specifies the Active Directory rights to assign. This parameter accepts multiple values
+            separated by commas. Valid values include:
+            - CreateChild
+            - DeleteChild
+            - ListChildren
+            - Self
+            - ReadProperty
+            - WriteProperty
+            - DeleteTree
+            - ListObject
+            - ExtendedRight
+            - Delete
+            - ReadControl
+            - GenericExecute
+            - GenericWrite
+            - GenericRead
+            - WriteDacl
+            - WriteOwner
+            - GenericAll
+            - Synchronize
+            - AccessSystemSecurity
 
         .PARAMETER AccessControlType
-            Specifies whether the access control is to Allow or Deny.
+            Specifies whether to Allow or Deny the permission. Valid values are:
+            - Allow
+            - Deny
 
         .PARAMETER ObjectType
-            Specifies the object type GUID. Use for specific property access or extended rights.
+            Specifies the object type GUID that defines the type of object the permission applies to.
+            This can be:
+            - Property set GUID
+            - Extended right GUID
+            - Object class GUID
+
+            Object type GUIDs determine the specific attributes or operations the permission applies to.
 
         .PARAMETER RemoveRule
-            If specified, the access rule will be removed. If omitted, the access rule will be added.
+            If specified, the access rule will be removed instead of added.
+            By default, the function adds the specified permission.
 
         .EXAMPLE
-            Set-AclConstructor4 -Id "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local" -AdRight "CreateChild,DeleteChild" -AccessControlType "Allow" -ObjectType "12345678-abcd-1234-abcd-0123456789012"
+            Set-AclConstructor4 -Id "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local" -AdRight "CreateChild,DeleteChild" -AccessControlType "Allow" -ObjectType "bf967aba-0de6-11d0-a285-00aa003049e2"
+
+            Adds permission for the SG_SiteAdmins_XXXX group to create and delete user objects
+            (specified by the user class GUID) in the Users OU.
 
         .EXAMPLE
             $splat = @{
                 Id                = "SG_SiteAdmins_XXXX"
                 LDAPPath          = "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
-                AdRight           = "CreateChild,DeleteChild"
+                AdRight           = "ReadProperty,WriteProperty"
                 AccessControlType = "Allow"
-                ObjectType        = "12345678-abcd-1234-abcd-0123456789012"
+                ObjectType        = "bf967a9c-0de6-11d0-a285-00aa003049e2"
             }
             Set-AclConstructor4 @splat
+
+            Adds permission for the SG_SiteAdmins_XXXX group to read and write the telephone number
+            attribute (specified by the attribute GUID) for objects in the Users OU.
 
         .EXAMPLE
             $group = Get-AdGroup "SG_SiteAdmins_XXXX"
@@ -49,15 +95,24 @@ function Set-AclConstructor4 {
             $splat = @{
                 Id                = $group
                 LDAPPath          = "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
-                AdRight           = "CreateChild,DeleteChild"
+                AdRight           = "ExtendedRight"
                 AccessControlType = "Allow"
-                ObjectType        = "12345678-abcd-1234-abcd-0123456789012"
+                ObjectType        = "00299570-246d-11d0-a768-00aa006e0529"
+                RemoveRule        = $true
             }
             Set-AclConstructor4 @splat
 
+            Removes the extended right permission (Reset Password) for the SG_SiteAdmins_XXXX group
+            on the Users OU.
+
+        .INPUTS
+            None. You cannot pipe objects to this function.
+
         .OUTPUTS
-            [void]
-            This function does not return any objects. It modifies ACLs directly on Active Directory objects.
+            System.Void
+
+            This function does not return any objects. It modifies ACLs directly
+            on Active Directory objects.
 
         .NOTES
             Used Functions:
@@ -74,29 +129,27 @@ function Set-AclConstructor4 {
                 Get-FunctionDisplay                        ║ EguibarIT.DelegationPS
 
         .NOTES
-            Version:         3.1
-            DateModified:    23/May/2025
+            Version:         4.0
+            DateModified:    22/May/2025
             LastModifiedBy:  Vicente Rodriguez Eguibar
                             vicente@eguibar.com
                             Eguibar IT
                             http://www.eguibarit.com
 
         .LINK
-            https://docs.microsoft.com/en-us/powershell/module/activedirectory/get-adobject
-            https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.security/get-acl
-            https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-acl
-            https://docs.microsoft.com/en-us/dotnet/api/system.directoryservices.activedirectoryrights
-            https://docs.microsoft.com/en-us/dotnet/api/system.directoryservices.activedirectorysecurityinheritance
-            https://learn.microsoft.com/en-us/dotnet/api/system.directoryservices.activedirectoryaccessrule.-ctor?view=windowsdesktop-9.0#system-directoryservices-activedirectoryaccessrule-ctor(system-security-principal-identityreference-system-directoryservices-activedirectoryrights-system-security-accesscontrol-accesscontroltype-system-guid)
+            https://github.com/vreguibar/EguibarIT.DelegationPS
 
         .LINK
-            https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Set-AclConstructor4.ps1
+            https://learn.microsoft.com/en-us/dotnet/api/system.directoryservices.activedirectoryaccessrule.-ctor?view=windowsdesktop-9.0#system-directoryservices-activedirectoryaccessrule-ctor(system-security-principal-identityreference-system-directoryservices-activedirectoryrights-system-security-accesscontrol-accesscontroltype-system-guid)
 
         .COMPONENT
-            Active Directory Security
+            Active Directory
 
         .ROLE
             Security Administration
+
+        .FUNCTIONALITY
+            Access Control Management
 
         .FUNCTIONALITY
             Active Directory ACL Management
@@ -438,8 +491,25 @@ function Set-AclConstructor4 {
                         $Object.DistinguishedName,
                         'Apply modified ACL')) {
 
-                    Set-Acl -AclObject $Acl -Path $ObjectPath
-                    Write-Verbose -Message ('Applied modified ACL to {0}' -f $Object.DistinguishedName)
+                    try {
+                        # Attempt to set ACL with standard method first
+                        Set-Acl -AclObject $Acl -Path $ObjectPath -ErrorAction Stop
+                        Write-Verbose -Message ('Applied modified ACL to {0}' -f $Object.DistinguishedName)
+                    } catch [System.UnauthorizedAccessException] {
+                        # Handle access denied errors by using a different approach
+                        Write-Verbose -Message ('Access denied using Set-Acl. Attempting alternative method for {0}' -f $Object.DistinguishedName)
+
+                        # Get the DirectoryEntry object directly
+                        $DirectoryEntry = [ADSI]"LDAP://$($Object.DistinguishedName)"
+
+                        # Set the security descriptor
+                        $DirectoryEntry.psbase.ObjectSecurity = $Acl
+
+                        # Commit the changes
+                        $DirectoryEntry.psbase.CommitChanges()
+
+                        Write-Verbose -Message ('Successfully applied ACL to {0} using DirectoryEntry method' -f $Object.DistinguishedName)
+                    }
 
                 } #end if
 

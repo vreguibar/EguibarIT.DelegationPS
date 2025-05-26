@@ -1,79 +1,138 @@
 ﻿function Write-CustomLog {
     <#
         .SYNOPSIS
-            Logs custom events to the Windows Event Log and optionally outputs to a JSON file.
+            Logs custom events to the Windows Event Log and optionally to JSON files.
 
         .DESCRIPTION
-            This function writes events to the Windows Event Log using predefined or custom event details.
-            It also supports logging to a JSON file. The function supports custom logging categories, severities,
-            and allows sensitive information to be masked. File logging can be customized for size and retention.
+            The Write-CustomLog function provides a comprehensive logging solution that
+            writes events to the Windows Event Log and optionally to JSON files with
+            advanced features:
+
+            - Supports both predefined event templates and custom event definitions
+            - Automatically masks sensitive information in log messages
+            - Configurable log retention and size limits
+            - JSON file output with structured data for easier parsing
+            - Event categorization and severity levels
+            - ShouldProcess support for -WhatIf and -Confirm parameters
+
+            The function is designed for enterprise environments requiring robust logging
+            with security and compliance features built-in.
 
         .PARAMETER EventInfo
-            Predefined event details, such as EventID, EventName, and Category, provided as a structured object.
+            A predefined EventIDInfo object containing standardized event details. This
+            parameter simplifies logging of common events with consistent information.
+            The object includes:
+            - EventID: Numeric identifier for the event
+            - Name: Short name of the event
+            - Description: Detailed description
+            - EventCategory: Logical category grouping
+            - EventSeverity: The severity level
 
         .PARAMETER CustomEventId
-            The custom event ID for custom event logs.
+            A custom event identifier when using non-standard events. This is typically
+            an integer value from the EventID enumeration.
 
         .PARAMETER EventName
-            The name of the custom event being logged.
+            The name of the custom event being logged. This should be a short, descriptive
+            name that identifies the event type.
 
         .PARAMETER EventCategory
-            Specifies the category of the event.
+            Specifies the logical category for the event. Categories help organize events
+            for filtering and reporting. Should be a value from the EventCategory enumeration.
 
         .PARAMETER Message
-            The log message that will be written. Sensitive information will be masked if necessary.
+            The detailed log message that will be written to the event log. Sensitive
+            information like passwords or personal data will be automatically masked
+            when the RemoveSensitiveData feature is enabled.
 
         .PARAMETER CustomSeverity
-            The severity level of the event (e.g., Information, Warning, Error, etc.).
+            The severity level of the event (Information, Warning, Error, Critical, etc.).
+            This should be a value from the EventSeverity enumeration.
 
         .PARAMETER LogAsJson
-            Switch to indicate if the log should be written to a JSON file.
+            When specified, the log entry will also be written to a JSON file in addition
+            to the Windows Event Log. This enables structured logging for integration with
+            log analysis tools.
 
         .PARAMETER MaximumKilobytes
-            The maximum size in kilobytes for the event log. Default is 16 MB.
+            Specifies the maximum size in kilobytes for the event log. The default is 16384 KB
+            (16 MB). Valid values range from 64 KB to 4,194,240 KB.
 
         .PARAMETER RetentionDays
-            The number of days the logs should be retained. Default is 30 days.
+            Specifies the number of days event log entries should be retained. The default
+            is 30 days. Valid values range from 1 to 365 days.
 
         .PARAMETER LogPath
-            The directory path where the JSON log files should be saved.
+            The directory path where JSON log files will be saved when LogAsJson is specified.
+            If not provided, logs will be written to the default application data location.
 
         .EXAMPLE
-            Write-CustomLog -EventInfo ([EventIDs]::SlowPerformance) -Message 'Old hardware.' -Verbose
+            Write-CustomLog -EventInfo ([EventIDs]::SlowPerformance) -Message 'System performance degraded due to outdated hardware.' -Verbose
 
-            Use the pre-defined events ([EventIDs]) and corresponding Message string.
-            Where "EventInfo" is defined as [EventIDs] Class with pre-defined values as:
-                EventID       = ID of the event as enum [EventID]
-                Name          = Name of the event
-                Description   = Description of the event
-                EventCategory = Category of the event as enum [EventCategory]. This is only working if a compiled DLL exist.
-                EventSeverity = Severity of the event as enum [EventSeverity]
+            Uses a predefined event template ([EventIDs]::SlowPerformance) with a custom message.
+            The event is logged with all the predefined metadata (category, severity, etc.).
 
         .EXAMPLE
             Write-CustomLog -CustomEventId ([EventID]::LowDiskSpace) `
-            -EventName "LowDiskSpace" `
-            -EventCategory SystemHealth `
-            -Message "Low disk space detected on C: drive. Free space below 10%." `
-            -CustomSeverity Warning -Verbose
+                -EventName "LowDiskSpace" `
+                -EventCategory SystemHealth `
+                -Message "Low disk space detected on C: drive. Free space below 10%." `
+                -CustomSeverity Warning `
+                -Verbose
 
-            We create the event to log by providing the required parameters.
+            Creates and logs a custom event with specific category and severity level.
 
-        .NOTES
-            Ensure necessary event types (EventIDs, EventCategory, etc.) are defined on Class.Events.ps1 file
-            located under Classes folder.
-            This file is written in C# (CSharp) language and compiled in runtime when module is imported. This is
-            due visibility and compatibility issues on modules when using just PowerShell code.
+        .EXAMPLE
+            $logParams = @{
+                EventInfo = ([EventIDs]::UnauthorizedAccess)
+                Message = "Failed login attempt for user: Administrator from IP: 192.168.1.100"
+                LogAsJson = $true
+                LogPath = "D:\\SecurityLogs"
+            }
+            Write-CustomLog @logParams
+
+            Logs a security event both to Windows Event Log and to a JSON file in a custom location.
+
+        .INPUTS
+            EventIDInfo
+
+            You can pipe EventIDInfo objects to this function.
+
+        .OUTPUTS
+            None
+
+            This function does not generate any output.
 
         .NOTES
             Used Functions:
-                Name                          | Module
-                ------------------------------|--------------------------
-                Remove-SensitiveData          | EguibarIT
-                Initialize-EventLogging       | EguibarIT
-                Write-EventLog                | Microsoft.PowerShell.Management
-                Write-Error                   | Microsoft.PowerShell.Utility.Activities
-                Write-Verbose                 | Microsoft.PowerShell.Utility.Activities
-                Write-Warning                 | Microsoft.PowerShell.Utility.Activities
+                Name                                       ║ Module/Namespace
+                ═══════════════════════════════════════════╬══════════════════════════════
+                Remove-SensitiveData                       ║ EguibarIT.DelegationPS
+                Initialize-EventLogging                    ║ EguibarIT.DelegationPS
+                Write-EventLog                             ║ Microsoft.PowerShell.Management
+                Write-Error                                ║ Microsoft.PowerShell.Utility
+                Write-Verbose                              ║ Microsoft.PowerShell.Utility
+                Write-Warning                              ║ Microsoft.PowerShell.Utility
+
+        .NOTES
+            Version:         2.0
+            DateModified:    22/May/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
+
+        .LINK
+            https://github.com/vreguibar/EguibarIT.DelegationPS
+
+        .COMPONENT
+            Logging
+
+        .ROLE
+            Operations
+
+        .FUNCTIONALITY
+            Event Logging, Auditing
 
     #>
 

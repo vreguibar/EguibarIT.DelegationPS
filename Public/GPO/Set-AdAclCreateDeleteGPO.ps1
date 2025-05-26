@@ -1,51 +1,96 @@
 ﻿function Set-AdAclCreateDeleteGPO {
     <#
         .SYNOPSIS
-            Delegates GPO creation/deletion permissions to a security group.
+            Delegates permissions to create and delete Group Policy Objects (GPOs).
 
         .DESCRIPTION
-            Delegates permissions to create and delete Group Policy Objects (GPOs) to a specified security group
-            within Active Directory's Group Policy Container. This function supports both granting and removing
-            these permissions through the -RemoveRule parameter.
+            The Set-AdAclCreateDeleteGPO function grants or removes permissions to create and delete
+            Group Policy Objects (GPOs) for a specified security group within Active Directory.
+
+            This function performs the following actions:
+            - Locates the Group Policy Container (CN=Policies,CN=System) in the domain
+            - Adds or removes the appropriate Access Control Entries (ACEs) to allow GPO creation/deletion
+            - Configures permissions that work with both GPMC and PowerShell-based GPO management
+
+            The function requires Domain Admin privileges or equivalent permissions to modify the
+            Group Policy Container ACL. It supports confirmation prompts through -Confirm and can be
+            bypassed with -Force when used in automation scenarios.
+
+        .PARAMETER Group
+            Specifies the security group that will receive or lose GPO creation and deletion permissions.
+            This parameter accepts various formats:
+            - SAM Account Name (e.g., 'SG_GPO_Admins')
+            - Distinguished Name (e.g., 'CN=SG_GPO_Admins,OU=Groups,DC=contoso,DC=com')
+            - Security Identifier (SID) object or string
+            - Group object from Get-ADGroup
+
+        .PARAMETER RemoveRule
+            When specified, the function removes GPO creation/deletion permissions instead of granting them.
+            This is useful when decommissioning administrative roles or reducing privileges.
 
         .EXAMPLE
             Set-AdAclCreateDeleteGPO -Group 'SG_GPO_Admins'
-            Grants GPO create/delete permissions to the SG_GPO_Admins group.
+
+            Grants permissions to create and delete Group Policy Objects to the 'SG_GPO_Admins' security group.
 
         .EXAMPLE
             Set-AdAclCreateDeleteGPO -Group 'SG_GPO_Admins' -RemoveRule
-            Removes GPO create/delete permissions from the SG_GPO_Admins group.
+
+            Removes permissions to create and delete Group Policy Objects from the 'SG_GPO_Admins' security group.
 
         .EXAMPLE
             'SG_GPO_Admins' | Set-AdAclCreateDeleteGPO
-            Grants permissions using pipeline input.
 
-        .PARAMETER Group
-            Specifies the security group that will receive or lose the GPO management permissions.
-            Accepts distinguished names, SamAccountNames, or GUID strings.
+            Grants GPO creation and deletion permissions using pipeline input.
 
-        .PARAMETER RemoveRule
-            When specified, removes the GPO management permissions instead of granting them.
+        .EXAMPLE
+            $Splat = @{
+                Group = 'SG_GPO_Admins'
+                RemoveRule = $true
+            }
+            Set-AdAclCreateDeleteGPO @Splat
+
+            Removes GPO creation and deletion permissions using splatting.
+
+        .INPUTS
+            System.String
+            Microsoft.ActiveDirectory.Management.ADGroup
+
+            You can pipe group names as strings or Group objects from Get-ADGroup to this function.
+
+        .OUTPUTS
+            System.Void
+
+            This function does not generate any output.
 
         .NOTES
             Used Functions:
-                Name                                      ║ Module
-                ══════════════════════════════════════════╬══════════════════════════════
-                Set-AclConstructor5                       ║ EguibarIT.DelegationPS
-                Get-AdObjectType                          ║ EguibarIT.DelegationPS
-                Write-Verbose                             ║ Microsoft.PowerShell.Utility
-                Write-Error                               ║ Microsoft.PowerShell.Utility
+                Name                                       ║ Module/Namespace
+                ═══════════════════════════════════════════╬══════════════════════════════
+                Set-AclConstructor5                        ║ EguibarIT.DelegationPS
+                Get-AdObjectType                           ║ EguibarIT.DelegationPS
+                Write-Verbose                              ║ Microsoft.PowerShell.Utility
+                Write-Error                                ║ Microsoft.PowerShell.Utility
 
         .NOTES
-            Version:         1.2
-            DateModified:    20/Mar/2024
-            LasModifiedBy:   Vicente Rodriguez Eguibar
-                vicente@eguibar.com
-                Eguibar IT
-                http://www.eguibarit.com
+            Version:         2.0
+            DateModified:    22/May/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
 
         .LINK
             https://github.com/vreguibar/EguibarIT.DelegationPS
+
+        .COMPONENT
+            Group Policy
+
+        .ROLE
+            Security Administration
+
+        .FUNCTIONALITY
+            GPO Management, Delegation of Control
     #>
 
     [CmdletBinding(
