@@ -42,7 +42,37 @@
     }
     EventLogInitialized        = $false
 
-    # Standard header used on each function on the Begin section
+    # Message header for new regions. Used on NewCentralItOu to easily identify regions on transcript
+    NewRegionMessage           = @'
+
+    ████████████████████████████████████████████████████████████████████████████████████████████████████
+    █                                                                                                  █
+    █             ╔══════════════════════════════════════════════════════════════════════╗             █
+    █             ║                                                                      ║             █
+    █             ║                        New Region Start                              ║             █
+    █             ║                                                                      ║             █
+    █             ╚══════════════════════════════════════════════════════════════════════╝             █
+    █                                                                                                  █
+    ████████████████████████████████████████████████████████████████████████████████████████████████████
+
+        REGION: {0}
+
+'@
+
+    # Standard header (EguibarIT module compatibility)
+    Header                     = @'
+
+    ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+    ┃                                        EguibarIT module                                          ┃
+    ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+            Date:     {0}
+            Starting: {1}
+
+    Parameters used by the function... {2}
+
+'@
+
+    # Standard header (DelegationPS specific)
     HeaderDelegation           = @'
 
          ═══════════════════════════════════════════════════════════════════════════
@@ -55,7 +85,16 @@
 
 '@
 
-    # Standard footer used on each function on the Begin section
+    # Standard footer (EguibarIT module compatibility)
+    Footer                     = @'
+
+        Function {0} finished {1}"
+
+    ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+
+'@
+
+    # Standard footer (DelegationPS specific)
     FooterDelegation           = @'
 
           Function {0} finished {1}"

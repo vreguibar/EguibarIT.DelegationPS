@@ -159,8 +159,7 @@ function Set-AdAclBitLockerTPM {
                     InheritanceType : Descendents
                 InheritedObjectType : computer [ClassSchema]
                         IsInherited = False
-        #>
-        $Splat = @{
+        #>        $Splat = @{
             Id                    = 'SELF'
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'WriteProperty'
@@ -172,13 +171,15 @@ function Set-AdAclBitLockerTPM {
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
 
-            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msTPM-OwnerInformation?', $Force)) {
+            if ($Force -or
+                $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msTPM-OwnerInformation?')) {
                 # Add the parameter to remove the rule
                 $Splat.Add('RemoveRule', $true)
             } #end If
         } #end If
 
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msTPM-OwnerInformation?', $Force)) {
+        If ($Force -or
+            $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msTPM-OwnerInformation?')) {
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -192,8 +193,7 @@ function Set-AdAclBitLockerTPM {
                     InheritanceType : Descendents
                 InheritedObjectType : computer [ClassSchema]
                         IsInherited = False
-        #>
-        $Splat = @{
+        #>        $Splat = @{
             Id                    = $CurrentGroup
             LDAPPath              = $PSBoundParameters['LDAPpath']
             AdRight               = 'ReadProperty'
@@ -205,13 +205,15 @@ function Set-AdAclBitLockerTPM {
         # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
 
-            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msTPM-OwnerInformation?', $Force)) {
+            if ($Force -or
+                $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove permissions to msTPM-OwnerInformation?')) {
                 # Add the parameter to remove the rule
                 $Splat.Add('RemoveRule', $true)
             } #end If
         } #end If
 
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msTPM-OwnerInformation?', $Force)) {
+        If ($Force -or
+            $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Delegate the permissions to msTPM-OwnerInformation?')) {
             Set-AclConstructor6 @Splat
         } #end If
 
@@ -274,13 +276,12 @@ function Set-AdAclBitLockerTPM {
             ObjectType            = $Variables.GuidMap['msTPM-TpmInformationForComputer']
             AdSecurityInheritance = 'Descendents'
             InheritedObjectType   = $Variables.GuidMap['computer']
-        }
-        # Check if RemoveRule switch is present.
+        }        # Check if RemoveRule switch is present.
         If ($PSBoundParameters['RemoveRule']) {
 
-            if ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'],
-                    'Remove permissions to msTPM-TpmInformationForComputer?',
-                    $Force)) {
+            if ($Force -or
+                $PSCmdlet.ShouldProcess($PSBoundParameters['Group'],
+                    'Remove permissions to msTPM-TpmInformationForComputer?')) {
 
                 # Add the parameter to remove the rule
                 $Splat.Add('RemoveRule', $true)
@@ -289,9 +290,9 @@ function Set-AdAclBitLockerTPM {
         } #end If
 
 
-        If ($PSCmdlet.ShouldProcess($PSBoundParameters['Group'],
-                'Delegate the permissions to msTPM-TpmInformationForComputer?',
-                $Force)) {
+        If ($Force -or
+            $PSCmdlet.ShouldProcess($PSBoundParameters['Group'],
+                'Delegate the permissions to msTPM-TpmInformationForComputer?')) {
 
             Set-AclConstructor6 @Splat
         } #end If

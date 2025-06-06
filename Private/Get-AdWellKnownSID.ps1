@@ -67,8 +67,8 @@
                 Test-IsValidSID                            ║ EguibarIT.DelegationPS
 
         .NOTES
-            Version:         2.2
-            DateModified:    22/May/2025
+            Version:         2.3
+            DateModified:    27/May/2025
             LastModifiedBy:  Vicente Rodriguez Eguibar
                             vicente@eguibar.com
                             Eguibar IT
@@ -90,8 +90,11 @@
             Identity Management, SID Resolution
     #>
 
-    [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'Medium')]
-    [OutputType([Bool])]
+    [CmdletBinding(
+        SupportsShouldProcess = $false,
+        ConfirmImpact = 'Medium'
+    )]
+    [OutputType([PSCustomObject])]
 
     Param (
 
@@ -103,11 +106,20 @@
             Position = 0)]
         [ValidateScript(
             { Test-IsValidSID -ObjectSID $_ },
-            ErrorMessage = 'Provided SID is not valid! Please check.'
+            ErrorMessage = 'Provided SID is not valid! Please Check.'
         )]
         [ValidateNotNullOrEmpty()]
         [Alias('SecurityIdentifier', 'ObjectSID')]
-        $SID
+        $SID,
+
+        [Parameter(Mandatory = $false,
+            ValueFromPipeline = $false,
+            ValueFromPipelineByPropertyName = $false,
+            ValueFromRemainingArguments = $false,
+            HelpMessage = 'Return detailed object with SID, IsWellKnown, and Description properties.',
+            Position = 1)]
+        [Switch]
+        $Detailed
     )
 
     Begin {
@@ -141,7 +153,17 @@
             ($Variables.WellKnownSIDs -eq '') -or
             ($Variables.WellKnownSIDs -eq $false)
         ) {
-            . "$PSScriptRoot\Enums\Enum.WellKnownSids.ps1"
+
+            # Try to load from module path
+            $enumPath = Join-Path -Path (Split-Path -Parent $PSScriptRoot) -ChildPath 'Enums\Enum.WellKnownSids.ps1'
+
+            if (Test-Path -Path $enumPath) {
+                . $enumPath
+                Write-Debug -Message "Loaded WellKnownSIDs from $enumPath"
+            } else {
+                Write-Warning -Message "Could not find Enum.WellKnownSids.ps1 at $enumPath"
+            } #end If
+
         } #end If
 
     } # end Begin
@@ -150,27 +172,47 @@
 
         try {
 
-            # Assuming $WellKnownSIDs is a hashtable where keys are the well-known SID values
-            if ($Variables.WellKnownSIDs.ContainsKey($SID)) {
+            # Default to not found
+            $isWellKnownSid = $false
 
-                $isWellKnownSid = $true
-                $sidDescription = $Variables.WellKnownSIDs[$SID]
+            # Check if the Variables.WellKnownSIDs collection exists
+            if ($null -ne $Variables -and
+                $null -ne $Variables.WellKnownSIDs) {
 
-                Write-Verbose -Message ('
-                  Checked SID: {0}.
-                Is Well-Known: {0}
-                  Description: {0}' -f $SID, $isWellKnownSid, $sidDescription
-                )
-            } #end if
+                # Check if the SID exists in the collection - safely handle different collection types
+                $hasSid = $false
 
+                try {
+                    # Use the most reliable method for checking if a key exists in any dictionary type
+                    $hasSid = $Variables.WellKnownSIDs.Keys -contains $SID
+                    Write-Debug -Message "Checking SID in collection: $SID, Found: $hasSid"
+
+                    if ($hasSid) {
+                        $isWellKnownSid = $true
+                        $sidDescription = $Variables.WellKnownSIDs[$SID]
+
+                        Write-Verbose -Message ('
+                          Checked SID: {0}
+                        Is Well-Known: {1}
+                          Description: {2}' -f $SID, $isWellKnownSid, $sidDescription
+                        )
+                    } else {
+                        Write-Debug -Message ('SID {0} not found in WellKnownSIDs collection' -f $SID)
+                    }
+                } catch {
+                    Write-Debug -Message ('Error checking WellKnownSIDs for {0}: {1}' -f $SID, $_.Exception.Message)
+                }
+            } else {
+                Write-Debug -Message 'Variables.WellKnownSIDs is null or not properly initialized'
+            }
         } catch {
 
-            Write-Error -Message 'Error when checking WellKnownSid'
+            Write-Error -Message ('Error when checking WellKnownSid: {0}' -f $_.Exception.Message)
             throw
 
         } #end Try-Catch
 
-    } # end Process
+    } #end Process
 
     End {
         if ($null -ne $Variables -and $null -ne $Variables.FooterDelegation) {
@@ -180,7 +222,17 @@
             Write-Verbose -Message $txt
         } #end if
 
-        return $IsWellKnownSid
+        if ($Detailed) {
+            # Return detailed object with SID, IsWellKnown, and Description
+            return [PSCustomObject]@{
+                SID         = $SID
+                IsWellKnown = $IsWellKnownSid
+                Description = $sidDescription
+            }
+        } else {
+            # Return simple boolean
+            return $IsWellKnownSid
+        } #end if
     } #end End
 
 } # End Function Get-AdWellKnownSID

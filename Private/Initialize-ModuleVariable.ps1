@@ -1,4 +1,5 @@
 ﻿Function Initialize-ModuleVariable {
+
     <#
         .SYNOPSIS
             Initializes or reinitializes module-level variables for the module.
@@ -51,12 +52,14 @@
             Used Functions:
                 Name                                       ║ Module/Namespace
                 ═══════════════════════════════════════════╬══════════════════════════════
+                Set-StrictMode                             ║ Microsoft.PowerShell.Core
                 Write-Verbose                              ║ Microsoft.PowerShell.Utility
                 Write-Warning                              ║ Microsoft.PowerShell.Utility
                 Write-Error                                ║ Microsoft.PowerShell.Utility
                 Set-StrictMode                             ║ Microsoft.PowerShell.Core
                 Get-AdObject                               ║ ActiveDirectory
                 Import-Module                              ║ Microsoft.PowerShell.Core
+                Get-Module                                 ║ Microsoft.PowerShell.Core
 
         .NOTES
             Version:         2.0
@@ -67,7 +70,7 @@
                             http://www.eguibarit.com
 
         .LINK
-            https://github.com/vreguibar/EguibarIT.DelegationPS
+            https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Initialize-ModuleVariable.ps1
 
         .COMPONENT
             EguibarIT.DelegationPS
@@ -78,7 +81,11 @@
         .FUNCTIONALITY
             Module Initialization
     #>
-    [CmdletBinding(SupportsShouldProcess = $false, ConfirmImpact = 'Low')]
+
+    [CmdletBinding(
+        SupportsShouldProcess = $false,
+        ConfirmImpact = 'Low'
+    )]
     [OutputType([void])]
 
     Param (
@@ -103,6 +110,7 @@
         $adModuleAvailable = Get-Module -ListAvailable -Name 'ActiveDirectory'
 
         try {
+
             if ($adModuleAvailable) {
 
                 Import-Module -Name 'ActiveDirectory' -Force -Verbose:$false | Out-Null
@@ -123,56 +131,70 @@
     Process {
 
         if ($adModuleAvailable) {
+
             try {
 
                 # Active Directory DistinguishedName
-                if ($Force -or $null -eq $Variables.AdDN) {
+                if ($Force -or
+                    $null -eq $Variables.AdDN) {
                     $Variables.AdDN = ([ADSI]'LDAP://RootDSE').DefaultNamingContext.ToString()
                 } #end If
 
                 # Configuration Naming Context
-                if ($Force -or $null -eq $Variables.configurationNamingContext) {
+                if ($Force -or
+                    $null -eq $Variables.configurationNamingContext) {
                     $Variables.configurationNamingContext = ([ADSI]'LDAP://RootDSE').configurationNamingContext.ToString()
                 } #end If
 
                 # Active Directory DistinguishedName
-                if ($Force -or $null -eq $Variables.defaultNamingContext) {
+                if ($Force -or
+                    $null -eq $Variables.defaultNamingContext) {
                     $Variables.defaultNamingContext = ([ADSI]'LDAP://RootDSE').DefaultNamingContext.ToString()
                 } #end If
 
                 # Get current DNS domain name
-                if ($Force -or $null -eq $Variables.DnsFqdn) {
+                if ($Force -or
+                    $null -eq $Variables.DnsFqdn) {
                     $Variables.DnsFqdn = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain().Name
                 } #end If
 
                 # Naming Contexts
-                if ($Force -or $null -eq $Variables.namingContexts) {
+                if ($Force -or
+                    $null -eq $Variables.namingContexts) {
                     $Variables.namingContexts = ([ADSI]'LDAP://RootDSE').namingContexts
                 } #end If
 
                 # Partitions Container
-                if ($Force -or $null -eq $Variables.PartitionsContainer) {
+                if ($Force -or
+                    $null -eq $Variables.PartitionsContainer) {
                     $Variables.PartitionsContainer = (([ADSI]'LDAP://RootDSE').configurationNamingContext.ToString())
                 } #end If
 
                 # Root Domain Naming Context
-                if ($Force -or $null -eq $Variables.rootDomainNamingContext) {
+                if ($Force -or
+                    $null -eq $Variables.rootDomainNamingContext) {
                     $Variables.rootDomainNamingContext = ([ADSI]'LDAP://RootDSE').rootDomainNamingContext.ToString()
                 } #end If
 
                 # Schema Naming Context
-                if ($Force -or $null -eq $Variables.SchemaNamingContext) {
+                if ($Force -or
+                    $null -eq $Variables.SchemaNamingContext) {
                     $Variables.SchemaNamingContext = ([ADSI]'LDAP://RootDSE').SchemaNamingContext.ToString()
                 } #end If
 
             } Catch {
 
-                Write-Error -Message '
-                    Something went wrong while trying to fill $Variables!
-                        Ensure that:
-                            * Machine is Domain Joined
-                            * Active Directory is available and working
-                            * Communication exist between this machine and AD'
+                [System.Text.StringBuilder]$sb = [System.Text.StringBuilder]::new()
+                [void]$sb.AppendLine( '' )
+                [void]$sb.AppendLine( '         ..:: $Variables ::..' )
+                [void]$sb.AppendLine( 'Something went wrong while trying to fill $Variables!' )
+                [void]$sb.AppendLine( '    Ensure that:' )
+                [void]$sb.AppendLine( '        * Machine is Domain Joined' )
+                [void]$sb.AppendLine( '        * Active Directory is available and working' )
+                [void]$sb.AppendLine( '        * Communication exist between this machine and AD' )
+                [void]$sb.AppendLine( '' )
+
+                Write-Error -Message $sb.ToString()
 
             } #end Try-Catch
 
@@ -181,6 +203,7 @@
             # Following functions must be the last ones to be called, otherwise error is thrown.
             # Hashtable containing the mappings between ClassSchema/AttributeSchema and GUID's
             If ($Variables.GuidMap.Count -eq 0) {
+
                 Try {
                     [hashtable]$TmpMap = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
                     [hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
@@ -213,12 +236,17 @@
 
                 } catch {
 
-                    Write-Error -Message '
-                        Something went wrong while trying to fill $Variables.GuidMap!
-                            Ensure that:
-                                * Machine is Domain Joined
-                                * Active Directory is available and working
-                                * Communication exist between this machine and AD'
+                    [System.Text.StringBuilder]$sb = [System.Text.StringBuilder]::new()
+                    [void]$sb.AppendLine( '' )
+                    [void]$sb.AppendLine( '         ..:: GuidMap ::..' )
+                    [void]$sb.AppendLine( 'Something went wrong while trying to fill $Variables.GuidMap!' )
+                    [void]$sb.AppendLine( '    Ensure that:' )
+                    [void]$sb.AppendLine( '        * Machine is Domain Joined' )
+                    [void]$sb.AppendLine( '        * Active Directory is available and working' )
+                    [void]$sb.AppendLine( '        * Communication exist between this machine and AD' )
+                    [void]$sb.AppendLine( '' )
+
+                    Write-Error -Message $sb.ToString()
 
                 } #end Try-Catch
             } #end If
@@ -257,12 +285,17 @@
 
                 } Catch {
 
-                    Write-Error -Message '
-                    Something went wrong while trying to fill $Variables.ExtendedRightsMap!
-                        Ensure that:
-                            * Machine is Domain Joined
-                            * Active Directory is available and working
-                            * Communication exist between this machine and AD'
+                    [System.Text.StringBuilder]$sb = [System.Text.StringBuilder]::new()
+                    [void]$sb.AppendLine( '' )
+                    [void]$sb.AppendLine( '         ..:: ExtendedRightsMap ::..' )
+                    [void]$sb.AppendLine( 'Something went wrong while trying to fill $Variables.GuidMap!' )
+                    [void]$sb.AppendLine( '    Ensure that:' )
+                    [void]$sb.AppendLine( '        * Machine is Domain Joined' )
+                    [void]$sb.AppendLine( '        * Active Directory is available and working' )
+                    [void]$sb.AppendLine( '        * Communication exist between this machine and AD' )
+                    [void]$sb.AppendLine( '' )
+
+                    Write-Error -Message $sb.ToString()
 
                 } #end Try-Catch
             } #end If

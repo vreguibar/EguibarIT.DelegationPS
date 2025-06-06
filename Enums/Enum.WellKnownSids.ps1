@@ -1,6 +1,4 @@
-﻿[Hashtable]$Variables.WellKnownSIDs = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
-
-$Variables.WellKnownSIDs = [ordered] @{
+﻿$Variables.WellKnownSIDs = [ordered] @{
     'S-1-0'                                      = 'null authority'
     'S-1-0-0'                                    = 'nobody'
     'S-1-1'                                      = 'world authority'
@@ -14,24 +12,30 @@ $Variables.WellKnownSIDs = [ordered] @{
     'S-1-16-8192'                                = 'medium mandatory level'
     'S-1-16-8448'                                = 'medium plus mandatory level'
     'S-1-2'                                      = 'local authority'
+    'S-1-2-0'                                    = 'local'
+    'S-1-2-1'                                    = 'console logon'
     'S-1-3'                                      = 'creator authority'
     'S-1-3-0'                                    = 'creator owner'
     'S-1-3-1'                                    = 'creator group'
     'S-1-3-2'                                    = 'creator owner server'
     'S-1-3-3'                                    = 'creator group server'
+    'S-1-3-4'                                    = 'owner rights'
     'S-1-4'                                      = 'nonunique authority'
     'S-1-5'                                      = 'nt authority'
     'S-1-5-1'                                    = 'dialup'
     'S-1-5-2'                                    = 'network'
     'S-1-5-3'                                    = 'batch'
-    'S-1-5-19'                                   = 'local service'
     'S-1-5-18'                                   = 'LocalSystem'
+    'S-1-5-19'                                   = 'local service'
     'S-1-5-20'                                   = 'network service'
     'S-1-5-21-4195037842-338827918-94892514-526' = 'key admins'
     'S-1-5-4'                                    = 'interactive'
     'S-1-5-6'                                    = 'service'
     'S-1-5-7'                                    = 'anonymous logon'
     'S-1-5-8'                                    = 'proxy'
+    'S-1-5-80'                                   = 'nt service'
+    'S-1-5-80-0'                                 = 'all services'
+    'S-1-5-83-0'                                 = 'virtual machines'
     'S-1-5-9'                                    = 'enterprise domain controllers'
     'S-1-5-10'                                   = 'self'
     'S-1-5-11'                                   = 'authenticated users'
@@ -91,31 +95,10 @@ $Variables.WellKnownSIDs = [ordered] @{
     'S-1-5-64-10'                                = 'ntlm authentication'
     'S-1-5-64-14'                                = 'schannel authentication'
     'S-1-5-64-21'                                = 'digest authentication'
-    'S-1-5-80'                                   = 'nt service'
-    'S-1-5-80-0'                                 = 'all services'
-    'S-1-5-83-0'                                 = 'virtual machines'
 }
 New-Variable -Name WellKnownSIDs -Value $Variables.WellKnownSIDs -Scope Script -Force
-#
-# Check if KEY exist
-# $Variables.WellKnownSIDs.Keys.Contains('S-1-5-11')
-# -> Return True or False
-#
-# Search by KEY to get VALUE
+# Search by Key to get Value
 # $Variables.WellKnownSIDs['S-1-5-11']
-# -> Return 'authenticated users'
 #
-#
-#
-# Check if VALUE exist
-# $Variables.WellKnownSIDs.Values.Contains('authenticated users')
-# -> Return True or False
-#
-# Search by VALUE to get KEY
+# Search by Value to get Key
 # $Variables.WellKnownSIDs.keys.where{$Variables.WellKnownSIDs[$_] -eq 'authenticated users'}
-#-> Return 'S-1-5-11'
-#
-
-
-
-

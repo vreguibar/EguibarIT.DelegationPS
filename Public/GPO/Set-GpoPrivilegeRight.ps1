@@ -1,88 +1,16 @@
 ﻿Function Set-GpoPrivilegeRight {
 
     <#
-        .Synopsis
-            Modifies user rights assignments in a specified Group Policy Object (MUST be executed on DomainController)
+        .SYNOPSIS
+            Modifies user rights assignments in a specified Group Policy Object (GPO).
+            Must be run as Administrator on a Domain Controller.
 
         .DESCRIPTION
-            The Set-GpoPrivilegeRight function allows for detailed configuration of user rights
-            assignments within a Group Policy Object. It can grant or deny various privilege rights
-            such as network logon, interactive logon, machine account creation, and backup privileges.
-
-            This function follows the Active Directory tiering model and adheres to security best practices.
-            It is designed to work in large-scale AD environments and minimizes performance overhead.
-
-        .EXAMPLE
-            Set-GpoPrivilegeRight -GpoToModify "Default Domain" -BatchLogon "Domain\User1","Domain\User2"
-            This example assigns "Log on as a batch job" rights to User1 and User2 in the "Default Domain" GPO.
-
-        .EXAMPLE
-            Test-GpoPrivilegeRight -GpoToModify 'Domain Controllers Policy' -NetworkLogon 'DOMAIN\Domain Admins'
-
-            This command grants the "Access this computer from the network" right to the "Domain Admins" group
-            in the "Domain Controllers Policy" GPO.
-
-        .EXAMPLE
-            Test-GpoPrivilegeRight -GpoToModify 'Workstations Policy' -DenyInteractiveLogon 'DOMAIN\Remote Users'
-
-            This command denies the "Allow Log On Locally" right to the "Remote Users" group in the
-            "Workstations Policy" GPO.
-
-        .EXAMPLE
-            Test-GpoPrivilegeRight -GpoToModify 'Servers Policy' -NetworkLogon 'DOMAIN\Server Admins' -DenyNetworkLogon 'DOMAIN\Domain Users' -Backup 'DOMAIN\Backup Operators'
-
-            This command makes multiple privilege right modifications in the "Servers Policy" GPO:
-            - Grants "Access this computer from the network" to "Server Admins"
-            - Denies "Access this computer from the network" to "Domain Users"
-            - Grants "Back up files and directories" to "Backup Operators"
-
-        .EXAMPLE
-            $Splat = @{
-                GpoToModify                    = 'My posh GPO'
-                NetworkLogon                   = $NetworkLogon
-                DenyNetworkLogon               = $DenyNetworkLogon
-                InteractiveLogon               = $InteractiveLogon
-                DenyInteractiveLogon           = $DenyInteractiveLogon
-                RemoteInteractiveLogon         = $RemoteInteractiveLogon
-                DenyRemoteInteractiveLogon     = $DenyRemoteInteractiveLogon
-                BatchLogon                     = $BatchLogon
-                DenyBatchLogon                 = $DenyBatchLogon
-                ServiceLogon                   = $ServiceLogon
-                DenyServiceLogon               = $DenyServiceLogon
-                MachineAccount                 = $MachineAccount
-                IncreaseQuota                  = $IncreaseQuota
-                Backup                         = $Backup
-                ChangeNotify                   = $ChangeNotify
-                SystemTime                     = $SystemTime
-                TimeZone                       = $TimeZone
-                CreatePagefile                 = $CreatePagefile
-                CreateGlobal                   = $CreateGlobal
-                CreateSymbolicLink             = $CreateSymbolicLink
-                EnableDelegation               = $EnableDelegation
-                RemoteShutdown                 = $RemoteShutdown
-                Audit                          = $Audit
-                Impersonate                    = $Impersonate
-                IncreaseWorkingSet             = $IncreaseWorkingSet
-                IncreaseBasePriority           = $IncreaseBasePriority
-                LoadDriver                     = $LoadDriver
-                AuditSecurity                  = $AuditSecurity
-                Relabel                        = $Relabel
-                SystemEnvironment              = $SystemEnvironment
-                DelegateSessionUserImpersonate = $DelegateSessionUserImpersonate
-                ManageVolume                   = $ManageVolume
-                ProfileSingleProcess           = $ProfileSingleProcess
-                SystemProfile                  = $SystemProfile
-                Undock                         = $Undock
-                AssignPrimaryToken             = $AssignPrimaryToken
-                Restore                        = $Restore
-                Shutdown                       = $Shutdown
-                SyncAgent                      = $SyncAgent
-                TakeOwnership                  = $TakeOwnership
-            }
-            Set-GpoPrivilegeRight @Splat
-
-            This example shows how to modify all Privilege Rights from a given GPO.
-            Each parameter uses an Array with members named after the parameter.
+            The Set-GpoPrivilegeRight function configures user rights assignments within a specified GPO.
+            It can grant or deny various privilege rights such as network logon, interactive logon, machine
+            account creation, backup privileges, and more. The function is designed for large-scale Active
+            Directory environments, follows the AD tiering model, and adheres to security best practices.
+            It minimizes performance overhead and ensures robust error handling.
 
         .PARAMETER GpoToModify
             Name of the GPO which will get the Privilege Right modification.
@@ -204,8 +132,70 @@
         .PARAMETER TakeOwnership
             Identity (SamAccountName) to configure the right "Take ownership of files or other objects".
 
-        .OUTPUTS
-            System.Void        .INPUTS
+        .PARAMETER Force
+            Forces the operation without confirmation.
+
+        .EXAMPLE
+            Set-GpoPrivilegeRight -GpoToModify "Default Domain" -BatchLogon "Domain\\User1","Domain\\User2"
+            Assigns "Log on as a batch job" rights to User1 and User2 in the "Default Domain" GPO.
+
+        .EXAMPLE
+            Set-GpoPrivilegeRight -GpoToModify 'Domain Controllers Policy' -NetworkLogon 'DOMAIN\\Domain Admins'
+            Grants the "Access this computer from the network" right to the "Domain Admins" group in the specified GPO.
+
+        .EXAMPLE
+            Set-GpoPrivilegeRight -GpoToModify 'Workstations Policy' -DenyInteractiveLogon 'DOMAIN\\Remote Users'
+            Denies the "Allow Log On Locally" right to the "Remote Users" group in the specified GPO.
+
+        .EXAMPLE
+            $Splat = @{
+                GpoToModify                    = 'My posh GPO'
+                NetworkLogon                   = $NetworkLogon
+                DenyNetworkLogon               = $DenyNetworkLogon
+                InteractiveLogon               = $InteractiveLogon
+                DenyInteractiveLogon           = $DenyInteractiveLogon
+                RemoteInteractiveLogon         = $RemoteInteractiveLogon
+                DenyRemoteInteractiveLogon     = $DenyRemoteInteractiveLogon
+                BatchLogon                     = $BatchLogon
+                DenyBatchLogon                 = $DenyBatchLogon
+                ServiceLogon                   = $ServiceLogon
+                DenyServiceLogon               = $DenyServiceLogon
+                MachineAccount                 = $MachineAccount
+                IncreaseQuota                  = $IncreaseQuota
+                Backup                         = $Backup
+                ChangeNotify                   = $ChangeNotify
+                SystemTime                     = $SystemTime
+                TimeZone                       = $TimeZone
+                CreatePagefile                 = $CreatePagefile
+                CreateGlobal                   = $CreateGlobal
+                CreateSymbolicLink             = $CreateSymbolicLink
+                EnableDelegation               = $EnableDelegation
+                RemoteShutdown                 = $RemoteShutdown
+                Audit                          = $Audit
+                Impersonate                    = $Impersonate
+                IncreaseWorkingSet             = $IncreaseWorkingSet
+                IncreaseBasePriority           = $IncreaseBasePriority
+                LoadDriver                     = $LoadDriver
+                AuditSecurity                  = $AuditSecurity
+                Relabel                        = $Relabel
+                SystemEnvironment              = $SystemEnvironment
+                DelegateSessionUserImpersonate = $DelegateSessionUserImpersonate
+                ManageVolume                   = $ManageVolume
+                ProfileSingleProcess           = $ProfileSingleProcess
+                SystemProfile                  = $SystemProfile
+                Undock                         = $Undock
+                AssignPrimaryToken             = $AssignPrimaryToken
+                Restore                        = $Restore
+                Shutdown                       = $Shutdown
+                SyncAgent                      = $SyncAgent
+                TakeOwnership                  = $TakeOwnership
+            }
+            Set-GpoPrivilegeRight @Splat
+
+            This example shows how to modify all Privilege Rights from a given GPO.
+            Each parameter uses an Array with members named after the parameter.
+
+        .INPUTS
             System.String, System.Collections.Generic.List[Object]
 
         .OUTPUTS
@@ -234,8 +224,8 @@
                 Add-Right                                  ║ EguibarIT.DelegationPS
 
         .NOTES
-            Version:         2.3
-            DateModified:    20/May/2025
+            Version:         2.4
+            DateModified:    05/Jun/2025
             LastModifiedBy:  Vicente Rodriguez Eguibar
                             vicente@eguibar.com
                             Eguibar Information Technology S.L.
@@ -265,7 +255,7 @@
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Name of the GPO which will get the Privilege Right modification.',
             Position = 0)]
         [ValidateNotNullOrEmpty()]
@@ -275,7 +265,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to be GRANTED the right "Access this computer from the network".',
             Position = 1)]
         [System.Collections.Generic.List[object]]
@@ -284,7 +274,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Deny access this computer from the network".',
             Position = 2)]
         [System.Collections.Generic.List[object]]
@@ -293,7 +283,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to be GRANTED the right "Allow Log On Locally"',
             Position = 3)]
         [System.Collections.Generic.List[object]]
@@ -302,7 +292,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to be DENIED the right "Allow Log On Locally"',
             Position = 4)]
         [System.Collections.Generic.List[object]]
@@ -311,7 +301,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to be GRANTED the right "Allow Log On through Remote Desktop Services".',
             Position = 5)]
         [System.Collections.Generic.List[object]]
@@ -320,7 +310,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to be DENIED the right "Allow Log On through Remote Desktop Services".',
             Position = 6)]
         [System.Collections.Generic.List[object]]
@@ -329,7 +319,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to be GRANTED the right "Log On as a Batch Job".',
             Position = 7)]
         [System.Collections.Generic.List[object]]
@@ -338,7 +328,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Deny Log On as a Batch Job".',
             Position = 8)]
         [System.Collections.Generic.List[object]]
@@ -347,7 +337,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to be GRANTED the right "Log On as a Service".',
             Position = 9)]
         [System.Collections.Generic.List[object]]
@@ -356,7 +346,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Deny Log On as a Service".',
             Position = 10)]
         [System.Collections.Generic.List[object]]
@@ -365,7 +355,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Add workstations to Domain (Domain Join)".',
             Position = 11)]
         [System.Collections.Generic.List[object]]
@@ -374,7 +364,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Adjust memory quotas for a process".',
             Position = 12)]
         [System.Collections.Generic.List[object]]
@@ -383,7 +373,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Back up files and directories".',
             Position = 13)]
         [System.Collections.Generic.List[object]]
@@ -392,7 +382,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Bypass traverse checking".',
             Position = 14)]
         [System.Collections.Generic.List[object]]
@@ -401,7 +391,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Change the system time".',
             Position = 15)]
         [System.Collections.Generic.List[object]]
@@ -410,7 +400,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Change the time zone".',
             Position = 16)]
         [System.Collections.Generic.List[object]]
@@ -419,7 +409,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Create a pagefile".',
             Position = 17)]
         [System.Collections.Generic.List[object]]
@@ -428,7 +418,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Create global objects".',
             Position = 18)]
         [System.Collections.Generic.List[object]]
@@ -437,7 +427,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Create symbolic links".',
             Position = 19)]
         [System.Collections.Generic.List[object]]
@@ -446,8 +436,8 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
-            HelpMessage = 'Identity (SamAccountName) to configure the right "Enable computer and user accounts to be trusted for delegation".',
+            ValueFromRemainingArguments = $false,
+            HelpMessage = 'Identity (SamAccountName) for "Enable accounts to be trusted for delegation".',
             Position = 20)]
         [System.Collections.Generic.List[object]]
         $EnableDelegation,
@@ -455,7 +445,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Force shutdown from a remote system".',
             Position = 21)]
         [System.Collections.Generic.List[object]]
@@ -464,7 +454,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Generate security audits".',
             Position = 22)]
         [System.Collections.Generic.List[object]]
@@ -473,7 +463,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Impersonate a client after authentication".',
             Position = 23)]
         [System.Collections.Generic.List[object]]
@@ -482,7 +472,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Increase a process working set".',
             Position = 24)]
         [System.Collections.Generic.List[object]]
@@ -491,7 +481,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Increase scheduling priority".',
             Position = 25)]
         [System.Collections.Generic.List[object]]
@@ -500,7 +490,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Load and unload device drivers".',
             Position = 26)]
         [System.Collections.Generic.List[object]]
@@ -509,7 +499,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Manage auditing and security log".',
             Position = 27)]
         [System.Collections.Generic.List[object]]
@@ -518,7 +508,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Modify an object label".',
             Position = 28)]
         [System.Collections.Generic.List[object]]
@@ -527,7 +517,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Modify firmware environment values".',
             Position = 29)]
         [System.Collections.Generic.List[object]]
@@ -536,8 +526,8 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
-            HelpMessage = 'Identity (SamAccountName) to configure the right "Obtain an impersonation token for another user in the same session".',
+            ValueFromRemainingArguments = $false,
+            HelpMessage = 'Identity (SamAccountName) for "Impersonation token in same session".',
             Position = 30)]
         [System.Collections.Generic.List[object]]
         $DelegateSessionUserImpersonate,
@@ -545,7 +535,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Perform volume maintenance tasks".',
             Position = 31)]
         [System.Collections.Generic.List[object]]
@@ -554,7 +544,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Profile single process".',
             Position = 32)]
         [System.Collections.Generic.List[object]]
@@ -563,7 +553,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Profile system performance".',
             Position = 33)]
         [System.Collections.Generic.List[object]]
@@ -572,7 +562,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Remove computer from docking station".',
             Position = 34)]
         [System.Collections.Generic.List[object]]
@@ -581,7 +571,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Replace a process level token".',
             Position = 35)]
         [System.Collections.Generic.List[object]]
@@ -590,7 +580,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Restore files and directories".',
             Position = 36)]
         [System.Collections.Generic.List[object]]
@@ -599,7 +589,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Shut down the system".',
             Position = 37)]
         [System.Collections.Generic.List[object]]
@@ -608,7 +598,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Synchronize directory service data".',
             Position = 38)]
         [System.Collections.Generic.List[object]]
@@ -617,7 +607,7 @@
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $True,
             ValueFromPipelineByPropertyName = $True,
-            ValueFromRemainingArguments = $true,
+            ValueFromRemainingArguments = $false,
             HelpMessage = 'Identity (SamAccountName) to configure the right "Take ownership of files or other objects".',
             Position = 39)]
         [System.Collections.Generic.List[object]]
@@ -722,25 +712,17 @@
         if ($PSCmdlet.ShouldProcess($PSBoundParameters['GpoToModify'], 'Set GPO Privilege Rights')) {
 
             # Ensure collection is the correct type before calling Add-EmptyPrivilegeRight
-            if ($null -eq $rightsCollection -or -not ($rightsCollection -is [System.Collections.Generic.List[object]])) {
+            if ($null -eq $rightsCollection -or
+                -not ($rightsCollection -is [System.Collections.Generic.List[object]])) {
 
-                Write-Verbose -Message '[DEBUG] Reinitializing rightsCollection as List[object]'
+                Write-Debug -Message '[DEBUG] Reinitializing rightsCollection as List[object]'
                 $rightsCollection = [System.Collections.Generic.List[object]]::new()
 
             } #end If
 
-            ################################################################################
-            # Keep empty due to security concerns
-
-            # Call the refactored external function that avoids parameter binding issues
-            Add-EmptyPrivilegeRightLocal -Collection $rightsCollection
-
-            ################################################################################
-            # Logon restrictions and Rights (following Tier implementation)
-
-            # Add parameter-based rights
-            Add-ParameterBasedRight -Collection $rightsCollection -BoundParameters $PSBoundParameters
-
+            # Get proper list of rights to add
+            # This function should return a collection of rights to be added
+            $rightsCollection = Add-PrivilegeRight -RightsToAdd $PSBoundParameters
 
             ################################################################################
             # Process all the Rights

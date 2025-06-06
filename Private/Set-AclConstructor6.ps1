@@ -564,12 +564,37 @@
             #############################
             try {
 
-                if ($PSCmdlet.ShouldProcess(
-                        $Object.DistinguishedName,
-                        'Apply modified ACL')) {
+                if ($PSCmdlet.ShouldProcess($Object.DistinguishedName, 'Apply modified ACL')) {
 
-                    Set-Acl -AclObject $Acl -Path $ObjectPath
-                    Write-Verbose -Message ('Applied modified ACL to {0}' -f $Object.DistinguishedName)
+                    try {
+
+                        # Attempt to set ACL with standard method first
+                        Set-Acl -AclObject $Acl -Path $ObjectPath -ErrorAction Stop
+                        Write-Verbose -Message ('Applied modified ACL to {0}' -f $Object.DistinguishedName)
+
+                    } catch [System.UnauthorizedAccessException] {
+
+                        # Handle access denied errors by using a different approach
+                        Write-Verbose -Message (
+                            'Access denied using Set-Acl. Attempting alternative method for {0}' -f
+                            $Object.DistinguishedName
+                        )
+
+                        # Get the DirectoryEntry object directly
+                        $DirectoryEntry = [ADSI]"LDAP://$($Object.DistinguishedName)"
+
+                        # Set the security descriptor
+                        $DirectoryEntry.psbase.ObjectSecurity = $Acl
+
+                        # Commit the changes
+                        $DirectoryEntry.psbase.CommitChanges()
+
+                        Write-Verbose -Message (
+                            'Successfully applied ACL to {0} using DirectoryEntry method' -f
+                            $Object.DistinguishedName
+                        )
+
+                    } #end try-catch
 
                 } #end if
 

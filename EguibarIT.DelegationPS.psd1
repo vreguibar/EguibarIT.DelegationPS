@@ -12,7 +12,7 @@
     RootModule           = 'EguibarIT.DelegationPS.psm1'
 
     # Version number of this module.
-    ModuleVersion        = '1.126.60'
+    ModuleVersion        = '1.127.60'
 
     # Supported PSEditions
     CompatiblePSEditions = 'Desktop', 'Core'
@@ -101,7 +101,7 @@
             # LicenseUri = ''
 
             # A URL to the main website for this project.
-            ProjectUri                 = 'https://github.com/vreguibar/EguibarIT'
+            ProjectUri                 = 'https://github.com/vreguibar/EguibarIT.DelegationPS'
 
             # A URL to an icon representing this module.
             IconUri                    = 'https://EguibarIT.com/wp-content/uploads/2017/09/LOGO_FondoBlanco.png'

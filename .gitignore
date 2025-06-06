@@ -1,6 +1,11 @@
 ﻿To-Do.txt
 Template.txt
 *.html
+*.bak*
+*.new
+*.corrupted
+*.tmp
+*.fixed
 Publish.ps1
 Ignore/*
 .vs/*
