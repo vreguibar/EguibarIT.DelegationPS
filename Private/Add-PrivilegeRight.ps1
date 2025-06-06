@@ -4,21 +4,20 @@ function Add-PrivilegeRight {
             Adds privilege rights (empty or parameter-based) to the specified collection.
 
         .DESCRIPTION
-            This function consolidates the logic of adding empty privilege rights and parameter-based rights.
-            It accepts a collection and a hashtable/dictionary of rights to add, where the key is the privilege right name
-            and the value is the member list (which can be empty). It uses internal mappings for descriptions.
+            The Add-PrivilegeRight function consolidates the logic for adding both empty privilege rights and parameter-based rights to a collection. It accepts a collection (or creates a new one if not provided) and a hashtable/dictionary of rights to add, where each key is the privilege right name and the value is a member list (which can be empty). The function uses internal mappings for privilege right descriptions and ensures consistent object structure for downstream processing.
 
         .PARAMETER Collection
-            The collection to add privilege rights to. If not provided or null, a new
-            System.Collections.Generic.List[object] collection will be created.
+            The collection to add privilege rights to. If not provided or null, a new System.Collections.Generic.List[object] collection will be created and returned.
 
         .PARAMETER RightsToAdd
-            A hashtable or dictionary where keys are privilege right names and values are member lists (can be empty).
+            A hashtable or dictionary where keys are privilege right names and values are member lists (can be empty). Each right will be added to the collection with its associated members.
 
         .EXAMPLE
             $rightsCollection = [System.Collections.Generic.List[object]]::new()
             $rightsToAdd = @{ 'SeDenyInteractiveLogonRight' = @('Everyone') }
-            Add-PrivilegeRights -Collection $rightsCollection -RightsToAdd $rightsToAdd
+            Add-PrivilegeRight -Collection $rightsCollection -RightsToAdd $rightsToAdd
+
+            Adds the 'SeDenyInteractiveLogonRight' privilege with 'Everyone' as a member to the specified collection.
 
         .EXAMPLE
             $rightsCollection = [System.Collections.Generic.List[object]]::new()
@@ -26,31 +25,48 @@ function Add-PrivilegeRight {
                 'SeTrustedCredManAccessPrivilege' = @()
                 'SeTcbPrivilege' = @()
             }
-            Add-PrivilegeRights -Collection $rightsCollection -RightsToAdd $emptyRights
+            Add-PrivilegeRight -Collection $rightsCollection -RightsToAdd $emptyRights
+
+            Adds two empty privilege rights to the collection.
 
         .INPUTS
             System.Collections.Generic.List[object]
             System.Collections.IDictionary
+            You can pipe a hashtable of rights to the RightsToAdd parameter.
 
         .OUTPUTS
-            System.Void
+            System.Collections.Generic.List[object]
+            Returns the updated collection with the added privilege rights.
 
         .NOTES
-            Version:         3.0
-            DateModified:    04/Jun/2025
-            LastModifiedBy:  Consolidation by GitHub Copilot
+            Used Functions:
+                Name                             ║ Module/Namespace
+                ═════════════════════════════════╬══════════════════════════════
+                Add-PrivilegeRight               ║ EguibarIT.DelegationPS (Private)
+                Write-Verbose                    ║ Microsoft.PowerShell.Utility
+                Write-Warning                    ║ Microsoft.PowerShell.Utility
+                Write-Debug                      ║ Microsoft.PowerShell.Utility
+                Get-FunctionDisplay              ║ EguibarIT.DelegationPS (Private)
+
+        .NOTES
+            Version:         3.1
+            DateModified:    06/Jun/2025
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibarit.com
+                            Eguibar IT
+                            http://www.eguibarit.com
 
         .LINK
-            https://github.com/vreguibar/EguibarIT.DelegationPS
+            https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Add-PrivilegeRight.ps1
 
         .COMPONENT
             Group Policy
 
         .ROLE
-            Security
+            Security Configuration
 
         .FUNCTIONALITY
-            Group Policy Management, Privilege Rights
+            Group Policy Management, Privilege Rights Consolidation
     #>
 
     [CmdletBinding(

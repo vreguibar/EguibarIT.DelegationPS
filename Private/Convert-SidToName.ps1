@@ -59,6 +59,12 @@ Function Convert-SidToName {
                 ═════════════════════════════════════════════╬══════════════════════════════
                 Write-Verbose                                ║ Microsoft.PowerShell.Utility
                 Write-Warning                                ║ Microsoft.PowerShell.Utility
+                Write-Debug                                  ║ Microsoft.PowerShell.Utility
+                Write-Error                                  ║ Microsoft.PowerShell.Utility
+                Get-Date                                     ║ Microsoft.PowerShell.Utility
+                Set-StrictMode                               ║ Microsoft.PowerShell.Utility
+                Test-Path                                    ║ Microsoft.PowerShell.Management
+                Get-FunctionDisplay                          ║ EguibarIT.DelegationPS
                 Test-IsValidSID                              ║ EguibarIT.DelegationPS
                 Get-AdWellKnownSID                           ║ EguibarIT.DelegationPS
 
@@ -69,6 +75,19 @@ Function Convert-SidToName {
                             vicente@eguibar.com
                             Eguibar IT
                             http://www.eguibarit.com
+
+        .LINK
+        https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Convert-SidToName.ps1
+
+        .COMPONENT
+            Active Directory
+
+        .ROLE
+            Security
+
+        .FUNCTIONALITY
+            SID to Name Conversion, Directory Lookup
+
     #>
 
     [CmdletBinding()]
@@ -167,7 +186,7 @@ Function Convert-SidToName {
 
         } catch {
 
-            Write-Warning -Message ('Error extracting SID value: {0}' -f $_.Exception.Message)
+            Write-Error -Message ('Error extracting SID value: {0}' -f $_.Exception.Message)
             return $null
 
         } #end try-catch
@@ -175,7 +194,7 @@ Function Convert-SidToName {
         # If no SID extracted, return null
         if ([string]::IsNullOrEmpty($sidValue)) {
 
-            Write-Warning -Message 'Extracted SID value is null or empty.'
+            Write-Error -Message 'Extracted SID value is null or empty.'
             return $null
 
         } #end if
@@ -183,7 +202,7 @@ Function Convert-SidToName {
         # Validate SID format
         if (-not ($sidValue -match $sidRegex)) {
 
-            Write-Warning -Message ('Invalid SID format: {0}' -f $sidValue)
+            Write-Error -Message ('Invalid SID format: {0}' -f $sidValue)
             return $null
 
         } #end if
@@ -232,12 +251,12 @@ Function Convert-SidToName {
 
         } catch [System.Security.Principal.IdentityNotMappedException] {
 
-            Write-Warning -Message ('SID {0} cannot be resolved to a name (not found)' -f $sidValue)
+            Write-Error -Message ('SID {0} cannot be resolved to a name (not found)' -f $sidValue)
             return $null
 
         } catch {
 
-            Write-Warning -Message ('Error translating SID {0}: {1}' -f $sidValue, $_.Exception.Message)
+            Write-Error -Message ('Error translating SID {0}: {1}' -f $sidValue, $_.Exception.Message)
             return $null
 
         } #end try-catch

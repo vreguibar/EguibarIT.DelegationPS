@@ -1,4 +1,5 @@
 ﻿function Set-AclConstructor4 {
+
     <#
         .SYNOPSIS
             Modifies ACLs on Active Directory objects using a 4-parameter constructor.
@@ -27,42 +28,42 @@
 
         .PARAMETER LDAPPath
             Specifies the LDAP path (Distinguished Name) of the target Active Directory object
-            on which the permissions will be set. This must be a valid LDAP path in the domain.
+            on which the permissions will be set. This must be a valid LDAP Distinguished Name.
 
         .PARAMETER AdRight
             Specifies the Active Directory rights to assign. This parameter accepts multiple values
             separated by commas. Valid values include:
-            - CreateChild
-            - DeleteChild
-            - ListChildren
-            - Self
-            - ReadProperty
-            - WriteProperty
-            - DeleteTree
-            - ListObject
-            - ExtendedRight
-            - Delete
-            - ReadControl
-            - GenericExecute
-            - GenericWrite
-            - GenericRead
-            - WriteDacl
-            - WriteOwner
-            - GenericAll
-            - Synchronize
-            - AccessSystemSecurity
+            - CreateChild: Permission to create child objects
+            - DeleteChild: Permission to delete child objects
+            - ListChildren: Permission to list child objects
+            - Self: Permission to perform validated writes to self
+            - ReadProperty: Permission to read properties
+            - WriteProperty: Permission to write properties
+            - DeleteTree: Permission to delete all child objects
+            - ListObject: Permission to list a particular object
+            - ExtendedRight: Permission to perform extended operations
+            - Delete: Permission to delete the object
+            - ReadControl: Permission to read security information
+            - GenericExecute: Generic execute access
+            - GenericWrite: Generic write access
+            - GenericRead: Generic read access
+            - WriteDacl: Permission to modify permissions
+            - WriteOwner: Permission to assume ownership
+            - GenericAll: Generic all access
+            - Synchronize: Permission to synchronize
+            - AccessSystemSecurity: Permission to access system security
 
         .PARAMETER AccessControlType
             Specifies whether to Allow or Deny the permission. Valid values are:
-            - Allow
-            - Deny
+            - Allow: Grant the specified permissions
+            - Deny: Explicitly deny the specified permissions
 
         .PARAMETER ObjectType
             Specifies the object type GUID that defines the type of object the permission applies to.
             This can be:
-            - Property set GUID
-            - Extended right GUID
-            - Object class GUID
+            - Property set GUID: Defines a set of properties
+            - Extended right GUID: Defines extended rights operations
+            - Object class GUID: Defines specific object classes
 
             Object type GUIDs determine the specific attributes or operations the permission applies to.
 
@@ -71,84 +72,86 @@
             By default, the function adds the specified permission.
 
         .EXAMPLE
-            Set-AclConstructor4 -Id "SG_SiteAdmins_XXXX" -LDAPPath "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local" -AdRight "CreateChild,DeleteChild" -AccessControlType "Allow" -ObjectType "bf967aba-0de6-11d0-a285-00aa003049e2"
+            Set-AclConstructor4 -Id 'SG_SiteAdmins_XXXX' -LDAPPath 'OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local' -AdRight 'CreateChild,DeleteChild' -AccessControlType 'Allow' -ObjectType 'bf967aba-0de6-11d0-a285-00aa003049e2'
 
             Adds permission for the SG_SiteAdmins_XXXX group to create and delete user objects
             (specified by the user class GUID) in the Users OU.
 
         .EXAMPLE
-            $splat = @{
-                Id                = "SG_SiteAdmins_XXXX"
-                LDAPPath          = "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
-                AdRight           = "ReadProperty,WriteProperty"
-                AccessControlType = "Allow"
-                ObjectType        = "bf967a9c-0de6-11d0-a285-00aa003049e2"
+            $Splat = @{
+                Id                = 'SG_SiteAdmins_XXXX'
+                LDAPPath          = 'OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local'
+                AdRight           = 'ReadProperty,WriteProperty'
+                AccessControlType = 'Allow'
+                ObjectType        = 'bf967a9c-0de6-11d0-a285-00aa003049e2'
             }
-            Set-AclConstructor4 @splat
+            Set-AclConstructor4 @Splat
 
             Adds permission for the SG_SiteAdmins_XXXX group to read and write the telephone number
             attribute (specified by the attribute GUID) for objects in the Users OU.
 
         .EXAMPLE
-            $group = Get-AdGroup "SG_SiteAdmins_XXXX"
+            $Group = Get-AdGroup 'SG_SiteAdmins_XXXX'
 
-            $splat = @{
-                Id                = $group
-                LDAPPath          = "OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local"
-                AdRight           = "ExtendedRight"
-                AccessControlType = "Allow"
-                ObjectType        = "00299570-246d-11d0-a768-00aa006e0529"
+            $Splat = @{
+                Id                = $Group
+                LDAPPath          = 'OU=Users,OU=XXXX,OU=Sites,DC=EguibarIT,DC=local'
+                AdRight           = 'ExtendedRight'
+                AccessControlType = 'Allow'
+                ObjectType        = '00299570-246d-11d0-a768-00aa006e0529'
                 RemoveRule        = $true
             }
-            Set-AclConstructor4 @splat
+            Set-AclConstructor4 @Splat
 
             Removes the extended right permission (Reset Password) for the SG_SiteAdmins_XXXX group
-            on the Users OU.
+            on the Users OU using an AD object for the identity.
 
         .INPUTS
             None. You cannot pipe objects to this function.
 
         .OUTPUTS
-            System.Void
+            [System.Void]
 
             This function does not return any objects. It modifies ACLs directly
             on Active Directory objects.
 
         .NOTES
             Used Functions:
-                Name                                       ║ Module/Namespace
-                ═══════════════════════════════════════════╬══════════════════════════════
-                Get-ADObject                               ║ ActiveDirectory
-                Get-Acl                                    ║ Microsoft.PowerShell.Security
-                Set-Acl                                    ║ Microsoft.PowerShell.Security
-                Test-IsValidDN                             ║ EguibarIT.DelegationPS
-                Get-AdObjectType                           ║ EguibarIT.DelegationPS
-                Write-Verbose                              ║ Microsoft.PowerShell.Utility
-                Write-Error                                ║ Microsoft.PowerShell.Utility
-                Write-Debug                                ║ Microsoft.PowerShell.Utility
-                Get-FunctionDisplay                        ║ EguibarIT.DelegationPS
+                Name                             ║ Module/Namespace
+                ═════════════════════════════════╬══════════════════════════════
+                Get-ADObject                     ║ ActiveDirectory
+                Get-Acl                          ║ Microsoft.PowerShell.Security
+                Set-Acl                          ║ Microsoft.PowerShell.Security
+                Write-Verbose                    ║ Microsoft.PowerShell.Utility
+                Write-Error                      ║ Microsoft.PowerShell.Utility
+                Write-Debug                      ║ Microsoft.PowerShell.Utility
+                Write-Warning                    ║ Microsoft.PowerShell.Utility
+                Get-Date                         ║ Microsoft.PowerShell.Utility
+                Set-StrictMode                   ║ Microsoft.PowerShell.Utility
+                Get-FunctionDisplay              ║ EguibarIT.DelegationPS
+                Test-IsValidDN                   ║ EguibarIT.DelegationPS
+                Get-AdObjectType                 ║ EguibarIT.DelegationPS
 
-        .NOTES            Version:         4.1
-            DateModified:    28/May/2025
+        .NOTES
+            Version:         4.2
+            DateModified:    15/Jan/2025
             LastModifiedBy:  Vicente Rodriguez Eguibar
-                            vicente@eguibar.com
+                            vicente@eguibarit.com
                             Eguibar IT
                             http://www.eguibarit.com
 
         .LINK
-            https://github.com/vreguibar/EguibarIT.DelegationPS
+            https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Set-AclConstructor4.ps1
 
         .LINK
             https://learn.microsoft.com/en-us/dotnet/api/system.directoryservices.activedirectoryaccessrule.-ctor?view=windowsdesktop-9.0#system-directoryservices-activedirectoryaccessrule-ctor(system-security-principal-identityreference-system-directoryservices-activedirectoryrights-system-security-accesscontrol-accesscontroltype-system-guid)
 
         .COMPONENT
             Active Directory
+            EguibarIT.DelegationPS
 
         .ROLE
-            Security Administration
-
-        .FUNCTIONALITY
-            Access Control Management
+            Administrator
 
         .FUNCTIONALITY
             Active Directory ACL Management
@@ -175,11 +178,11 @@
         [Alias('IdentityReference', 'Identity', 'Trustee', 'GroupID', 'Group')]
         $Id,
 
-        # PARAM2 STRING for the object's LDAP path
-        # The LDAP path to the object where the ACL will be changed
-        [Parameter(Mandatory = $true,
-            ValueFromPipeline = $True,
-            ValueFromPipelineByPropertyName = $True,
+        # PARAM2: STRING for the object's LDAP path
+        [Parameter(
+            Mandatory = $true,
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             ValueFromRemainingArguments = $false,
             HelpMessage = 'Distinguished (DN) Name of the object. The LDAP path to the object where the ACL will be changed.',
             Position = 1)]
@@ -192,8 +195,9 @@
         [String]
         $LDAPpath,
 
-        # PARAM3 STRING representing AdRight
-        [Parameter(Mandatory = $true,
+        # PARAM3: STRING representing AdRight
+        [Parameter(
+            Mandatory = $true,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Active Directory Right',
@@ -204,8 +208,9 @@
         [String[]]
         $AdRight,
 
-        # PARAM4 STRING representing Access Control Type
-        [Parameter(Mandatory = $true,
+        # PARAM4: STRING representing Access Control Type
+        [Parameter(
+            Mandatory = $true,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Allow or Deny access to the given object',
@@ -215,8 +220,9 @@
         [String]
         $AccessControlType,
 
-        # PARAM5 STRING representing Object GUID
-        [Parameter(Mandatory = $true,
+        # PARAM5: STRING representing Object GUID
+        [Parameter(
+            Mandatory = $true,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Schema GUID of the affected object, either object or Extended Right.',
@@ -224,8 +230,9 @@
         [AllowNull()]
         $ObjectType,
 
-        # PARAM6 SWITCH if $false (default) will add the rule. If $true, it will remove the rule
-        [Parameter(Mandatory = $False,
+        # PARAM6: SWITCH if $false (default) will add the rule. If $true, it will remove the rule
+        [Parameter(
+            Mandatory = $false,
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'If present, the access rule will be removed.',
@@ -261,9 +268,7 @@
         [String]$ObjectPath = $null
         [Bool]$IsWellKnownSid = $false
         [HashTable]$AdObjectCache = @{}
-        [int]$RulesRemovedCount = 0        # Define regex pattern for privilege keys and SID validation
-        [string]$privilegeKeyRegex = '^Se[A-Za-z]+Privilege$|^Se[A-Za-z]+Right$'
-        [string]$sidRegex = '^S-\d+-\d+(-\d+)*$'
+        [int]$RulesRemovedCount = 0
 
         # Convert ObjectType to GUID if it's a string
         if ($null -ne $PSBoundParameters['ObjectType']) {

@@ -1,7 +1,7 @@
 ﻿function Convert-GUIDToName {
     <#
         .SYNOPSIS
-            Translates a GUID to a human-readable Display Name within Active Directory.
+            Converts a GUID to its corresponding Active Directory object name.
 
         .DESCRIPTION
             This function converts a GUID (Globally Unique Identifier) into its corresponding
@@ -71,14 +71,12 @@
             Convert-GUIDToName -Guid "4c164200-20c0-11d0-a768-00aa006e0529" # Account Restrictions [Property Set]
 
         .INPUTS
-            System.String
-            System.Guid
-            You can pipe a string or Guid object representing a GUID to this function.
+            [String], [Guid]
+            You can pipe a GUID value to this function.
 
         .OUTPUTS
-            System.String
-            Returns a string with the format "Name [Type]" where Type is classSchema, attributeSchema,
-            or ExtendedRight.
+            [String]
+            Returns the name of the AD object corresponding to the GUID.
 
         .NOTES
             Used Functions:
@@ -87,19 +85,23 @@
                 Get-ADObject                               ║ ActiveDirectory
                 Write-Verbose                              ║ Microsoft.PowerShell.Utility
                 Write-Error                                ║ Microsoft.PowerShell.Utility
+                Write-Debug                                ║ Microsoft.PowerShell.Utility
+                Write-Warning                              ║ Microsoft.PowerShell.Utility
+                Set-StrictMode                             ║ Microsoft.PowerShell.Utility
+                Get-Date                                   ║ Microsoft.PowerShell.Utility
                 Test-IsValidGUID                           ║ EguibarIT.DelegationPS
                 Get-FunctionDisplay                        ║ EguibarIT.DelegationPS
 
         .NOTES
             Version:         2.0
-            DateModified:    22/May/2025
+            DateModified:    06/Jun/2025
             LastModifiedBy:  Vicente Rodriguez Eguibar
                             vicente@eguibar.com
                             Eguibar IT
                             http://www.eguibarit.com
 
         .LINK
-            https://github.com/vreguibar/EguibarIT.DelegationPS
+            https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Convert-GUIDToName.ps1
 
         .LINK
             https://learn.microsoft.com/en-us/windows/win32/adschema/attributes-all
@@ -111,21 +113,10 @@
             Security
 
         .FUNCTIONALITY
-            AD Schema, GUID Translation
+            AD Schema, GUID Translation,GUID to Name Conversion, Directory Lookup
             https://learn.microsoft.com/en-us/windows/win32/adschema/classes
             https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-adts/1522b774-6464-41a3-87a5-1e5633c3fbbb
 
-        .LINK
-            https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Convert-GUIDToName.ps1
-
-        .COMPONENT
-            Active Directory
-
-        .ROLE
-            Identity Management
-
-        .FUNCTIONALITY
-            Schema Translation, GUID Resolution, Active Directory Object Identification
     #>
 
     [CmdletBinding(
@@ -263,7 +254,8 @@
 
     End {
         # Display function footer if variables exist
-        if ($null -ne $Variables -and $null -ne $Variables.FooterDelegation) {
+        if ($null -ne $Variables -and
+            $null -ne $Variables.FooterDelegation) {
 
             $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
                 'converting GUID to name (Private Function).'

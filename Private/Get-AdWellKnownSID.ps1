@@ -63,8 +63,13 @@
                 Write-Verbose                              ║ Microsoft.PowerShell.Utility
                 Write-Warning                              ║ Microsoft.PowerShell.Utility
                 Write-Error                                ║ Microsoft.PowerShell.Utility
+                Write-Debug                                ║ Microsoft.PowerShell.Utility
                 Get-FunctionDisplay                        ║ EguibarIT.DelegationPS
                 Test-IsValidSID                            ║ EguibarIT.DelegationPS
+                Set-StrictMode                             ║ Microsoft.PowerShell.Utility
+                Get-Date                                   ║ Microsoft.PowerShell.Utility
+                Join-path                                  ║ Microsoft.PowerShell.Management
+                Test-Path                                  ║ Microsoft.PowerShell.Management
 
         .NOTES
             Version:         2.3
@@ -75,7 +80,7 @@
                             http://www.eguibarit.com
 
         .LINK
-            https://github.com/vreguibar/EguibarIT.DelegationPS
+             https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Get-AdWellKnownSID.ps1
 
         .LINK
             https://learn.microsoft.com/en-us/windows/win32/secauthz/well-known-sids
@@ -84,10 +89,11 @@
             Active Directory
 
         .ROLE
-            Security
+            Security, Validation
 
         .FUNCTIONALITY
-            Identity Management, SID Resolution
+            Identity Management, SID Resolution, Well-Known SID Lookup, Directory Validation
+
     #>
 
     [CmdletBinding(

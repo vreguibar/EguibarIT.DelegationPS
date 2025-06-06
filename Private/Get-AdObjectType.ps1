@@ -95,14 +95,16 @@ function Get-AdObjectType {
                 Write-Warning                              ║ Microsoft.PowerShell.Utility
                 Write-Error                                ║ Microsoft.PowerShell.Utility
                 Write-Output                               ║ Microsoft.PowerShell.Utility
+                Set-StrictMode                             ║ Microsoft.PowerShell.Utility
+                Get-Date                                   ║ Microsoft.PowerShell.Utility
                 Get-ADObject                               ║ ActiveDirectory
                 Get-ADUser                                 ║ ActiveDirectory
                 Get-ADGroup                                ║ ActiveDirectory
                 Get-ADComputer                             ║ ActiveDirectory
                 Get-ADOrganizationalUnit                   ║ ActiveDirectory
                 Get-ADServiceAccount                       ║ ActiveDirectory
-                Import-MyModule                            ║ EguibarIT
-                Get-FunctionDisplay                        ║ EguibarIT
+                Import-MyModule                            ║ EguibarIT.DelegationPS
+                Get-FunctionDisplay                        ║ EguibarIT.DelegationPS
 
         .NOTES
             Version:         1.1

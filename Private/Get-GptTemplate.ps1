@@ -4,99 +4,69 @@
             Retrieves or creates the GPT template (GptTmpl.inf) for a specified Group Policy Object.
 
         .DESCRIPTION
-            This function retrieves or creates the GPT template file (GptTmpl.inf) for a specified
-            Group Policy Object (GPO).
-
-            It performs the following operations:
-            - Retrieves the specified GPO using the Group Policy module
-            - Locates or creates the necessary directory structure in SYSVOL
-            - Creates the GptTmpl.inf file if it doesn't exist
-            - Returns an IniFileHandler.IniFile object representing the template
-
-            This function is essential for Group Policy security settings management as it provides
-            access to the underlying infrastructure file that stores security configurations.
-
-            The function handles errors gracefully with detailed error messages for better troubleshooting
-            and supports pipeline input for efficient batch processing.
+            The Get-GptTemplate function retrieves or creates the GPT template file (GptTmpl.inf) for a specified Group Policy Object (GPO). It locates or creates the necessary directory structure in SYSVOL, creates the GptTmpl.inf file if it doesn't exist, and returns an IniFileHandler.IniFile object representing the template. This function is essential for Group Policy security settings management as it provides access to the underlying infrastructure file that stores security configurations. Handles errors gracefully and supports pipeline input for batch processing.
 
         .PARAMETER GpoName
-            The name of the Group Policy Object (GPO) for which the GPT template is to be retrieved.
-            This parameter accepts both direct input and pipeline input, including objects from Get-GPO.
+            The name of the Group Policy Object (GPO) for which the GPT template is to be retrieved. Accepts direct input and pipeline input, including objects from Get-GPO.
 
         .PARAMETER DomainName
-            The Fully Qualified Domain Name (FQDN) of the domain containing the GPO.
-            If not specified, the current user's domain (from environment variable USERDNSDOMAIN) is used.
+            The Fully Qualified Domain Name (FQDN) of the domain containing the GPO. If not specified, the current user's domain (from environment variable USERDNSDOMAIN) is used.
 
         .PARAMETER Server
-            The Domain Controller to connect to for Group Policy operations.
-            If not specified, the nearest Domain Controller is automatically selected.
+            The Domain Controller to connect to for Group Policy operations. If not specified, the nearest Domain Controller is automatically selected.
 
         .EXAMPLE
             Get-GptTemplate -GpoName "Default Domain Policy"
-
-            Retrieves the GPT template for the "Default Domain Policy" GPO in the current domain.
-            Creates the template file if it doesn't exist.
+            Retrieves the GPT template for the "Default Domain Policy" GPO in the current domain. Creates the template file if it doesn't exist.
 
         .EXAMPLE
             Get-GptTemplate -GpoName "Default Domain Policy" -DomainName "EguibarIT.local" -Server "DC01.EguibarIT.local"
-
-            Retrieves the GPT template for the "Default Domain Policy" GPO in the EguibarIT.local domain,
-            connecting to the specified domain controller DC01.EguibarIT.local.
-
-        .EXAMPLE
-            Get-GPO -Name "Default Domain Policy" | Get-GptTemplate
-
-            Retrieves the GPT template for the GPO object passed through the pipeline.
-
-        .EXAMPLE
-            "Default Domain Policy" | Get-GptTemplate
-
-            Retrieves the GPT template for the GPO name passed through the pipeline.
+            Retrieves the GPT template for the "Default Domain Policy" GPO in the EguibarIT.local domain, connecting to the specified domain controller DC01.EguibarIT.local.
 
         .INPUTS
-            System.String
-            Microsoft.GroupPolicy.Gpo
-
-            You can pipe a GPO name as a string or a GPO object from Get-GPO to this function.
+            [String], [Microsoft.GroupPolicy.GPO]
+            You can pipe a GPO name or GPO object to this function.
 
         .OUTPUTS
-            IniFileHandler.IniFile
-
-            Returns an IniFileHandler.IniFile object representing the GPT template if successful.
-            Returns $null if the operation fails.
+            [IniFileHandler.IniFile]
+            Returns an IniFileHandler.IniFile object representing the GPT template.
 
         .NOTES
             Used Functions:
-                Name                                       ║ Module/Namespace
-                ═══════════════════════════════════════════╬══════════════════════════════
-                Get-GPO                                    ║ GroupPolicy
-                New-Item                                   ║ Microsoft.PowerShell.Management
-                Test-Path                                  ║ Microsoft.PowerShell.Management
-                Write-Error                                ║ Microsoft.PowerShell.Utility
-                Write-Verbose                              ║ Microsoft.PowerShell.Utility
-                Write-Debug                                ║ Microsoft.PowerShell.Utility
-                Get-FunctionDisplay                        ║ EguibarIT.DelegationPS
-                Import-MyModule                            ║ EguibarIT.DelegationPS
+                Name                             ║ Module/Namespace
+                ═════════════════════════════════╬══════════════════════════════
+                Set-StrictMode                   ║ Microsoft.PowerShell.Core
+                Get-Date                         ║ Microsoft.PowerShell.Utility
+                Get-FunctionDisplay              ║ EguibarIT.DelegationPS
+                Import-MyModule                  ║ EguibarIT.DelegationPS
+                Get-ADDomain                     ║ ActiveDirectory
+                Get-GPO                          ║ GroupPolicy
+                Write-Verbose                    ║ Microsoft.PowerShell.Utility
+                Write-Debug                      ║ Microsoft.PowerShell.Utility
+                Write-Error                      ║ Microsoft.PowerShell.Utility
+                Test-Path                        ║ Microsoft.PowerShell.Management
+                New-Item                         ║ Microsoft.PowerShell.Management
+                [IniFileHandler.IniFile]         ║ EguibarIT.DelegationPS.Classes
 
         .NOTES
-            Version:         2.0
-            DateModified:    22/May/2025
+            Version:         2.1
+            DateModified:    06/Jun/2025
             LastModifiedBy:  Vicente Rodriguez Eguibar
-                            vicente@eguibar.com
+                            vicente@eguibarit.com
                             Eguibar IT
                             http://www.eguibarit.com
 
         .LINK
-            https://github.com/vreguibar/EguibarIT.DelegationPS
+            https://github.com/vreguibar/EguibarIT.DelegationPS/blob/main/Private/Get-GptTemplate.ps1
 
         .COMPONENT
             Group Policy
 
         .ROLE
-            Security Administration
+            Security Configuration
 
         .FUNCTIONALITY
-            Group Policy Management
+            Group Policy Template Management, Security Settings
     #>
 
     [CmdletBinding(SupportsShouldProcess = $true,
@@ -316,11 +286,17 @@
 
             } elseif ($_.Exception.ToString() -like '*UnauthorizedAccessException*') {
 
-                Write-Error -Message ('Access denied while attempting to access {0}. Error: {1}' -f $GpoPathFile, $_.Exception.Message)
+                Write-Error -Message (
+                    'Access denied while attempting to access {0}. Error: {1}' -f
+                    $GpoPathFile, $_.Exception.Message
+                )
 
             } else {
 
-                Write-Error -Message ('An unexpected error occurred while handling the GPT template path. Error: {0}' -f $_.Exception.Message)
+                Write-Error -Message (
+                    'An unexpected error occurred while handling the GPT template path. Error: {0}' -f
+                    $_.Exception.Message
+                )
 
             } #end If-ElseIf-Else
 
