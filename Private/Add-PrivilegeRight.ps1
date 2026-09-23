@@ -93,6 +93,7 @@ function Add-PrivilegeRight {
         #     Keys as privilege right names (e.g. SeNetworkLogonRight, SeDenyNetworkLogonRight)
         #     Values as description of the right (e.g. 'Access this computer from the network', 'Deny access to this computer from the network')
         # This mapping is used to provide descriptions for the rights being added
+
         $rightMappings = @{
             # Empty by default rights
             'SeTrustedCredManAccessPrivilege'           = 'Access Credential Manager as a trusted caller'
