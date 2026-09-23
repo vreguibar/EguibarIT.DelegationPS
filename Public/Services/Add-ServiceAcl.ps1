@@ -1,4 +1,4 @@
-﻿Function Add-ServiceAcl {
+﻿function Add-ServiceAcl {
     <#
         .Synopsis
             Adds a group to the specified Service ACL.
@@ -44,7 +44,7 @@
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     [OutputType([void])]
 
-    Param (
+    param (
 
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $true,
@@ -84,7 +84,7 @@
 
     )
 
-    Begin {
+    begin {
 
         Set-StrictMode -Version Latest
 
@@ -93,9 +93,9 @@
         # Display function header if variables exist
         if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
             $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToString('dd/MMM/yyyy'),
+                (Get-Date).ToString('dd/MMM/yyyy'),
                 $MyInvocation.Mycommand,
-            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
+                (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
             )
             Write-Verbose -Message $txt
         } #end if
@@ -105,8 +105,6 @@
 
         ##############################
         # Variables Definition
-
-        [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
         # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
         $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
@@ -152,7 +150,7 @@
 
     } #end Begin
 
-    Process {
+    process {
 
         # get current Service acl in SDDL format
         Write-Verbose -Message 'Get current Service acl in SDDL format'
@@ -160,7 +158,7 @@
         $MySDDL = if ($Computer) {
             (& $ServiceControlCmd.Definition @("\\$Computer", 'sdshow', $PSBoundParameters['Service']))[1]
         } else {
-           ( & $ServiceControlCmd.Definition @('sdshow', $PSBoundParameters['Service']))[1]
+            ( & $ServiceControlCmd.Definition @('sdshow', $PSBoundParameters['Service']))[1]
         } #end If-Else
 
         Write-Verbose -Message ('Retrieved SDDL: {0}' -f $MySDDL)
@@ -182,7 +180,7 @@
 
         # Add new DACL
         Write-Verbose -Message 'Add new DACL'
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Add group Service ACL?')) {
+        if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Add group Service ACL?')) {
 
             try {
                 $Permission.DiscretionaryAcl.AddAccess(
@@ -205,7 +203,7 @@
                 Write-Verbose -Message 'Get SDDL from Common Security Descriptor.'
                 $sddl = $Permission.GetSddlForm([System.Security.AccessControl.AccessControlSections]::All)
 
-                If ($Computer) {
+                if ($Computer) {
                     & $ServiceControlCmd.Definition @("\\$Computer", 'sdset', $PSBoundParameters['Service'], "$sddl")
                 } else {
                     & $ServiceControlCmd.Definition @('sdset', $PSBoundParameters['Service'], "$sddl")
@@ -218,7 +216,7 @@
 
     } #end Process
 
-    End {
+    end {
         $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
             'adding Service access.'
         )

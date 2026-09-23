@@ -1,4 +1,4 @@
-Function Convert-SidToName {
+﻿function Convert-SidToName {
 
     <#
         .SYNOPSIS
@@ -104,7 +104,7 @@ Function Convert-SidToName {
         $SID
     )
 
-    Begin {
+    begin {
         Set-StrictMode -Version Latest
 
         # Display function header if variables exist
@@ -130,7 +130,7 @@ Function Convert-SidToName {
         $privilegeKeyRegex = '^Se[A-Za-z]+Privilege$|^Se[A-Za-z]+Right$'
     } #end Begin
 
-    Process {
+    process {
         $sidValue = $null
         $result = $null
 
@@ -265,7 +265,7 @@ Function Convert-SidToName {
         return $null
     } #end Process
 
-    End {
+    end {
         if ($null -ne $Variables -and
             $null -ne $Variables.FooterDelegation) {
 

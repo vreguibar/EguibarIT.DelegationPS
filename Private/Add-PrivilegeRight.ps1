@@ -1,4 +1,4 @@
-function Add-PrivilegeRight {
+﻿function Add-PrivilegeRight {
     <#
         .SYNOPSIS
             Adds privilege rights (empty or parameter-based) to the specified collection.
@@ -87,7 +87,7 @@ function Add-PrivilegeRight {
         $RightsToAdd
     )
 
-    Begin {
+    begin {
 
         # mapping hashtable containing:
         #     Keys as privilege right names (e.g. SeNetworkLogonRight, SeDenyNetworkLogonRight)
@@ -208,7 +208,7 @@ function Add-PrivilegeRight {
 
     } #end Begin
 
-    Process {
+    process {
 
         #region Process Empty Member Rights
 
@@ -312,7 +312,7 @@ function Add-PrivilegeRight {
         } #end foreach
     } #end Process
 
-    End {
+    end {
 
         Write-Verbose -Message ('Finalizing collection with {0} items' -f $Collection.Count)
 

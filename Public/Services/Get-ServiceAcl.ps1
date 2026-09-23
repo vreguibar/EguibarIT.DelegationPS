@@ -127,7 +127,7 @@
         $Computer
     )
 
-    Begin {
+    begin {
 
         Set-StrictMode -Version Latest
 
@@ -136,9 +136,9 @@
         # Display function header if variables exist
         if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
             $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToString('dd/MMM/yyyy'),
+                (Get-Date).ToString('dd/MMM/yyyy'),
                 $MyInvocation.Mycommand,
-            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
+                (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
             )
             Write-Verbose -Message $txt
         } #end if
@@ -151,7 +151,7 @@
 
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
 
-        If (-Not $Computer) {
+        if (-not $Computer) {
             Write-Verbose -Message 'No computer name provided. Trying the local computer instead.'
             $Computer = $env:COMPUTERNAME
         }
@@ -173,7 +173,7 @@
 
     } #end Begin
 
-    Process {
+    process {
 
         Write-Verbose -Message 'Getting the services'
         # Get-Service does the work looking up the service the user requested:
@@ -185,14 +185,14 @@
         }
         $CurrentService = Invoke-Command @splat
 
-        ForEach ($_ in $CurrentService) {
+        foreach ($item in $CurrentService) {
 
             # We might need this info in catch block, so store it to a variable
-            $CurrentName = $_.Name
+            $CurrentName = $item.Name
 
             Write-Verbose -Message 'Getting SDDL'
             # Get SDDL using sc.exe
-            $Sddl = & $ServiceControlCmd.Definition "\\$Computer" sdshow "$CurrentName" | Where-Object { $_ }
+            $Sddl = & $ServiceControlCmd.Definition "\\$Computer" sdshow "$CurrentName" | Where-Object { $item }
 
             try {
 
@@ -207,7 +207,7 @@
             # Create the custom object with the note properties
             $CustomObject = New-Object -TypeName PSObject -Property (
                 [ordered] @{
-                    Name = $_.Name
+                    Name = $item.Name
                     Dacl = $Dacl
                 }
             )
@@ -215,7 +215,7 @@
             # Add the 'Access' property:
             $CustomObject | Add-Member -MemberType ScriptProperty -Name Access -Value {
                 $this.Dacl.DiscretionaryAcl | ForEach-Object {
-                    $CurrentDacl = $_
+                    $CurrentDacl = $item
 
                     try {
 
@@ -240,7 +240,7 @@
             # Add 'AccessToString' property that mimics a property of the same name from normal Get-Acl call
             $CustomObject | Add-Member -MemberType ScriptProperty -Name AccessToString -Value {
                 $this.Access | ForEach-Object {
-                    '{0} {1} {2}' -f $_.IdentityReference, $_.AccessControlType, $_.ServiceRights
+                    '{0} {1} {2}' -f $item.IdentityReference, $item.AccessControlType, $item.ServiceRights
                 } | Out-String
             }
 
@@ -248,7 +248,7 @@
 
     } #end Process
 
-    End {
+    end {
         $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
             'getting Service ACL.'
         )

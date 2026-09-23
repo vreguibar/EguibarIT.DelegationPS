@@ -1,4 +1,4 @@
-function Get-AdObjectType {
+﻿function Get-AdObjectType {
 
     <#
         .SYNOPSIS
@@ -149,7 +149,7 @@ function Get-AdObjectType {
         [System.String])
     ]
 
-    Param (
+    param (
         # Identity parameter
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $true,
@@ -173,7 +173,7 @@ function Get-AdObjectType {
         $Server
     )
 
-    Begin {
+    begin {
 
         Set-StrictMode -Version Latest
 
@@ -208,7 +208,7 @@ function Get-AdObjectType {
 
     } # End Begin Section
 
-    Process {
+    process {
 
         Write-Verbose -Message ('Attempting to determine the type of AD object for identity: {0}' -f $Identity)
 
@@ -349,7 +349,7 @@ function Get-AdObjectType {
 
     } # End Process Section
 
-    End {
+    end {
         # Display function footer if variables exist
         if ($null -ne $Variables -and
             $null -ne $Variables.FooterDelegation) {

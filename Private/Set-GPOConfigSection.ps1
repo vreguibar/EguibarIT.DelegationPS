@@ -1,4 +1,4 @@
-function Set-GPOConfigSection {
+﻿function Set-GPOConfigSection {
 
     <#
         .SYNOPSIS
@@ -149,7 +149,7 @@ function Set-GPOConfigSection {
         $GptTmpl
     )
 
-    Begin {
+    begin {
 
         Set-StrictMode -Version Latest
 
@@ -181,7 +181,7 @@ function Set-GPOConfigSection {
 
     } #end Begin
 
-    Process {
+    process {
 
         try {
 
@@ -520,7 +520,7 @@ function Set-GPOConfigSection {
         } #end try-catch
     } #end Process
 
-    End {
+    end {
         if ($null -ne $Variables -and
             $null -ne $Variables.FooterDelegation) {
 

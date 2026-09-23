@@ -1,4 +1,4 @@
-﻿Function Get-ExtendedRightHashTable {
+﻿function Get-ExtendedRightHashTable {
     <#
         .SYNOPSIS
             Gets all Extended Rights GUIDs from Active Directory and stores them in a hashtable.
@@ -67,7 +67,7 @@
     )]
     [OutputType([System.Collections.Hashtable])]
 
-    Param(
+    param(
         [Parameter(Mandatory = $false,
             ValueFromPipeline = $false,
             ValueFromPipelineByPropertyName = $false,
@@ -90,7 +90,7 @@
         [string]$Server
     )
 
-    Begin {
+    begin {
 
         Set-StrictMode -Version Latest
 
@@ -110,12 +110,10 @@
 
         [hashtable]$TmpMap = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
         [hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
-        [int32]$i = 0
         [bool]$FillUp = $false
 
         [hashtable]$ProgressSplat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
         [int32]$ProcessedItems = 0
-        [bool]$NeedToFillExtendedRightsMap = $false
         [int32]$BatchSize = 1000 # Optimized batch size for AD queries
 
 
@@ -135,10 +133,10 @@
 
     } #end Begin
 
-    Process {
+    process {
 
         # Check if $Variables.ExtendedRightsMap is Null or Empty
-        If ($Force -or
+        if ($Force -or
             [string]::IsNullOrEmpty($Variables.ExtendedRightsMap) -or
             $Variables.ExtendedRightsMap.Count -eq 0) {
 
@@ -152,7 +150,7 @@
 
         } #end If-Else
 
-        If ( $FillUp ) {
+        if ( $FillUp ) {
             try {
                 Write-Debug -Message 'Getting the GUID value of each Extended Right'
 
@@ -167,7 +165,7 @@
                 Write-Debug -Message ('Found {0} Extended Rights objects' -f $ExtendedRightsCount)
 
                 # Process Extended Rights objects
-                ForEach ($Item in $AllExtended) {
+                foreach ($Item in $AllExtended) {
                     $ProcessedItems++
 
                     # Update progress bar
@@ -241,7 +239,7 @@
                 Write-Error -Message ('Error filling Extended Rights map: {0}' -f $_.Exception.Message)
                 throw
 
-            } Finally {
+            } finally {
 
                 # Complete the progress bar
                 $ProgressSplat = @{
@@ -258,7 +256,7 @@
 
     } #end Process
 
-    End {
+    end {
 
         # Display function footer if variables exist
         if ($null -ne $Variables -and

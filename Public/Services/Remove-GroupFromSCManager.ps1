@@ -1,4 +1,4 @@
-﻿Function Remove-GroupFromSCManager {
+﻿function Remove-GroupFromSCManager {
     <#
         .Synopsis
             Removes a group from the Service Control Manager (SCM) ACL.
@@ -39,7 +39,7 @@
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     [OutputType([void])]
 
-    Param (
+    param (
         # PARAM1 STRING for the Delegated Group Name
         [Parameter(Mandatory = $true,
             ValueFromPipeline = $true,
@@ -69,16 +69,16 @@
         $Force
     )
 
-    Begin {
+    begin {
 
         Set-StrictMode -Version Latest
 
         # Display function header if variables exist
         if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
             $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToString('dd/MMM/yyyy'),
+                (Get-Date).ToString('dd/MMM/yyyy'),
                 $MyInvocation.Mycommand,
-            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
+                (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
             )
             Write-Verbose -Message $txt
         } #end if
@@ -91,8 +91,6 @@
         ##############################
         # Variables Definition
 
-        [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
-
         # Verify Group exist and return it as Microsoft.ActiveDirectory.Management.AdGroup
         $CurrentGroup = Get-AdObjectType -Identity $PSBoundParameters['Group']
 
@@ -104,7 +102,7 @@
 
     } #end Begin
 
-    Process {
+    process {
 
         # get current 'Service Control Manager (SCM)' acl in SDDL format
         Write-Verbose -Message 'Get current "Service Control Manager (SCM)" acl in SDDL format'
@@ -112,7 +110,7 @@
         $MySDDL = if ($Computer) {
             (& $ServiceControlCmd.Definition @("\\$Computer", 'sdshow', 'scmanager'))[1]
         } else {
-           ( & $ServiceControlCmd.Definition @('sdshow', 'scmanager'))[1]
+            ( & $ServiceControlCmd.Definition @('sdshow', 'scmanager'))[1]
         } #end If-Else
 
         Write-Verbose -Message ('Retrieved SDDL: {0}' -f $MySDDL)
@@ -123,7 +121,7 @@
 
         # Search the DACL for the given Group SID. Delete if found!
         Write-Verbose -Message 'Search the DACL for the given Group SID. Delete if found!'
-        If ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove group from SCM?')) {
+        if ($Force -or $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove group from SCM?')) {
 
             $Permission.DiscretionaryAcl | Where-Object { $_.SecurityIdentifier.Value -eq $GroupSID } | ForEach-Object {
                 try {
@@ -147,7 +145,7 @@
                 Write-Verbose -Message 'Get SDDL from Common Security Descriptor.'
                 $sddl = $Permission.GetSddlForm([System.Security.AccessControl.AccessControlSections]::All)
 
-                If ($Computer) {
+                if ($Computer) {
                     & $ServiceControlCmd.Definition @("\\$Computer", 'sdset', 'scmanager', "$sddl")
                 } else {
                     & $ServiceControlCmd.Definition @('sdset', 'scmanager', "$sddl")
@@ -160,7 +158,7 @@
 
     } #end Process
 
-    End {
+    end {
         $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
             'removing Service Control Manager (SCM) access.'
         )

@@ -1,5 +1,5 @@
 ﻿# Remove Account Operators Built-In Group from object
-Function Remove-AccountOperator {
+function Remove-AccountOperator {
     <#
         .SYNOPSIS
             Removes Account Operators built-in group permissions from specified Active Directory objects.
@@ -68,7 +68,7 @@ Function Remove-AccountOperator {
         .ROLE
             Security Administration
     #>
-    
+
     [CmdletBinding(
         SupportsShouldProcess = $true,
         ConfirmImpact = 'Medium'
@@ -147,7 +147,7 @@ Function Remove-AccountOperator {
                 RemoveRule            = $true
             }
 
-            If ($Force -or
+            if ($Force -or
                 $PSCmdlet.ShouldProcess($PSBoundParameters['Group'], 'Remove "Account Operators permissions"?')) {
 
                 Set-AclConstructor5 @Splat

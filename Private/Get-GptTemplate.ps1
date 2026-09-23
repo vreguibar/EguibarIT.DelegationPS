@@ -103,7 +103,7 @@
         $Server
     )
 
-    Begin {
+    begin {
         # Set strict mode to catch syntax errors
         Set-StrictMode -Version Latest
 
@@ -158,11 +158,11 @@
             $env:USERDNSDOMAIN
         } #end if-else
 
-        $PDCEmulator = (Get-ADDomain | Select-Object -Property PDCEmulator).PDCEmulator
+        # $PDCEmulator = (Get-ADDomain | Select-Object -Property PDCEmulator).PDCEmulator
 
     } #end Begin
 
-    Process {
+    process {
         try {
 
             # Get the GPO object
@@ -305,7 +305,7 @@
 
     } #end Process
 
-    End {
+    end {
         # Display function footer if variables exist
         if ($null -ne $Variables -and $null -ne $Variables.FooterDelegation) {
             $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
