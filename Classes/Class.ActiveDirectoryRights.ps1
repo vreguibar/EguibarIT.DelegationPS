@@ -1,6 +1,26 @@
 ﻿class ActiveDirectoryRights : System.Management.Automation.IValidateSetValuesGenerator {
     [String[]] GetValidValues() {
 
+        <#
+        .SYNOPSIS
+            Returns the valid values for the ActiveDirectoryRights validation set.
+
+        .DESCRIPTION
+            This method provides the supported Active Directory rights values used by the
+            module's access-control validation metadata and parameter constraints.
+
+        .OUTPUTS
+            System.String[]
+
+        .NOTES
+            Version:         2.0
+            DateModified:    23/09/2026
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
+        #>
+
         $ActiveDirectoryRights = @(
             'AccessSystemSecurity',
             'CreateChild',

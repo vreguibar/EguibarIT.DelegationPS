@@ -1,5 +1,35 @@
 ﻿# Function to check if a class is already loaded
 function Test-ClassExist {
+    <#
+        .SYNOPSIS
+            Determines whether a .NET type is already loaded in the current PowerShell session.
+
+        .DESCRIPTION
+            The Test-ClassExist function checks whether the specified full type name is already
+            available in the current session and returns a bool indicating the result.
+
+        .PARAMETER ClassName
+            The fully qualified .NET type name to check.
+
+        .EXAMPLE
+            Test-ClassExist -ClassName 'System.DateTime'
+
+            Returns $true when the type is already loaded.
+
+        .INPUTS
+            System.String
+
+        .OUTPUTS
+            System.Boolean
+
+        .NOTES
+            Version:         2.0
+            DateModified:    23/09/2026
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
+    #>
 
     [CmdletBinding()]
     [OutputType([bool])]

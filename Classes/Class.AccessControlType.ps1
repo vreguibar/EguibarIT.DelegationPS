@@ -1,6 +1,26 @@
 ﻿class AccessControlType : System.Management.Automation.IValidateSetValuesGenerator {
     [String[]] GetValidValues() {
 
+        <#
+        .SYNOPSIS
+            Returns the valid values for the AccessControlType validation set.
+
+        .DESCRIPTION
+            This method provides the supported access-control values used by the module's
+            validation metadata and parameter constraints.
+
+        .OUTPUTS
+            System.String[]
+
+        .NOTES
+            Version:         2.0
+            DateModified:    23/09/2026
+            LastModifiedBy:  Vicente Rodriguez Eguibar
+                            vicente@eguibar.com
+                            Eguibar IT
+                            http://www.eguibarit.com
+        #>
+
         $AccessControlType = @(
             'Allow',
             'Deny'
