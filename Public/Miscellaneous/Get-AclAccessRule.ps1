@@ -1,4 +1,4 @@
-﻿Function Get-AclAccessRule {
+﻿function Get-AclAccessRule {
     <#
         .SYNOPSIS
             Retrieves and displays Access Control Entries (ACEs) of an Active Directory object.
@@ -8,7 +8,7 @@
             It can filter the results by identity reference. The function supports both pipeline input and batch processing
             for efficient handling of multiple objects. Use this function to analyze and audit permissions on AD objects.
 
-            The Tool will return an arrayList with the following information:
+            The Tool will return a Generic.List[PSCustomObject] with the following information:
 
             ACENumber             : 1
             Id                    : Everyone
@@ -138,7 +138,7 @@
             Retrieves ACEs for all OUs with names starting with "IT", demonstrating pipeline integration with AD cmdlets.
 
         .OUTPUTS
-            [System.Collections.ArrayList] containing PSCustomObjects with ACE properties
+            [System.Collections.Generic.List[PSCustomObject]] containing ACE objects
             Each object contains:
             - ACENumber: Sequential number of the ACE
             - Id: Identity Reference (trustee)
@@ -185,7 +185,7 @@
         SupportsShouldProcess = $false,
         ConfirmImpact = 'Low'
     )]
-    [OutputType([System.Collections.ArrayList])]
+    [OutputType([System.Collections.Generic.List[PSCustomObject]])]
 
     param
     (
@@ -215,7 +215,7 @@
         $SearchBy
     )
 
-    Begin {
+    begin {
 
         Set-StrictMode -Version Latest
 
@@ -240,7 +240,7 @@
         # Variables Definition
 
         [Hashtable]$Splat = [hashtable]::New([StringComparer]::OrdinalIgnoreCase)
-        [System.Collections.ArrayList]$result = [System.Collections.ArrayList]::New()
+        [System.Collections.Generic.List[PSCustomObject]]$Result = [System.Collections.Generic.List[PSCustomObject]]::new()
         [System.Text.StringBuilder]$sb = [System.Text.StringBuilder]::new()
 
         # Define ANSI escape codes for colors
@@ -271,7 +271,7 @@
 
     } #end Begin
 
-    Process {
+    process {
 
         # Clear StringBuilder for new processing
         [void]$sb.Clear()
@@ -281,7 +281,7 @@
         Write-Verbose -Message ('Processing LDAP path: {0}' -f $LDAPPath)
 
 
-        Try {
+        try {
             # Get the ACL for the current path
             $Acl = Get-Acl -Path $PSBoundParameters['LDAPpath'] -ErrorAction Stop
 
@@ -293,7 +293,7 @@
 
             } #end If
 
-            If ($PSBoundParameters['searchBy']) {
+            if ($PSBoundParameters['searchBy']) {
 
                 $AclAccess = @($Acl |
                         Select-Object -ExpandProperty Access |
@@ -349,7 +349,7 @@
                     InheritedObjectType   = (Convert-GUIDToName -guid $entry.InheritedObjectType -Verbose:$false)
                     IsInherited           = $entry.IsInherited
                 }
-                [void]$result.Add($ACLResult)
+                $Result.Add($ACLResult)
 
             } #end Foreach
 
@@ -377,7 +377,7 @@
         } #end try-catch
     } #end Process
 
-    End {
+    end {
         # Display footer if variables exist
         if ($null -ne $Variables -and
             $null -ne $Variables.FooterDelegation) {
