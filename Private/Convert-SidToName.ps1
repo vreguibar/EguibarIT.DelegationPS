@@ -90,7 +90,10 @@
 
     #>
 
-    [CmdletBinding()]
+    [CmdletBinding(
+        SupportsShouldProcess = $false,
+        ConfirmImpact = 'Low'
+    )]
     [OutputType([string])]
 
     param (

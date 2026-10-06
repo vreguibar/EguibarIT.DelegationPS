@@ -83,7 +83,10 @@
             Event Logging
     #>
 
-    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Low')]
+    [CmdletBinding(
+        SupportsShouldProcess = $true,
+        ConfirmImpact = 'Low'
+    )]
     [OutputType([void])]
 
     param (
@@ -94,7 +97,10 @@
             HelpMessage = 'Maximum size of the Event file.',
             Position = 0)]
         [ValidateRange(64, 1048576)]  # Minimum of 64 KB, max of 1 GB
-        [PSDefaultValue(Help = 'Default Value is "16384"')]
+        [PSDefaultValue(
+            Help = 'Default Value is "16384"',
+            Value = 16384
+        )]
         [int]
         $MaximumKilobytes = 16384, # default to 16 MB
 
@@ -105,12 +111,15 @@
             HelpMessage = 'Maximum day to retain events.',
             Position = 0)]
         [ValidateRange(1, 365)]  # Minimum of 1 day, max of 1 year
-        [PSDefaultValue(Help = 'Default Value is "30"')]
+        [PSDefaultValue(
+            Help = 'Default Value is "30"',
+            Value = 30
+        )]
         [int]
         $RetentionDays = 30         # default to 30 days
     )
 
-    Begin {
+    begin {
 
         Set-StrictMode -Version Latest
 
@@ -136,7 +145,7 @@
 
     } #end Begin
 
-    Process {
+    process {
         # Retry logic with up to 3 attempts
         if (-not $Variables.EventLogInitialized) {
             try {
@@ -205,7 +214,7 @@
 
     } #end Process
 
-    End {
+    end {
         $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
             'initializing Event Logging. (Private Function)'
         )

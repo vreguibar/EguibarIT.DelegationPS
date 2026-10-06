@@ -89,6 +89,8 @@
 
     begin {
 
+        Set-StrictMode -Version Latest
+
         # mapping hashtable containing:
         #     Keys as privilege right names (e.g. SeNetworkLogonRight, SeDenyNetworkLogonRight)
         #     Values as description of the right (e.g. 'Access this computer from the network', 'Deny access to this computer from the network')

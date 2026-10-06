@@ -96,8 +96,10 @@
             Identity Validation
     #>
 
-    [CmdletBinding(ConfirmImpact = 'Low',
-        SupportsShouldProcess = $false)]
+    [CmdletBinding(
+        ConfirmImpact = 'Low',
+        SupportsShouldProcess = $false
+    )]
     [OutputType([bool])]
 
     param (
@@ -113,7 +115,7 @@
         $ObjectGUID
     )
 
-    Begin {
+    begin {
 
         Set-StrictMode -Version Latest
 
@@ -129,9 +131,9 @@
 
     } #end Begin
 
-    Process {
+    process {
 
-        Try {
+        try {
 
             # Perform the actual validation
             #$isValid = $ObjectDN -match $distinguishedNameRegex

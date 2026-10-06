@@ -69,6 +69,7 @@
     #>
 
     [CmdletBinding(SupportsShouldProcess = $true)]
+    [OutputType([void])]
 
     param(
 
@@ -118,16 +119,16 @@
 
     )
 
-    Begin {
+    begin {
 
         Set-StrictMode -Version Latest
 
         # Display function header if variables exist
         if ($null -ne $Variables -and $null -ne $Variables.HeaderDelegation) {
             $txt = ($Variables.HeaderDelegation -f
-            (Get-Date).ToString('dd/MMM/yyyy'),
+                (Get-Date).ToString('dd/MMM/yyyy'),
                 $MyInvocation.Mycommand,
-            (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
+                (Get-FunctionDisplay -HashTable $PsBoundParameters -Verbose:$False)
             )
             Write-Verbose -Message $txt
         } #end if
@@ -213,7 +214,7 @@
 
     } #end Begin
 
-    Process {
+    process {
 
         # Iterate all services
         foreach ($service in $ServiceName) {
@@ -365,7 +366,7 @@
         } #end Foreach Service
     } #end Process
 
-    End {
+    end {
         $txt = ($Variables.FooterDelegation -f $MyInvocation.InvocationName,
             'setting permissions on service.'
         )
